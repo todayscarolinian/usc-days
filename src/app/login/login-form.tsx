@@ -11,12 +11,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export const description =
-  "A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account."
+import { login } from "./actions"
 
 export function LoginForm() {
   return (
-    <Card className="mx-auto max-w-sm">
+    <form>
+      <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
@@ -30,7 +30,8 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="example@usc.edu.ph"
+              name='email'
               required
             />
           </div>
@@ -41,9 +42,9 @@ export function LoginForm() {
                 Forgot your password?
               </Link>
             </div>
-            <Input id="password" type="password" required />
+            <Input id="password" type="password" name='password' required />
           </div>
-          <Button type="submit" className="w-full">
+          <Button formAction={login} type="submit" className="w-full">
             Login
           </Button>
           <Button variant="outline" className="w-full">
@@ -58,5 +59,7 @@ export function LoginForm() {
         </div>
       </CardContent>
     </Card>
+    </form>
+    
   )
 }
