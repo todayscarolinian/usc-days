@@ -6,7 +6,17 @@
       "password": "password123",
       "email": "23100371@usc.edu.ph",
       "name": "Luis Andrei Ouano",
-      "role_id": 1
+      "role_id": 1,
+      "active": true
+    },
+    {
+      "user_id": 1,
+      "username": "ssiwsiw",
+      "password": "password321",
+      "email": "23000371@usc.edu.ph",
+      "name": "Luisa Andrea Ouano",
+      "role_id": 1,
+      "active": false
     }
   ]
 }

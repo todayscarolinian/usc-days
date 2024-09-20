@@ -27,10 +27,14 @@ export async function login(formData: FormData) {
     method: 'GET',
   })
   const users = await response.json()
-  const user = users.find((u: { email: string; password: string }) => u.email === data.email && u.password === data.password)
+  const user = users.find((u: { 
+    email: string; 
+    password: string;
+    active: boolean;
+  }) => u.email === data.email && u.password === data.password && u.active === true)
 
   if (!user) {
-    console.log('Invalid credentials')
+    console.log('Invalid credentials or account is inactive')
   }else{
     redirect('/')
   }
