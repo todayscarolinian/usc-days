@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'; // Ensure correct path to Prisma client
+import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 class AuthService {
