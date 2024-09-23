@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import {
   ColumnDef,
@@ -21,7 +21,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "./advanced-search";
+import { AdvancedSearch } from "./advanced-search"; // Import your AdvancedSearch component
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,7 +47,8 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 8,
-  })
+  });
+  const [isAdvancedSearchOpen, setAdvancedSearchOpen] = useState(false); // State for dialog visibility
 
   const table = useReactTable({
     data,
@@ -68,29 +69,42 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  console.log(`Pagination index: ${pagination.pageIndex}`);
+  const handleOpenAdvancedSearch = () => {
+    setAdvancedSearchOpen(true);
+  };
+
+  const handleCloseAdvancedSearch = () => {
+    setAdvancedSearchOpen(false);
+  };
 
   return (
     <div className="rounded-md border m-4">
-      <div className="p-6 bg-black flex gap-6 justify-between">
+      <div className="p-6 bg-black flex gap-4 justify-between items-center">
         <h1 className="uppercase text-white text-3xl font-semibold">
           USC Days
         </h1>
 
-        {/* 
-          Multiple filters - To be transfered in a button which shows a dialog for this multiple filters options.
-          TODO: Create new component for this as it is getting messier
-         */}
-        {/* <AdvancedSearch /> */}
-        
-        <Input
-          placeholder="Keyword search"
-          onChange={e => table.setGlobalFilter(e.target.value)}
-          className="max-w-sm" 
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search teams"
+            onChange={e => table.setGlobalFilter(e.target.value)}
+            className="max-w-sm" 
+          />
+          <button
+            onClick={handleOpenAdvancedSearch}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Filters
+          </button>
+        </div>
       </div>
 
-      {/* Data table (Date, Sport, Teams, Score, Winner, Actions - if staff authenticated) */}
+      {/* Advanced Search Dialog */}
+      {isAdvancedSearchOpen && (
+        <AdvancedSearch onClose={handleCloseAdvancedSearch} />
+      )}
+
+      {/* Data table */}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -101,9 +115,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 );
               })}
@@ -135,12 +149,15 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col gap-4 items-center justify-center p-4">
         <Pagination>
           <PaginationContent>
-            {/* Previous Button */}
             <PaginationItem>
-              <PaginationPrevious href="#" onClick={() => { table.previousPage(); console.log(table.getState().pagination.pageIndex) }}/>
+              <PaginationPrevious
+                href="#"
+                onClick={() => {
+                  table.previousPage();
+                }}
+              />
             </PaginationItem>
 
-            {/* Number of pages */}
             {Array.from({ length: table.getPageCount() }).map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
@@ -151,11 +168,14 @@ export function DataTable<TData, TValue>({
                 </PaginationLink>
               </PaginationItem>
             ))}
-            
 
-            {/* Next Button */}
             <PaginationItem>
-              <PaginationNext href="#" onClick={() => { table.nextPage(); console.log(table.getState().pagination.pageIndex) }} />
+              <PaginationNext
+                href="#"
+                onClick={() => {
+                  table.nextPage();
+                }}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

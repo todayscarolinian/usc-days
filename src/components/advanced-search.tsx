@@ -44,6 +44,7 @@ const FormSchema = z.object({
   game: z.string(),
   team1: z.string(),
   team2: z.string(),
+  location: z.string().optional(), // New location filter
 })
 
 export function AdvancedSearch() {
@@ -66,6 +67,7 @@ export function AdvancedSearch() {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Date Picker */}
             <FormField
               control={form.control}
               name="date"
@@ -106,6 +108,8 @@ export function AdvancedSearch() {
                 </FormItem>
               )}
             />
+            
+            {/* Game Selector */}
             <FormField
               control={form.control}
               name="game"
@@ -118,15 +122,40 @@ export function AdvancedSearch() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">m@example.com</SelectItem>
-                      <SelectItem value="m@google.com">m@google.com</SelectItem>
-                      <SelectItem value="m@support.com">m@support.com</SelectItem>
+                      <SelectItem value="game1">Game 1</SelectItem>
+                      <SelectItem value="game2">Game 2</SelectItem>
+                      <SelectItem value="game3">Game 3</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Location Filter */}
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="location1">Location 1</SelectItem>
+                      <SelectItem value="location2">Location 2</SelectItem>
+                      <SelectItem value="location3">Location 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Team Selection */}
             <div className="border p-4 flex flex-col gap-4">
               <Label>Select Teams</Label>
               <div className="flex flex-col gap-3">
@@ -142,9 +171,9 @@ export function AdvancedSearch() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="m@example.com">m@example.com</SelectItem>
-                          <SelectItem value="m@google.com">m@google.com</SelectItem>
-                          <SelectItem value="m@support.com">m@support.com</SelectItem>
+                          <SelectItem value="teamA">Team A</SelectItem>
+                          <SelectItem value="teamB">Team B</SelectItem>
+                          <SelectItem value="teamC">Team C</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -164,9 +193,9 @@ export function AdvancedSearch() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="m@example.com">m@example.com</SelectItem>
-                          <SelectItem value="m@google.com">m@google.com</SelectItem>
-                          <SelectItem value="m@support.com">m@support.com</SelectItem>
+                          <SelectItem value="teamD">Team D</SelectItem>
+                          <SelectItem value="teamE">Team E</SelectItem>
+                          <SelectItem value="teamF">Team F</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -175,6 +204,7 @@ export function AdvancedSearch() {
                 />
               </div>
             </div>
+            
             <DialogClose asChild>
               <Button type="submit">Search</Button>
             </DialogClose>
