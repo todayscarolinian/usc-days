@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import AuthService from "@/services/auth.service";
 import { prisma } from "@/lib/prisma";
+import { Score } from "@/types/scores.types";
 
 // GET /api/scores - fetch all scores
 export async function GET() {
-  const scores = await prisma.score.findMany({
+  const scores: Score[] = await prisma.score.findMany({
     include: {
       game: {
         include: {
@@ -27,9 +26,15 @@ export async function GET() {
 
 // POST /api/scores - Add a new score
 export async function POST(req: Request) {
-  const { game_id, team_a_score, team_b_score, created_by } = await req.json();
+  const { gameId, teamAScore, teamBScore, createdBy } =
+    (await req.json()) as Score;
 
-  if (!game_id || !team_a_score || !team_b_score || !created_by) {
+  if (
+    !gameId ||
+    teamAScore === undefined ||
+    teamBScore === undefined ||
+    !createdBy
+  ) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -38,10 +43,10 @@ export async function POST(req: Request) {
 
   const newScore = await prisma.score.create({
     data: {
-      game_id,
-      team_a_score,
-      team_b_score,
-      created_by,
+      gameId,
+      teamAScore,
+      teamBScore,
+      createdBy,
     },
   });
 
@@ -57,11 +62,11 @@ export async function POST(req: Request) {
 
 // PUT /api/scores - Edit an existing score
 export async function PUT(req: Request) {
-  const { game_id, team_a_score, team_b_score } = await req.json();
+  const { gameId, teamAScore, teamBScore } = (await req.json()) as Score;
 
   const updatedScore = await prisma.score.update({
-    where: { game_id },
-    data: { team_a_score, team_b_score },
+    where: { gameId },
+    data: { teamAScore, teamBScore },
   });
 
   if (!updatedScore) {
@@ -76,10 +81,10 @@ export async function PUT(req: Request) {
 
 // DELETE /api/scores - Delete a score
 export async function DELETE(req: Request) {
-  const { game_id } = await req.json();
+  const { gameId } = (await req.json()) as Score;
 
   const deletedScore = await prisma.score.delete({
-    where: { game_id },
+    where: { gameId },
   });
 
   if (!deletedScore) {
