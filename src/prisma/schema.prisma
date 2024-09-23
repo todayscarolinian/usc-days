@@ -1,7 +1,7 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("POSTGRES_DATABASE_URL")
-  directUrl         = env("POSTGRES_DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_DB_URL")
+  directUrl = env("POSTGRES_DIRECT_URL")
 }
 
 generator client {
@@ -9,78 +9,80 @@ generator client {
 }
 
 model User {
-  userId    Int    @id @default(autoincrement()) @map("user_id")
-  email     String @unique @db.VarChar(100)
-  name      String @db.VarChar(100)
-  roleId    Int    @map("role_id")
-  role      Role   @relation(fields: [roleId], references: [roleId])
+  id    Int     @id @default(autoincrement())
+  email String  @unique @db.VarChar(100)
+  Score Score[]
 
   @@map("users")
 }
 
-model Role {
-  roleId    Int    @id @default(autoincrement()) @map("role_id")
-  roleName  String @unique @db.VarChar(50) @map("role_name")
-
-  users     User[]
-
-  @@map("roles")
-}
-
 model Team {
-  teamId    Int    @id @default(autoincrement()) @map("team_id")
-  teamName  String @db.VarChar(100) @map("team_name")
-  schoolId  Int    @map("school_id")
-  school    School @relation(fields: [schoolId], references: [schoolId])
+  id       Int    @id @default(autoincrement())
+  teamName String @map("team_name") @db.VarChar(100)
+  schoolId Int    @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  gameTypes  TeamGameType[]
+  teamAGames Game[]         @relation("TeamAGames")
+  teamBGames Game[]         @relation("TeamBGames")
 
   @@map("teams")
 }
 
 model School {
-  schoolId   Int    @id @default(autoincrement()) @map("school_id")
-  schoolName String @unique @db.VarChar(100) @map("school_name")
+  id         Int    @id @default(autoincrement())
+  schoolName String @unique @map("school_name") @db.VarChar(100)
 
-  teams      Team[]
+  teams Team[]
 
   @@map("schools")
 }
 
 model GameType {
-  gameTypeId    Int    @id @default(autoincrement()) @map("game_type_id")
-  gameName      String @db.VarChar(100) @map("game_name")
-  scoringFormat String @db.VarChar(50) @map("scoring_format")
+  id       Int    @id @default(autoincrement())
+  gameName String @map("game_name") @db.VarChar(100)
 
-  games         Game[]
+  games Game[]
+  teams TeamGameType[]
 
   @@map("game_types")
 }
 
+model TeamGameType {
+  id     Int  @id @default(autoincrement())
+  teamId Int  @map("team_id")
+  team   Team @relation(fields: [teamId], references: [id])
+
+  gameTypeId Int      @map("game_type_id")
+  gameType   GameType @relation(fields: [gameTypeId], references: [id])
+
+  @@map("team_game_types")
+}
+
 model Game {
-  gameId           Int      @id @default(autoincrement()) @map("game_id")
-  gameTypeId       Int      @map("game_type_id")
-  gameType         GameType @relation(fields: [gameTypeId], references: [gameTypeId])
-  teamAId          Int      @map("team_a_id")
-  teamBId          Int      @map("team_b_id")
-  teamA            Team     @relation("TeamA", fields: [teamAId], references: [teamId])
-  teamB            Team     @relation("TeamB", fields: [teamBId], references: [teamId])
-  scheduledDateTime DateTime @map("scheduled_date_time")
-  location         String?  @db.VarChar(255)
-  status           String   @db.VarChar(50)
-  score            Score?   @relation(fields: [gameId], references: [gameId])
+  id         Int      @id @default(autoincrement())
+  gameTypeId Int      @map("game_type_id")
+  gameType   GameType @relation(fields: [gameTypeId], references: [id])
+  teamAId    Int      @map("team_a_id")
+  teamBId    Int      @map("team_b_id")
+  teamA      Team     @relation("TeamAGames", fields: [teamAId], references: [id])
+  teamB      Team     @relation("TeamBGames", fields: [teamBId], references: [id])
+  date       DateTime @default(now())
+  location   String?  @db.VarChar(255)
+  score      Score?
 
   @@map("games")
 }
 
 model Score {
-  scoreId      Int      @id @default(autoincrement()) @map("score_id")
-  gameId       Int      @unique @map("game_id")
-  game         Game?    @relation(fields: [gameId], references: [gameId])
-  teamAScore   Decimal  @db.Decimal(10, 2) @map("team_a_score")
-  teamBScore   Decimal  @db.Decimal(10, 2) @map("team_b_score")
-  createdAt    DateTime @default(now()) @map("created_at")
-  createdBy    Int      @map("created_by")
-  createdByUser User    @relation(fields: [createdBy], references: [userId])
+  id          Int      @id @default(autoincrement())
+  gameId      Int      @unique @map("game_id")
+  game        Game     @relation(fields: [gameId], references: [id])
+  teamAScore  Decimal  @map("team_a_score") @db.Decimal(10, 2)
+  teamBScore  Decimal  @map("team_b_score") @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  createdById Int      @map("created_by")
+  createdBy   User     @relation(fields: [createdById], references: [id])
 
   @@map("scores")
 }
-
