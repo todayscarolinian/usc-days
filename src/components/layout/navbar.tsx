@@ -21,12 +21,16 @@ const nav_items = [
     name: "Home"
   },
   {
-    href: "/rankings",
-    name: "Rankings"
+    href: "#",
+    name: "Scoring"
   },
   {
     href: "#",
-    name: "Champion"
+    name: "Schedules"
+  },
+  {
+    href: "/rankings",
+    name: "Rankings"
   },
 ]
 
