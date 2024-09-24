@@ -27,13 +27,13 @@ export async function GET() {
     );
   }
 
-  const userInDatabase = await AuthService.isUserInDatabase({ email });
-  if (!userInDatabase) {
-    return NextResponse.json({ session: null }, { status: 401 });
+  const currentUser = await AuthService.userInDatabase({ email });
+  if (!currentUser) {
+    return NextResponse.json({ session: null, currentUser }, { status: 401 });
   }
 
   // Return the session
-  return NextResponse.json({ session }, { status: 200 });
+  return NextResponse.json({ session, currentUser }, { status: 200 });
 }
 
 // POST /api/user
