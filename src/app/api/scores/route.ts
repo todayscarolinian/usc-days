@@ -1,98 +1,83 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import ScoreService from "@/services/scores.service";
 import { Score } from "@/types/scores.types";
+
+const scoreService = new ScoreService();
 
 // GET /api/scores - fetch all scores
 export async function GET() {
-  const scores: Score[] = await prisma.score.findMany({
-    include: {
-      game: {
-        include: {
-          teamA: true,
-          teamB: true,
-          gameType: true,
-        },
-      },
-      createdBy: true,
-    },
-  });
+  try {
+    const scores = await scoreService.getScores();
 
-  if (!scores) {
-    return NextResponse.json({ scores: null }, { status: 401 });
+    if (!scores) {
+      return NextResponse.json({ scores: null }, { status: 401 });
+    }
+
+    NextResponse.json({ scores }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error in fetching scores: ", error);
+    NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ scores }, { status: 200 });
 }
 
 // POST /api/scores - Add a new score
 export async function POST(req: Request) {
-  const { gameId, teamAScore, teamBScore, createdBy } =
-    (await req.json()) as Score;
+  try {
+    const { gameId, teamAScore, teamBScore, createdBy } =
+      (await req.json()) as Score;
 
-  if (
-    !gameId ||
-    teamAScore === undefined ||
-    teamBScore === undefined ||
-    !createdBy
-  ) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
-  }
+    if (
+      !gameId ||
+      teamAScore === undefined ||
+      teamBScore === undefined ||
+      !createdBy
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
 
-  const newScore = await prisma.score.create({
-    data: {
+    const newScore = await scoreService.createScore({
       gameId,
       teamAScore,
       teamBScore,
       createdBy,
-    },
-  });
+    });
 
-  if (!newScore) {
-    return NextResponse.json(
-      { error: "Unable to create score" },
-      { status: 500 }
-    );
+    return NextResponse.json({ newScore });
+  } catch (error: any) {
+    console.error("Error creating score: ", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ newScore }, { status: 201 });
 }
 
 // PUT /api/scores - Edit an existing score
 export async function PUT(req: Request) {
-  const { gameId, teamAScore, teamBScore } = (await req.json()) as Score;
+  try {
+    const { gameId, teamAScore, teamBScore } = (await req.json()) as Score;
+    const updatedScore = await scoreService.updateScore({
+      gameId,
+      teamAScore,
+      teamBScore,
+    });
 
-  const updatedScore = await prisma.score.update({
-    where: { gameId },
-    data: { teamAScore, teamBScore },
-  });
-
-  if (!updatedScore) {
-    return NextResponse.json(
-      { error: "Unable to update score" },
-      { status: 500 }
-    );
+    return NextResponse.json({ updatedScore }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error updating score: ", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ updatedScore }, { status: 200 });
 }
 
 // DELETE /api/scores - Delete a score
 export async function DELETE(req: Request) {
-  const { gameId } = (await req.json()) as Score;
+  try {
+    const { gameId } = (await req.json()) as Score;
+    const deletedScore = await scoreService.deleteScore(gameId);
 
-  const deletedScore = await prisma.score.delete({
-    where: { gameId },
-  });
-
-  if (!deletedScore) {
-    return NextResponse.json(
-      { error: "Unable to delete score" },
-      { status: 500 }
-    );
+    return NextResponse.json({ deletedScore }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error deleting score: ", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ deletedScore }, { status: 200 });
 }
