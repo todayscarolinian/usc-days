@@ -1,5 +1,5 @@
-import { DataTable } from "@/components/data-table";
-import { championColumns } from "@/components/columns";
+import { DataTable } from "@/components/Scores/score-table";
+import { championColumns } from "@/components/Scores/columns";
 import { mockChampionsData } from "@/constants/mockData";
 
 const Champions = () => {
