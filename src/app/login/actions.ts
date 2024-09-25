@@ -1,41 +1,48 @@
 'use server'
 
-// import { revalidatePath } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/client'
+import { supabase } from "@/lib/supabase";
 
-// import { createClient } from '@/utils/supabase/server'
-
-export async function login(formData: FormData) {
-  // const supabase = createClient()
+export async function loginWithPassword(formData: FormData) {
+  const supabase = createClient()
 
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   }
 
-  // uncomment once supabase client is already set up
+  const { error } = await supabase.auth.signInWithPassword(data)
+  if (error) {
+    // will need to setup error notif 
+    console.log(error)
+  }
+  revalidatePath('/', 'layout')
+  redirect('/scoring')
+}
 
-  // const { error } = await supabase.auth.signInWithPassword(data)
-  // if (error) {
-  //   redirect('/error')
-  // }
-  // revalidatePath('/', 'layout')
-  // redirect('/')
+const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+    'http://localhost:3000/scoring'
+  url = url.startsWith('http') ? url : `https://${url}`
+  url = url.endsWith('/') ? url : `${url}/`
+  return url
+}
 
-  // mock data fetching, remove this once supabase client is already set up
-  const response = await fetch('http://localhost:3001/users', {
-    method: 'GET',
-  })
-  const users = await response.json()
-  const user = users.find((u: { 
-    email: string; 
-    password: string;
-    active: boolean;
-  }) => u.email === data.email && u.password === data.password && u.active === true)
+export async function loginWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: getURL()
+    }
+  });
 
-  if (!user) {
-    console.log('Invalid credentials or account is inactive')
+  if(error){
+    console.log(error)
   }else{
-    redirect('/')
+    return redirect(data.url)
   }
 }

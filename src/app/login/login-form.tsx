@@ -1,5 +1,4 @@
 import Link from "next/link"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,26 +10,26 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { login } from "./actions"
+import { loginWithGoogle, loginWithPassword } from "./actions"
 
 export function LoginForm() {
   return (
-    <form>
       <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your usc email below to login to your account
+          Enter your staff email below to login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <form>
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              placeholder="example@usc.edu.ph"
+              placeholder="example@gmail.com"
               name='email'
               required
             />
@@ -44,16 +43,23 @@ export function LoginForm() {
             </div>
             <Input id="password" type="password" name='password' required />
           </div>
-          <Button formAction={login} type="submit" className="w-full">
+          <Button formAction={loginWithPassword} type="submit" className="w-full">
             Login
           </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
+        </div>
+        </form>
+        <form action={loginWithGoogle}>
+          <Button variant="outline" className="w-full mt-3">
+              Login with Google
           </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{" "}
+          <Link href="#" className="underline">
+            Contact us
+          </Link>
         </div>
       </CardContent>
     </Card>
-    </form>
-    
   )
 }
