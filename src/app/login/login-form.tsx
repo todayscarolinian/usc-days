@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,10 +11,24 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/components/hooks/use-toast"
 
 import { loginWithGoogle, loginWithPassword } from "./actions"
 
 export function LoginForm() {
+  const { toast } = useToast()
+  
+  const handleLogin = async (formData: FormData) => {
+    const response = await loginWithPassword(formData)
+
+    if (response?.error) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed!",
+        description: "Invalid username or password",
+      })
+    }
+  }
   return (
       <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -43,7 +59,7 @@ export function LoginForm() {
             </div>
             <Input id="password" type="password" name='password' required />
           </div>
-          <Button formAction={loginWithPassword} type="submit" className="w-full">
+          <Button formAction={async (formData) =>  await handleLogin(formData) } type="submit" className="w-full">
             Login
           </Button>
         </div>

@@ -15,9 +15,7 @@ export async function loginWithPassword(formData: FormData) {
 
   const { error } = await supabase.auth.signInWithPassword(data)
   if (error) {
-    // should setup toast for invalid credentials
-    console.log(error)
-    redirect('/error')
+    return { error: error.message }
   }
   revalidatePath('/', 'layout')
   redirect('/scoring')

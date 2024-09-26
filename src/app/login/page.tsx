@@ -1,4 +1,5 @@
 import { LoginForm } from '@/app/login/login-form'
+import { Toaster } from "@/components/ui/toaster"
 
 export default function LoginPage() {
   return (
@@ -6,6 +7,7 @@ export default function LoginPage() {
       <div className="mt-[-140px]">
         <LoginForm />
       </div>
+      <Toaster />
     </div>
   )
 }
