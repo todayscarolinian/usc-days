@@ -25,7 +25,7 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: "Login Failed!",
-        description: "Invalid username or password",
+        description: response?.error,
       })
     }
   }
