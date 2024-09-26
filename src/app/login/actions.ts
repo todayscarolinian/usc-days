@@ -15,8 +15,9 @@ export async function loginWithPassword(formData: FormData) {
 
   const { error } = await supabase.auth.signInWithPassword(data)
   if (error) {
-    // will need to setup error notif 
+    // should setup toast for invalid credentials
     console.log(error)
+    redirect('/error')
   }
   revalidatePath('/', 'layout')
   redirect('/scoring')
@@ -42,6 +43,7 @@ export async function loginWithGoogle() {
 
   if(error){
     console.log(error)
+    redirect('/error')
   }else{
     return redirect(data.url)
   }
