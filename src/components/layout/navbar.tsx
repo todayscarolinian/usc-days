@@ -76,21 +76,13 @@ export default function Navbar() {
                 width={50}
                 height={50}
               />
-              <Link href="/" className="text-white">
-                Home
-              </Link>
-              <Link
-                href="/rankings"
-                className="text-white"
-              >
-                Rankings
-              </Link>
-              <Link
-                href="#"
-                className="text-white"
-              >
-                Champions
-              </Link>
+              {
+                nav_items.map((i) => (
+                  <Link key={i.href} href={i.href} className="text-white">
+                    {i.name}
+                  </Link>
+                ))
+              }
             </nav>
           </SheetContent>
         </Sheet>
