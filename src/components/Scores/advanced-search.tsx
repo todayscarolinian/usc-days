@@ -75,7 +75,7 @@ export function AdvancedSearch() {
           <FaFilter />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="h-full flex flex-col justify-center">
         <DialogHeader>
           <DialogTitle>Advanced Search</DialogTitle>
         </DialogHeader>

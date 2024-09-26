@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
                 <TableHead className="p-6">
                   <span className="font-bold sm:text-lg">Action</span>
                 </TableHead>
-              ): (
+              ) : (
                 ""
               )}
             </TableRow>
@@ -154,11 +154,11 @@ export function DataTable<TData, TValue>({
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                 {userMockData.role === "staff" ? (
                   <TableCell className="p-6">
-                    <Button className="bg-green-400 hover:bg-green-600">
+                    <Button className="bg-[#9B2626] hover:bg-[#771D1D]">
                       <FaRegEdit />
                     </Button>
                   </TableCell>
-                ):(
+                ) : (
                   ""
                 )}
               </TableRow>
@@ -198,6 +198,11 @@ export function DataTable<TData, TValue>({
                 <PaginationLink
                   isActive={index === table.getState().pagination.pageIndex}
                   onClick={() => table.setPageIndex(index)}
+                  className={`px-4 py-2 rounded-md ${
+                    index === table.getState().pagination.pageIndex
+                      ? "border-[#9B2626]"
+                      : "border-none"
+                  }`}
                 >
                   {index + 1}
                 </PaginationLink>
