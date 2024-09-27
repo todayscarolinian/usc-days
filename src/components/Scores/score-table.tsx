@@ -6,6 +6,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   PaginationState,
+  SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -50,6 +51,12 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 8,
   });
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "date",
+      desc: true,
+    }
+  ]) 
   const filters = useFilter();
 
   useEffect(() => {
@@ -88,11 +95,13 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     globalFilterFn: "includesString",
     state: {
       globalFilter,
       columnFilters,
       pagination,
+      sorting
     },
   });
 

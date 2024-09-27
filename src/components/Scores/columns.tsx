@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, SortingFn } from "@tanstack/react-table";
 import { Scores } from "@/types/types";
 import { Champions } from "@/types/types";
 import { 
@@ -24,10 +24,22 @@ const sportIcons: Record<string, JSX.Element> = {
   // Add other sports and their icons here
 };
 
+const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
+  const dateStrA = rowA.getValue<string>(columnId);
+  const dateStrB = rowB.getValue<string>(columnId);
+
+  // Convert the formatted date strings to Date objects
+  const dateA = new Date(dateStrA);
+  const dateB = new Date(dateStrB);
+
+  // Compare the Date objects (ascending order)
+  return dateA.getTime() - dateB.getTime();
+};
+
 export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "date",
-    accessorKey: "date",
+    accessorFn: (row) => formatLongDate(row.date), // Create derived field
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const date = info.getValue<string>();
@@ -38,6 +50,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         <span className="sm:text-[16px]">{formattedDate}</span>
       )
     },
+    sortingFn: dateSortingFn,
   },
   {
     id: "game",
