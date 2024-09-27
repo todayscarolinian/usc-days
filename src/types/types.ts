@@ -23,10 +23,10 @@ export type Champions = {
 }
 
 export type filterType = {
-  date: string,
-  game: string,
-  teams: {
-    home: string,
-    away: string,
+  date?: string,
+  game?: string,
+  teams?: {
+    home?: string,
+    away?: string,
   }
 };

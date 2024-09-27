@@ -8,7 +8,7 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [date, setDate] = useState<string>('');
   const [game, setGame] = useState<string>('');
   const [isFilterActive, setIsFilterActive] = useState(false);
-  const [teams, setTeams] = useState<{ home: string; away: string }>({
+  const [teams, setTeams] = useState<{ home?: string; away?: string }>({
     home: '',
     away: '',
   });

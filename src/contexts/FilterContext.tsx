@@ -5,8 +5,8 @@ interface FilterContextProps {
   date: string;
   game: string;
   teams: {
-    home: string,
-    away: string,
+    home?: string,
+    away?: string,
   };
   isFilterActive: boolean;
   setFiltered: (filter: filterType) => void;

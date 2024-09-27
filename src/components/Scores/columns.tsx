@@ -51,6 +51,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
       )
     },
     sortingFn: dateSortingFn,
+    enableColumnFilter: true,
   },
   {
     id: "game",
@@ -67,6 +68,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         </span>
       );
     },
+    enableColumnFilter: true,
   },
   {
     id: "teams",

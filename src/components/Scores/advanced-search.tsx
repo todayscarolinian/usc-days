@@ -13,6 +13,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -40,13 +41,10 @@ import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
 
 const FormSchema = z.object({
-  date: z.date({
-    required_error: "A date is required.",
-  }),
-  game: z.string(),
-  team1: z.string(),
-  team2: z.string(),
-  location: z.string().optional(),
+  date: z.date().optional(),
+  game: z.string().optional(),
+  team1: z.string().optional(),
+  team2: z.string().optional(),
 });
 
 export function AdvancedSearch() {
@@ -57,13 +55,22 @@ export function AdvancedSearch() {
   const { setFiltered } = useFilter();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    const formattedDate = data.date ? format(data.date, "MMMM d, yyyy") : ""; // gets only the Month day and year e.g (September 2, 2024)
     setFiltered({
-      date: data.date.toISOString(), // Convert date to string if necessary
+      date: formattedDate,
       game: data.game,
       teams: {
         home: data.team1,
         away: data.team2,
       },
+    });
+
+     // Reset the form fields once applied button is clicked
+    form.reset({
+      date: undefined,
+      game: "",
+      team1: "",
+      team2: "",
     });
     console.log(data);
   }
@@ -77,7 +84,7 @@ export function AdvancedSearch() {
       </DialogTrigger>
       <DialogContent className="h-full flex flex-col justify-center">
         <DialogHeader>
-          <DialogTitle>Advanced Search</DialogTitle>
+          <DialogTitle>Show results by</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -87,6 +94,7 @@ export function AdvancedSearch() {
               name="date"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -123,12 +131,13 @@ export function AdvancedSearch() {
               )}
             />
 
-            {/* Game Selector */}
+            {/* Game Selector - A dropdown list of all games found in db */}
             <FormField
               control={form.control}
               name="game"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Game</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -150,37 +159,10 @@ export function AdvancedSearch() {
               )}
             />
 
-            {/* Location Filter */}
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    {/* Select options to be adjusted to get from the DB */}
-                    <SelectContent>
-                      <SelectItem value="location1">Location 1</SelectItem>
-                      <SelectItem value="location2">Location 2</SelectItem>
-                      <SelectItem value="location3">Location 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Team Selection */}
-            <div className="border p-4 flex flex-col gap-4">
-              <Label>Select Teams</Label>
-              <div className="flex flex-col gap-3">
+            {/* Team Selection (Home and Away) - drop down list of all teams found from the db */}
+            <div className="flex flex-col gap-4">
+              <Label>Teams</Label>
+              <div className="flex border p-4 flex-col gap-3">
                 <FormField
                   control={form.control}
                   name="team1"
@@ -198,8 +180,8 @@ export function AdvancedSearch() {
                         {/* Select options to be adjusted to get from the DB */}
                         <SelectContent>
                           <SelectItem value="SHCP">SHCP</SelectItem>
-                          <SelectItem value="teamB">Team B</SelectItem>
-                          <SelectItem value="teamC">Team C</SelectItem>
+                          <SelectItem value="SAFAD">SAFAD</SelectItem>
+                          <SelectItem value="SAS">SAS</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -223,9 +205,9 @@ export function AdvancedSearch() {
                         </FormControl>
                         {/* Select options to be adjusted to get from the DB */}
                         <SelectContent>
-                          <SelectItem value="SAS">SAS</SelectItem>
-                          <SelectItem value="teamE">Team E</SelectItem>
-                          <SelectItem value="teamF">Team F</SelectItem>
+                          <SelectItem value="SOE">SOE</SelectItem>
+                          <SelectItem value="SLG">SLG</SelectItem>
+                          <SelectItem value="SBE">SBE</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -236,7 +218,7 @@ export function AdvancedSearch() {
             </div>
             <DialogClose asChild>
               <Button type="submit" className="w-full">
-                Search
+                Apply
               </Button>
             </DialogClose>
           </form>

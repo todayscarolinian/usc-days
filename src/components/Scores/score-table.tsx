@@ -85,6 +85,8 @@ export function DataTable<TData, TValue>({
     setColumnFilters(newFilters);
   }, [filters]);
 
+  console.log(filters);
+
   const table = useReactTable({
     data,
     columns,

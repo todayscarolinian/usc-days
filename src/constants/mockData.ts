@@ -6,7 +6,7 @@ import { Scores, Champions } from "@/types/types"
 export const mockScoresData: Scores[] = [
   {
     id: 1,
-    date: "2024-09-18T16:00:00.000Z",
+    date: "2024-09-02T16:00:00.000Z",
     sport: "Basketball",
     teams: {
       home: "SAFAD",
@@ -48,7 +48,7 @@ export const mockScoresData: Scores[] = [
   },
   {
     id: 4,
-    date: "2024-09-20T07:00:00.000Z",
+    date: "2024-09-02T07:00:00.000Z",
     sport: "Badminton",
     teams: {
       home: "SHCP",
