@@ -13,6 +13,7 @@ import {
   GiShuttlecock, 
   GiTennisRacket 
 } from "react-icons/gi";
+import { formatLongDate } from "@/lib/utils";
 
 const sportIcons: Record<string, JSX.Element> = {
   Basketball: <FaBasketballBall className="inline mr-2" />,
@@ -30,11 +31,13 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const date = info.getValue<string>();
+      
+      const formattedDate = formatLongDate(date);
 
       return (
-        <span className="sm:text-[16px]">{date}</span>
+        <span className="sm:text-[16px]">{formattedDate}</span>
       )
-    }
+    },
   },
   {
     id: "game",
