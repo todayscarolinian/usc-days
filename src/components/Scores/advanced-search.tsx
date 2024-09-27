@@ -72,7 +72,6 @@ export function AdvancedSearch() {
       team1: "",
       team2: "",
     });
-    console.log(data);
   }
 
   return (
