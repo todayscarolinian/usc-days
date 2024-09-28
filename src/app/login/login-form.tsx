@@ -13,22 +13,35 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/hooks/use-toast"
 
-import { loginWithGoogle, loginWithPassword } from "./actions"
+import axios from "axios"
 
 export function LoginForm() {
-  const { toast } = useToast()
+  // const { toast } = useToast()
   
-  const handleLogin = async (formData: FormData) => {
-    const response = await loginWithPassword(formData)
+  // const handleLoginWithPassword = async (formData: FormData) => {
+  //   const response = await loginWithPassword(formData)
 
-    if (response?.error) {
-      toast({
-        variant: "destructive",
-        title: "Login Failed!",
-        description: response?.error,
-      })
+  //   if (response?.error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Login Failed!",
+  //       description: response?.error,
+  //     })
+  //   }
+  // }
+
+  const handleLoginWithGoogle = async () => {
+    try {
+      const response = await axios.get("/api/user/login");
+      const { url } = response.data;
+
+      // Redirect to Google OAuth URL
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error during login", error);
     }
-  }
+  };
+
   return (
       <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -59,16 +72,14 @@ export function LoginForm() {
             </div>
             <Input id="password" type="password" name='password' required />
           </div>
-          <Button formAction={async (formData) =>  await handleLogin(formData) } type="submit" className="w-full">
+          <Button type="submit" className="w-full">
             Login
           </Button>
         </div>
         </form>
-        <form action={loginWithGoogle}>
-          <Button variant="outline" className="w-full mt-3">
-              Login with Google
-          </Button>
-        </form>
+        <Button onClick={handleLoginWithGoogle} variant="outline" className="w-full mt-3">
+            Login with Google
+        </Button>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link href="#" className="underline">
