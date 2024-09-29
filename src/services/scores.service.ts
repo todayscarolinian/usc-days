@@ -26,12 +26,13 @@ class ScoreService {
 
   async createScore(scoreData: Score) {
     try {
-      const { gameId, teamAScore, teamBScore, createdBy } = scoreData;
+      const { gameId, teamAScore, teamBScore, createdAt, createdBy } = scoreData;
       const newScore = await prisma.score.create({
         data: {
           gameId,
           teamAScore,
           teamBScore,
+          createdAt,
           createdBy,
         },
       });
