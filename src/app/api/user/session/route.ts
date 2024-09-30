@@ -56,11 +56,11 @@ export async function GET(req: NextRequest) {
   });
 
   if (!isUserInDatabase) {
-    return NextResponse.redirect(`${baseUrl}/login`);
+    return NextResponse.redirect(`${baseUrl}/auth/login`);
   }
-  
+
   return NextResponse.json(
-    { redirectTo: `${baseUrl}/success`, session, currentUser },
+    { redirectTo: `${baseUrl}/auth/success`, session, currentUser },
     { status: 200 }
   );
 }

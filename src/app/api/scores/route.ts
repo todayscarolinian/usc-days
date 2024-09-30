@@ -23,13 +23,14 @@ export async function GET() {
 // POST /api/scores - Add a new score
 export async function POST(req: Request) {
   try {
-    const { gameId, teamAScore, teamBScore, createdBy } =
+    const { gameId, teamAScore, teamBScore, createdAt, createdBy } =
       (await req.json()) as Score;
 
     if (
       !gameId ||
       teamAScore === undefined ||
       teamBScore === undefined ||
+      !createdAt ||
       !createdBy
     ) {
       return NextResponse.json(
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
       gameId,
       teamAScore,
       teamBScore,
+      createdAt,
       createdBy,
     });
 
