@@ -1,4 +1,4 @@
-import { LoginForm } from '@/app/login/login-form'
+import { LoginForm } from '@/app/auth/login/login-form'
 import { Toaster } from "@/components/ui/toaster"
 
 export default function LoginPage() {
