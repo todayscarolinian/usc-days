@@ -1,4 +1,8 @@
-import * as React from "react"
+"use client";
+
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { Games } from "@/types/games.types";
 
 import {
   Select,
@@ -7,87 +11,45 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-const selection = [
-  {
-    value: "basketball",
-    name: "Basketball"
-  },
-  {
-    value: "soccer",
-    name: "Soccer"
-  },
-  {
-    value: "tennis",
-    name: "Tennis"
-  },
-  {
-    value: "baseball",
-    name: "Baseball"
-  },
-  {
-    value: "football",
-    name: "Football"
-  },
-  {
-    value: "cricket",
-    name: "Cricket"
-  },
-  {
-    value: "hockey",
-    name: "Hockey"
-  },
-  {
-    value: "volleyball",
-    name: "Volleyball"
-  },
-  {
-    value: "rugby",
-    name: "Rugby"
-  },
-  {
-    value: "golf",
-    name: "Golf"
-  },
-  {
-    value: "swimming",
-    name: "Swimming"
-  },
-  {
-    value: "badminton",
-    name: "Badminton"
-  },
-  {
-    value: "boxing",
-    name: "Boxing"
-  },
-  {
-    value: "skiing",
-    name: "Skiing"
-  },
-  {
-    value: "cycling",
-    name: "Cycling"
-  }
-];
+interface SelectSportButtonProps {
+  onSelectSport: (sport: string) => void; 
+}
 
+export function SelectSportButton({ onSelectSport }: SelectSportButtonProps) {
+  const [selection, setSelection] = useState<Games>();
+  const [isLoading, setLoading] = useState(true);
 
-export function SelectSportButton() {
+  useEffect(() => {
+    // mock data
+    setSelection({
+      games: ["Soccer", "Basketball", "Baseball"], 
+      count: 3,
+    });
+    setLoading(false);
+  }, []);
+
+  const handleSportSelect = (sport: string) => {
+    onSelectSport(sport); 
+  };
+
+  if (isLoading) return <p>Loading...</p>;
+
   return (
-    <Select>
+    <Select onValueChange={handleSportSelect}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a game" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {
-            selection.map((sport) => (
-              <SelectItem key={sport.value} value={sport.value}>{sport.name}</SelectItem>
-            ))
-          }
+          {selection?.games.map((sport) => (
+            <SelectItem key={sport} value={sport}>
+              {sport}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }
