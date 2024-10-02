@@ -30,3 +30,14 @@ export async function PUT(req: Request) {
         return NextResponse.json({ error: 'An unexpected error occurred while updating the team.' }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const { id } = await req.json(); // Get the id from the request body
+        const deletedTeam = await teamService.deleteTeam(id);
+        return NextResponse.json({ deletedTeam }, { status: 200 });
+    } catch (error) {
+        console.error('Error deleting team:', error);
+        return NextResponse.json({ error: 'An unexpected error occurred while deleting the team.' }, { status: 500 });
+    }
+}

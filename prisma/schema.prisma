@@ -51,7 +51,7 @@ model GameType {
 model TeamGameType {
   id     Int  @id @default(autoincrement())
   teamId Int  @map("team_id")
-  team   Team @relation(fields: [teamId], references: [id])
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   gameTypeId Int      @map("game_type_id")
   gameType   GameType @relation(fields: [gameTypeId], references: [id])

@@ -51,7 +51,18 @@ class TeamService {
             throw new Error('An unexpected error occurred while updating the team.');
         }
     }
+    async deleteTeam(id: number) {
+        try {
+            const deletedTeam = await prisma.team.delete({
+                where: { id },
+            });
 
+            return deletedTeam;
+        } catch (error) {
+            console.error('Error deleting team:', error);
+            throw new Error('An unexpected error occurred while deleting the team.');
+        }
+    }
 }
 
 export default TeamService;
