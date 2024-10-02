@@ -6,13 +6,13 @@ export interface Teams extends BaseGet {
 
 export interface AddTeamPayload {
   teamName: string;
-  schoolId: number;
+  schoolIds: number[];
   gameTypeIds: number[];
 }
 
 export interface EditTeamPayload {
   id: number;
-  schoolId: number;
+  schoolIds: number[];
   teamName: string;
   gameTypeIds: number[];
 }
