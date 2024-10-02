@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { AddTeamPayload, EditTeamPayload } from '@/types/teams.types';
 
 class TeamService {
     async getTeams() {
@@ -10,6 +11,47 @@ class TeamService {
             throw new Error('An unexpected error occurred while fetching teams.');
         }
     }
+    async addTeam({ teamName, schoolId, gameTypeIds }: AddTeamPayload) {
+        try {
+            const newTeam = await prisma.team.create({
+                data: {
+                    teamName,
+                    schoolId,
+                    gameTypes: {
+                        create: gameTypeIds.map((gameTypeId) => ({
+                            gameTypeId,
+                        })),
+                    },
+                },
+            });
+            return newTeam;
+        } catch (error) {
+            console.error('Error adding a team:', error);
+            throw new Error('An unexpected error occurred while adding the team.');
+        }
+    }
+    async editTeam({ id, schoolId, teamName, gameTypeIds }: EditTeamPayload) {
+        try {
+            const updatedTeam = await prisma.team.update({
+                where: { id },
+                data: {
+                    teamName,
+                    schoolId,
+                    gameTypes: {
+                        deleteMany: {},
+                        create: gameTypeIds.map((gameTypeId) => ({
+                            gameTypeId,
+                        })),
+                    },
+                },
+            });
+            return updatedTeam;
+        } catch (error) {
+            console.error('Error updating the team:', error);
+            throw new Error('An unexpected error occurred while updating the team.');
+        }
+    }
+
 }
 
 export default TeamService;
