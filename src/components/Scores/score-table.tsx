@@ -115,7 +115,7 @@ export function DataTable<TData, TValue>({
             onChange={(e) => table.setGlobalFilter(e.target.value)}
             className="max-w-sm"
           />
-          {/* Filter button, To be added: clear filters */}
+          {/* Filter button */}
           <AdvancedSearch />
           {/* Clear filter */}
           {filters.isFilterActive && (
@@ -124,7 +124,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      {/* Data table, To be added: Actions column when staff authenticated */}
+      {/* Data table */}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
