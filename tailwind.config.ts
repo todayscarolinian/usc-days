@@ -11,6 +11,7 @@ const config: Config = {
   	extend: {
   		colors: {
         tc_red: '#C02D2D',
+        primary_600: '#9B2626',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

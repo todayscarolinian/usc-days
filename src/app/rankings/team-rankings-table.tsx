@@ -4,6 +4,7 @@ interface Ranking {
   rank: number;
   team: string;
   win_ratio: number;
+  school: string;
 }
 
 const mock_scores = [
@@ -19,8 +20,8 @@ const mock_scores = [
       gameType: { id: 1, gameName: "Soccer" },
       teamAId: 1,
       teamBId: 2,
-      teamA: { id: 1, teamName: "Team A", schoolId: 1, school: { id: 1, schoolName: "School A" } },
-      teamB: { id: 2, teamName: "Team B", schoolId: 2, school: { id: 2, schoolName: "School B" } },
+      teamA: { id: 1, teamName: "SAS Majesties", schoolId: 1, school: { id: 1, schoolName: "SAS" } },
+      teamB: { id: 2, teamName: "Warriors", schoolId: 2, school: { id: 2, schoolName: "SOE" } },
       date: new Date(),
       location: "Stadium 1",
     },
@@ -39,8 +40,8 @@ const mock_scores = [
       gameType: { id: 1, gameName: "Basketball" },
       teamAId: 1,
       teamBId: 3,
-      teamA: { id: 1, teamName: "Team A", schoolId: 1, school: { id: 1, schoolName: "School A" } },
-      teamB: { id: 3, teamName: "Team C", schoolId: 3, school: { id: 3, schoolName: "School C" } },
+      teamA: { id: 1, teamName: "Money Gang", schoolId: 1, school: { id: 1, schoolName: "SBE" } },
+      teamB: { id: 3, teamName: "SAS Majesties", schoolId: 3, school: { id: 3, schoolName: "SAS" } },
       date: new Date(),
       location: "Stadium 2",
     },
@@ -59,8 +60,8 @@ const mock_scores = [
       gameType: { id: 1, gameName: "Baseball" },
       teamAId: 2,
       teamBId: 3,
-      teamA: { id: 2, teamName: "Team B", schoolId: 2, school: { id: 2, schoolName: "School B" } },
-      teamB: { id: 3, teamName: "Team C", schoolId: 3, school: { id: 3, schoolName: "School C" } },
+      teamA: { id: 2, teamName: "SAS Majesties", schoolId: 2, school: { id: 2, schoolName: "SAS" } },
+      teamB: { id: 3, teamName: "Warriors", schoolId: 3, school: { id: 3, schoolName: "SOE" } },
       date: new Date(),
       location: "Stadium 3",
     },
@@ -71,7 +72,7 @@ const mock_scores = [
 
 
 function calculateRankings(scores, selectedSport: string | null): Ranking[] {
-  const teamStats: Record<string, { teamName: string; wins: number; totalGames: number }> = {};
+  const teamStats: Record<string, { schoolName: string; teamName: string; wins: number; totalGames: number }> = {};
 
   scores.forEach((score) => {
     const game = score.game; 
@@ -86,10 +87,10 @@ function calculateRankings(scores, selectedSport: string | null): Ranking[] {
     }
 
     if (!teamStats[teamA.teamName]) {
-      teamStats[teamA.teamName] = { teamName: teamA.teamName, wins: 0, totalGames: 0 };
+      teamStats[teamA.teamName] = { schoolName: teamA.school.schoolName, teamName: teamA.teamName, wins: 0, totalGames: 0 };
     }
     if (!teamStats[teamB.teamName]) {
-      teamStats[teamB.teamName] = { teamName: teamB.teamName, wins: 0, totalGames: 0 };
+      teamStats[teamB.teamName] = { schoolName: teamB.school.schoolName, teamName: teamB.teamName, wins: 0, totalGames: 0 };
     }
 
     teamStats[teamA.teamName].totalGames += 1;
@@ -102,7 +103,8 @@ function calculateRankings(scores, selectedSport: string | null): Ranking[] {
     }
   });
 
-  const rankings: Ranking[] = Object.values(teamStats).map(({ teamName, wins, totalGames }) => ({
+  const rankings: Ranking[] = Object.values(teamStats).map(({ schoolName, teamName, wins, totalGames }) => ({
+    school: schoolName,
     team: teamName,
     win_ratio: totalGames === 0 ? 0 : (wins / totalGames) * 100,
     rank: 0,
@@ -127,18 +129,18 @@ export function TeamRankingsTable({ selectedSport }: { selectedSport: string | n
   return (
     <Table>
       <TableCaption>USC Days 2024</TableCaption>
-      <TableHeader className="bg-gray-50">
-        <TableRow>
-          <TableHead className="w-[100px]">Rank</TableHead>
-          <TableHead>Team</TableHead>
-          <TableHead>Wins Ratio</TableHead>
+      <TableHeader className="bg-primary_600">
+        <TableRow >
+          <TableHead className="w-[100px] text-white font-bold">Rank</TableHead>
+          <TableHead className="text-white font-bold">Team</TableHead>
+          <TableHead className="text-white font-bold">Win Ratio</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {rankings.map((ranking) => (
           <TableRow key={ranking.team}>
             <TableCell className="font-medium">{ranking.rank}</TableCell>
-            <TableCell>{ranking.team}</TableCell>
+            <TableCell>{ranking.team} <span className="text-gray-500">({ranking.school})</span></TableCell>
             <TableCell>{ranking.win_ratio.toFixed(2)} %</TableCell>
           </TableRow>
         ))}
