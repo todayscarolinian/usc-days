@@ -55,8 +55,8 @@ export function DataTable<TData, TValue>({
     {
       id: "date",
       desc: true,
-    }
-  ]) 
+    },
+  ]);
   const filters = useFilter();
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
       globalFilter,
       columnFilters,
       pagination,
-      sorting
+      sorting,
     },
   });
 
@@ -127,42 +127,55 @@ export function DataTable<TData, TValue>({
       {/* Data table */}
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-none">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id} className="p-6">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+          {table.getHeaderGroups().map((headerGroup) => {
+            return (
+              <TableRow key={headerGroup.id} className="border-none">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={`p-4 md:p-6 ${header.id == "winner" && "hidden md:block"}`}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+                {userMockData.role === "staff" ? (
+                  <TableHead className="p-4">
+                    <span className="font-bold sm:text-lg">Action</span>
                   </TableHead>
-                );
-              })}
-              {userMockData.role === "staff" ? (
-                <TableHead className="p-6">
-                  <span className="font-bold sm:text-lg">Action</span>
-                </TableHead>
-              ) : (
-                ""
-              )}
-            </TableRow>
-          ))}
+                ) : (
+                  ""
+                )}
+              </TableRow>
+            );
+          })}
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className="border-none">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="p-6">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      className={`p-4 md:p-6 ${cell.id.includes("winner") && "hidden md:block"}`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  );
+                })}
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                 {userMockData.role === "staff" ? (
-                  <TableCell className="p-6">
+                  <TableCell className="p-4">
                     <Button className="bg-[#9B2626] hover:bg-[#771D1D]">
                       <FaRegEdit />
                     </Button>
