@@ -38,12 +38,19 @@ export const scoreColumns: ColumnDef<Scores>[] = [
       const dateString = info.getValue<string>();
       const date = new Date(dateString);
 
-      const longDate = format(date, "MMMM d, h:mm a");
+      const longDate = {
+        date: format(date, "MMMM d"),
+        time: format(date, "h:mm a"),
+      };
       const shortDate = format(date, "MMM d");
 
       return (
         <>
-          <span className="sm:text-[16px] hidden md:block">{longDate}</span>
+          <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
+            <span>{longDate.date}</span>
+            {/* <span className="opacity-50">-</span> */}
+            <span>{longDate.time}</span>
+          </span>
           <span className="sm:text-[16px] block md:hidden">{shortDate}</span>
         </>
       );
@@ -78,11 +85,23 @@ export const scoreColumns: ColumnDef<Scores>[] = [
 
       return (
         <span className="sm:text-[16px]">
-          <span className={winner === teams.home ? "font-bold underline md:font-normal md:no-underline" : ""}>
+          <span
+            className={
+              winner === teams.home
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
             {teams.home}
           </span>{" "}
           <span className="opacity-50">vs</span>{" "}
-          <span className={winner === teams.away ? "font-bold underline md:font-normal md:no-underline" : ""}>
+          <span
+            className={
+              winner === teams.away
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
             {teams.away}
           </span>
         </span>
