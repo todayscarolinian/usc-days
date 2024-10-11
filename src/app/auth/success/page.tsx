@@ -4,12 +4,17 @@ import { useUserStore } from "@/stores/user-store";
 
 export default function AuthSuccess() {
 
-  const { name, email} = useUserStore()
+  const { name, email, picture } = useUserStore()
 
 
   if (name && email ) {
     return (
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <img
+          src={picture}
+          alt={`${name}'s profile picture`}
+          className="w-24 h-24 rounded-full"
+        />
         <h1 className="text-2xl font-bold">
           Welcome, {`${name} (${email})` ?? "User"}!
         </h1>

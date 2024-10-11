@@ -10,7 +10,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
-  const { setEmail, setName} = useUserStore()
+  const { setEmail, setName, setPicture } = useUserStore()
 
   useEffect(() => {
     const exchangeCodeForSession = async () => {
@@ -28,7 +28,8 @@ export default function Page() {
         const currentUser = data.currentUser as GoogleUserMetadata;
         setUrl(data.redirectTo);
         setEmail(currentUser.email);
-        setName(currentUser.full_name)
+        setName(currentUser.full_name);
+        setPicture(currentUser.picture);
         // Mark the API call as done
         setHasFetched(true);
 
