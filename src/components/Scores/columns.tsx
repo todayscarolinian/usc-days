@@ -140,10 +140,10 @@ export const scoreColumns: ColumnDef<Scores>[] = [
 export const championColumns: ColumnDef<Champions>[] = [
   {
     accessorKey: "sport",
-    header: () => <span>Sport</span>,
+    header: () => <span className="font-bold sm:text-lg">Sport</span>,
   },
   {
     accessorKey: "team",
-    header: () => <span>Team</span>,
+    header: () => <span className="font-bold sm:text-lg">Team</span>,
   },
 ];

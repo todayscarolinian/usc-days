@@ -184,31 +184,31 @@ export const userMockData = {
   Mock data for the Champions page
 */
 export const mockChampionsData: Champions[] = [
-  // {
-  //   id: '1',
-  //   sport: "Badminton",
-  //   team: "SAS"
-  // },
-  // {
-  //   id: '2',
-  //   sport: "Basketball",
-  //   team: "TEAM A - SOE"
-  // },
-  // {
-  //   id: '3',
-  //   sport: "Volleyball",
-  //   team: "SAS"
-  // },
-  // {
-  //   id: '4',
-  //   sport: "Lawn Tennis",
-  //   team: "SAFAD"
-  // },
-  // {
-  //   id: '5',
-  //   sport: "Soccer",
-  //   team: "SAFAD"
-  // }
+  {
+    id: '1',
+    sport: "Badminton",
+    team: "SAS"
+  },
+  {
+    id: '2',
+    sport: "Basketball",
+    team: "TEAM A - SOE"
+  },
+  {
+    id: '3',
+    sport: "Volleyball",
+    team: "SAS"
+  },
+  {
+    id: '4',
+    sport: "Lawn Tennis",
+    team: "SAFAD"
+  },
+  {
+    id: '5',
+    sport: "Soccer",
+    team: "SAFAD"
+  }
 ];
 
 
