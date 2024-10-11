@@ -1,5 +1,5 @@
 import GameService from "@/services/games.service";
-import { EditGamePayload, AddGamePayload, AddGameSchema, EditGameSchema, DeleteGameSchema } from "@/types/games.types";
+import { AddGameSchema, EditGameSchema, DeleteGameSchema } from "@/types/games.types";
 import { NextResponse } from "next/server";
 
 const gameService = new GameService

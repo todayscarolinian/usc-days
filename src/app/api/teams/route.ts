@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import TeamService from "@/services/teams.service";
-import { AddTeamPayload, EditTeamPayload } from "@/types/teams.types";
+import { AddTeamSchema, DeleteTeamSchema, EditTeamSchema } from "@/types/teams.types";
 
 const teamService = new TeamService()
 
@@ -11,8 +11,16 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
-        const body: AddTeamPayload = await req.json();
-        const newTeam = await teamService.addTeam(body);
+        const body = await req.json();
+        const result = AddTeamSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+        }
+
+        const validatedBody = result.data;
+
+        const newTeam = await teamService.addTeam(validatedBody);
         return NextResponse.json({ newTeam }, { status: 201 });
     } catch (error) {
         console.error('Error adding team:', error);
@@ -22,8 +30,15 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
     try {
-        const body: EditTeamPayload = await req.json();
-        const updatedTeam = await teamService.editTeam(body);
+        const body = await req.json();
+        const result = EditTeamSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+        }
+
+        const validatedBody = result.data;
+        const updatedTeam = await teamService.editTeam(validatedBody);
         return NextResponse.json({ updatedTeam }, { status: 200 });
     } catch (error) {
         console.error('Error updating team:', error);
@@ -33,8 +48,15 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
-        const { id } = await req.json(); // Get the id from the request body
-        const deletedTeam = await teamService.deleteTeam(id);
+        const body = await req.json();
+        const result = DeleteTeamSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+        }
+
+        const validatedBody = result.data;
+        const deletedTeam = await teamService.deleteTeam(validatedBody.id);
         return NextResponse.json({ deletedTeam }, { status: 200 });
     } catch (error) {
         console.error('Error deleting team:', error);
