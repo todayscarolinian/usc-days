@@ -38,7 +38,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
       const dateString = info.getValue<string>();
       const date = new Date(dateString);
 
-      const longDate = format(date, "MMMM d, yyyy, h:mm a");
+      const longDate = format(date, "MMMM d, h:mm a");
       const shortDate = format(date, "MMM d");
 
       return (
