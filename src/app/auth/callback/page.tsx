@@ -25,15 +25,16 @@ export default function Page() {
         // Make a request to the API endpoint to exchange the code and set the session
         const response = await fetch(`/api/user/session?code=${code}`);
         const data = await response.json();
-        const currentUser = data.currentUser as GoogleUserMetadata;
-        setUrl(data.redirectTo);
-        setEmail(currentUser.email);
-        setName(currentUser.full_name);
-        setPicture(currentUser.picture);
-        // Mark the API call as done
-        setHasFetched(true);
-
+        
         if (response.ok) {
+          const currentUser = data.currentUser as GoogleUserMetadata;
+          setUrl(data.redirectTo);
+          setEmail(currentUser.email);
+          setName(currentUser.full_name);
+          setPicture(currentUser.picture);
+          // Mark the API call as done
+          setHasFetched(true);
+
           // On success, redirect the user to the success page
           router.push(data.redirectTo);
         } else {

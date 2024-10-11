@@ -56,11 +56,14 @@ export async function GET(req: NextRequest) {
   });
 
   if (!isUserInDatabase) {
-    return NextResponse.redirect(`${baseUrl}/auth/login`);
+    return NextResponse.json(
+      { redirectTo: `${baseUrl}/auth/login?error=no_account`}, 
+      { status: 401 }
+    );
   }
 
   return NextResponse.json(
-    { redirectTo: `${baseUrl}/auth/success`, session, currentUser },
+    { redirectTo: `${baseUrl}/scoring?success=login_true`, session, currentUser },
     { status: 200 }
   );
 }
