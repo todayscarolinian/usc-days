@@ -19,7 +19,7 @@ class GameService {
             throw new Error('Could not fetch games');
         }
     }
-    async addGame({ gameTypeId, teamAId, teamBId, date, location }: AddGamePayload) {
+    async addGame({ gameTypeId, teamAId, teamBId, startDate, endDate, location }: AddGamePayload) {
         try {
 
             const newGame = await prisma.game.create({
@@ -27,7 +27,8 @@ class GameService {
                     gameTypeId,
                     teamAId,
                     teamBId,
-                    date,
+                    startDate,
+                    endDate,
                     location,
                 },
             });
@@ -37,7 +38,7 @@ class GameService {
             throw new Error('An unexpected error occurred while adding the game.');
         }
     }
-    async editGame({ id, gameTypeId, teamAId, teamBId, date, location }: EditGamePayload) {
+    async editGame({ id, gameTypeId, teamAId, teamBId, startDate, endDate, location }: EditGamePayload) {
         try {
             const updatedGame = await prisma.game.update({
                 where: { id },
@@ -45,7 +46,8 @@ class GameService {
                     gameTypeId,
                     teamAId,
                     teamBId,
-                    date,
+                    startDate,
+                    endDate,
                     location,
                 },
             });

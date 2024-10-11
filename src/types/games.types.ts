@@ -8,7 +8,8 @@ export interface AddGamePayload {
     gameTypeId: number;
     teamAId: number;
     teamBId: number;
-    date: string;
+    startDate: string;
+    endDate: string
     location?: string;
 }
 
@@ -17,6 +18,7 @@ export interface EditGamePayload {
     gameTypeId: number;
     teamAId: number;
     teamBId: number;
-    date: string;
+    startDate: string;
+    endDate: string
     location?: string;
 }
