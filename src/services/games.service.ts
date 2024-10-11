@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { AddGamePayload, EditGamePayload } from "@/types/games.types";
+import { AddGamePayload, DeleteGamePayload, EditGamePayload } from "@/types/games.types";
 
 class GameService {
     async getGames() {
@@ -57,7 +57,7 @@ class GameService {
             throw new Error('An unexpected error occurred while updating the game.');
         }
     }
-    async deleteGame(id: number) {
+    async deleteGame({ id }: DeleteGamePayload) {
         try {
             const deletedGame = await prisma.game.delete({
                 where: { id },

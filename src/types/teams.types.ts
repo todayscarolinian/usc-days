@@ -1,9 +1,4 @@
-import { BaseGet } from "./base.types";
 import { z } from 'zod';
-
-export interface Teams extends BaseGet {
-  teams: string[];
-}
 
 export const AddTeamSchema = z.object({
   teamName: z.string({

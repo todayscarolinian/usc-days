@@ -5,8 +5,14 @@ import { AddTeamSchema, DeleteTeamSchema, EditTeamSchema } from "@/types/teams.t
 const teamService = new TeamService()
 
 export async function GET() {
-    const teams = await teamService.getTeams()
-    return NextResponse.json({ teams, count: teams.length }, { status: 200 });
+    try {
+        const teams = await teamService.getTeams()
+        return NextResponse.json({ teams, count: teams.length }, { status: 200 });
+    }
+    catch (error) {
+        console.error("Error in fetching teams: ", error);
+        return NextResponse.json({ error: "An unexpected error occurred while fetching teams." }, { status: 500 });
+    }
 }
 
 export async function POST(req: Request) {
@@ -56,7 +62,7 @@ export async function DELETE(req: Request) {
         }
 
         const validatedBody = result.data;
-        const deletedTeam = await teamService.deleteTeam(validatedBody.id);
+        const deletedTeam = await teamService.deleteTeam(validatedBody);
         return NextResponse.json({ deletedTeam }, { status: 200 });
     } catch (error) {
         console.error('Error deleting team:', error);

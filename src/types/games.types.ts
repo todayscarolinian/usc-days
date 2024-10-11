@@ -1,9 +1,4 @@
-import { BaseGet } from "./base.types";
 import { z } from 'zod';
-
-export interface Games extends BaseGet {
-    games: string[];
-}
 
 export const AddGameSchema = z.object({
     gameTypeId: z.number({

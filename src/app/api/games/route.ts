@@ -54,7 +54,7 @@ export async function DELETE(req: Request) {
         }
 
         const validatedBody = result.data;
-        const deletedGame = await gameService.deleteGame(validatedBody.id);
+        const deletedGame = await gameService.deleteGame(validatedBody);
         return NextResponse.json({ deletedGame }, { status: 200 });
     } catch (error) {
         console.error('Error deleting game:', error);

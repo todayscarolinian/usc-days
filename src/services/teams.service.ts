@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { AddTeamPayload, EditTeamPayload } from '@/types/teams.types';
+import { AddTeamPayload, DeleteTeamPayload, EditTeamPayload } from '@/types/teams.types';
 
 class TeamService {
     async getTeams() {
@@ -69,7 +69,7 @@ class TeamService {
             throw new Error('An unexpected error occurred while updating the team.');
         }
     }
-    async deleteTeam(id: number) {
+    async deleteTeam({ id }: DeleteTeamPayload) {
         try {
             const deletedTeam = await prisma.team.delete({
                 where: { id },
