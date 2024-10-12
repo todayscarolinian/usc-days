@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { redirectTo: `${baseUrl}/scoring?success=login_true`, session, currentUser },
+    { redirectTo: `${baseUrl}/?success=login_true`, session, currentUser },
     { status: 200 }
   );
 }
