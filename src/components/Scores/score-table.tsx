@@ -39,11 +39,15 @@ import { FaRegEdit } from "react-icons/fa";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  showFilter?: boolean;
+  actionButton?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  showFilter = true,
+  actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
   const [globalFilter, setGlobalFilter] = useState<any>([]);
@@ -116,11 +120,12 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
           {/* Filter button */}
-          <AdvancedSearch />
+          {showFilter && <AdvancedSearch />}
           {/* Clear filter */}
-          {filters.isFilterActive && (
+          {showFilter && filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
           )}
+          {actionButton && actionButton}
         </div>
       </div>
 
@@ -134,7 +139,9 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`p-4 md:p-6 ${header.id == "winner" && "hidden md:block"}`}
+                      className={`p-4 md:p-6 ${
+                        header.id == "winner" && "hidden md:block"
+                      }`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -164,7 +171,9 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableCell
                       key={cell.id}
-                      className={`p-4 md:p-6 ${cell.id.includes("winner") && "hidden md:block"}`}
+                      className={`p-4 md:p-6 ${
+                        cell.id.includes("winner") && "hidden md:block"
+                      }`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

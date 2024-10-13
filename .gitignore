@@ -28,6 +28,9 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+# Don't ignore the .env.example file
+!.env.example
 
 # vercel
 .vercel
@@ -35,9 +38,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Ignore the .env file
-.env
-
-# Don't ignore the .env.example file
-!.env.example

@@ -10,7 +10,15 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                tc_red: '#C02D2D',
+                tc_primary: {
+                    DEFAULT: '#C02D2D',
+                    '800': '#771D1D',
+                    '700': '#842020',
+                    '600': '#9B2626',
+                    '500': '#C02D2D',
+                    '400': '#D73333',
+                    '300': '#FF5959'
+                },
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 card: {

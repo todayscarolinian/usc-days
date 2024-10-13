@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatLongDate(dateString: string): string {
-  const date = new Date(dateString);
-  
-  return format(date, "MMMM d, yyyy, h:mm a");
-}
+    const date = new Date(dateString);
+    
+    return format(date, "MMMM d, yyyy, h:mm a");
+  }
