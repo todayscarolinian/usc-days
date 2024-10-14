@@ -19,10 +19,9 @@ model User {
 model Team {
   id       Int    @id @default(autoincrement())
   teamName String @map("team_name") @db.VarChar(100)
-  schoolId Int    @map("school_id")
-  school   School @relation(fields: [schoolId], references: [id])
 
   gameTypes  TeamGameType[]
+  teamSchools TeamSchool[]
   teamAGames Game[]         @relation("TeamAGames")
   teamBGames Game[]         @relation("TeamBGames")
 
@@ -33,9 +32,19 @@ model School {
   id         Int    @id @default(autoincrement())
   schoolName String @unique @map("school_name") @db.VarChar(100)
 
-  teams Team[]
+  teams TeamSchool[]
 
   @@map("schools")
+}
+
+model TeamSchool {
+  id       Int    @id @default(autoincrement())
+  teamId   Int    @map("team_id")
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  schoolId Int    @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("team_schools")
 }
 
 model GameType {
@@ -51,7 +60,7 @@ model GameType {
 model TeamGameType {
   id     Int  @id @default(autoincrement())
   teamId Int  @map("team_id")
-  team   Team @relation(fields: [teamId], references: [id])
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   gameTypeId Int      @map("game_type_id")
   gameType   GameType @relation(fields: [gameTypeId], references: [id])
