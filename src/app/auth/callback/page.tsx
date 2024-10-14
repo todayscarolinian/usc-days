@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { GoogleUserMetadata } from "@/types/auth.types";
+import { useUserStore } from "@/stores/user-store";
 
 export default function Page() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
+  const { setEmail, setName, setPicture } = useUserStore()
 
   useEffect(() => {
     const exchangeCodeForSession = async () => {
@@ -24,25 +25,16 @@ export default function Page() {
         // Make a request to the API endpoint to exchange the code and set the session
         const response = await fetch(`/api/user/session?code=${code}`);
         const data = await response.json();
-        const currentUser = data.currentUser as GoogleUserMetadata;
-        setUrl(data.redirectTo);
-        Cookies.set("email", currentUser.email, {
-          path: "/",
-          sameSite: "lax",
-        });
-        Cookies.set("name", currentUser.full_name, {
-          path: "/",
-          sameSite: "lax",
-        });
-        Cookies.set("pic", currentUser.picture, {
-          path: "/",
-          sameSite: "lax",
-        });
-
-        // Mark the API call as done
-        setHasFetched(true);
-
+        
         if (response.ok) {
+          const currentUser = data.currentUser as GoogleUserMetadata;
+          setUrl(data.redirectTo);
+          setEmail(currentUser.email);
+          setName(currentUser.full_name);
+          setPicture(currentUser.picture);
+          // Mark the API call as done
+          setHasFetched(true);
+
           // On success, redirect the user to the success page
           router.push(data.redirectTo);
         } else {

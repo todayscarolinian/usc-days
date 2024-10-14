@@ -1,31 +1,33 @@
-"use client";
+"use client"
 
-import axios from "axios";
+import { useEffect } from 'react'
+import { LoginForm } from '@/app/auth/login/login-form'
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/components/hooks/use-toast"
+import { useSearchParams } from 'next/navigation'
 
-export default function Page() {
-
-  const handleLogin = async () => {
-    try {
-      const response = await axios.get("/api/user/login");
-      const { url } = response.data;
-
-      // Redirect to Google OAuth URL
-      window.location.href = url;
-    } catch (error) {
-      console.error("Error during login", error);
+export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const { toast } = useToast();
+ 
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error === "no_account") {
+      toast({
+        variant: "destructive",
+        title: "Login Failed!",
+        description: "User not found. Please contact support.",
+      })
     }
-  };
+  }, [])
+  
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-3xl font-bold">Login</h1>
-      <p className="text-lg">To continue, please log in with Google:</p>
-      <button
-        onClick={handleLogin}
-        className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-500 transition duration-300"
-      >
-        Login with Google
-      </button>
+    <div className='flex items-center justify-center min-h-screen'>
+      <div className="mt-[-140px]">
+        <LoginForm />
+      </div>
+      <Toaster />
     </div>
-  );
+  )
 }
