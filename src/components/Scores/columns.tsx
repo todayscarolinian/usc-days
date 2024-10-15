@@ -31,6 +31,7 @@ const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
 export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "date",
+    accessorFn: (row) => format(new Date(row.date), "MMMM d, yyyy, h:mm a"),
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const dateString = info.getValue<string>();
@@ -46,7 +47,6 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         <>
           <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
             <span>{longDate.date}</span>
-            {/* <span className="opacity-50">-</span> */}
             <span>{longDate.time}</span>
           </span>
           <span className="sm:text-[16px] block md:hidden">{shortDate}</span>

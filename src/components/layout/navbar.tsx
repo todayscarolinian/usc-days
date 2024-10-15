@@ -34,11 +34,11 @@ const nav_items = [
 export default function Navbar() {
   return (
     <div>
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-[#C02D2D]">
+      <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
           {nav_items.map((n) => (
-            <Button key={n.name} className="bg-[#C02D2D] shadow-none" asChild>
+            <Button key={n.name} className="bg-tc_primary shadow-none" asChild>
               <Link
                 href={n.href}
                 className="text-white transition-colors hover:text-white"
@@ -50,12 +50,12 @@ export default function Navbar() {
         </nav>
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="icon" className="shrink-0 md:hidden">
+            <Button size="icon" className="shrink-0 bg-tc_primary-600 md:hidden">
               <Menu />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="bg-[#C02D2D]">
+          <SheetContent side="left" className="bg-tc_primary">
             <nav className="grid gap-6 text-lg font-medium">
               <Image
                 src="/tc-logo-white.png"
