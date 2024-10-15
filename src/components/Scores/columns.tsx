@@ -5,7 +5,6 @@ import { Scores } from "@/types/types";
 import { Champions } from "@/types/types";
 import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
 import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
-import { formatLongDate } from "@/lib/utils";
 import { format } from "date-fns";
 
 const sportIcons: Record<string, JSX.Element> = {
@@ -32,7 +31,6 @@ const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
 export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "date",
-    accessorFn: (row) => formatLongDate(row.date), // Create derived field
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const dateString = info.getValue<string>();
