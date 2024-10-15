@@ -7,14 +7,14 @@ export default function Home() {
 	return (
 		<div className="p-4 sm:py-10">
 			<div className="mx-auto sm:max-w-[90rem]">
-				<div className="grid grid-cols-7 gap-6">
-					<div className="col-span-3">
+				<div className="grid lg:grid-cols-7 gap-6">
+					<div className="lg:col-span-3">
 						<TeamsDataTable
 							columns={teamColumns}
 							data={teamMockData}
 						/>
 					</div>
-					<div className="col-span-4">
+					<div className="lg:col-span-4">
 						<SportsDataTable
 							columns={sportColumns}
 							data={sportMockData}

@@ -20,7 +20,7 @@ export const sportMockData: SportInfo[] = [
 		teams: [
 			{
 				id: 1,
-				name: "Team 1",
+				name: "Lakers",
 			},
 		],
 	},
@@ -30,31 +30,31 @@ export const sportMockData: SportInfo[] = [
 		teams: [
 			{
 				id: 1,
-				name: "Team 1",
+				name: "Lakers",
 			},
 			{
 				id: 2,
-				name: "Team 2",
+				name: "Celtics",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 		],
 	},
@@ -64,11 +64,11 @@ export const sportMockData: SportInfo[] = [
 		teams: [
 			{
 				id: 1,
-				name: "Team 1",
+				name: "Lakers",
 			},
 			{
 				id: 3,
-				name: "Team 3",
+				name: "Warriors",
 			},
 		],
 	},
@@ -78,7 +78,7 @@ export const sportMockData: SportInfo[] = [
 		teams: [
 			{
 				id: 2,
-				name: "Team 2",
+				name: "Celtics",
 			},
 		],
 	},
@@ -88,7 +88,7 @@ export const sportMockData: SportInfo[] = [
 		teams: [
 			{
 				id: 2,
-				name: "Team 2",
+				name: "Celtics",
 			},
 		],
 	},
@@ -119,20 +119,22 @@ export const sportColumns: ColumnDef<SportInfo>[] = [
 		header: "Name",
 	},
 	{
-		accessorKey: "teams",
+        accessorKey: "teams",
+        accessorFn: (row) => row.teams.map(team => team.name).join(", "),
 		cell: (info) => {
-			const teamData = info.getValue<{ id: number; name: string }[]>();
+            const teamData = info.getValue<string>();
+            
 			return (
 				<div className="grid grid-cols-4 gap-2">
-					{teamData?.map((team) => {
-						const Icon = sportIcons[team.name];
+					{teamData?.split(", ").map((team) => {
+						const Icon = sportIcons[team];
 						return (
 							<div
-								key={team.id}
+								key={team}
 								className="flex justify-center items-center py-1 px-4 rounded-full bg-tc_red text-white"
 							>
 								<span className="bg-yellow 500">{Icon}</span>
-								<span className="font-bold">{team.name}</span>
+								<span className="font-bold">{team}</span>
 							</div>
 						);
 					})}

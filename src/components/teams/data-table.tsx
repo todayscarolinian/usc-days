@@ -5,6 +5,8 @@ import {
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
+    ColumnFiltersState,
+    getFilteredRowModel,
 } from "@tanstack/react-table";
 import {
 	Pagination,
@@ -23,6 +25,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -33,11 +36,19 @@ export function TeamsDataTable<TData, TValue>({
 	columns,
 	data,
 }: DataTableProps<TData, TValue>) {
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+        []
+      )
 	const table = useReactTable({
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
-	});
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+            columnFilters
+        }
+    });
 
 	return (
 		<div className="rounded-md border h-fit">
@@ -49,7 +60,7 @@ export function TeamsDataTable<TData, TValue>({
 					<Input
 						placeholder="Keyword Search"
 						onChange={(e) => table.setGlobalFilter(e.target.value)}
-						className="max-w-sm"
+						className="max-w-sm text-white"
 					/>
 				</div>
 			</div>

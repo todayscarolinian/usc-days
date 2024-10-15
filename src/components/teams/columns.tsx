@@ -1,8 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
-import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
 
 export type TeamInfo = {
 	id: number;
@@ -27,15 +25,6 @@ export const teamMockData: TeamInfo[] = [
 		school: "School 3",
 	},
 ];
-
-const sportIcons: Record<string, JSX.Element> = {
-	Basketball: <FaBasketballBall className="inline mr-2" />,
-	Badminton: <GiShuttlecock className="inline mr-2" />,
-	Volleyball: <FaVolleyballBall className="inline mr-2" />,
-	Swimming: <FaSwimmer className="inline mr-2" />,
-	"Lawn Tennis": <GiTennisRacket className="inline mr-2" />,
-	// Add other sports and their icons here
-};
 
 export const teamColumns: ColumnDef<TeamInfo>[] = [
 	{
