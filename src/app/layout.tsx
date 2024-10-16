@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Roboto_Condensed } from "next/font/google";
 import { FilterProvider } from "@/providers/FilterProvider";
 import "./globals.css";
-import Header from "@/components/Header/header";
+// import Header from "@/components/Header/header";
+import Navbar from "@/components/layout/navbar";
 
 const robotoCondensed = Roboto_Condensed({
   subsets: ['latin'],
@@ -26,7 +27,7 @@ export default function RootLayout({
         <body
           className={`${robotoCondensed.variable}`}
         >
-          <Header />
+          <Navbar />
           {children}
         </body>
       </FilterProvider>

@@ -3,17 +3,9 @@
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
 import { Scores } from "@/types/types";
 import { Champions } from "@/types/types";
-import { 
-  FaBasketballBall, 
-  FaVolleyballBall, 
-  FaSwimmer, 
-  FaRegEdit 
-} from "react-icons/fa";
-import { 
-  GiShuttlecock, 
-  GiTennisRacket 
-} from "react-icons/gi";
-import { formatLongDate } from "@/lib/utils";
+import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
+import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
+import { format } from "date-fns";
 
 const sportIcons: Record<string, JSX.Element> = {
   Basketball: <FaBasketballBall className="inline mr-2" />,
@@ -39,16 +31,27 @@ const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
 export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "date",
-    accessorFn: (row) => formatLongDate(row.date), // Create derived field
+    accessorFn: (row) => format(new Date(row.date), "MMMM d, yyyy, h:mm a"),
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
-      const date = info.getValue<string>();
-      
-      const formattedDate = formatLongDate(date);
+      const dateString = info.getValue<string>();
+      const date = new Date(dateString);
+
+      const longDate = {
+        date: format(date, "MMMM d"),
+        time: format(date, "h:mm a"),
+      };
+      const shortDate = format(date, "MMM d");
 
       return (
-        <span className="sm:text-[16px]">{formattedDate}</span>
-      )
+        <>
+          <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
+            <span>{longDate.date}</span>
+            <span>{longDate.time}</span>
+          </span>
+          <span className="sm:text-[16px] block md:hidden">{shortDate}</span>
+        </>
+      );
     },
     sortingFn: dateSortingFn,
     enableColumnFilter: true,
@@ -62,9 +65,9 @@ export const scoreColumns: ColumnDef<Scores>[] = [
       const Icon = sportIcons[sport]; // Retrieve the icon from the mapping
 
       return (
-        <span className="flex items-center sm:text-[16px]">
+        <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
           {Icon}
-          {sport}
+          <span className="hidden md:block">{sport}</span>
         </span>
       );
     },
@@ -76,11 +79,31 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     header: () => <span className="font-bold sm:text-lg">Teams</span>,
     cell: (info) => {
       const teams = info.row.original.teams;
+      const winner = info.row.original.winner;
+
       return (
-      <span className="sm:text-[16px]">
-        {teams.home} <span className="opacity-50">vs</span> {teams.away}
-      </span>
-    );
+        <span className="sm:text-[16px]">
+          <span
+            className={
+              winner === teams.home
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
+            {teams.home}
+          </span>{" "}
+          <span className="opacity-50">vs</span>{" "}
+          <span
+            className={
+              winner === teams.away
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
+            {teams.away}
+          </span>
+        </span>
+      );
     },
     filterFn: (row, columnId, filterValue) => {
       // Get the teams string (already flattened in accessorFn)
@@ -92,15 +115,13 @@ export const scoreColumns: ColumnDef<Scores>[] = [
   },
   {
     id: "score",
-    accessorFn: (row) => `${row.scores.home} vs ${row.scores.away}`, 
+    accessorFn: (row) => `${row.scores.home} vs ${row.scores.away}`,
     header: () => <span className="font-bold sm:text-lg">Score</span>,
     cell: (info) => {
       const score = info.getValue<string>();
 
-      return (
-        <span className="sm:text-[16px]">{score}</span>
-      )
-    }
+      return <span className="sm:text-[16px]">{score}</span>;
+    },
   },
   {
     id: "winner",
@@ -109,20 +130,18 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     cell: (info) => {
       const winner = info.getValue<string>();
 
-      return (
-        <span className="sm:text-[16px]">{winner}</span>
-      )
-    }
+      return <span className="sm:text-[16px]">{winner}</span>;
+    },
   },
 ];
 
 export const championColumns: ColumnDef<Champions>[] = [
   {
     accessorKey: "sport",
-    header: () => <span>Sport</span>,
+    header: () => <span className="font-bold sm:text-lg">Sport</span>,
   },
   {
     accessorKey: "team",
-    header: () => <span>Team</span>,
+    header: () => <span className="font-bold sm:text-lg">Team</span>,
   },
 ];

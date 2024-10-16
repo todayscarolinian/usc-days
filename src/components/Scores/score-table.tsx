@@ -41,11 +41,15 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  showFilter?: boolean;
+  actionButton?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  showFilter = true,
+  actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
   const [globalFilter, setGlobalFilter] = useState<any>([]);
@@ -57,8 +61,8 @@ export function DataTable<TData, TValue>({
     {
       id: "date",
       desc: true,
-    }
-  ]) 
+    },
+  ]);
   const filters = useFilter();
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -111,7 +115,7 @@ export function DataTable<TData, TValue>({
       globalFilter,
       columnFilters,
       pagination,
-      sorting
+      sorting,
     },
   });
 
@@ -125,54 +129,72 @@ export function DataTable<TData, TValue>({
             onChange={(e) => table.setGlobalFilter(e.target.value)}
             className="max-w-sm"
           />
-          {/* Filter button, To be added: clear filters */}
-          <AdvancedSearch />
+          {/* Filter button */}
+          {showFilter && <AdvancedSearch />}
           {/* Clear filter */}
-          {filters.isFilterActive && (
+          {showFilter && filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
           )}
+          {actionButton && actionButton}
         </div>
       </div>
 
-      {/* Data table, To be added: Actions column when staff authenticated */}
+      {/* Data table */}
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-none">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id} className="p-6">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+          {table.getHeaderGroups().map((headerGroup) => {
+            return (
+              <TableRow key={headerGroup.id} className="border-none">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={`p-4 md:p-6 ${
+                        header.id == "winner" && "hidden md:block"
+                      }`}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+                {userMockData.role === "staff" ? (
+                  <TableHead className="p-4">
+                    <span className="font-bold sm:text-lg">Action</span>
                   </TableHead>
-                );
-              })}
-              {userMockData.role === "staff" ? (
-                <TableHead className="p-6">
-                  <span className="font-bold sm:text-lg">Action</span>
-                </TableHead>
-              ) : (
-                ""
-              )}
-            </TableRow>
-          ))}
+                ) : (
+                  ""
+                )}
+              </TableRow>
+            );
+          })}
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className="border-none">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="p-6">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      className={`p-4 md:p-6 ${
+                        cell.id.includes("winner") && "hidden md:block"
+                      }`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  );
+                })}
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                 {userMockData.role === "staff" ? (
-                  <TableCell className="p-6">
+                  <TableCell className="p-4">
                     <Dialog>
                       <DialogTrigger onClick={() => toggleDialog(true, row.original)} className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
                         <FaRegEdit />

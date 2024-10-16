@@ -6,8 +6,10 @@ import { mockScoresData } from "@/constants/mockData"
 
 export default function Scores() {
   return (
-    <div className="p-4 sm:p-10">
-      <DataTable columns={scoreColumns} data={mockScoresData} />
+    <div className="p-4 sm:py-10">
+      <div className="mx-auto sm:max-w-[90rem]">
+        <DataTable columns={scoreColumns} data={mockScoresData} />
+      </div>
     </div>
   )
 }
