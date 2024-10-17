@@ -1,4 +1,4 @@
-import Scores from "@/components/Scores/scores";
+import Scores from "@/components/scores/scores";
 
 export default function Home() {
   return (
