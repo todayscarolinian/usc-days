@@ -1,8 +1,7 @@
 "use client";
 
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
-import { Scores } from "@/types/types";
-import { Champions } from "@/types/types";
+import { Schedules } from "@/types/types";
 import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
 import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
 import { format } from "date-fns";
@@ -16,7 +15,7 @@ const sportIcons: Record<string, JSX.Element> = {
   // Add other sports and their icons here
 };
 
-const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
+const dateSortingFn: SortingFn<Schedules> = (rowA, rowB, columnId) => {
   const dateStrA = rowA.getValue<string>(columnId);
   const dateStrB = rowB.getValue<string>(columnId);
 
@@ -25,10 +24,10 @@ const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
   const dateB = new Date(dateStrB);
 
   // Compare the Date objects (ascending order)
-  return dateA.getTime() - dateB.getTime();
+  return dateB.getTime() - dateA.getTime();
 };
 
-export const scoreColumns: ColumnDef<Scores>[] = [
+export const scheduleColumns: ColumnDef<Schedules>[] = [
   {
     id: "date",
     accessorFn: (row) => format(new Date(row.date), "MMMM d, yyyy, h:mm a"),
@@ -79,69 +78,57 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     header: () => <span className="font-bold sm:text-lg">Teams</span>,
     cell: (info) => {
       const teams = info.row.original.teams;
-      const winner = info.row.original.winner;
 
       return (
         <span className="sm:text-[16px]">
-          <span
-            className={
-              winner === teams.home
-                ? "font-bold underline md:font-normal md:no-underline"
-                : ""
-            }
-          >
-            {teams.home}
-          </span>{" "}
-          <span className="opacity-50">vs</span>{" "}
-          <span
-            className={
-              winner === teams.away
-                ? "font-bold underline md:font-normal md:no-underline"
-                : ""
-            }
-          >
-            {teams.away}
-          </span>
+          {teams.home} <span className="opacity-50">vs</span> {teams.away}
         </span>
       );
     },
     filterFn: (row, columnId, filterValue) => {
-      // Get the teams string (already flattened in accessorFn)
       const teams = row.getValue(columnId) as string;
-      // Perform filtering (case-insensitive includes check)
+
       return teams.toLowerCase().includes(filterValue.toLowerCase());
     },
     enableColumnFilter: true,
   },
   {
-    id: "score",
-    accessorFn: (row) => `${row.scores.home} vs ${row.scores.away}`,
-    header: () => <span className="font-bold sm:text-lg">Score</span>,
+    id: "location",
+    accessorKey: "location",
+    header: () => <span className="font-bold sm:text-lg">Location</span>,
     cell: (info) => {
-      const score = info.getValue<string>();
+      const location = info.getValue<string>();
 
-      return <span className="sm:text-[16px]">{score}</span>;
+      return <span className="sm:text-[16px]">{location}</span>;
     },
   },
   {
-    id: "winner",
-    accessorKey: "winner",
-    header: () => <span className="font-bold sm:text-lg">Winner</span>,
-    cell: (info) => {
-      const winner = info.getValue<string>();
+    id: "status",
+    accessorFn: (row) => {
+      const scores = row.scores;
+      const scheduledDate = new Date(row.date);
+      const currentDate = new Date();
 
-      return <span className="sm:text-[16px]">{winner}</span>;
+      const status =
+        scores?.home && scores?.away
+          ? "Finished"
+          : currentDate.getTime() >= scheduledDate.getTime()
+          ? "Ongoing"
+          : "Not Started";
+
+      return status;
     },
-  },
-];
+    accessorKey: "status",
+    header: () => <span className="font-bold sm:text-lg">Status</span>,
+    cell: (info) => {
+      const status = info.getValue<string>();
 
-export const championColumns: ColumnDef<Champions>[] = [
-  {
-    accessorKey: "sport",
-    header: () => <span className="font-bold sm:text-lg">Sport</span>,
-  },
-  {
-    accessorKey: "team",
-    header: () => <span className="font-bold sm:text-lg">Team</span>,
+      return <span className="sm:text-[16px]">{status}</span>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const status = row.getValue(columnId) as string;
+      return true;
+      // return teams.toLowerCase().includes(filterValue.toLowerCase());
+    },
   },
 ];

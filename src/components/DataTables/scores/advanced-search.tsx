@@ -36,7 +36,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "../ui/label";
+import { Label } from "../../ui/label";
 import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
 

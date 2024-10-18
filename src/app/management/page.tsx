@@ -1,7 +1,7 @@
-import { sportColumns, sportMockData } from "@/components/sports/columns";
-import { SportsDataTable } from "@/components/sports/data-table";
-import { teamColumns, teamMockData } from "@/components/teams/columns";
-import { TeamsDataTable } from "@/components/teams/data-table";
+import { sportColumns, sportMockData } from "@/components/DataTables/sports/columns";
+import { SportsDataTable } from "@/components/DataTables/sports/data-table";
+import { teamColumns, teamMockData } from "@/components/DataTables/teams/columns";
+import { TeamsDataTable } from "@/components/DataTables/teams/data-table";
 
 export default function Home() {
 	return (

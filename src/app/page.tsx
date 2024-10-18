@@ -1,4 +1,4 @@
-import Scores from "@/components/scores/scores";
+import Scores from "@/components/DataTables/scores/scores";
 
 export default function Home() {
   return (

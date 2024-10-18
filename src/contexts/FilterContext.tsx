@@ -5,9 +5,10 @@ interface FilterContextProps {
   date: string;
   game: string;
   teams: {
-    home?: string,
-    away?: string,
+    home?: string;
+    away?: string;
   };
+  status: boolean;
   isFilterActive: boolean;
   setFiltered: (filter: filterType) => void;
   clearFilter: () => void;
@@ -18,15 +19,17 @@ const defaultFilterContext: FilterContextProps = {
   game: "",
   teams: {
     home: "",
-    away: ""
+    away: "",
   },
+  status: false,
   isFilterActive: false,
   setFiltered: () => {},
   clearFilter: () => {},
-}
+};
 
-export const FilterContext = createContext<FilterContextProps>(defaultFilterContext);
+export const FilterContext =
+  createContext<FilterContextProps>(defaultFilterContext);
 
 export const useFilter = () => {
   return useContext(FilterContext);
-}
+};

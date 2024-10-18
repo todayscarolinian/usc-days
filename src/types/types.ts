@@ -2,31 +2,47 @@
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
 */
 export type Scores = {
-  id: number,
-  date: string,
-  sport: string,
-  teams: {
-    home: string,
-    away: string,
-  },
-  scores: {
-    home: number,
-    away: number,
-  },
-  winner: string,
+    id: number,
+    date: string,
+    sport: string,
+    teams: {
+        home: string,
+        away: string,
+    },
+    scores: {
+        home: number,
+        away: number,
+    },
+    winner: string,
 }
 
 export type Champions = {
-  id: string,
-  sport: string,
-  team: string,
+    id: number,
+    sport: string,
+    team: string,
+}
+
+export type Schedules = {
+    id: number,
+    date: string,
+    sport: string,
+    teams: {
+        home: string,
+        away: string,
+    },
+    scores: {
+        home: number,
+        away: number,
+    } | null,
+    location: string,
 }
 
 export type filterType = {
-  date?: string,
-  game?: string,
-  teams?: {
-    home?: string,
-    away?: string,
-  }
+    date?: string,
+    game?: string,
+    teams?: {
+        home?: string,
+        away?: string,
+    },
+    status?: boolean,
 };

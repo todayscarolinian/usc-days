@@ -1,5 +1,5 @@
-import { scoreColumns } from "@/components/scores/columns"
-import { DataTable } from "@/components/scores/score-table"
+import { scoreColumns } from "@/components/DataTables/scores/columns"
+import { DataTable } from "@/components/DataTables/scores/score-table"
 
 // Currently static data. To be Fetched from the db using the api
 import { mockScoresData } from "@/constants/mockData"
