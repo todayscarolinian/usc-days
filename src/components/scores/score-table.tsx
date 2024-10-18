@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Input } from "../../ui/input";
+import { Input } from "../ui/input";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,12 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "@/components/DataTables/scores/advanced-search";
+import { AdvancedSearch } from "@/components/scores/advanced-search";
 import { useFilter } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
 import AddScoreDialog from "./add-score-dialog";
-import { Dialog, DialogTrigger } from "../../ui/dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import { useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {

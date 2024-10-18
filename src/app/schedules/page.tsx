@@ -1,4 +1,4 @@
-import Schedules from "@/components/DataTables/schedules/schedules";
+import Schedules from "@/components/schedules/schedules";
 
 export default function SchedulesPage() {
   return (

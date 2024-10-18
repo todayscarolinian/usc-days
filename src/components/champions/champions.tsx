@@ -1,5 +1,5 @@
-import { DataTable } from "@/components/DataTables/champions/champions-table";
-import { championColumns } from "@/components/DataTables/champions/columns";
+import { DataTable } from "@/components/champions/champions-table";
+import { championColumns } from "@/components/champions/columns";
 import { mockChampionsData } from "@/constants/mockData";
 import AddChampionDialog from "@/components/ActionButtons/AddChampionDialog";
 

@@ -44,5 +44,4 @@ export type filterType = {
         home?: string,
         away?: string,
     },
-    status?: boolean,
 };

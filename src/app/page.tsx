@@ -1,10 +1,9 @@
-import Scores from "@/components/DataTables/scores/scores";
+import Scores from "@/components/scores/scores";
 
 export default function Home() {
   return (
     <div>
       <Scores />
     </div>
-
   );
 }

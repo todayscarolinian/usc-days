@@ -36,17 +36,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "../../ui/label";
+import { Label } from "../ui/label";
 import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const FormSchema = z.object({
   date: z.date().optional(),
   game: z.string().optional(),
   team1: z.string().optional(),
   team2: z.string().optional(),
-  status: z.boolean().optional(),
 });
 
 export function AdvancedSearch() {
@@ -65,16 +63,14 @@ export function AdvancedSearch() {
         home: data.team1,
         away: data.team2,
       },
-      status: data.status,
     });
 
-    // Reset the form fields once applied button is clicked
+     // Reset the form fields once applied button is clicked
     form.reset({
       date: undefined,
       game: "",
       team1: "",
       team2: "",
-      status: false,
     });
   }
 
@@ -219,20 +215,6 @@ export function AdvancedSearch() {
                 />
               </div>
             </div>
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <Checkbox
-                    onCheckedChange={field.onChange}
-                    checked={field.value}
-                  />
-                  <FormLabel>Show finished games</FormLabel>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogClose asChild>
               <Button type="submit" className="w-full">
                 Apply

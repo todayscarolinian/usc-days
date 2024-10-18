@@ -36,7 +36,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "../../ui/label";
+import { Label } from "@/components/ui/label";
 import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
 
@@ -65,7 +65,7 @@ export function AdvancedSearch() {
       },
     });
 
-     // Reset the form fields once applied button is clicked
+    // Reset the form fields once applied button is clicked
     form.reset({
       date: undefined,
       game: "",

@@ -1,5 +1,5 @@
-import { scheduleColumns } from "@/components/DataTables/schedules/columns"
-import { DataTable } from "@/components/DataTables/schedules/schedules-table"
+import { scheduleColumns } from "@/components/schedules/columns"
+import { DataTable } from "@/components/schedules/schedules-table"
 
 // Currently static data. To be Fetched from the db using the api
 import { mockSchedulesData } from "@/constants/mockData"

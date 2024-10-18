@@ -1,4 +1,4 @@
-import Champions from "@/components/DataTables/champions/champions";
+import Champions from "@/components/champions/champions";
 
 const ChampionsPage = () => {
   return (

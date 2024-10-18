@@ -125,10 +125,6 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
 
       return <span className="sm:text-[16px]">{status}</span>;
     },
-    filterFn: (row, columnId, filterValue) => {
-      const status = row.getValue(columnId) as string;
-      return true;
-      // return teams.toLowerCase().includes(filterValue.toLowerCase());
-    },
+    enableColumnFilter: true,
   },
 ];

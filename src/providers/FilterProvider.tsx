@@ -14,14 +14,12 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
     home: "",
     away: "",
   });
-  const [status, setStatus] = useState<boolean>(false);
 
   // Function to update filter values
   const setFiltered = (filter: filterType) => {
     if (filter.date !== undefined) setDate(filter.date);
     if (filter.game !== undefined) setGame(filter.game);
     if (filter.teams !== undefined) setTeams(filter.teams);
-    if (filter.status !== undefined) setStatus(filter.status);
 
     setIsFilterActive(true);
   };
@@ -33,7 +31,6 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
       home: "",
       away: "",
     });
-      setStatus(false);
 
     setIsFilterActive(false);
   };
@@ -44,7 +41,6 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
         date,
         game,
         teams,
-        status,
         setFiltered,
         clearFilter,
         isFilterActive,

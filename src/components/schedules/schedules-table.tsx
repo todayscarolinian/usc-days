@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Input } from "../../ui/input";
+import { Input } from "@/components/ui/input";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,12 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "@/components/DataTables/schedules/advanced-search";
+import { AdvancedSearch } from "@/components/schedules/advanced-search";
 import { useFilter } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
 import AddScoreDialog from "./add-score-dialog";
-import { Dialog, DialogTrigger } from "../../ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {
@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
-  const [globalFilter, setGlobalFilter] = useState<any>();
+  const [globalFilter, setGlobalFilter] = useState<string>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 8,
@@ -87,10 +87,6 @@ export function DataTable<TData, TValue>({
       newFilters.push({ id: "game", value: filters.game });
     }
 
-    if (filters.status) {
-      newFilters.push({ id: "status", value: filters.status });
-    }
-
     // Flattened string for teams
     if (filters.teams.home && filters.teams.away) {
       const teamsString = `${filters.teams.home} vs ${filters.teams.away}`;
@@ -99,8 +95,6 @@ export function DataTable<TData, TValue>({
       newFilters.push({ id: "teams", value: filters.teams.home });
     } else if (filters.teams.away) {
       newFilters.push({ id: "teams", value: filters.teams.away });
-    } else if (filters.status) {
-        newFilters.push({ id: "status", value: filters.status });
     }
 
     setColumnFilters(newFilters);
