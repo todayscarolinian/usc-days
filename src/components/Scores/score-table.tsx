@@ -35,6 +35,8 @@ import { useFilter } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { userMockData } from "@/constants/mockData";
 import { FaRegEdit } from "react-icons/fa";
+import AddScoreDialog from "./add-score-dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -62,6 +64,14 @@ export function DataTable<TData, TValue>({
     },
   ]);
   const filters = useFilter();
+
+  const [openDialog, setOpenDialog] = useState(false);
+  let [selectedRecord, setSelectedRecord] = useState(null);
+
+  const toggleDialog = (open: boolean, data: any) => {
+    setOpenDialog(open);
+    setSelectedRecord(data);
+  }
 
   useEffect(() => {
     const newFilters: ColumnFiltersState = [];
@@ -185,9 +195,11 @@ export function DataTable<TData, TValue>({
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                 {userMockData.role === "staff" ? (
                   <TableCell className="p-4">
-                    <Button className="bg-[#9B2626] hover:bg-[#771D1D]">
-                      <FaRegEdit />
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger onClick={() => toggleDialog(true, row.original)} className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
+                        <FaRegEdit />
+                      </DialogTrigger>
+                    </Dialog>
                   </TableCell>
                 ) : (
                   ""
@@ -262,6 +274,13 @@ export function DataTable<TData, TValue>({
           </PaginationContent>
         </Pagination>
       </div>
+
+      <AddScoreDialog
+        isOpen={openDialog}
+        selectedRecord={selectedRecord}
+        onCancel={() => toggleDialog(false, null)}
+        onSave={() => toggleDialog(false, null)}
+      />
     </div>
   );
 }
