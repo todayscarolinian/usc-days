@@ -34,9 +34,9 @@ import { AdvancedSearch } from "@/components/scores/advanced-search";
 import { useFilter } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
-import { useUserStore } from "@/stores/user-store";
 import AddScoreDialog from "./add-score-dialog";
 import { Dialog, DialogTrigger } from "../ui/dialog";
+import { useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
   const filters = useFilter();
 
   const [openDialog, setOpenDialog] = useState(false);
-  let [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   const toggleDialog = (open: boolean, data: any) => {
     setOpenDialog(open);
