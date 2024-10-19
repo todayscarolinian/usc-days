@@ -8,6 +8,7 @@ interface FilterContextProps {
     home?: string;
     away?: string;
   };
+  finishedGames: boolean,
   isFilterActive: boolean;
   setFiltered: (filter: filterType) => void;
   clearFilter: () => void;
@@ -20,6 +21,7 @@ const defaultFilterContext: FilterContextProps = {
     home: "",
     away: "",
   },
+  finishedGames: false,
   isFilterActive: false,
   setFiltered: () => {},
   clearFilter: () => {},

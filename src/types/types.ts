@@ -44,4 +44,5 @@ export type filterType = {
         home?: string,
         away?: string,
     },
+    finishedGame?: boolean
 };

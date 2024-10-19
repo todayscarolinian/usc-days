@@ -39,12 +39,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const FormSchema = z.object({
   date: z.date().optional(),
   game: z.string().optional(),
   team1: z.string().optional(),
   team2: z.string().optional(),
+  status: z.boolean().optional()
 });
 
 export function AdvancedSearch() {
@@ -55,6 +57,7 @@ export function AdvancedSearch() {
   const { setFiltered } = useFilter();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
     const formattedDate = data.date ? format(data.date, "MMMM d, yyyy") : ""; // gets only the Month day and year e.g (September 2, 2024)
     setFiltered({
       date: formattedDate,
@@ -63,6 +66,7 @@ export function AdvancedSearch() {
         home: data.team1,
         away: data.team2,
       },
+      finishedGame: data.status
     });
 
     // Reset the form fields once applied button is clicked
@@ -215,6 +219,20 @@ export function AdvancedSearch() {
                 />
               </div>
             </div>
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <Checkbox
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                  />
+                  <FormLabel>Show finished games</FormLabel>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogClose asChild>
               <Button type="submit" className="w-full">
                 Apply
