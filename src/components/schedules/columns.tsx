@@ -125,6 +125,15 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
 
       return <span className="sm:text-[16px]">{status}</span>;
     },
+    filterFn: (row, columnId, filterValue) => {
+      const status = row.getValue(columnId) as string;
+
+      if (filterValue) {
+        return true;
+      }
+      
+      return status !== "Finished";
+    },
     enableColumnFilter: true,
   },
 ];
