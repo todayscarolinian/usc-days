@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma, User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 class AuthService {
   static async userInDatabase({ email }: { email: string }): Promise<boolean> {

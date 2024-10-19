@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
-  const [globalFilter, setGlobalFilter] = useState<any>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 8,
@@ -68,7 +68,9 @@ export function DataTable<TData, TValue>({
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const toggleDialog = (open: boolean, data: any) => {
+    const toggleDialog = (open: boolean, data: any) => {
+      console.log(data);
+      
     setOpenDialog(open);
     setSelectedRecord(data);
   }
@@ -164,12 +166,10 @@ export function DataTable<TData, TValue>({
                     </TableHead>
                   );
                 })}
-                {email ? (
+                {!email && (
                   <TableHead className="p-4">
                     <span className="font-bold sm:text-lg">Action</span>
                   </TableHead>
-                ) : (
-                  ""
                 )}
               </TableRow>
             );
@@ -195,7 +195,7 @@ export function DataTable<TData, TValue>({
                   );
                 })}
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
-                {email ? (
+                {!email && (
                   <TableCell className="p-4">
                     <Dialog>
                       <DialogTrigger onClick={() => toggleDialog(true, row.original)} className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
@@ -203,8 +203,6 @@ export function DataTable<TData, TValue>({
                       </DialogTrigger>
                     </Dialog>
                   </TableCell>
-                ) : (
-                  ""
                 )}
               </TableRow>
             ))

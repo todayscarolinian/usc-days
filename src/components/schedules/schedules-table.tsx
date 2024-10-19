@@ -32,9 +32,6 @@ import {
 } from "@/components/ui/table";
 import { AdvancedSearch } from "@/components/schedules/advanced-search";
 import { Button } from "@/components/ui/button";
-import { FaRegEdit } from "react-icons/fa";
-import AddScoreDialog from "./add-score-dialog";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 
@@ -51,10 +48,12 @@ export function DataTable<TData, TValue>({
   showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([{
-    id: "status",
-    value: ""
-  }]); // Column filter state
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
+    {
+      id: "status",
+      value: "",
+    },
+  ]); // Column filter state
   const [globalFilter, setGlobalFilter] = useState<string>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -66,19 +65,10 @@ export function DataTable<TData, TValue>({
       desc: true,
     },
   ]);
-  
+
   const filters = useFilterStore();
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState(null);
-
-  const toggleDialog = (open: boolean, data: any) => {
-    setOpenDialog(open);
-    setSelectedRecord(data);
-  };
-
   useEffect(() => {
-
     const newFilters: ColumnFiltersState = [];
 
     // Filters for date
@@ -202,21 +192,6 @@ export function DataTable<TData, TValue>({
                     </TableCell>
                   );
                 })}
-                {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
-                {email ? (
-                  <TableCell className="p-4">
-                    <Dialog>
-                      <DialogTrigger
-                        onClick={() => toggleDialog(true, row.original)}
-                        className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3"
-                      >
-                        <FaRegEdit />
-                      </DialogTrigger>
-                    </Dialog>
-                  </TableCell>
-                ) : (
-                  ""
-                )}
               </TableRow>
             ))
           ) : (
@@ -287,13 +262,6 @@ export function DataTable<TData, TValue>({
           </PaginationContent>
         </Pagination>
       </div>
-
-      <AddScoreDialog
-        isOpen={openDialog}
-        selectedRecord={selectedRecord}
-        onCancel={() => toggleDialog(false, null)}
-        onSave={() => toggleDialog(false, null)}
-      />
     </div>
   );
 }
