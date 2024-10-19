@@ -19,7 +19,7 @@ import {
 
 import { games, teams } from "@/lib/data";
 
-export default function AddDialog() {
+export default function AddChampionDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>

@@ -1,13 +1,13 @@
-import { DataTable } from "@/components/Scores/score-table";
-import { championColumns } from "@/components/Scores/columns";
+import { DataTable } from "@/components/champions/score-table";
+import { championColumns } from "@/components/champions/columns";
 import { mockChampionsData } from "@/constants/mockData";
-import AddDialog from "@/components/ActionButtons/AddDialog";
+import AddChampionDialog from "@/components/ActionButtons/AddChampionDialog";
 
 const Champions = () => {
   return (
     <div className="p-4 sm:py-10">
       <div className="mx-auto sm:max-w-[90rem]">
-        <DataTable columns={championColumns} data={mockChampionsData} showFilter={false} actionButton={<AddDialog />} />
+        <DataTable columns={championColumns} data={mockChampionsData} actionButton={<AddChampionDialog />} />
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
+import { useUserStore } from "@/stores/user-store";
+import axios from "axios";
 
 const nav_items = [
   {
@@ -32,6 +35,18 @@ const nav_items = [
 ];
 
 export default function Navbar() {
+  const { email, resetUser } = useUserStore();
+
+  const signOut = async () => {
+    try {
+      const response = await axios.get("/api/user/logout");
+      const { status } = response.data;
+      return status;
+    } catch (error) {
+      console.error("Error during login", error);
+    }
+  };
+
   return (
     <div>
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary">
@@ -50,7 +65,10 @@ export default function Navbar() {
         </nav>
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="icon" className="shrink-0 bg-tc_primary-600 md:hidden">
+            <Button
+              size="icon"
+              className="shrink-0 bg-tc_primary-600 md:hidden"
+            >
               <Menu />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
@@ -71,25 +89,38 @@ export default function Navbar() {
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-          <div className="ml-auto flex-1 sm:flex-initial"></div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        {email ? (
+          <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+            <div className="ml-auto flex-1 sm:flex-initial"></div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="rounded-full"
+                >
+                  <CircleUser className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={async () => {
+                    const status = await signOut();
+                    if (status == 200) resetUser();
+                  }}
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : null}
       </header>
     </div>
   );
