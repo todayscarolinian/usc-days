@@ -38,17 +38,17 @@ export async function POST(req: Request) {
 
 // PUT /api/scores - Edit an existing score
 export async function PUT(req: Request) {
-    try {
-        const body = await req.json();
-        const result = EditScoreSchema.safeParse(body);
+  try {
+    const body = await req.json();
+    const result = EditScoreSchema.safeParse(body);
 
-        if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
-        }
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors }, { status: 400 });
+    }
 
-        const validatedBody = result.data;
+    const validatedBody = result.data;
 
-        const updatedScore = await scoreService.editScore(validatedBody);
+    const updatedScore = await scoreService.editScore(validatedBody);
 
         return NextResponse.json({ updatedScore }, { status: 200 });
     } catch (error) {

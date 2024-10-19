@@ -48,10 +48,12 @@ export function DataTable<TData, TValue>({
   showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([{
-    id: "status",
-    value: ""
-  }]); // Column filter state
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
+    {
+      id: "status",
+      value: "",
+    },
+  ]); // Column filter state
   const [globalFilter, setGlobalFilter] = useState<string>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -63,11 +65,10 @@ export function DataTable<TData, TValue>({
       desc: true,
     },
   ]);
-  
+
   const filters = useFilterStore();
 
   useEffect(() => {
-
     const newFilters: ColumnFiltersState = [];
 
     // Filters for date

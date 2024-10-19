@@ -35,6 +35,7 @@ export interface GoogleIdentity {
   identity_id: string;
   id: string;
   user_id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   identity_data: Record<string, any>; // Since identity_data is dynamic, we'll use a generic object type
   provider: string;
   last_sign_in_at: string;
@@ -61,16 +62,4 @@ export interface GoogleSession {
   created_at: string;
   updated_at: string;
   is_anonymous: boolean;
-}
-
-export interface GoogleIdentity {
-  identity_id: string;
-  id: string;
-  user_id: string;
-  identity_data: Record<string, any>; // Since identity_data is dynamic, we'll use a generic object type
-  provider: string;
-  last_sign_in_at: string;
-  created_at: string;
-  updated_at: string;
-  email: string;
 }

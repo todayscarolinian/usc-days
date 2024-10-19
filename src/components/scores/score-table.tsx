@@ -48,22 +48,32 @@ export function DataTable<TData, TValue>({
     data,
     actionButton = null,
 }: DataTableProps<TData, TValue>) {
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
-    const [globalFilter, setGlobalFilter] = useState<string>();
-    const [pagination, setPagination] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 8,
-    });
-    const [sorting, setSorting] = useState<SortingState>([
-        {
-            id: "date",
-            desc: true,
-        },
-    ]);
-    const filters = useFilterStore();
-    
-    useEffect(() => {
-        const newFilters: ColumnFiltersState = [];
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
+  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 8,
+  });
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "date",
+      desc: true,
+    },
+  ]);
+  const filters = useFilterStore();
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
+    const toggleDialog = (open: boolean, data: any) => {
+      console.log(data);
+      
+    setOpenDialog(open);
+    setSelectedRecord(data);
+  }
+
+  useEffect(() => {
+    const newFilters: ColumnFiltersState = [];
 
         // Filters for date
         if (filters.date) {

@@ -8,9 +8,8 @@ import { useUserStore } from "@/stores/user-store";
 export default function Page() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [url, setUrl] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
-  const { setEmail, setName, setPicture } = useUserStore()
+  const { setEmail, setName, setPicture } = useUserStore();
 
   useEffect(() => {
     const exchangeCodeForSession = async () => {
@@ -25,10 +24,9 @@ export default function Page() {
         // Make a request to the API endpoint to exchange the code and set the session
         const response = await fetch(`/api/user/session?code=${code}`);
         const data = await response.json();
-        
+
         if (response.ok) {
           const currentUser = data.currentUser as GoogleUserMetadata;
-          setUrl(data.redirectTo);
           setEmail(currentUser.email);
           setName(currentUser.full_name);
           setPicture(currentUser.picture);
@@ -54,7 +52,7 @@ export default function Page() {
       setHasFetched(true);
       exchangeCodeForSession();
     }
-  }, []);
+  }, [hasFetched, router, setHasFetched, setEmail, setName, setPicture]);
 
   if (error) {
     return <div>Error: {error}</div>;
