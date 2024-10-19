@@ -62,16 +62,6 @@ export function DataTable<TData, TValue>({
   ]);
   const filters = useFilterStore();
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState(null);
-
-    const toggleDialog = (open: boolean, data: any) => {
-      console.log(data);
-      
-    setOpenDialog(open);
-    setSelectedRecord(data);
-  }
-
   useEffect(() => {
     const newFilters: ColumnFiltersState = [];
 
