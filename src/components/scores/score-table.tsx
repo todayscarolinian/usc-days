@@ -48,22 +48,22 @@ export function DataTable<TData, TValue>({
     data,
     actionButton = null,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
-  const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 8,
-  });
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "date",
-      desc: true,
-    },
-  ]);
-  const filters = useFilterStore();
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
+    const [globalFilter, setGlobalFilter] = useState<string>("");
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 8,
+    });
+    const [sorting, setSorting] = useState<SortingState>([
+        {
+            id: "date",
+            desc: true,
+        },
+    ]);
+    const filters = useFilterStore();
 
-  useEffect(() => {
-    const newFilters: ColumnFiltersState = [];
+    useEffect(() => {
+        const newFilters: ColumnFiltersState = [];
 
         // Filters for date
         if (filters.date) {
@@ -196,7 +196,10 @@ export function DataTable<TData, TValue>({
                                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                                 {email && (
                                     <TableCell className="p-4">
-                                        <EditScoreDialog key={row.id} game={row.original as Scores} />
+                                        <EditScoreDialog
+                                            key={row.id}
+                                            game={row.original as Scores}
+                                        />
                                     </TableCell>
                                 )}
                             </TableRow>
