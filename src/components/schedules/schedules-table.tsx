@@ -31,12 +31,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AdvancedSearch } from "@/components/schedules/advanced-search";
-import { useFilter } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
 import AddScoreDialog from "./add-score-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useUserStore } from "@/stores/user-store";
+import { useFilterStore } from "@/stores/filter-store";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
     },
   ]);
   
-  const filters = useFilter();
+  const filters = useFilterStore();
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);

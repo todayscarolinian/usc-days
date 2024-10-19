@@ -37,9 +37,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useFilterStore } from "@/stores/filter-store";
 
 const FormSchema = z.object({
   date: z.date().optional(),
@@ -54,7 +54,7 @@ export function AdvancedSearch() {
     resolver: zodResolver(FormSchema),
   });
 
-  const { setFiltered } = useFilter();
+  const { setFiltered } = useFilterStore();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
