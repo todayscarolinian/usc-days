@@ -2,17 +2,22 @@
 
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
 import { Scores } from "@/types/types";
-import { Champions } from "@/types/types";
-import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
+import {
+  FaBasketballBall,
+  FaVolleyballBall,
+  FaSwimmer,
+  FaFootballBall,
+} from "react-icons/fa";
 import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
 import { format } from "date-fns";
 
 const sportIcons: Record<string, JSX.Element> = {
-  Basketball: <FaBasketballBall className="inline mr-2" />,
+  "Basketball": <FaBasketballBall className="inline mr-2" />,
   Badminton: <GiShuttlecock className="inline mr-2" />,
   Volleyball: <FaVolleyballBall className="inline mr-2" />,
   Swimming: <FaSwimmer className="inline mr-2" />,
   "Lawn Tennis": <GiTennisRacket className="inline mr-2" />,
+  Football: <FaFootballBall className="inline mr-2" />,
   // Add other sports and their icons here
 };
 
@@ -31,7 +36,8 @@ const dateSortingFn: SortingFn<Scores> = (rowA, rowB, columnId) => {
 export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "date",
-    accessorFn: (row) => format(new Date(row.date), "MMMM d, yyyy, h:mm a"),
+    accessorFn: (row) =>
+      format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const dateString = info.getValue<string>();
@@ -59,10 +65,15 @@ export const scoreColumns: ColumnDef<Scores>[] = [
   {
     id: "game",
     accessorKey: "sport",
+    accessorFn: (row) => row.gameType.gameName,
     header: () => <span className="font-bold sm:text-lg">Sport</span>,
     cell: (info) => {
       const sport = info.getValue<string>();
-      const Icon = sportIcons[sport]; // Retrieve the icon from the mapping
+
+      // Find a matching sport key that is contained within the sport name
+        const matchingSportKey = Object.keys(sportIcons).find((key) => sport.includes(key));
+
+      const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
 
       return (
         <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
@@ -75,32 +86,36 @@ export const scoreColumns: ColumnDef<Scores>[] = [
   },
   {
     id: "teams",
-    accessorFn: (row) => `${row.teams.home} vs ${row.teams.away}`, // Flatten the teams object into a string
+    accessorFn: (row) => `${row.teamA.teamName} vs ${row.teamB.teamName}`, // Flatten the teams object into a string
     header: () => <span className="font-bold sm:text-lg">Teams</span>,
     cell: (info) => {
-      const teams = info.row.original.teams;
-      const winner = info.row.original.winner;
+      const teamA = info.row.original.teamA.teamName;
+      const teamB = info.row.original.teamB.teamName;
+      const winner =
+        info.row.original.score.teamAScore > info.row.original.score.teamBScore
+          ? teamA
+          : teamB;
 
       return (
         <span className="sm:text-[16px]">
           <span
             className={
-              winner === teams.home
+              winner === teamA
                 ? "font-bold underline md:font-normal md:no-underline"
                 : ""
             }
           >
-            {teams.home}
+            {teamA}
           </span>{" "}
           <span className="opacity-50">vs</span>{" "}
           <span
             className={
-              winner === teams.away
+              winner === teamB
                 ? "font-bold underline md:font-normal md:no-underline"
                 : ""
             }
           >
-            {teams.away}
+            {teamB}
           </span>
         </span>
       );
@@ -115,12 +130,35 @@ export const scoreColumns: ColumnDef<Scores>[] = [
   },
   {
     id: "score",
-    accessorFn: (row) => `${row.scores.home} vs ${row.scores.away}`,
+    accessorFn: (row) => `${row.score.teamAScore} vs ${row.score.teamBScore}`,
     header: () => <span className="font-bold sm:text-lg">Score</span>,
     cell: (info) => {
-      const score = info.getValue<string>();
+      const teamAScore = info.row.original.score.teamAScore;
+      const teamBScore = info.row.original.score.teamBScore;
 
-      return <span className="sm:text-[16px]">{score}</span>;
+      return (
+        <span className="sm:text-[16px]">
+          <span
+            className={
+              teamAScore > teamBScore
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
+            {teamAScore}
+          </span>{" "}
+          <span className="opacity-50">vs</span>{" "}
+          <span
+            className={
+              teamBScore > teamAScore
+                ? "font-bold underline md:font-normal md:no-underline"
+                : ""
+            }
+          >
+            {teamBScore}
+          </span>
+        </span>
+      );
     },
   },
   {
@@ -128,20 +166,12 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     accessorKey: "winner",
     header: () => <span className="font-bold sm:text-lg">Winner</span>,
     cell: (info) => {
-      const winner = info.getValue<string>();
+      const winner =
+        info.row.original.score.teamAScore > info.row.original.score.teamBScore
+          ? info.row.original.teamA.teamName
+          : info.row.original.teamB.teamName;
 
       return <span className="sm:text-[16px]">{winner}</span>;
     },
-  },
-];
-
-export const championColumns: ColumnDef<Champions>[] = [
-  {
-    accessorKey: "sport",
-    header: () => <span className="font-bold sm:text-lg">Sport</span>,
-  },
-  {
-    accessorKey: "team",
-    header: () => <span className="font-bold sm:text-lg">Team</span>,
   },
 ];

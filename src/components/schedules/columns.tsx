@@ -30,7 +30,8 @@ const dateSortingFn: SortingFn<Schedules> = (rowA, rowB, columnId) => {
 export const scheduleColumns: ColumnDef<Schedules>[] = [
   {
     id: "date",
-    accessorFn: (row) => format(new Date(row.date), "MMMM d, yyyy, h:mm a"),
+    accessorFn: (row) =>
+      format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
     header: () => <span className="font-bold sm:text-lg">Date</span>,
     cell: (info) => {
       const dateString = info.getValue<string>();
@@ -58,10 +59,17 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
   {
     id: "game",
     accessorKey: "sport",
+    accessorFn: (row) => row.gameType.gameName,
     header: () => <span className="font-bold sm:text-lg">Sport</span>,
     cell: (info) => {
       const sport = info.getValue<string>();
-      const Icon = sportIcons[sport]; // Retrieve the icon from the mapping
+
+      // Find a matching sport key that is contained within the sport name
+      const matchingSportKey = Object.keys(sportIcons).find((key) =>
+        sport.includes(key)
+      );
+
+      const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
 
       return (
         <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
@@ -74,20 +82,23 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
   },
   {
     id: "teams",
-    accessorFn: (row) => `${row.teams.home} vs ${row.teams.away}`, // Flatten the teams object into a string
+    accessorFn: (row) => `${row.teamA.teamName} vs ${row.teamB.teamName}`, // Flatten the teams object into a string
     header: () => <span className="font-bold sm:text-lg">Teams</span>,
     cell: (info) => {
-      const teams = info.row.original.teams;
+      const teamA = info.row.original.teamA.teamName;
+      const teamB = info.row.original.teamB.teamName;
 
       return (
         <span className="sm:text-[16px]">
-          {teams.home} <span className="opacity-50">vs</span> {teams.away}
+          <span>{teamA}</span> <span className="opacity-50">vs</span>{" "}
+          <span>{teamB}</span>
         </span>
       );
     },
     filterFn: (row, columnId, filterValue) => {
+      // Get the teams string (already flattened in accessorFn)
       const teams = row.getValue(columnId) as string;
-
+      // Perform filtering (case-insensitive includes check)
       return teams.toLowerCase().includes(filterValue.toLowerCase());
     },
     enableColumnFilter: true,
@@ -105,12 +116,12 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
   {
     id: "status",
     accessorFn: (row) => {
-      const scores = row.scores;
-      const scheduledDate = new Date(row.date);
+      const scores = row.score;
+      const scheduledDate = new Date(row.startDate);
       const currentDate = new Date();
 
       const status =
-        scores?.home && scores?.away
+        scores?.teamAScore && scores?.teamBScore
           ? "Finished"
           : currentDate.getTime() >= scheduledDate.getTime()
           ? "Ongoing"
@@ -131,7 +142,7 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
       if (filterValue) {
         return true;
       }
-      
+
       return status !== "Finished";
     },
     enableColumnFilter: true,

@@ -6,7 +6,11 @@ class TeamService {
         try {
             const teams = await prisma.team.findMany({
                 include: {
-                    gameTypes: true,
+                    gameTypes: {
+                        include: {
+                            gameType: true
+                        }
+                    },
                     teamSchools: {
                         include: {
                             school: true,

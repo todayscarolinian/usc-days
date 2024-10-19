@@ -17,7 +17,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-import { games, teams } from "@/lib/data";
+import { games, teams } from "@/constants/mockData";
 
 export default function AddChampionDialog() {
   return (
