@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Score } from "@/types/scores.types";
+import { AddScorePayload, DeleteScorePayload, EditScorePayload } from "@/types/scores.types";
 
 class ScoreService {
   async getScores() {
@@ -13,7 +13,6 @@ class ScoreService {
               gameType: true,
             },
           },
-          createdAt: true,
           createdBy: true,
         },
       });
@@ -24,16 +23,15 @@ class ScoreService {
     }
   }
 
-  async createScore(data: {
-    gameId: string;
-    teamAScore: number;
-    teamBScore: number;
-    createdAt: Date;
-    createdBy: string;
-  }) {
+  async createScore({ gameId, teamAScore, teamBScore, createdById }: AddScorePayload) {
     try {
       const newScore = await prisma.score.create({
-        data,
+        data: {
+          gameId,
+          teamAScore,
+          teamBScore,
+          createdById
+        }
       });
       return newScore;
     } catch (error) {
@@ -42,7 +40,7 @@ class ScoreService {
     }
   }
 
-  async updateScore(gameId: string, teamAScore: number, teamBScore: number) {
+  async editScore({ gameId, teamAScore, teamBScore }: EditScorePayload) {
     try {
       const updatedScore = await prisma.score.update({
         where: { gameId },
@@ -55,7 +53,7 @@ class ScoreService {
     }
   }
 
-  async deleteScore(gameId: string) {
+  async deleteScore({ gameId }: DeleteScorePayload) {
     try {
       const deletedScore = await prisma.score.delete({
         where: { gameId },
