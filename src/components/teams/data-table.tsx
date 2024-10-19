@@ -66,7 +66,7 @@ export function TeamsDataTable<TData, TValue>({
           <Input
             placeholder="Keyword Search"
             onChange={(e) => table.setGlobalFilter(e.target.value)}
-            className="max-w-sm text-white"
+            className="max-w-sm"
           />
         </div>
       </div>

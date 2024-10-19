@@ -15,7 +15,7 @@ export type Scores = {
     teamB: {
         id: number,
         teamName: string,
-    }
+    },
     score: {
         teamAScore: number,
         teamBScore: number,
@@ -31,15 +31,22 @@ export type Champions = {
 
 export type Schedules = {
     id: number,
-    date: string,
-    sport: string,
-    teams: {
-        home: string,
-        away: string,
+    startDate: string,
+    gameType: {
+        id: number,
+        gameName: string,
     },
-    scores: {
-        home: number,
-        away: number,
+    teamA: {
+        id: number,
+        teamName: string,
+    }
+    teamB: {
+        id: number,
+        teamName: string,
+    },
+    score: {
+        teamAScore: number,
+        teamBScore: number,
     } | null,
     location: string,
 }
