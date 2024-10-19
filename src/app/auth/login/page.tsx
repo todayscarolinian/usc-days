@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
 import { useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function SearchParamsHandler() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
 
@@ -21,13 +21,18 @@ export default function LoginPage() {
         }
     }, [searchParams, toast]);
 
+    return null; // This component does not render anything
+}
+
+export default function LoginPage() {
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="mt-[-140px]">
                 <LoginForm />
             </div>
 
-            <Suspense>
+            <Suspense fallback={<div>Loading...</div>}>
+                <SearchParamsHandler />
                 <Toaster />
             </Suspense>
         </div>
