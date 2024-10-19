@@ -33,7 +33,7 @@ import {
 import { AdvancedSearch } from "@/components/scores/advanced-search";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
-import AddScoreDialog from "./add-score-dialog";
+import AddScoreDialog from "./edit-score-dialog";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
@@ -41,14 +41,12 @@ import { useFilterStore } from "@/stores/filter-store";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  showFilter?: boolean;
   actionButton?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
@@ -132,12 +130,12 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
           {/* Filter button */}
-          {showFilter && <AdvancedSearch />}
+           <AdvancedSearch />
           {/* Clear filter */}
-          {showFilter && filters.isFilterActive && (
+          {filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
           )}
-          {(email && actionButton) && actionButton}
+          {(!email && actionButton) && actionButton}
         </div>
       </div>
 

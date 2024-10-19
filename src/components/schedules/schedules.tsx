@@ -6,7 +6,7 @@ import axios from "axios";
 export default async function Schedules() {
   const {
     data: { games: gamesData },
-  } = await axios.get(process.env.NEXT_PUBLIC_BASE_URL + "/api/games");
+    } = await axios.get(process.env.NEXT_PUBLIC_BASE_URL + "/api/games");
 
   return (
     <div className="p-4 sm:py-10">
