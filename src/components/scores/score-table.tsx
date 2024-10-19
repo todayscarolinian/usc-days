@@ -61,6 +61,7 @@ export function DataTable<TData, TValue>({
         },
     ]);
     const filters = useFilterStore();
+    
 
     useEffect(() => {
         const newFilters: ColumnFiltersState = [];
