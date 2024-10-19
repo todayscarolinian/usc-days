@@ -1,152 +1,137 @@
-import { useEffect, useRef, useState } from 'react';
-import { DialogOverlay, DialogFooter, DialogHeader,  DialogContent, DialogTitle, DialogPortal, Dialog } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Scores } from '@/types/types';
+"use client";
 
-interface EditScoreDialogProps {
-  isOpen: boolean;
-  selectedRecord: Scores | null;
-  onCancel: () => void;
-  onSave: () => void;
-}
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Scores } from "@/types/types";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { FaRegEdit } from "react-icons/fa";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ScoreInputs {
-  schedule?: string;
-  homeScore?: number;
-  awayScore?: number;
+    teamA: {
+        teamId: number;
+        score: number;
+    };
+    teamB: {
+        teamId: number;
+        score?: number;
+    };
 }
 
-const EditScoreDialog: React.FC<EditScoreDialogProps> = ({ isOpen, selectedRecord, onCancel, onSave }) => {
-  const [scoreInputs, setScoreInputs] = useState({} as ScoreInputs);
-  const [homeTeam, setHomeTeam] = useState("Team A");
-  const [awayTeam, setAwayTeam] = useState("Team B");
-  let open = useRef(isOpen);
-  
-  const prev = useRef({isOpen, selectedRecord, onCancel, onSave, scoreInputs});
+export default function EditScoreDialog({ game }: { game: Scores }) {
+    const [scoreInputs, setScoreInputs] = useState<ScoreInputs>({
+        teamA: { teamId: game.teamA.id, score: game.score.teamAScore },
+        teamB: { teamId: game.teamB.id, score: game.score.teamBScore },
+    });
 
-  useEffect(() => {
-    if (isOpen) {
-      setupForm();
-      open.current = true;
-    }
-  }, [isOpen]);
-
-  const setOpen = () => {
-    open.current = !open.current;
-    if(!open.current) {
-      onCancel();
-    }
-  };
-
-  useEffect(() => {
-    console.log(scoreInputs);
-  }, [scoreInputs]);
-  
-
-  const handleCancel = () => {
-    open.current = false;
-    onCancel();
-  };
-
-  const handleSave = () => {
-    // Add save logic here
-    onSave();
-  };
-
-  const setupForm = () => {
-    // make inputs as necessary
-    if(selectedRecord) {
-      setScoreInputs({
-        schedule: selectedRecord.startDate,
-        homeScore: selectedRecord.score.teamAScore,
-        awayScore: selectedRecord.score.teamBScore
-      });
-      setHomeTeam(selectedRecord?.teamA.teamName);
-      setAwayTeam(selectedRecord?.teamB.teamName);
-
-      console.log(scoreInputs, homeTeam, awayTeam);
-    } else {
-      setScoreInputs({});
-      setHomeTeam("Team A");
-      setAwayTeam("Team B");
-    }
-  };
-
-  const setScore = (event: any) => {
-    const { name, value } = event.target;
-    let currentInputs = {...scoreInputs};
-    const prop = name == 'homeScore' ? 'homeScore' : 'awayScore';
-
-    if(!value) {
-      delete currentInputs[prop];
-    } else {
-      currentInputs[prop] = parseInt(value);
-    }
-
-    setScoreInputs(currentInputs);
-  }
-
-  const changeSchedule = (value: any) => {
-    let currentInputs = {...scoreInputs};
-
-    if(!value) {
-      delete currentInputs['schedule'];
-    } else {
-      currentInputs['schedule'] = value;
-    }
-
-    setScoreInputs(currentInputs);
-  };
-
-  return (
-    <Dialog open={open.current} onOpenChange={setOpen}>
-      <DialogPortal>
-        <DialogOverlay>
-          <DialogContent>
-            <DialogHeader onAbort={handleCancel}>
-              <DialogTitle>Add Score</DialogTitle>
-            </DialogHeader>
-
-            {/* FORM FIELDS */}
-              <label>Schedule</label>
-              <Select name="schedule" onValueChange={changeSchedule}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select schedule..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={"yes"}>Yes</SelectItem>
-                  <SelectItem value={"no"}>No</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <div className="flex justify-between row">
-                <div>
-                  <label>Home Score ({homeTeam})</label>
-                  <Input type="number" name="homeScore" value={scoreInputs.homeScore} onChange={setScore} />
+    return (
+        <Dialog>
+            <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
+                <FaRegEdit />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Score</DialogTitle>
+                    <DialogDescription>
+                        Edit an existing score. Click Submit when you&apos;re
+                        done or Remove to delete the entry.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-8 py-4">
+                    <div className="relative flex flex-col gap-4 p-4 border-2 rounded-md md:flex-row sm:gap-10">
+                        <p className="absolute top-[-12px] bg-[#f9f9f9] text-[#2D2A29]">
+                            Set {game.teamA.teamName} Score
+                        </p>
+                        <div className="w-56 md:w-64">
+                            <Input
+                                type="number"
+                                name="teamAScore"
+                                value={scoreInputs.teamA.score}
+                                onChange={(e) =>
+                                    setScoreInputs((prev) => ({
+                                        ...prev,
+                                        teamA: {
+                                            ...prev.teamA,
+                                            score: Number(e.target.value),
+                                        },
+                                    }))
+                                }
+                            />
+                        </div>
+                    </div>
+                    <div className="relative flex flex-col gap-4 p-4 border-2 rounded-md md:flex-row sm:gap-10">
+                        <p className="absolute top-[-12px] bg-[#f9f9f9] text-[#2D2A29]">
+                            Set {game.teamB.teamName} Score
+                        </p>
+                        <div className="w-56 md:w-64">
+                            <Input
+                                type="number"
+                                name="teamBScore"
+                                value={scoreInputs.teamB.score}
+                                onChange={(e) =>
+                                    setScoreInputs((prev) => ({
+                                        ...prev,
+                                        teamB: {
+                                            ...prev.teamB,
+                                            score: Number(e.target.value),
+                                        },
+                                    }))
+                                }
+                            />
+                        </div>
+                    </div>
                 </div>
-
-                <div>
-                  <label>Away Score ({awayTeam})</label>
-                  <Input type="number" name="awayScore" value={scoreInputs.awayScore} onChange={setScore} />
-                </div>
-              </div>
-
-              {/* / FORM FIELDS */}
-            <DialogFooter>
-              <Button onClick={handleCancel} variant="secondary">
-                Cancel
-              </Button>
-              <Button onClick={handleSave}>
-                Save
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </DialogOverlay>
-      </DialogPortal>
-    </Dialog>
-  );
-};
-
-export default EditScoreDialog;
+                <DialogFooter>
+                    <AlertDialog>
+                        <AlertDialogTrigger>
+                            <Button
+                                className="bg-transparent border border-tc_primary text-tc_primary hover:text-white"
+                                type="button"
+                            >
+                                Delete
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete the score entry and
+                                    remove the data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <Button type="submit" className="px-8">
+                        Save
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}

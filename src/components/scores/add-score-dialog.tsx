@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 
-import { games, teams } from "@/constants/mockData";
 import { Schedules } from "@/types/types";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { AddScorePayload } from "@/types/scores.types";
+import { useUserStore } from "@/stores/user-store";
+import axios from "axios";
 
 interface ScoreInputs {
     teamA: {
@@ -32,7 +34,7 @@ interface ScoreInputs {
     };
     teamB: {
         teamId: number;
-        score?: number;
+        score: number;
     };
 }
 
@@ -44,13 +46,57 @@ export default function AddScoreDialog({
     const [selectedSchedule, setSelectedSchedule] = useState<Schedules | null>(
         null
     );
+    const [error, setError] = useState<string>("");
     const [scoreInputs, setScoreInputs] = useState<ScoreInputs>({
         teamA: { teamId: 0, score: 0 },
         teamB: { teamId: 0, score: 0 },
     });
 
+    const user = useUserStore();
+
+    async function createScore() {
+        const {
+            data: { userId },
+        } = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/services`,
+            {
+                params: {
+                    email: user.email,
+                },
+            }
+        );
+
+        if (!selectedSchedule || !userId) return;
+        const data: AddScorePayload = {
+            gameId: selectedSchedule?.id,
+            teamAScore: scoreInputs.teamA.score,
+            teamBScore: scoreInputs.teamB.score,
+            createdById: userId,
+        };
+
+        const newScore = await axios.post(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/scores`,
+            data
+        );
+
+        if (newScore.data.status != 200) {
+            setError("An error occurred");
+            console.log(newScore.data.error);
+        }
+    }
+
     return (
-        <Dialog onOpenChange={(open) => !open && setSelectedSchedule(null)}>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    setSelectedSchedule(null);
+                    setScoreInputs({
+                        teamA: { teamId: 0, score: 0 },
+                        teamB: { teamId: 0, score: 0 },
+                    });
+                }
+            }}
+        >
             <DialogTrigger asChild>
                 <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
                     Add Score
@@ -150,8 +196,21 @@ export default function AddScoreDialog({
                         </div>
                     </div>
                 </div>
-                <DialogFooter>
-                    <Button type="submit" disabled={selectedSchedule === null}>Submit</Button>
+                <DialogFooter className="flex items-center">
+                    {error && (
+                        <span className="text-red-500">
+                            Error message is here
+                        </span>
+                    )}
+                    <Button
+                        type="submit"
+                        onClick={async () => {
+                            await createScore();
+                        }}
+                        disabled={selectedSchedule === null}
+                    >
+                        Submit
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
