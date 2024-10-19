@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import ScoreService from "@/services/scores.service";
-import { Score } from "@/types/scores.types";
+import { AddScoreSchema, DeleteScoreSchema, EditScoreSchema } from "@/types/scores.types";
 
 const scoreService = new ScoreService();
 
@@ -8,44 +8,26 @@ const scoreService = new ScoreService();
 export async function GET() {
   try {
     const scores = await scoreService.getScores();
-
-    if (!scores) {
-      return NextResponse.json({ scores: null }, { status: 401 });
-    }
-
-    NextResponse.json({ scores }, { status: 200 });
+    return NextResponse.json({ scores, count: scores.length }, { status: 200 });
   } catch (error: any) {
     console.error("Error in fetching scores: ", error);
-    NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 // POST /api/scores - Add a new score
 export async function POST(req: Request) {
   try {
-    const { gameId, teamAScore, teamBScore, createdAt, createdBy } =
-      (await req.json()) as Score;
+    const body = await req.json();
+    const result = AddScoreSchema.safeParse(body);
 
-    if (
-      !gameId ||
-      teamAScore === undefined ||
-      teamBScore === undefined ||
-      !createdAt ||
-      !createdBy
-    ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors }, { status: 400 });
     }
 
-    const newScore = await scoreService.createScore({
-      gameId,
-      teamAScore,
-      teamBScore,
-      createdAt,
-      createdBy,
-    });
+    const validatedBody = result.data;
+
+    const newScore = await scoreService.createScore(validatedBody);
 
     return NextResponse.json({ newScore });
   } catch (error: any) {
@@ -57,12 +39,16 @@ export async function POST(req: Request) {
 // PUT /api/scores - Edit an existing score
 export async function PUT(req: Request) {
   try {
-    const { gameId, teamAScore, teamBScore } = (await req.json()) as Score;
-    const updatedScore = await scoreService.updateScore({
-      gameId,
-      teamAScore,
-      teamBScore,
-    });
+    const body = await req.json();
+    const result = EditScoreSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors }, { status: 400 });
+    }
+
+    const validatedBody = result.data;
+
+    const updatedScore = await scoreService.editScore(validatedBody);
 
     return NextResponse.json({ updatedScore }, { status: 200 });
   } catch (error: any) {
@@ -74,8 +60,16 @@ export async function PUT(req: Request) {
 // DELETE /api/scores - Delete a score
 export async function DELETE(req: Request) {
   try {
-    const { gameId } = (await req.json()) as Score;
-    const deletedScore = await scoreService.deleteScore(gameId);
+    const body = await req.json();
+    const result = DeleteScoreSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors }, { status: 400 });
+    }
+
+    const validatedBody = result.data;
+
+    const deletedScore = await scoreService.deleteScore(validatedBody);
 
     return NextResponse.json({ deletedScore }, { status: 200 });
   } catch (error: any) {
