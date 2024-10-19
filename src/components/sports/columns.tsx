@@ -40,22 +40,6 @@ export const sportMockData: SportInfo[] = [
 				id: 3,
 				name: "Warriors",
 			},
-			{
-				id: 3,
-				name: "Warriors",
-			},
-			{
-				id: 3,
-				name: "Warriors",
-			},
-			{
-				id: 3,
-				name: "Warriors",
-			},
-			{
-				id: 3,
-				name: "Warriors",
-			},
 		],
 	},
 	{
@@ -123,15 +107,16 @@ export const sportColumns: ColumnDef<SportInfo>[] = [
         accessorFn: (row) => row.teams.map(team => team.name).join(", "),
 		cell: (info) => {
             const teamData = info.getValue<string>();
+            console.log(teamData);
             
 			return (
-				<div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2">
 					{teamData?.split(", ").map((team) => {
 						const Icon = sportIcons[team];
 						return (
 							<div
 								key={team}
-								className="flex justify-center items-center py-1 px-4 rounded-full bg-tc_red text-white"
+								className="flex justify-center items-center py-1 px-4 rounded-full bg-tc_primary text-white"
 							>
 								<span className="bg-yellow 500">{Icon}</span>
 								<span className="font-bold">{team}</span>
