@@ -3,15 +3,23 @@
 */
 export type Scores = {
     id: number,
-    date: string,
-    sport: string,
-    teams: {
-        home: string,
-        away: string,
+    startDate: string,
+    endDate: string,
+    gameType: {
+        id: number,
+        gameName: string,
     },
-    scores: {
-        home: number,
-        away: number,
+    teamA: {
+        id: number,
+        teamName: string,
+    }
+    teamB: {
+        id: number,
+        teamName: string,
+    },
+    score: {
+        teamAScore: number,
+        teamBScore: number,
     },
     winner: string,
 }
@@ -24,15 +32,22 @@ export type Champions = {
 
 export type Schedules = {
     id: number,
-    date: string,
-    sport: string,
-    teams: {
-        home: string,
-        away: string,
+    startDate: string,
+    gameType: {
+        id: number,
+        gameName: string,
     },
-    scores: {
-        home: number,
-        away: number,
+    teamA: {
+        id: number,
+        teamName: string,
+    }
+    teamB: {
+        id: number,
+        teamName: string,
+    },
+    score: {
+        teamAScore: number,
+        teamBScore: number,
     } | null,
     location: string,
 }
@@ -43,6 +58,5 @@ export type filterType = {
     teams?: {
         home?: string,
         away?: string,
-    },
-    finishedGame?: boolean
+    }
 };

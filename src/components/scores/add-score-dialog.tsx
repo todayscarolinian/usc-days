@@ -1,151 +1,218 @@
-import { useEffect, useRef, useState } from 'react';
-import { DialogOverlay, DialogFooter, DialogHeader,  DialogContent, DialogTitle, DialogPortal, Dialog } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+"use client";
 
-interface AddScoreDialogProps {
-  isOpen: boolean;
-  selectedRecord: any;
-  onCancel: () => void;
-  onSave: () => void;
-}
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectTrigger,
+    SelectValue,
+    SelectItem,
+} from "@/components/ui/select";
+import { format } from "date-fns";
+
+import { Schedules } from "@/types/types";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { AddScorePayload } from "@/types/scores.types";
+import { useUserStore } from "@/stores/user-store";
+import axios from "axios";
 
 interface ScoreInputs {
-  schedule?: string;
-  homeScore?: number;
-  awayScore?: number;
+    teamA: {
+        teamId: number;
+        score: number;
+    };
+    teamB: {
+        teamId: number;
+        score: number;
+    };
 }
 
-const AddScoreDialog: React.FC<AddScoreDialogProps> = ({ isOpen, selectedRecord, onCancel, onSave }) => {
-  const [scoreInputs, setScoreInputs] = useState({} as ScoreInputs);
-  const [homeTeam, setHomeTeam] = useState("Team A");
-  const [awayTeam, setAwayTeam] = useState("Team B");
-  let open = useRef(isOpen);
-  
-  const prev = useRef({isOpen, selectedRecord, onCancel, onSave, scoreInputs});
+export default function AddScoreDialog({
+    schedules,
+}: {
+    schedules: Schedules[];
+}) {
+    const [selectedSchedule, setSelectedSchedule] = useState<Schedules | null>(
+        null
+    );
+    const [error, setError] = useState<string>("");
+    const [scoreInputs, setScoreInputs] = useState<ScoreInputs>({
+        teamA: { teamId: 0, score: 0 },
+        teamB: { teamId: 0, score: 0 },
+    });
 
-  useEffect(() => {
-    if (isOpen) {
-      setupForm();
-      open.current = true;
-    }
-  }, [isOpen]);
+    const user = useUserStore();
 
-  const setOpen = () => {
-    open.current = !open.current;
-    if(!open.current) {
-      onCancel();
-    }
-  };
+    async function createScore() {
+        const {
+            data: { userId },
+        } = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/services`,
+            {
+                params: {
+                    email: user.email,
+                },
+            }
+        );
 
-  useEffect(() => {
-    console.log(scoreInputs);
-  }, [scoreInputs]);
-  
+        if (!selectedSchedule || !userId) return;
+        const data: AddScorePayload = {
+            gameId: selectedSchedule?.id,
+            teamAScore: scoreInputs.teamA.score,
+            teamBScore: scoreInputs.teamB.score,
+            createdById: userId,
+        };
 
-  const handleCancel = () => {
-    open.current = false;
-    onCancel();
-  };
+        const newScore = await axios.post(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/scores`,
+            data
+        );
 
-  const handleSave = () => {
-    // Add save logic here
-    onSave();
-  };
-
-  const setupForm = () => {
-    // make inputs as necessary
-    if(selectedRecord) {
-      setScoreInputs({
-        schedule: selectedRecord?.schedule,
-        homeScore: selectedRecord?.scores.home,
-        awayScore: selectedRecord?.scores.away
-      });
-      setHomeTeam(selectedRecord?.teams.home);
-      setAwayTeam(selectedRecord?.teams.away);
-
-      console.log(scoreInputs, homeTeam, awayTeam);
-    } else {
-      setScoreInputs({});
-      setHomeTeam("Team A");
-      setAwayTeam("Team B");
-    }
-  };
-
-  const setScore = (event: any) => {
-    const { name, value } = event.target;
-    let currentInputs = {...scoreInputs};
-    const prop = name == 'homeScore' ? 'homeScore' : 'awayScore';
-
-    if(!value) {
-      delete currentInputs[prop];
-    } else {
-      currentInputs[prop] = parseInt(value);
+        if (newScore.data.status != 200) {
+            setError("An error occurred");
+            console.log(newScore.data.error);
+        }
     }
 
-    setScoreInputs(currentInputs);
-  }
-
-  const changeSchedule = (value: any) => {
-    let currentInputs = {...scoreInputs};
-
-    if(!value) {
-      delete currentInputs['schedule'];
-    } else {
-      currentInputs['schedule'] = value;
-    }
-
-    setScoreInputs(currentInputs);
-  };
-
-  return (
-    <Dialog open={open.current} onOpenChange={setOpen}>
-      <DialogPortal>
-        <DialogOverlay>
-          <DialogContent>
-            <DialogHeader onAbort={handleCancel}>
-              <DialogTitle>Add Score</DialogTitle>
-            </DialogHeader>
-
-            {/* FORM FIELDS */}
-              <label>Schedule</label>
-              <Select name="schedule" onValueChange={changeSchedule}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select schedule..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={"yes"}>Yes</SelectItem>
-                  <SelectItem value={"no"}>No</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <div className="flex justify-between row">
-                <div>
-                  <label>Home Score ({homeTeam})</label>
-                  <Input type="number" name="homeScore" value={scoreInputs.homeScore} onChange={setScore} />
+    return (
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    setSelectedSchedule(null);
+                    setScoreInputs({
+                        teamA: { teamId: 0, score: 0 },
+                        teamB: { teamId: 0, score: 0 },
+                    });
+                }
+            }}
+        >
+            <DialogTrigger asChild>
+                <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
+                    Add Score
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>Add Score</DialogTitle>
+                    <DialogDescription>
+                        Add a new score for a schedule. Click Submit when
+                        you&apos;re done.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-8 py-4">
+                    <div className="w-full">
+                        <Select
+                            onValueChange={(value: string) =>
+                                setSelectedSchedule(schedules[Number(value)])
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a Game" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    {schedules.map((sched, ndx) => (
+                                        <SelectItem
+                                            key={sched.id}
+                                            value={ndx.toString()}
+                                        >
+                                            {format(
+                                                new Date(sched.startDate),
+                                                "MMMM d h:mm a"
+                                            )}{" "}
+                                            - {sched.teamA.teamName}{" "}
+                                            <span className="opacity-50">
+                                                vs
+                                            </span>{" "}
+                                            {sched.teamB.teamName} (
+                                            {sched.gameType.gameName})
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="relative flex flex-col gap-4 p-4 border-2 rounded-md md:flex-row sm:gap-10">
+                        <p className="absolute top-[-12px] bg-[#f9f9f9] text-[#2D2A29]">
+                            Set{" "}
+                            {selectedSchedule
+                                ? selectedSchedule.teamA.teamName
+                                : "Team 1"}{" "}
+                            Score
+                        </p>
+                        <div className="w-56 md:w-64">
+                            <Input
+                                type="number"
+                                name="teamAScore"
+                                value={scoreInputs.teamA.score}
+                                onChange={(e) =>
+                                    setScoreInputs((prev) => ({
+                                        ...prev,
+                                        teamA: {
+                                            ...prev.teamA,
+                                            score: Number(e.target.value),
+                                        },
+                                    }))
+                                }
+                                disabled={selectedSchedule === null}
+                            />
+                        </div>
+                    </div>
+                    <div className="relative flex flex-col gap-4 p-4 border-2 rounded-md md:flex-row sm:gap-10">
+                        <p className="absolute top-[-12px] bg-[#f9f9f9] text-[#2D2A29]">
+                            Set{" "}
+                            {selectedSchedule
+                                ? selectedSchedule.teamB.teamName
+                                : "Team 2"}{" "}
+                            Score
+                        </p>
+                        <div className="w-56 md:w-64">
+                            <Input
+                                type="number"
+                                name="teamBScore"
+                                value={scoreInputs.teamB.score}
+                                onChange={(e) =>
+                                    setScoreInputs((prev) => ({
+                                        ...prev,
+                                        teamB: {
+                                            ...prev.teamB,
+                                            score: Number(e.target.value),
+                                        },
+                                    }))
+                                }
+                                disabled={selectedSchedule === null}
+                            />
+                        </div>
+                    </div>
                 </div>
-
-                <div>
-                  <label>Away Score ({awayTeam})</label>
-                  <Input type="number" name="awayScore" value={scoreInputs.awayScore} onChange={setScore} />
-                </div>
-              </div>
-
-              {/* / FORM FIELDS */}
-            <DialogFooter>
-              <Button onClick={handleCancel} variant="secondary">
-                Cancel
-              </Button>
-              <Button onClick={handleSave}>
-                Save
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </DialogOverlay>
-      </DialogPortal>
-    </Dialog>
-  );
-};
-
-export default AddScoreDialog;
+                <DialogFooter className="flex items-center">
+                    {error && (
+                        <span className="text-red-500">
+                            Error message is here
+                        </span>
+                    )}
+                    <Button
+                        type="submit"
+                        onClick={async () => {
+                            await createScore();
+                        }}
+                        disabled={selectedSchedule === null}
+                    >
+                        Submit
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}

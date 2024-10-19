@@ -192,6 +192,8 @@ export function DataTable<TData, TValue>({
                     </TableCell>
                   );
                 })}
+                {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
+                {/* Dialog */}
               </TableRow>
             ))
           ) : (
@@ -262,6 +264,7 @@ export function DataTable<TData, TValue>({
           </PaginationContent>
         </Pagination>
       </div>
+
     </div>
   );
 }

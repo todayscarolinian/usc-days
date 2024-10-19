@@ -9,13 +9,9 @@ export async function GET() {
     try {
         const scores = await scoreService.getScores();
         return NextResponse.json({ scores, count: scores.length }, { status: 200 });
-    } catch (error: unknown) {
+    } catch (error) {
         console.error("Error in fetching scores: ", error);
-
-        if (error instanceof Error)
-            return NextResponse.json({ error: error.message }, { status: 500 });
-
-        return NextResponse.json({ error: "An unexpected error occurred while fetching scores." }, { status: 500 });
+        return NextResponse.json({ error }, { status: 500 });
     }
 }
 
@@ -33,39 +29,31 @@ export async function POST(req: Request) {
 
         const newScore = await scoreService.createScore(validatedBody);
 
-        return NextResponse.json({ newScore });
-    } catch (error: unknown) {
-        console.error("Error creating scores: ", error);
-
-        if (error instanceof Error)
-            return NextResponse.json({ error: error.message }, { status: 500 });
-
-        return NextResponse.json({ error: "An unexpected error occurred while creating score." }, { status: 500 });
+        return NextResponse.json({ newScore }, { status: 200 });
+    } catch (error) {
+        console.error("Error creating score: ", error);
+        return NextResponse.json({ error }, { status: 500 });
     }
 }
 
 // PUT /api/scores - Edit an existing score
 export async function PUT(req: Request) {
-    try {
-        const body = await req.json();
-        const result = EditScoreSchema.safeParse(body);
+  try {
+    const body = await req.json();
+    const result = EditScoreSchema.safeParse(body);
 
-        if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
-        }
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors }, { status: 400 });
+    }
 
-        const validatedBody = result.data;
+    const validatedBody = result.data;
 
-        const updatedScore = await scoreService.editScore(validatedBody);
+    const updatedScore = await scoreService.editScore(validatedBody);
 
         return NextResponse.json({ updatedScore }, { status: 200 });
-    } catch (error: unknown) {
+    } catch (error) {
         console.error("Error updating score: ", error);
-
-        if (error instanceof Error)
-            return NextResponse.json({ error: error.message }, { status: 500 });
-
-        return NextResponse.json({ error: "An unexpected error occurred while updating score." }, { status: 500 });
+        return NextResponse.json({ error }, { status: 500 });
     }
 }
 
@@ -84,12 +72,8 @@ export async function DELETE(req: Request) {
         const deletedScore = await scoreService.deleteScore(validatedBody);
 
         return NextResponse.json({ deletedScore }, { status: 200 });
-    } catch (error: unknown) {
+    } catch (error) {
         console.error("Error deleting score: ", error);
-
-        if (error instanceof Error)
-            return NextResponse.json({ error: error.message }, { status: 500 });
-
-        return NextResponse.json({ error: "An unexpected error occurred while deleting score." }, { status: 500 });
+        return NextResponse.json({ error }, { status: 500 });
     }
 }

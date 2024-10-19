@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/champions/champions-table";
 import { championColumns } from "@/components/champions/columns";
 import { mockChampionsData } from "@/constants/mockData";
-import AddChampionDialog from "@/components/ActionButtons/AddChampionDialog";
+import AddChampionDialog from "@/components/champions/add-champion-dialog";
 
 export default function Champions() {
   return (
