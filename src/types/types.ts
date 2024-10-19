@@ -29,6 +29,21 @@ export type Champions = {
     team: string,
 }
 
+export type Schedules = {
+    id: number,
+    date: string,
+    sport: string,
+    teams: {
+        home: string,
+        away: string,
+    },
+    scores: {
+        home: number,
+        away: number,
+    } | null,
+    location: string,
+}
+
 export type filterType = {
     date?: string,
     game?: string,

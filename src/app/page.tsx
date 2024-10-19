@@ -5,6 +5,5 @@ export default function Home() {
     <div>
       <Scores />
     </div>
-
   );
 }

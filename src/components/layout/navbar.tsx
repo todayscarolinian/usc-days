@@ -21,7 +21,7 @@ const nav_items = [
     name: "Scores",
   },
   {
-    href: "#",
+    href: "/schedules",
     name: "Schedules",
   },
   {

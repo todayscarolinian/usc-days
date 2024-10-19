@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import {
   ColumnDef,
+  ColumnFiltersState,
   PaginationState,
+  SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -27,39 +30,92 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AdvancedSearch } from "@/components/scores/advanced-search";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
+import AddScoreDialog from "./add-score-dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import { useUserStore } from "@/stores/user-store";
+import { useFilterStore } from "@/stores/filter-store";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  showFilter?: boolean;
   actionButton?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // Column filter state
   const [globalFilter, setGlobalFilter] = useState<any>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 8,
   });
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "date",
+      desc: true,
+    },
+  ]);
+  const filters = useFilterStore();
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
+  const toggleDialog = (open: boolean, data: any) => {
+    setOpenDialog(open);
+    setSelectedRecord(data);
+  }
+
+  useEffect(() => {
+    const newFilters: ColumnFiltersState = [];
+
+    // Filters for date
+    if (filters.date) {
+      newFilters.push({ id: "date", value: filters.date });
+    }
+
+    // Filters for games
+    if (filters.game) {
+      newFilters.push({ id: "game", value: filters.game });
+    }
+
+    // Flattened string for teams
+    if (filters.teams.home && filters.teams.away) {
+      const teamsString = `${filters.teams.home} vs ${filters.teams.away}`;
+      newFilters.push({ id: "teams", value: teamsString });
+    } else if (filters.teams.home) {
+      newFilters.push({ id: "teams", value: filters.teams.home });
+    } else if (filters.teams.away) {
+      newFilters.push({ id: "teams", value: filters.teams.away });
+    }
+
+    setColumnFilters(newFilters);
+  }, [filters]);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     globalFilterFn: "includesString",
     state: {
       globalFilter,
+      columnFilters,
       pagination,
+      sorting,
     },
   });
 
@@ -75,6 +131,12 @@ export function DataTable<TData, TValue>({
             onChange={(e) => table.setGlobalFilter(e.target.value)}
             className="max-w-sm"
           />
+          {/* Filter button */}
+          {showFilter && <AdvancedSearch />}
+          {/* Clear filter */}
+          {showFilter && filters.isFilterActive && (
+            <Button onClick={filters.clearFilter}>Clear Filter</Button>
+          )}
           {(email && actionButton) && actionButton}
         </div>
       </div>
@@ -135,9 +197,11 @@ export function DataTable<TData, TValue>({
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
                 {email ? (
                   <TableCell className="p-4">
-                    <Button className="bg-[#9B2626] hover:bg-[#771D1D]">
-                      <FaRegEdit />
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger onClick={() => toggleDialog(true, row.original)} className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
+                        <FaRegEdit />
+                      </DialogTrigger>
+                    </Dialog>
                   </TableCell>
                 ) : (
                   ""
@@ -212,6 +276,13 @@ export function DataTable<TData, TValue>({
           </PaginationContent>
         </Pagination>
       </div>
+
+      <AddScoreDialog
+        isOpen={openDialog}
+        selectedRecord={selectedRecord}
+        onCancel={() => toggleDialog(false, null)}
+        onSave={() => toggleDialog(false, null)}
+      />
     </div>
   );
 }

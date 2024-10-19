@@ -37,8 +37,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "../ui/label";
-import { useFilter } from "@/contexts/FilterContext";
 import { FaFilter } from "react-icons/fa";
+import { useFilterStore } from "@/stores/filter-store";
 
 const FormSchema = z.object({
   date: z.date().optional(),
@@ -52,7 +52,7 @@ export function AdvancedSearch() {
     resolver: zodResolver(FormSchema),
   });
 
-  const { setFiltered } = useFilter();
+  const { setFiltered } = useFilterStore();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const formattedDate = data.date ? format(data.date, "MMMM d, yyyy") : ""; // gets only the Month day and year e.g (September 2, 2024)
