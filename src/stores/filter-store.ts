@@ -22,7 +22,7 @@ export const useFilterStore = create<FilterState>((set) => ({
       date: filter.date ?? "",
       game: filter.game ?? "",
       teams: filter.teams ?? { home: "", away: "" },
-      finishedGames: filter.finishedGame ?? false,
+      finishedGames: filter.finishedGames ?? false,
       isFilterActive: true,
     });
   },

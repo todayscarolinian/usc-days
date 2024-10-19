@@ -66,7 +66,7 @@ export function AdvancedSearch() {
         home: data.team1,
         away: data.team2,
       },
-      finishedGame: data.status
+      finishedGames: data.status
     });
 
     // Reset the form fields once applied button is clicked

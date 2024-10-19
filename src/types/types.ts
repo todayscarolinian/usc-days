@@ -58,5 +58,6 @@ export type filterType = {
     teams?: {
         home?: string,
         away?: string,
-    }
+    },
+    finishedGames?: boolean
 };
