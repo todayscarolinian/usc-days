@@ -27,8 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { FaRegEdit } from "react-icons/fa";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {
