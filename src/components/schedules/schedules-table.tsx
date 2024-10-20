@@ -30,8 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "@/components/schedules/advanced-search";
-import { Button } from "@/components/ui/button";
+// import { AdvancedSearch } from "@/components/schedules/advanced-search";
+// import { Button } from "@/components/ui/button";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 
@@ -45,7 +45,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  showFilter = true,
+//   showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
@@ -131,11 +131,11 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
           {/* Filter button */}
-          {showFilter && <AdvancedSearch />}
+          {/* {showFilter && <AdvancedSearch />} */}
           {/* Clear filter */}
-          {showFilter && filters.isFilterActive && (
+                  {/* {showFilter && filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
-          )}
+          )} */}
           {email && actionButton && actionButton}
         </div>
       </div>

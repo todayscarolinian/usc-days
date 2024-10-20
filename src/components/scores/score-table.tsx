@@ -30,8 +30,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "@/components/scores/advanced-search";
-import { Button } from "@/components/ui/button";
+// import { AdvancedSearch } from "@/components/scores/advanced-search";
+// import { Button } from "@/components/ui/button";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 import EditScoreDialog from "./edit-score-dialog";
@@ -125,13 +125,13 @@ export function DataTable<TData, TValue>({
                         className="max-w-sm"
                     />
                     {/* Filter button */}
-                    <AdvancedSearch />
+                    {/* <AdvancedSearch /> */}
                     {/* Clear filter */}
-                    {filters.isFilterActive && (
+                    {/* {filters.isFilterActive && (
                         <Button onClick={filters.clearFilter}>
                             Clear Filter
                         </Button>
-                    )}
+                    )} */}
                     {email && actionButton && actionButton}
                 </div>
             </div>
