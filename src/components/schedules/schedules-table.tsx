@@ -131,11 +131,11 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
           {/* Filter button */}
-          {showFilter && <AdvancedSearch />}
+          {/* {showFilter && <AdvancedSearch />} */}
           {/* Clear filter */}
-          {showFilter && filters.isFilterActive && (
+                  {/* {showFilter && filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
-          )}
+          )} */}
           {email && actionButton && actionButton}
         </div>
       </div>
