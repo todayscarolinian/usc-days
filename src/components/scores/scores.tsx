@@ -8,7 +8,7 @@ import { Schedules, Scores } from "@/types/types";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { AdvancedSearch } from "./advanced-search";
+// import { AdvancedSearch } from "./advanced-search";
 import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function ScoresPage() {
@@ -74,7 +74,7 @@ export default function ScoresPage() {
                                     placeholder="Keyword Search"
                                     className="max-w-sm"
                                 />
-                                <AdvancedSearch />
+                                {/* <AdvancedSearch /> */}
                             </div>
                         </div>
                         <Table>
@@ -129,7 +129,7 @@ export default function ScoresPage() {
                                     placeholder="Keyword Search"
                                     className="max-w-sm"
                                 />
-                                <AdvancedSearch />
+                                {/* <AdvancedSearch /> */}
                             </div>
                         </div>
                         <Table>
