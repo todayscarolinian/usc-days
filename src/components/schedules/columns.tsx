@@ -165,11 +165,14 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
         accessorFn: (row) => {
             const scores = row.score;
             const scheduledDate = new Date(row.startDate);
+            const endDate = new Date(row.endDate);
             const currentDate = new Date();
 
             const status =
                 scores?.teamAScore && scores?.teamBScore
                     ? "Finished"
+                    : currentDate.getTime() >= endDate.getTime() && !scores
+                    ? "Score Pending"
                     : currentDate.getTime() >= scheduledDate.getTime()
                     ? "Ongoing"
                     : "Not Started";
