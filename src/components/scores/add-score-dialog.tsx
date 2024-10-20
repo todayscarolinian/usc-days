@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { AddScorePayload } from "@/types/scores.types";
 import { useUserStore } from "@/stores/user-store";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface ScoreInputs {
     teamA: {
@@ -43,9 +44,11 @@ export default function AddScoreDialog({
 }: {
     schedules: Schedules[];
 }) {
+    const router = useRouter();
     const [selectedSchedule, setSelectedSchedule] = useState<Schedules | null>(
         null
     );
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [scoreInputs, setScoreInputs] = useState<ScoreInputs>({
         teamA: { teamId: 0, score: 0 },
@@ -55,33 +58,43 @@ export default function AddScoreDialog({
     const user = useUserStore();
 
     async function createScore() {
-        const {
-            data: { userId },
-        } = await axios.get(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/services`,
-            {
-                params: {
-                    email: user.email,
-                },
+        try {
+            setLoading(true);
+            const {
+                data: { userId },
+            } = await axios.get(
+                `/api/user/services`,
+                {
+                    params: {
+                        email: user.email,
+                    },
+                }
+            );
+    
+            if (!selectedSchedule || !userId) return;
+            const data: AddScorePayload = {
+                gameId: selectedSchedule?.id,
+                teamAScore: scoreInputs.teamA.score,
+                teamBScore: scoreInputs.teamB.score,
+                createdById: userId,
+            };
+    
+            const newScore = await axios.post(
+                `/api/scores`,
+                data
+            );
+            
+            setLoading(false);
+            if (newScore.status != 200) {
+                setError("An error occurred");
+                console.log(newScore.data.error);
+            } else {
+                router.refresh();
             }
-        );
-
-        if (!selectedSchedule || !userId) return;
-        const data: AddScorePayload = {
-            gameId: selectedSchedule?.id,
-            teamAScore: scoreInputs.teamA.score,
-            teamBScore: scoreInputs.teamB.score,
-            createdById: userId,
-        };
-
-        const newScore = await axios.post(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/scores`,
-            data
-        );
-
-        if (newScore.data.status != 200) {
-            setError("An error occurred");
-            console.log(newScore.data.error);
+        } catch (error) {
+            setLoading(false);
+            setError("An error occurred.");
+            console.log(error);
         }
     }
 
@@ -199,7 +212,7 @@ export default function AddScoreDialog({
                 <DialogFooter className="flex items-center">
                     {error && (
                         <span className="text-red-500">
-                            Error message is here
+                            {error}
                         </span>
                     )}
                     <Button
@@ -207,7 +220,7 @@ export default function AddScoreDialog({
                         onClick={async () => {
                             await createScore();
                         }}
-                        disabled={selectedSchedule === null}
+                        disabled={selectedSchedule === null || loading}
                     >
                         Submit
                     </Button>

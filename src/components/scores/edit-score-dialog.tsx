@@ -25,6 +25,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { DeleteScorePayload, EditScorePayload } from "@/types/scores.types";
+import axios from "axios";
 
 interface ScoreInputs {
     teamA: {
@@ -33,7 +35,7 @@ interface ScoreInputs {
     };
     teamB: {
         teamId: number;
-        score?: number;
+        score: number;
     };
 }
 
@@ -42,9 +44,80 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
         teamA: { teamId: game.teamA.id, score: game.score.teamAScore },
         teamB: { teamId: game.teamB.id, score: game.score.teamBScore },
     });
+    const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+
+    async function editScore() {
+        setLoading(true);
+        setError("");
+        if (!game) return;
+
+        const data: EditScorePayload = {
+            gameId: game.id,
+            teamAScore: Number(scoreInputs.teamA.score),
+            teamBScore: Number(scoreInputs.teamB.score),
+        };
+
+        try {
+            const newScore = await axios.put(`/api/scores`, data);
+
+            console.log(newScore);
+
+            setLoading(false);
+            if (newScore.status != 200) {
+                setError("An error occurred");
+                console.log(newScore.data.error);
+            }
+        } catch (error) {
+            setLoading(false);
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error:", error);
+            }
+        }
+    }
+
+    async function deleteScore() {
+        setLoading(true);
+        setError("");
+        if (!game) return;
+
+        const data: DeleteScorePayload = {
+            gameId: game.id,
+        };
+
+        try {
+            const deletedScore = await axios.delete(`/api/scores`, { data });
+
+            setLoading(false);
+            if (deletedScore.status != 200) {
+                setError("An error occurred");
+                console.log(deletedScore.data.error);
+            }
+        } catch (error) {
+            setLoading(false);
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error:", error);
+            }
+        }
+    }
 
     return (
-        <Dialog>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    setScoreInputs({
+                        teamA: {
+                            teamId: game.teamA.id,
+                            score: game.score.teamAScore,
+                        },
+                        teamB: {
+                            teamId: game.teamB.id,
+                            score: game.score.teamBScore,
+                        },
+                    });
+                }
+            }}
+        >
             <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
                 <FaRegEdit />
             </DialogTrigger>
@@ -100,12 +173,14 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
                         </div>
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex items-center">
+                    {error && <span className="text-red-500">{error}</span>}
                     <AlertDialog>
-                        <AlertDialogTrigger>
+                        <AlertDialogTrigger disabled={loading}>
                             <Button
                                 className="bg-transparent border border-tc_primary text-tc_primary hover:text-white"
                                 type="button"
+                                disabled={loading}
                             >
                                 Delete
                             </Button>
@@ -123,11 +198,18 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction>Delete</AlertDialogAction>
+                                <AlertDialogAction onClick={deleteScore}>
+                                    Delete
+                                </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                    <Button type="submit" className="px-8">
+                    <Button
+                        type="submit"
+                        className="px-8"
+                        onClick={editScore}
+                        disabled={loading}
+                    >
                         Save
                     </Button>
                 </DialogFooter>
