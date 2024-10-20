@@ -1,4 +1,5 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { useEffect } from 'react';
 
 interface UserState {
     email: string;
@@ -8,23 +9,44 @@ interface UserState {
     setName: (name: string) => void;
     setPicture: (picture: string) => void;
     resetUser: () => void;
+    initializeUser: () => void;
 }
 
-// Utility function to safely access localStorage on the client side
-const getLocalStorageValue = (key: string, defaultValue: string) => {
-    if (typeof window !== 'undefined') {
-        const storedValue = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user") as string)[key];
-        return storedValue ? storedValue : defaultValue;
-    }
-    return defaultValue;
-};
-
 export const useUserStore = create<UserState>((set) => ({
-    email: getLocalStorageValue('email', ''),
-    name: getLocalStorageValue('name', ''),
-    picture: getLocalStorageValue('picture', ''),
-    setEmail: (email) => set({ email }),
-    setName: (name) => set({ name }),
-    setPicture: (picture) => set({ picture }),
-    resetUser: () => set({ email: '', name: '' }),
+    email: '',
+    name: '',
+    picture: '',
+    setEmail: (email) => {
+        set({ email });
+        localStorage.setItem('email', email);
+    },
+    setName: (name) => {
+        set({ name });
+        localStorage.setItem('name', name);
+    },
+    setPicture: (picture) => {
+        set({ picture });
+        localStorage.setItem('picture', picture);
+    },
+    resetUser: () => {
+        set({ email: '', name: '', picture: '' });
+        localStorage.removeItem('email');
+        localStorage.removeItem('name');
+        localStorage.removeItem('picture');
+    },
+    initializeUser: () => {
+        const email = localStorage.getItem('email') || '';
+        const name = localStorage.getItem('name') || '';
+        const picture = localStorage.getItem('picture') || '';
+        set({ email, name, picture });
+    },
 }));
+
+// Custom hook to initialize the user state on the client side
+export const useInitializeUserStore = () => {
+    const initializeUser = useUserStore((state) => state.initializeUser);
+
+    useEffect(() => {
+        initializeUser();
+    }, [initializeUser]);
+};

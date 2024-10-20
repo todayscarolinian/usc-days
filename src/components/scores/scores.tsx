@@ -9,12 +9,7 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { AdvancedSearch } from "./advanced-search";
-import {
-    Table,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function ScoresPage() {
     const [gamesData, setGamesData] = useState<Scores[]>([]);
@@ -32,14 +27,25 @@ export default function ScoresPage() {
                 const now = new Date();
 
                 // Filter games data
-                const filteredGamesData = data.filter(
-                    (game: Scores) => game.score !== null
-                );
-                const filteredSchedulesData = data.filter((game: Scores) => {
-                    const startDate = new Date(game.startDate);
-                    const isFuture = now.getTime() - startDate.getTime() <= 0;
-                    return !isFuture && game.score === null; // games that are not yet ongoing and don't have a score
-                });
+                const filteredGamesData = data
+                    .filter((game: Scores) => game.score !== null)
+                    .sort(
+                        (a: Scores, b: Scores) =>
+                            new Date(a.startDate).getTime() -
+                            new Date(b.startDate).getTime()
+                    );
+                const filteredSchedulesData = data
+                    .filter((game: Scores) => {
+                        const startDate = new Date(game.startDate);
+                        const isFuture =
+                            now.getTime() - startDate.getTime() <= 0;
+                        return !isFuture && game.score === null; // games that are not yet ongoing and don't have a score
+                    })
+                    .sort(
+                        (a: Scores, b: Scores) =>
+                            new Date(a.startDate).getTime() -
+                            new Date(b.startDate).getTime()
+                    );
 
                 setGamesData(filteredGamesData);
                 setSchedulesData(filteredSchedulesData);
@@ -158,9 +164,7 @@ export default function ScoresPage() {
                             </TableHeader>
                         </Table>
                         <div className="p-4">
-                            <p className="text-red-500">
-                                Failed to load data
-                            </p>
+                            <p className="text-red-500">Failed to load data</p>
                         </div>
                     </div>
                 </div>

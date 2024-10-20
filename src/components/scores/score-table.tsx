@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/table";
 import { AdvancedSearch } from "@/components/scores/advanced-search";
 import { Button } from "@/components/ui/button";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 import EditScoreDialog from "./edit-score-dialog";
 import { Scores } from "@/types/types";
@@ -108,6 +108,7 @@ export function DataTable<TData, TValue>({
         },
     });
 
+    useInitializeUserStore();
     const { email } = useUserStore();
 
     return (

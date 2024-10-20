@@ -24,7 +24,7 @@ import { Schedules } from "@/types/types";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { AddScorePayload } from "@/types/scores.types";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import axios from "axios";
 
 interface ScoreInputs {
@@ -53,6 +53,7 @@ export default function AddScoreDialog({
         teamB: { teamId: 0, score: 0 },
     });
 
+    useInitializeUserStore();
     const user = useUserStore();
 
     async function createScore() {
