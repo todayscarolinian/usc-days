@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
                             Clear Filter
                         </Button>
                     )}
-                    {email && actionButton && actionButton}
+                    {!email && actionButton && actionButton}
                 </div>
             </div>
 
@@ -162,7 +162,7 @@ export function DataTable<TData, TValue>({
                                         </TableHead>
                                     );
                                 })}
-                                {email && (
+                                {!email && (
                                     <TableHead className="p-4">
                                         <span className="font-bold sm:text-lg">
                                             Action
@@ -194,7 +194,7 @@ export function DataTable<TData, TValue>({
                                     );
                                 })}
                                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
-                                {email && (
+                                {!email && (
                                     <TableCell className="p-4">
                                         <EditScoreDialog
                                             key={row.id}

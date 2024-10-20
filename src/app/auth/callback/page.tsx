@@ -32,7 +32,7 @@ export default function Page() {
           setPicture(currentUser.picture);
           // Mark the API call as done
           setHasFetched(true);
-
+            
           // On success, redirect the user to the success page
           router.push(data.redirectTo);
         } else {
