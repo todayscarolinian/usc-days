@@ -26,7 +26,6 @@ import { Input } from "@/components/ui/input";
 import { AddScorePayload } from "@/types/scores.types";
 import { useUserStore } from "@/stores/user-store";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 interface ScoreInputs {
     teamA: {
@@ -44,7 +43,6 @@ export default function AddScoreDialog({
 }: {
     schedules: Schedules[];
 }) {
-    const router = useRouter();
     const [selectedSchedule, setSelectedSchedule] = useState<Schedules | null>(
         null
     );
@@ -88,9 +86,7 @@ export default function AddScoreDialog({
             if (newScore.status != 200) {
                 setError("An error occurred");
                 console.log(newScore.data.error);
-            } else {
-                router.refresh();
-            }
+            } else window.location.reload();
         } catch (error) {
             setLoading(false);
             setError("An error occurred.");
