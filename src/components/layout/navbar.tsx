@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import axios from "axios";
 
 const nav_items = [
@@ -44,6 +44,7 @@ const nav_items = [
 ];
 
 export default function Navbar() {
+    useInitializeUserStore();
     const { email, resetUser } = useUserStore();
 
     const signOut = async () => {

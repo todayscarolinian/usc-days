@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FaRegEdit } from "react-icons/fa";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -62,7 +62,7 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   });
-
+  useInitializeUserStore();
   const { email } = useUserStore();
 
   return (

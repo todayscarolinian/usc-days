@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/table";
 import { AdvancedSearch } from "@/components/schedules/advanced-search";
 import { Button } from "@/components/ui/button";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 
 interface DataTableProps<TData, TValue> {
@@ -117,6 +117,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
+    useInitializeUserStore();
   const { email } = useUserStore();
 
   return (
