@@ -67,7 +67,7 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
             if (newScore.status != 200) {
                 setError("An error occurred");
                 console.log(newScore.data.error);
-            }
+            } else window.location.reload();
         } catch (error) {
             setLoading(false);
             if (axios.isAxiosError(error)) {
@@ -92,7 +92,7 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
             if (deletedScore.status != 200) {
                 setError("An error occurred");
                 console.log(deletedScore.data.error);
-            }
+            } else window.location.reload();
         } catch (error) {
             setLoading(false);
             if (axios.isAxiosError(error)) {
