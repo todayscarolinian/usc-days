@@ -21,6 +21,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis,
 } from "@/components/ui/pagination";
 import {
   Table,
@@ -71,7 +72,7 @@ export function DataTable<TData, TValue>({
   const toggleDialog = (open: boolean, data: any) => {
     setOpenDialog(open);
     setSelectedRecord(data);
-  }
+  };
 
   useEffect(() => {
     const newFilters: ColumnFiltersState = [];
@@ -137,7 +138,7 @@ export function DataTable<TData, TValue>({
           {showFilter && filters.isFilterActive && (
             <Button onClick={filters.clearFilter}>Clear Filter</Button>
           )}
-          {(email && actionButton) && actionButton}
+          {email && actionButton && actionButton}
         </div>
       </div>
 
@@ -198,7 +199,10 @@ export function DataTable<TData, TValue>({
                 {email ? (
                   <TableCell className="p-4">
                     <Dialog>
-                      <DialogTrigger onClick={() => toggleDialog(true, row.original)} className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
+                      <DialogTrigger
+                        onClick={() => toggleDialog(true, row.original)}
+                        className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3"
+                      >
                         <FaRegEdit />
                       </DialogTrigger>
                     </Dialog>
@@ -217,7 +221,7 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      {/* Pagination Controls */}
+      {/* Pagination */}
       <div className="flex flex-col gap-4 items-center justify-center p-4">
         <Pagination>
           <PaginationContent>
@@ -225,7 +229,8 @@ export function DataTable<TData, TValue>({
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={() => {
+                onClick={(event) => {
+                  event.preventDefault();
                   if (table.getState().pagination.pageIndex > 0) {
                     table.previousPage();
                   }
@@ -237,27 +242,79 @@ export function DataTable<TData, TValue>({
                 }
               />
             </PaginationItem>
-            {/* Page count */}
-            {Array.from({ length: table.getPageCount() }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  isActive={index === table.getState().pagination.pageIndex}
-                  onClick={() => table.setPageIndex(index)}
-                  className={`px-4 py-2 rounded-md ${
-                    index === table.getState().pagination.pageIndex
-                      ? "border-[#9B2626]"
-                      : "border-none"
-                  }`}
-                >
-                  {index + 1}
-                </PaginationLink>
+
+            {/* Page numbers */}
+            {(() => {
+              const { pageIndex } = table.getState().pagination;
+              const pageCount = table.getPageCount() - 1;
+              const maxVisiblePages = 2;
+
+              let startPage = Math.max(0, pageIndex - 1);
+              let endPage = Math.min(pageCount, pageIndex + 2);
+
+              if (endPage - startPage < maxVisiblePages) {
+                startPage = Math.max(0, endPage - maxVisiblePages);
+              }
+
+              const pages = Array.from(
+                { length: endPage - startPage },
+                (_, i) => startPage + i
+              );
+
+              return pages.map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    isActive={page === pageIndex}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      table.setPageIndex(page);
+                    }}
+                    className={`px-4 py-2 rounded-md ${
+                      page === table.getState().pagination.pageIndex
+                        ? "border-[#9B2626]"
+                        : "border-none"
+                    }`}
+                  >
+                    {page + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ));
+            })()}
+
+            {/* Ellipsis and page input */}
+            {table.getState().pagination.pageIndex !==
+              table.getPageCount() - 1 && (
+              <PaginationItem>
+                <PaginationEllipsis />
               </PaginationItem>
-            ))}
-            {/* Next Button */}
+            )}
+
+            {/* Display Last Page index here */}
+            <PaginationItem>
+              <PaginationLink
+                href="#"
+                isActive={table.getState().pagination.pageIndex === table.getPageCount() - 1}
+                onClick={(event) => {
+                  event.preventDefault();
+                  table.setPageIndex(table.getPageCount() - 1);
+                }}
+                className={`px-4 py-2 rounded-md ${
+                  table.getPageCount() - 1 === table.getState().pagination.pageIndex
+                    ? "border-[#9B2626]"
+                    : "border-none"
+                }`}
+              >
+                {table.getPageCount()}
+              </PaginationLink>
+            </PaginationItem>
+
+            {/* Next button */}
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={() => {
+                onClick={(event) => {
+                  event.preventDefault();
                   if (
                     table.getState().pagination.pageIndex <
                     table.getPageCount() - 1
