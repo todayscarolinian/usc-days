@@ -48,8 +48,6 @@ export async function PUT(req: Request) {
 
         const updatedScore = await scoreService.editScore(validatedBody);
 
-        await revalidate('/');
-
         return NextResponse.json({ updatedScore }, { status: 200 });
     } catch (error) {
         console.error("Error updating score: ", error);

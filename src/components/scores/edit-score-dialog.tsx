@@ -25,7 +25,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { EditScorePayload } from "@/types/scores.types";
+import { DeleteScorePayload, EditScorePayload } from "@/types/scores.types";
 import axios from "axios";
 
 interface ScoreInputs {
@@ -67,15 +67,31 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
             if (newScore.status != 200) {
                 setError("An error occurred");
                 console.log(newScore.data.error);
-            } else {
-                const revalidation = await axios.get(`/api/revalidate`, {
-                    params: {
-                        path: "/",
-                    },
-                });
+            }
+        } catch (error) {
+            setLoading(false);
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error:", error);
+            }
+        }
+    }
 
-                console.log(revalidation);
-                setError("");
+    async function deleteScore() {
+        setLoading(true);
+        setError("");
+        if (!game) return;
+
+        const data: DeleteScorePayload = {
+            gameId: game.id,
+        };
+
+        try {
+            const deletedScore = await axios.delete(`/api/scores`, { data });
+
+            setLoading(false);
+            if (deletedScore.status != 200) {
+                setError("An error occurred");
+                console.log(deletedScore.data.error);
             }
         } catch (error) {
             setLoading(false);
@@ -86,7 +102,22 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
     }
 
     return (
-        <Dialog>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    setScoreInputs({
+                        teamA: {
+                            teamId: game.teamA.id,
+                            score: game.score.teamAScore,
+                        },
+                        teamB: {
+                            teamId: game.teamB.id,
+                            score: game.score.teamBScore,
+                        },
+                    });
+                }
+            }}
+        >
             <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
                 <FaRegEdit />
             </DialogTrigger>
@@ -167,7 +198,9 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction>Delete</AlertDialogAction>
+                                <AlertDialogAction onClick={deleteScore}>
+                                    Delete
+                                </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
