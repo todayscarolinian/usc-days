@@ -30,8 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdvancedSearch } from "@/components/schedules/advanced-search";
-import { Button } from "@/components/ui/button";
+// import { AdvancedSearch } from "@/components/schedules/advanced-search";
+// import { Button } from "@/components/ui/button";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
 
@@ -45,7 +45,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  showFilter = true,
+//   showFilter = true,
   actionButton = null,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
