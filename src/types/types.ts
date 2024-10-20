@@ -33,6 +33,7 @@ export type Champions = {
 export type Schedules = {
     id: number,
     startDate: string,
+    endDate: string,
     gameType: {
         id: number,
         gameName: string,
