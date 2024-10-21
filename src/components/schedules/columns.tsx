@@ -130,7 +130,8 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
         accessorFn: (row) =>
             format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
         header: () => <span className="font-bold sm:text-lg">Date</span>,
-        cell: (info) => {
+        cell: function CellComponent(info) {
+            const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
             const dateString = info.getValue<string>();
             const date = new Date(dateString);
 
@@ -140,15 +141,34 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
             };
             const shortDate = format(date, "MMM d");
 
+            const handleTooltipToggle = () => {
+                setIsTooltipOpen(!isTooltipOpen);
+            };
+
             return (
                 <>
                     <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
                         <span>{longDate.date}</span>
                         <span>{longDate.time}</span>
                     </span>
-                    <span className="sm:text-[16px] block md:hidden">
-                        {shortDate}
-                    </span>
+
+                    <div className="block md:hidden">
+                        <TooltipProvider>
+                            <Tooltip open={isTooltipOpen}>
+                                <TooltipTrigger onClick={handleTooltipToggle}>
+                                    <span className="sm:text-[16px]">
+                                        {shortDate}
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <span className="sm:text-[16px] flex gap-2 items-center">
+                                        <span>{longDate.date}</span>
+                                        <span>{longDate.time}</span>
+                                    </span>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
                 </>
             );
         },
@@ -160,7 +180,7 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
         accessorKey: "sport",
         accessorFn: (row) => row.gameType.gameName,
         header: () => <span className="font-bold sm:text-lg">Sport</span>,
-        cell: function CellComponent (info) {
+        cell: function CellComponent(info) {
             const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
             const sport = info.getValue<string>();
 
