@@ -36,7 +36,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { prisma } from "@/lib/prisma";
+import { getSportsTeamData } from "@/lib/actions";
 
 interface ScheduleInputs {
     teamAId: number;
@@ -122,19 +122,8 @@ export default function EditScheduleDialog({
         const fetchSportTeamsData = async () => {
             try {
                 setFetchingTeams(true);
-                const fetchedSportTeamData = await prisma.teamGameType.findMany({
-                    where: {
-                        gameTypeId: Number(selectedSport),
-                    },
-                    include: {
-                        team: {
-                            select: {
-                                teamName: true,
-                            },
-                        },
-                    },
-                });
-
+                const fetchedSportTeamData = await getSportsTeamData(Number(selectedSport));
+                if(!fetchedSportTeamData) return setError("Failed to load sports data");
                 setFetchingTeams(false);
                 setSportTeams(fetchedSportTeamData);
             } catch (err) {
