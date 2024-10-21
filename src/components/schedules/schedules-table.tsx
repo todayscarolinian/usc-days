@@ -35,6 +35,8 @@ import {
 // import { Button } from "@/components/ui/button";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useFilterStore } from "@/stores/filter-store";
+import EditScheduleDialog from "./edit-schedule-dialog";
+import { Schedules } from "@/types/types";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -205,7 +207,14 @@ export function DataTable<TData, TValue>({
                                     );
                                 })}
                                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
-                                {/* Dialog */}
+                                {email && (
+                                    <TableCell className="p-4">
+                                        <EditScheduleDialog
+                                            key={row.id}
+                                            schedule={row.original as Schedules}
+                                        />
+                                    </TableCell>
+                                )}
                             </TableRow>
                         ))
                     ) : (

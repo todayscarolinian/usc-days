@@ -21,8 +21,21 @@ import {
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { AddGamePayload } from "@/types/games.types";
+import { DeleteGamePayload, EditGamePayload } from "@/types/games.types";
 import { Label } from "@/components/ui/label";
+import { Schedules } from "@/types/types";
+import { FaRegEdit } from "react-icons/fa";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { prisma } from "@/lib/prisma";
 
 interface ScheduleInputs {
@@ -49,21 +62,41 @@ interface SportTeam {
     };
 }
 
-export default function AddScheduleDialog() {
-    const [selectedSport, setSelectedSport] = useState<number | null>(null);
+export default function EditScheduleDialog({
+    schedule,
+}: {
+    schedule: Schedules;
+}) {
+    const [selectedSport, setSelectedSport] = useState<number>(
+        schedule.gameType.id
+    );
     const [sports, setSports] = useState<Sport[]>([]);
     const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
-        teamAId: -1,
-        teamBId: -1,
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
-        location: undefined,
+        teamAId: schedule.teamA.id,
+        teamBId: schedule.teamB.id,
+        startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
+            timeZone: "Asia/Manila",
+        }),
+        endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
+            timeZone: "Asia/Manila",
+        }),
+        startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // Use 24-hour format
+            timeZone: "Asia/Manila",
+        }),
+        endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // Use 24-hour format
+            timeZone: "Asia/Manila",
+        }),
+        location: schedule.location ? schedule.location : undefined,
     });
 
     useEffect(() => {
@@ -113,12 +146,13 @@ export default function AddScheduleDialog() {
         fetchSportTeamsData();
     }, [selectedSport]);
 
-    async function createSchedule() {
+    async function editSchedule() {
         try {
             setLoading(true);
             if (!selectedSport) return;
 
-            const data: AddGamePayload = {
+            const data: EditGamePayload = {
+                id: schedule.id,
                 gameTypeId: selectedSport,
                 teamAId: scheduleInputs.teamAId,
                 teamBId: scheduleInputs.teamBId,
@@ -129,10 +163,10 @@ export default function AddScheduleDialog() {
                     : undefined,
             };
 
-            const newSchedule = await axios.post(`/api/games`, data);
+            const newSchedule = await axios.put(`/api/games`, data);
 
             setLoading(false);
-            if (newSchedule.status != 201) {
+            if (newSchedule.status != 200) {
                 setError("An error occurred");
                 console.log(newSchedule.data.error);
             } else window.location.reload();
@@ -143,34 +177,84 @@ export default function AddScheduleDialog() {
         }
     }
 
+    async function deleteSchedule() {
+        setLoading(true);
+        setError("");
+        if (!selectedSport) return;
+
+        const data: DeleteGamePayload = {
+            id: schedule.id,
+        };
+
+        try {
+            const deletedScore = await axios.delete(`/api/games`, { data });
+
+            setLoading(false);
+            if (deletedScore.status != 200) {
+                setError("An error occurred");
+                console.log(deletedScore.data.error);
+            } else window.location.reload();
+        } catch (error) {
+            setLoading(false);
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error:", error);
+            }
+        }
+    }
+
     return (
         <Dialog
             onOpenChange={(open) => {
                 if (!open) {
-                    setSelectedSport(null);
+                    setSelectedSport(schedule.gameType.id);
+                    setSportTeams([]);
                     setScheduleInputs({
-                        teamAId: -1,
-                        teamBId: -1,
-                        startDate: "",
-                        endDate: "",
-                        startTime: "",
-                        endTime: "",
-                        location: undefined,
+                        teamAId: schedule.teamA.id,
+                        teamBId: schedule.teamB.id,
+                        startDate: new Date(
+                            schedule.startDate
+                        ).toLocaleDateString("en-CA", {
+                            timeZone: "Asia/Manila",
+                        }),
+                        endDate: new Date(schedule.endDate).toLocaleDateString(
+                            "en-CA",
+                            {
+                                timeZone: "Asia/Manila",
+                            }
+                        ),
+                        startTime: new Date(
+                            schedule.startDate
+                        ).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false, // Use 24-hour format
+                            timeZone: "Asia/Manila",
+                        }),
+                        endTime: new Date(schedule.endDate).toLocaleTimeString(
+                            "en-US",
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false, // Use 24-hour format
+                                timeZone: "Asia/Manila",
+                            }
+                        ),
+                        location: schedule.location
+                            ? schedule.location
+                            : undefined,
                     });
                 }
             }}
         >
-            <DialogTrigger asChild>
-                <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-                    Add Schedule
-                </Button>
+            <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
+                <FaRegEdit />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Add Score</DialogTitle>
                     <DialogDescription>
-                        Add a new game schedule. Click Submit when you&apos;re
-                        done.
+                        Edit an existing game schedule. Click Submit when
+                        you&apos;re done.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-8 py-4">
@@ -185,6 +269,7 @@ export default function AddScheduleDialog() {
                             <Input
                                 type="date"
                                 placeholder="Start Date"
+                                value={scheduleInputs.startDate}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -203,6 +288,7 @@ export default function AddScheduleDialog() {
                             <Input
                                 type="date"
                                 placeholder="End Date"
+                                value={scheduleInputs.endDate}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -223,6 +309,7 @@ export default function AddScheduleDialog() {
                             <Input
                                 type="time"
                                 placeholder="Start Time"
+                                value={scheduleInputs.startTime}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -241,6 +328,7 @@ export default function AddScheduleDialog() {
                             <Input
                                 type="time"
                                 placeholder="End Time"
+                                value={scheduleInputs.endTime}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -252,12 +340,18 @@ export default function AddScheduleDialog() {
                     </div>
                     <div className="w-full">
                         <Select
+                            value={
+                                sports.length > 0
+                                    ? selectedSport.toString()
+                                    : undefined
+                            }
                             onValueChange={(value: string) =>
                                 setSelectedSport(Number(value))
                             }
+                            disabled={sports.length <= 0}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select a Sport" />
+                                <SelectValue placeholder="Loading..." />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
@@ -282,16 +376,21 @@ export default function AddScheduleDialog() {
                                 Team
                             </Label>
                             <Select
+                                value={
+                                    sportTeams.length > 0
+                                        ? scheduleInputs.teamAId.toString()
+                                        : undefined
+                                }
                                 onValueChange={(value: string) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
                                         teamAId: Number(value),
                                     })
                                 }
-                                disabled={!selectedSport || fetchingTeams}
+                                disabled={sportTeams.length <= 0 || fetchingTeams}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select Team" />
+                                    <SelectValue placeholder="Loading..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
@@ -316,16 +415,21 @@ export default function AddScheduleDialog() {
                                 Team
                             </Label>
                             <Select
+                                value={
+                                    sportTeams.length > 0
+                                        ? scheduleInputs.teamBId.toString()
+                                        : undefined
+                                }
                                 onValueChange={(value: string) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
                                         teamBId: Number(value),
                                     })
                                 }
-                                disabled={!selectedSport || fetchingTeams}
+                                disabled={sportTeams.length <= 0 || fetchingTeams}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select Team" />
+                                    <SelectValue placeholder="Loading..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
@@ -352,6 +456,7 @@ export default function AddScheduleDialog() {
                         <Input
                             type="text"
                             placeholder="Location"
+                            value={scheduleInputs.location}
                             onChange={(e) =>
                                 setScheduleInputs({
                                     ...scheduleInputs,
@@ -363,14 +468,48 @@ export default function AddScheduleDialog() {
                 </div>
                 <DialogFooter className="flex items-center">
                     {error && <span className="text-red-500">{error}</span>}
+                    <AlertDialog>
+                        <AlertDialogTrigger disabled={loading}>
+                            <Button
+                                className="bg-transparent border border-tc_primary text-tc_primary hover:text-white"
+                                type="button"
+                                disabled={loading}
+                            >
+                                Delete
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete the schedule entry and
+                                    remove the data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                onClick={deleteSchedule}
+                                >
+                                    Delete
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     <Button
                         type="submit"
-                        onClick={async () => {
-                            await createSchedule();
-                        }}
-                        disabled={selectedSport === null || loading}
+                        className="px-8"
+                        onClick={editSchedule}
+                        disabled={
+                            loading ||
+                            sportTeams.length <= 0 ||
+                            sports.length <= 0
+                        }
                     >
-                        Submit
+                        Save
                     </Button>
                 </DialogFooter>
             </DialogContent>
