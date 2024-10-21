@@ -11,7 +11,7 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "USC Days 2023 Scoreboard - Today's Carolinian",
+  title: "USC Days 2024 Scoreboard - Today's Carolinian",
   description: "Scoreboard of the different school teams per game for USC Days 2024",
 };
 
