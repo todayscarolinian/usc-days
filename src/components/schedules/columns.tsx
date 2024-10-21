@@ -30,10 +30,10 @@ import {
 import { useState } from "react";
 
 const sportIcons: Record<string, JSX.Element> = {
-    Badminton: (
+    "Badminton": (
         <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
     ),
-    Basketball: (
+    "Basketball": (
         <Image
             src={Basketball}
             className="inline mr-2 size-6"
@@ -47,7 +47,7 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Cheer Dance"
         />
     ),
-    Chess: <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
+    "Chess": <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
     "E-Sports": (
         <Image src={Esports} className="inline mr-2 size-6" alt="Esports" />
     ),
@@ -58,13 +58,13 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Flag Football"
         />
     ),
-    Football: (
+    "Football": (
         <Image src={Football} className="inline mr-2 size-6" alt="Football" />
     ),
-    Frisbee: (
+    "Frisbee": (
         <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
     ),
-    Futsal: <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
+    "Futsal": <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
     "Lawn Tennis": (
         <Image
             src={LawnTennis}
@@ -86,7 +86,7 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Ms. USC Days"
         />
     ),
-    Swimming: (
+    "Swimming": (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
     "Table Tennis": (
@@ -103,7 +103,7 @@ const sportIcons: Record<string, JSX.Element> = {
             alt={"3x3 Basketball"}
         />
     ),
-    Volleyball: (
+    "Volleyball": (
         <Image
             src={Volleyball}
             className="inline mr-2 size-6"
