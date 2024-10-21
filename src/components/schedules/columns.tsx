@@ -153,13 +153,14 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
     {
         id: "location",
         accessorKey: "location",
+        accessorFn: (row) => row.location,
         header: () => <span className="font-bold sm:text-lg">Location</span>,
         cell: (info) => {
             const location = info.getValue<string>();
 
             return <span className="sm:text-[16px]">{location}</span>;
         },
-        enableColumnFilter: true,
+        enableGlobalFilter: true,
     },
     {
         id: "status",
