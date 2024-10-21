@@ -109,14 +109,14 @@ export const sportColumns: ColumnDef<SportInfo>[] = [
       const teamData = info.getValue<string>();
 
       return (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {teamData?.split(", ").map((team) => {
             return (
               <div
                 key={team}
                 className="flex justify-center items-center py-1 px-4 rounded-full bg-tc_primary text-white"
               >
-                <span className="font-bold">{team}</span>
+                <span className="font-bold text-center">{team}</span>
               </div>
             );
           })}
