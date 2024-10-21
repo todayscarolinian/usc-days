@@ -5,26 +5,42 @@ import { Scores } from "@/types/types";
 import { format } from "date-fns";
 import Badminton from "@/assets/icons/Diamond/Badminton.svg";
 import Basketball from "@/assets/icons/Diamond/Basketball.svg";
+import Cheerdance from "@/assets/icons/Diamond/Cheerdance.svg";
 import Chess from "@/assets/icons/Diamond/Chess.svg";
 import Esports from "@/assets/icons/Diamond/Esports.svg";
 import FlagFootball from "@/assets/icons/Diamond/Flag Football.svg";
 import Football from "@/assets/icons/Diamond/Football.svg";
+import Frisbee from "@/assets/icons/Diamond/Frisbee.svg";
 import Futsal from "@/assets/icons/Diamond/Futsal.svg";
 import LawnTennis from "@/assets/icons/Diamond/Lawn Tennis.svg";
+import MrIntrams from "@/assets/icons/Diamond/Mr Intrams.svg";
+import MsIntrams from "@/assets/icons/Diamond/Ms Intrams.svg";
+import Swimming from "@/assets/icons/Diamond/Swimming.svg";
 import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
+import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
 import Image from "next/image";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useState } from "react";
 
 const sportIcons: Record<string, JSX.Element> = {
-    Badminton: (
+    "Badminton": (
         <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
     ),
-    Basketball: (
+    "Basketball": (
         <Image
             src={Basketball}
             className="inline mr-2 size-6"
             alt="Basketball"
         />
+    ),
+    "Cheer Dance": (
+        <Image src={Cheerdance} className="inline mr-2 size-6" alt="Cheer Dance" />
     ),
     Chess: <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
     "E-Sports": (
@@ -37,12 +53,24 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Flag Football"
         />
     ),
-    Football: (
+    "Football": (
         <Image src={Football} className="inline mr-2 size-6" alt="Football" />
     ),
-    Futsal: <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
+    "Frisbee": (
+        <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
+    ),
+    "Futsal": <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
     "Lawn Tennis": (
-        <Image src={LawnTennis} className="inline mr-2 size-6" alt="Futsal" />
+        <Image src={LawnTennis} className="inline mr-2 size-6" alt="Lawn Tennis" />
+    ),
+    "Mr. USC Days": (
+        <Image src={MrIntrams} className="inline mr-2 size-6" alt="Mr. USC Days" />
+    ),
+    "Ms. USC Days": (
+        <Image src={MsIntrams} className="inline mr-2 size-6" alt="Ms. USC Days" />
+    ),
+    "Swimming": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
     "Table Tennis": (
         <Image
@@ -51,7 +79,10 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Table Tennis"
         />
     ),
-    Volleyball: (
+    "3x3 Basketball": (
+        <Image src={ThreeByThreeBasketball} className="inline mr-2 size-6" alt={"3x3 Basketball"} />
+    ),
+    "Volleyball": (
         <Image
             src={Volleyball}
             className="inline mr-2 size-6"
@@ -78,26 +109,34 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         accessorFn: (row) =>
             format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
         header: () => <span className="font-bold sm:text-lg">Date</span>,
-        cell: (info) => {
-            const dateString = info.getValue<string>();
-            const date = new Date(dateString);
+        cell: function CellComponent (info) {
+            const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
+            const sport = info.getValue<string>();
 
-            const longDate = {
-                date: format(date, "MMMM d"),
-                time: format(date, "h:mm a"),
+            // Find a matching sport key that is contained within the sport name
+            const matchingSportKey = Object.keys(sportIcons).find((key) =>
+                sport.includes(key)
+            );
+
+            const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
+            const handleTooltipToggle = () => {
+                setIsTooltipOpen(!isTooltipOpen);
             };
-            const shortDate = format(date, "MMM d");
 
             return (
-                <>
-                    <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
-                        <span>{longDate.date}</span>
-                        <span>{longDate.time}</span>
-                    </span>
-                    <span className="sm:text-[16px] block md:hidden">
-                        {shortDate}
-                    </span>
-                </>
+                <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
+                    <TooltipProvider>
+                        <Tooltip open={isTooltipOpen}>
+                            <TooltipTrigger onClick={handleTooltipToggle}>
+                                {Icon}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <span>{sport}</span>
+                            </TooltipContent>
+                        </Tooltip>
+                        <span className="hidden md:block">{sport}</span>
+                    </TooltipProvider>
+                </span>
             );
         },
         sortingFn: dateSortingFn,
