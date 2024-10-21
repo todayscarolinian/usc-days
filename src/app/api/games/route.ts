@@ -1,5 +1,5 @@
 import GameService from "@/services/games.service";
-import { EditGamePayload, AddGamePayload } from "@/types/games.types";
+import { AddGameSchema, EditGameSchema, DeleteGameSchema } from "@/types/games.types";
 import { NextResponse } from "next/server";
 
 const gameService = new GameService
@@ -10,11 +10,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
-        const body: AddGamePayload = await req.json();
-        if (body.teamAId === body.teamBId) {
-            throw new Error('Team A and Team B cannot be the same.')
+        const body = await req.json();
+        const result = AddGameSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
         }
-        const newGame = await gameService.addGame(body);
+
+        const validatedBody = result.data;
+        const newGame = await gameService.addGame(validatedBody);
         return NextResponse.json({ newGame }, { status: 201 });
     } catch (error) {
         console.error('Error adding game:', error);
@@ -24,11 +28,15 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
     try {
-        const body: EditGamePayload = await req.json();
-        if (body.teamAId === body.teamBId) {
-            throw new Error('Team A and Team B cannot be the same.')
+        const body = await req.json();
+        const result = EditGameSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
         }
-        const updatedGame = await gameService.editGame(body);
+
+        const validatedBody = result.data;
+        const updatedGame = await gameService.editGame(validatedBody);
         return NextResponse.json({ updatedGame }, { status: 200 });
     } catch (error) {
         console.error('Error updating game:', error);
@@ -38,8 +46,15 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
-        const { id } = await req.json(); // Get the id from the request body
-        const deletedGame = await gameService.deleteGame(id);
+        const body = await req.json();
+        const result = DeleteGameSchema.safeParse(body)
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+        }
+
+        const validatedBody = result.data;
+        const deletedGame = await gameService.deleteGame(validatedBody);
         return NextResponse.json({ deletedGame }, { status: 200 });
     } catch (error) {
         console.error('Error deleting game:', error);

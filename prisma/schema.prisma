@@ -1,38 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_DB_URL")
   directUrl = env("POSTGRES_DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id    Int     @id @default(autoincrement())
   email String  @unique @db.VarChar(100)
+  id    Int     @id @default(autoincrement())
   Score Score[]
 
   @@map("users")
 }
 
 model Team {
-  id       Int    @id @default(autoincrement())
-  teamName String @map("team_name") @db.VarChar(100)
-
-  gameTypes  TeamGameType[]
+  teamName    String         @map("team_name") @db.VarChar(100)
+  id          Int            @id @default(autoincrement())
+  teamAGames  Game[]         @relation("TeamAGames")
+  teamBGames  Game[]         @relation("TeamBGames")
+  gameTypes   TeamGameType[]
   teamSchools TeamSchool[]
-  teamAGames Game[]         @relation("TeamAGames")
-  teamBGames Game[]         @relation("TeamBGames")
 
   @@map("teams")
 }
 
 model School {
-  id         Int    @id @default(autoincrement())
-  schoolName String @unique @map("school_name") @db.VarChar(100)
-
-  teams TeamSchool[]
+  schoolName String       @unique @map("school_name") @db.VarChar(100)
+  id         Int          @id @default(autoincrement())
+  teams      TeamSchool[]
 
   @@map("schools")
 }
@@ -40,58 +38,57 @@ model School {
 model TeamSchool {
   id       Int    @id @default(autoincrement())
   teamId   Int    @map("team_id")
-  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
   schoolId Int    @map("school_id")
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@map("team_schools")
 }
 
 model GameType {
-  id       Int    @id @default(autoincrement())
-  gameName String @map("game_name") @db.VarChar(100)
-
-  games Game[]
-  teams TeamGameType[]
+  gameName String         @map("game_name") @db.VarChar(100)
+  id       Int            @id @default(autoincrement())
+  games    Game[]
+  teams    TeamGameType[]
 
   @@map("game_types")
 }
 
 model TeamGameType {
-  id     Int  @id @default(autoincrement())
-  teamId Int  @map("team_id")
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
+  id         Int      @id @default(autoincrement())
   gameTypeId Int      @map("game_type_id")
+  teamId     Int      @map("team_id")
   gameType   GameType @relation(fields: [gameTypeId], references: [id])
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@map("team_game_types")
 }
 
 model Game {
-  id         Int      @id @default(autoincrement())
   gameTypeId Int      @map("game_type_id")
-  gameType   GameType @relation(fields: [gameTypeId], references: [id])
   teamAId    Int      @map("team_a_id")
   teamBId    Int      @map("team_b_id")
+  location   String?  @db.VarChar(255)
+  id         Int      @id @default(autoincrement())
+  endDate    DateTime @default(now()) @map("end_date")
+  startDate  DateTime @default(now()) @map("start_date")
+  gameType   GameType @relation(fields: [gameTypeId], references: [id])
   teamA      Team     @relation("TeamAGames", fields: [teamAId], references: [id])
   teamB      Team     @relation("TeamBGames", fields: [teamBId], references: [id])
-  date       DateTime @default(now())
-  location   String?  @db.VarChar(255)
   score      Score?
 
   @@map("games")
 }
 
 model Score {
-  id          Int      @id @default(autoincrement())
   gameId      Int      @unique @map("game_id")
-  game        Game     @relation(fields: [gameId], references: [id])
   teamAScore  Decimal  @map("team_a_score") @db.Decimal(10, 2)
   teamBScore  Decimal  @map("team_b_score") @db.Decimal(10, 2)
   createdAt   DateTime @default(now()) @map("created_at")
   createdById Int      @map("created_by")
+  id          Int      @id @default(autoincrement())
   createdBy   User     @relation(fields: [createdById], references: [id])
+  game        Game     @relation(fields: [gameId], references: [id])
 
   @@map("scores")
 }

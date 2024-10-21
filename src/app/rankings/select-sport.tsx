@@ -19,8 +19,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { Games } from "@/types/games.types";
-
 interface SelectSportButtonProps {
   onSelectSport: (sport: string) => void;
 }
@@ -33,7 +31,7 @@ export function SelectSportButton({ onSelectSport }: SelectSportButtonProps) {
 
   useEffect(() => {
     // Mock data
-    const mockData: Games = {
+    const mockData = {
       games: ["Soccer", "Basketball", "Baseball"],
       count: 3,
     };

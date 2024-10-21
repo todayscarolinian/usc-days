@@ -28,9 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { FaRegEdit } from "react-icons/fa";
-import { useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,7 +61,7 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   });
-
+  useInitializeUserStore();
   const { email } = useUserStore();
 
   return (
@@ -103,13 +101,13 @@ export function DataTable<TData, TValue>({
                     </TableHead>
                   );
                 })}
-                {email ? (
+                {/* {email ? (
                   <TableHead className="p-4">
                     <span className="font-bold sm:text-lg">Action</span>
                   </TableHead>
                 ) : (
                   ""
-                )}
+                )} */}
               </TableRow>
             );
           })}
@@ -134,7 +132,7 @@ export function DataTable<TData, TValue>({
                   );
                 })}
                 {/* Staff authenticated show edit button - Once clicked, dialog for Score submission will appear*/}
-                {email ? (
+                {/* {email ? (
                   <TableCell className="p-4">
                     <Button className="bg-[#9B2626] hover:bg-[#771D1D]">
                       <FaRegEdit />
@@ -142,7 +140,7 @@ export function DataTable<TData, TValue>({
                   </TableCell>
                 ) : (
                   ""
-                )}
+                )} */}
               </TableRow>
             ))
           ) : (
