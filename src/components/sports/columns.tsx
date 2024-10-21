@@ -1,8 +1,24 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { FaBasketballBall, FaVolleyballBall, FaSwimmer } from "react-icons/fa";
-import { GiShuttlecock, GiTennisRacket } from "react-icons/gi";
+
+import Badminton from "@/assets/icons/Diamond/Badminton.svg";
+import Basketball from "@/assets/icons/Diamond/Basketball.svg";
+import Cheerdance from "@/assets/icons/Diamond/Cheerdance.svg";
+import Chess from "@/assets/icons/Diamond/Chess.svg";
+import Esports from "@/assets/icons/Diamond/Esports.svg";
+import FlagFootball from "@/assets/icons/Diamond/Flag Football.svg";
+import Football from "@/assets/icons/Diamond/Football.svg";
+import Frisbee from "@/assets/icons/Diamond/Frisbee.svg";
+import Futsal from "@/assets/icons/Diamond/Futsal.svg";
+import LawnTennis from "@/assets/icons/Diamond/Lawn Tennis.svg";
+import MrIntrams from "@/assets/icons/Diamond/Mr Intrams.svg";
+import MsIntrams from "@/assets/icons/Diamond/Ms Intrams.svg";
+import Swimming from "@/assets/icons/Diamond/Swimming.svg";
+import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
+import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
+import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
+import Image from "next/image";
 
 export type SportInfo = {
   id: number;
@@ -13,90 +29,105 @@ export type SportInfo = {
   }[];
 };
 
-export const sportMockData: SportInfo[] = [
-  {
-    id: 1,
-    name: "Badminton",
-    teams: [
-      {
-        id: 1,
-        name: "Lakers",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Basketball",
-    teams: [
-      {
-        id: 1,
-        name: "Lakers",
-      },
-      {
-        id: 2,
-        name: "Celtics",
-      },
-      {
-        id: 3,
-        name: "Warriors",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Swimming",
-    teams: [
-      {
-        id: 1,
-        name: "Lakers",
-      },
-      {
-        id: 3,
-        name: "Warriors",
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Lawn Tennis",
-    teams: [
-      {
-        id: 2,
-        name: "Celtics",
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: "Volleyball",
-    teams: [
-      {
-        id: 2,
-        name: "Celtics",
-      },
-    ],
-  },
-];
-
 const sportIcons: Record<string, JSX.Element> = {
-  Basketball: <FaBasketballBall className="inline mr-2" />,
-  Badminton: <GiShuttlecock className="inline mr-2" />,
-  Volleyball: <FaVolleyballBall className="inline mr-2" />,
-  Swimming: <FaSwimmer className="inline mr-2" />,
-  "Lawn Tennis": <GiTennisRacket className="inline mr-2" />,
-  // Add other sports and their icons here
+    "Badminton": (
+        <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
+    ),
+    "Basketball": (
+        <Image
+            src={Basketball}
+            className="inline mr-2 size-6"
+            alt="Basketball"
+        />
+    ),
+    "Cheer Dance": (
+        <Image
+            src={Cheerdance}
+            className="inline mr-2 size-6"
+            alt="Cheer Dance"
+        />
+    ),
+    "Chess": <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
+    "E-Sports": (
+        <Image src={Esports} className="inline mr-2 size-6" alt="Esports" />
+    ),
+    "Flag Football": (
+        <Image
+            src={FlagFootball}
+            className="inline mr-2 size-6"
+            alt="Flag Football"
+        />
+    ),
+    "Football": (
+        <Image src={Football} className="inline mr-2 size-6" alt="Football" />
+    ),
+    "Frisbee": (
+        <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
+    ),
+    "Futsal": <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
+    "Lawn Tennis": (
+        <Image
+            src={LawnTennis}
+            className="inline mr-2 size-6"
+            alt="Lawn Tennis"
+        />
+    ),
+    "Mr. USC Days": (
+        <Image
+            src={MrIntrams}
+            className="inline mr-2 size-6"
+            alt="Mr. USC Days"
+        />
+    ),
+    "Ms. USC Days": (
+        <Image
+            src={MsIntrams}
+            className="inline mr-2 size-6"
+            alt="Ms. USC Days"
+        />
+    ),
+    "Swimming": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+    ),
+    "Table Tennis": (
+        <Image
+            src={TableTennis}
+            className="inline mr-2 size-6"
+            alt="Table Tennis"
+        />
+    ),
+    "3x3 Basketball": (
+        <Image
+            src={ThreeByThreeBasketball}
+            className="inline mr-2 size-6"
+            alt={"3x3 Basketball"}
+        />
+    ),
+    "Volleyball": (
+        <Image
+            src={Volleyball}
+            className="inline mr-2 size-6"
+            alt="Volleyball"
+        />
+    ),
 };
 
 export const sportColumns: ColumnDef<SportInfo>[] = [
   {
     accessorKey: "name",
-    cell: (info) => {
-      const name = info.getValue<string>();
-      const Icon = sportIcons[name];
+        cell: (info) => {
+            const sport = info.getValue<string>();
+
+            // Find a matching sport key that is contained within the sport name
+            const matchingSportKey = Object.keys(sportIcons).find((key) =>
+                sport.includes(key)
+            );
+
+            const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
       return (
         <div className="flex items-center">
           {Icon}
-          <span>{name}</span>
+          <span>{sport}</span>
         </div>
       );
     },
