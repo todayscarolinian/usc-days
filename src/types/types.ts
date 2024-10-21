@@ -50,7 +50,7 @@ export type Schedules = {
         teamAScore: number,
         teamBScore: number,
     } | null,
-    location: string,
+    location?: string | undefined,
 }
 
 export type filterType = {
