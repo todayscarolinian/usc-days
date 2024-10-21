@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { AddGamePayload } from "@/types/games.types";
 import { Label } from "@/components/ui/label";
-import { prisma } from "@/lib/prisma";
+import { getSportsTeamData } from "@/lib/actions";
 
 interface ScheduleInputs {
     teamAId: number;
@@ -89,19 +89,8 @@ export default function AddScheduleDialog() {
         const fetchSportTeamsData = async () => {
             try {
                 setFetchingTeams(true);
-                const fetchedSportTeamData = await prisma.teamGameType.findMany({
-                    where: {
-                        gameTypeId: Number(selectedSport),
-                    },
-                    include: {
-                        team: {
-                            select: {
-                                teamName: true,
-                            },
-                        },
-                    },
-                });
-
+                const fetchedSportTeamData = await getSportsTeamData(Number(selectedSport));
+                if(!fetchedSportTeamData) return setError("Failed to load sports data");
                 setFetchingTeams(false);
                 setSportTeams(fetchedSportTeamData);
             } catch (err) {
