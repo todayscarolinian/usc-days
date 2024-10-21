@@ -39,7 +39,7 @@ const nav_items = [
     {
         href: "/management",
         name: "Management",
-        protected: true,
+        protected: false,
     },
 ];
 
