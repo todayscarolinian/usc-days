@@ -213,13 +213,13 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         id: "winner",
         accessorKey: "winner",
         header: () => <span className="font-bold sm:text-lg">Winner</span>,
-        cell: (info) => {
+        cell: (info) => {            
             const winner =
-                info.row.original.score.teamAScore >
-                info.row.original.score.teamBScore
+                Number(info.row.original.score.teamAScore) >
+                Number(info.row.original.score.teamBScore)
                     ? info.row.original.teamA.teamName
-                    : info.row.original.score.teamAScore ==
-                      info.row.original.score.teamBScore
+                    : Number(info.row.original.score.teamAScore) ==
+                      Number(info.row.original.score.teamBScore)
                     ? "Draw"
                     : info.row.original.teamB.teamName;
 
