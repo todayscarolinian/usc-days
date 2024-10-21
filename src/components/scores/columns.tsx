@@ -3,16 +3,16 @@
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
 import { Scores } from "@/types/types";
 import { format } from "date-fns";
-import Badminton from "@/assets/icons/Square/Badminton.svg";
-import Basketball from "@/assets/icons/Square/Basketball.svg";
-import Chess from "@/assets/icons/Square/Chess.svg";
-import Esports from "@/assets/icons/Square/Esports.svg";
-import FlagFootball from "@/assets/icons/Square/Flag Football.svg";
-import Football from "@/assets/icons/Square/Football.svg";
-import Futsal from "@/assets/icons/Square/Futsal.svg";
-import LawnTennis from "@/assets/icons/Square/Lawn Tennis.svg";
-import TableTennis from "@/assets/icons/Square/Table Tennis.svg";
-import Volleyball from "@/assets/icons/Square/Volleyball.svg";
+import Badminton from "@/assets/icons/Diamond/Badminton.svg";
+import Basketball from "@/assets/icons/Diamond/Basketball.svg";
+import Chess from "@/assets/icons/Diamond/Chess.svg";
+import Esports from "@/assets/icons/Diamond/Esports.svg";
+import FlagFootball from "@/assets/icons/Diamond/Flag Football.svg";
+import Football from "@/assets/icons/Diamond/Football.svg";
+import Futsal from "@/assets/icons/Diamond/Futsal.svg";
+import LawnTennis from "@/assets/icons/Diamond/Lawn Tennis.svg";
+import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
+import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
 import Image from "next/image";
 
 const sportIcons: Record<string, JSX.Element> = {
