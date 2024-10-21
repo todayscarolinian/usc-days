@@ -29,10 +29,10 @@ import {
 import { useState } from "react";
 
 const sportIcons: Record<string, JSX.Element> = {
-    "Badminton": (
+    Badminton: (
         <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
     ),
-    "Basketball": (
+    Basketball: (
         <Image
             src={Basketball}
             className="inline mr-2 size-6"
@@ -40,7 +40,11 @@ const sportIcons: Record<string, JSX.Element> = {
         />
     ),
     "Cheer Dance": (
-        <Image src={Cheerdance} className="inline mr-2 size-6" alt="Cheer Dance" />
+        <Image
+            src={Cheerdance}
+            className="inline mr-2 size-6"
+            alt="Cheer Dance"
+        />
     ),
     Chess: <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
     "E-Sports": (
@@ -53,23 +57,35 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Flag Football"
         />
     ),
-    "Football": (
+    Football: (
         <Image src={Football} className="inline mr-2 size-6" alt="Football" />
     ),
-    "Frisbee": (
+    Frisbee: (
         <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
     ),
-    "Futsal": <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
+    Futsal: <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
     "Lawn Tennis": (
-        <Image src={LawnTennis} className="inline mr-2 size-6" alt="Lawn Tennis" />
+        <Image
+            src={LawnTennis}
+            className="inline mr-2 size-6"
+            alt="Lawn Tennis"
+        />
     ),
     "Mr. USC Days": (
-        <Image src={MrIntrams} className="inline mr-2 size-6" alt="Mr. USC Days" />
+        <Image
+            src={MrIntrams}
+            className="inline mr-2 size-6"
+            alt="Mr. USC Days"
+        />
     ),
     "Ms. USC Days": (
-        <Image src={MsIntrams} className="inline mr-2 size-6" alt="Ms. USC Days" />
+        <Image
+            src={MsIntrams}
+            className="inline mr-2 size-6"
+            alt="Ms. USC Days"
+        />
     ),
-    "Swimming": (
+    Swimming: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
     "Table Tennis": (
@@ -80,9 +96,13 @@ const sportIcons: Record<string, JSX.Element> = {
         />
     ),
     "3x3 Basketball": (
-        <Image src={ThreeByThreeBasketball} className="inline mr-2 size-6" alt={"3x3 Basketball"} />
+        <Image
+            src={ThreeByThreeBasketball}
+            className="inline mr-2 size-6"
+            alt={"3x3 Basketball"}
+        />
     ),
-    "Volleyball": (
+    Volleyball: (
         <Image
             src={Volleyball}
             className="inline mr-2 size-6"
@@ -109,7 +129,8 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         accessorFn: (row) =>
             format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
         header: () => <span className="font-bold sm:text-lg">Date</span>,
-        cell: (info) => {
+        cell: function CellComponent(info) {
+            const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
             const dateString = info.getValue<string>();
             const date = new Date(dateString);
 
@@ -119,15 +140,34 @@ export const scoreColumns: ColumnDef<Scores>[] = [
             };
             const shortDate = format(date, "MMM d");
 
+            const handleTooltipToggle = () => {
+                setIsTooltipOpen(!isTooltipOpen);
+            };
+
             return (
                 <>
                     <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
                         <span>{longDate.date}</span>
                         <span>{longDate.time}</span>
                     </span>
-                    <span className="sm:text-[16px] block md:hidden">
-                        {shortDate}
-                    </span>
+
+                    <div className="block md:hidden">
+                        <TooltipProvider>
+                            <Tooltip open={isTooltipOpen}>
+                                <TooltipTrigger onClick={handleTooltipToggle}>
+                                    <span className="sm:text-[16px]">
+                                        {shortDate}
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <span className="sm:text-[16px] flex gap-2 items-center">
+                                        <span>{longDate.date}</span>
+                                        <span>{longDate.time}</span>
+                                    </span>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
                 </>
             );
         },
@@ -139,7 +179,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         accessorKey: "sport",
         accessorFn: (row) => row.gameType.gameName,
         header: () => <span className="font-bold sm:text-lg">Sport</span>,
-        cell: function CellComponent (info) {
+        cell: function CellComponent(info) {
             const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
             const sport = info.getValue<string>();
 
@@ -257,7 +297,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         id: "winner",
         accessorKey: "winner",
         header: () => <span className="font-bold sm:text-lg">Winner</span>,
-        cell: (info) => {            
+        cell: (info) => {
             const winner =
                 Number(info.row.original.score.teamAScore) >
                 Number(info.row.original.score.teamBScore)
