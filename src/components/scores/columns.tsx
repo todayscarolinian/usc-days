@@ -20,6 +20,7 @@ import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
 import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
 import Image from "next/image";
+import { useState } from "react";
 
 const sportIcons: Record<string, JSX.Element> = {
     "Badminton": (
@@ -102,26 +103,34 @@ export const scoreColumns: ColumnDef<Scores>[] = [
         accessorFn: (row) =>
             format(new Date(row.startDate), "MMMM d, yyyy, h:mm a"),
         header: () => <span className="font-bold sm:text-lg">Date</span>,
-        cell: (info) => {
-            const dateString = info.getValue<string>();
-            const date = new Date(dateString);
+        cell: function CellComponent (info) {
+            const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
+            const sport = info.getValue<string>();
 
-            const longDate = {
-                date: format(date, "MMMM d"),
-                time: format(date, "h:mm a"),
+            // Find a matching sport key that is contained within the sport name
+            const matchingSportKey = Object.keys(sportIcons).find((key) =>
+                sport.includes(key)
+            );
+
+            const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
+            const handleTooltipToggle = () => {
+                setIsTooltipOpen(!isTooltipOpen);
             };
-            const shortDate = format(date, "MMM d");
 
             return (
-                <>
-                    <span className="sm:text-[16px] hidden md:flex gap-2 items-center">
-                        <span>{longDate.date}</span>
-                        <span>{longDate.time}</span>
-                    </span>
-                    <span className="sm:text-[16px] block md:hidden">
-                        {shortDate}
-                    </span>
-                </>
+                <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
+                    <TooltipProvider>
+                        <Tooltip open={isTooltipOpen}>
+                            <TooltipTrigger onClick={handleTooltipToggle}>
+                                {Icon}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <span>{sport}</span>
+                            </TooltipContent>
+                        </Tooltip>
+                        <span className="hidden md:block">{sport}</span>
+                    </TooltipProvider>
+                </span>
             );
         },
         sortingFn: dateSortingFn,
