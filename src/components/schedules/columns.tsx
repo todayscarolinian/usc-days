@@ -152,7 +152,6 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
     },
     {
         id: "location",
-        accessorKey: "location",
         accessorFn: (row) => row.location,
         header: () => <span className="font-bold sm:text-lg">Location</span>,
         cell: (info) => {
