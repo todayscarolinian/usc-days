@@ -159,6 +159,7 @@ export const scheduleColumns: ColumnDef<Schedules>[] = [
 
             return <span className="sm:text-[16px]">{location}</span>;
         },
+        enableColumnFilter: true,
     },
     {
         id: "status",
