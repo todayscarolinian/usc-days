@@ -138,6 +138,9 @@ export const scoreColumns: ColumnDef<Scores>[] = [
                 info.row.original.score.teamAScore >
                 info.row.original.score.teamBScore
                     ? teamA
+                    : info.row.original.score.teamAScore ==
+                      info.row.original.score.teamBScore
+                    ? "Draw"
                     : teamB;
 
             return (
@@ -215,6 +218,9 @@ export const scoreColumns: ColumnDef<Scores>[] = [
                 info.row.original.score.teamAScore >
                 info.row.original.score.teamBScore
                     ? info.row.original.teamA.teamName
+                    : info.row.original.score.teamAScore ==
+                      info.row.original.score.teamBScore
+                    ? "Draw"
                     : info.row.original.teamB.teamName;
 
             return <span className="sm:text-[16px]">{winner}</span>;

@@ -15,7 +15,6 @@ class AuthService {
 
             return true;
         } catch (error) {
-            console.log("EEEEEEEEE: ", error)
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 throw new Error("Database request failed");
             }
