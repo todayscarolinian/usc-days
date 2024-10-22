@@ -94,10 +94,10 @@ const sportIcons: Record<string, JSX.Element> = {
     "stroke": (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "butterfly": (
+    "Butterfly": (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "relay": (
+    "Relay": (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
     "Table Tennis": (
