@@ -112,7 +112,7 @@ export default function AddScheduleDialog() {
                 teamAId: scheduleInputs.teamAId,
                 teamBId: scheduleInputs.teamBId,
                 startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-                endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+                 endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
                 location: scheduleInputs.location
                     ? scheduleInputs.location
                     : undefined,

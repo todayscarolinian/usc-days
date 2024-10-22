@@ -23,7 +23,7 @@ model Team {
   teamBGames  Game[]         @relation("TeamBGames")
   gameTypes   TeamGameType[]
   teamSchools TeamSchool[]
-  Champion    Champion?
+  Champion    Champion[]
 
   @@map("teams")
 }
@@ -51,7 +51,7 @@ model GameType {
   id       Int            @id @default(autoincrement())
   games    Game[]
   teams    TeamGameType[]
-  Champion Champion?
+  Champion Champion[]
 
   @@map("game_types")
 }
@@ -97,11 +97,13 @@ model Score {
 
 model Champion {
   id         Int      @id @default(autoincrement())
-  teamId     Int      @map("team_id") @unique
-  gameTypeId Int      @map("game_type_id") @unique
+  teamId     Int      @map("team_id")
+  gameTypeId Int      @map("game_type_id")
   rank       Int
   startDate  DateTime @default(now()) @map("start_date")
   endDate    DateTime @default(now()) @map("end_date")
   team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   gameType   GameType @relation(fields: [gameTypeId], references: [id])
+  
+  @@map("champions")
 }
