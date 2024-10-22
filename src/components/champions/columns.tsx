@@ -88,16 +88,16 @@ const sportIcons: Record<string, JSX.Element> = {
     Swimming: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "Freestyle": (
+    Freestyle: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "stroke": (
+    stroke: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "Butterfly": (
+    Butterfly: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "Relay": (
+    Relay: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
     "Table Tennis": (
@@ -168,19 +168,22 @@ export const championColumns: ColumnDef<Champions>[] = [
     },
     {
         accessorKey: "rank",
-        accessorFn: (row) => row.rank,
+        accessorFn: (row) =>
+            row.rank === 1
+                ? "Champion"
+                : row.rank === 2
+                ? "First Runner Up"
+                : "Second Runner Up",
         header: () => <span className="font-bold sm:text-lg">Rank</span>,
         cell: (info) => {
-            const data = info.getValue<number>();
+            const data = info.getValue<string>();
 
-            const rank =
-                data === 1
-                    ? <span className="font-bold">Champion</span>
-                    : data === 2
-                    ? <span>First Runner Up</span>
-                    : <span>Second Runner Up</span>;
-
-            return rank;
+            return (
+                <span className={`${data === "Champion" && "font-bold"}`}>
+                    {data}
+                </span>
+            );
         },
+        enableColumnFilter: true,
     },
 ];
