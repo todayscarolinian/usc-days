@@ -26,8 +26,17 @@ export type Scores = {
 
 export type Champions = {
     id: number,
-    sport: string,
-    team: string,
+    gameType: {
+        id: number,
+        gameName: string,
+    }
+    team: {
+        id: number,
+        teamName: string
+    },
+    startDate: string,
+    endDate: string,
+    rank: number,
 }
 
 export type Schedules = {

@@ -156,7 +156,7 @@ export default function AddScheduleDialog() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>Add Score</DialogTitle>
+                    <DialogTitle>Add Schedule</DialogTitle>
                     <DialogDescription>
                         Add a new game schedule. Click Submit when you&apos;re
                         done.

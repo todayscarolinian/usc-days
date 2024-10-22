@@ -188,7 +188,7 @@ import {
   Mock data for the Champions page
 */
 export const mockChampionsData: Champions[] = [
-
+    
 ];
 
 // /* 
