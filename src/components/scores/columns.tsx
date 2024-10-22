@@ -219,11 +219,11 @@ export const scoreColumns: ColumnDef<Scores>[] = [
             const teamA = info.row.original.teamA.teamName;
             const teamB = info.row.original.teamB.teamName;
             const winner =
-                info.row.original.score.teamAScore >
-                info.row.original.score.teamBScore
+                Number(info.row.original.score.teamAScore) >
+                Number(info.row.original.score.teamBScore)
                     ? teamA
-                    : info.row.original.score.teamAScore ==
-                      info.row.original.score.teamBScore
+                    : Number(info.row.original.score.teamAScore) ==
+                      Number(info.row.original.score.teamBScore)
                     ? "Draw"
                     : teamB;
 
@@ -265,8 +265,8 @@ export const scoreColumns: ColumnDef<Scores>[] = [
             `${row.score.teamAScore} vs ${row.score.teamBScore}`,
         header: () => <span className="font-bold sm:text-lg">Score</span>,
         cell: (info) => {
-            const teamAScore = info.row.original.score.teamAScore;
-            const teamBScore = info.row.original.score.teamBScore;
+            const teamAScore = Number(info.row.original.score.teamAScore);
+            const teamBScore = Number(info.row.original.score.teamBScore);
 
             return (
                 <span className="sm:text-[16px]">

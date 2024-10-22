@@ -20,6 +20,13 @@ import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
 import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
 import Image from "next/image";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useState } from "react";
 
 const sportIcons: Record<string, JSX.Element> = {
     Badminton: (
@@ -81,6 +88,18 @@ const sportIcons: Record<string, JSX.Element> = {
     Swimming: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
+    "Freestyle": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+    ),
+    "stroke": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+    ),
+    "butterfly": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+    ),
+    "relay": (
+        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+    ),
     "Table Tennis": (
         <Image
             src={TableTennis}
@@ -111,7 +130,8 @@ export const championColumns: ColumnDef<Champions>[] = [
         accessorFn: (row) => row.gameType.gameName,
         header: () => <span className="font-bold sm:text-lg">Sport</span>,
 
-        cell: (info) => {
+        cell: function CellComponent(info) {
+            const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
             const sport = info.getValue<string>();
 
             // Find a matching sport key that is contained within the sport name
@@ -120,11 +140,23 @@ export const championColumns: ColumnDef<Champions>[] = [
             );
 
             const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
+            const handleTooltipToggle = () => {
+                setIsTooltipOpen(!isTooltipOpen);
+            };
 
             return (
                 <span className="flex items-center justify-center md:justify-normal sm:text-[16px]">
-                    {Icon}
-                    <span className="hidden md:block">{sport}</span>
+                    <TooltipProvider>
+                        <Tooltip open={isTooltipOpen}>
+                            <TooltipTrigger onClick={handleTooltipToggle}>
+                                {Icon}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <span>{sport}</span>
+                            </TooltipContent>
+                        </Tooltip>
+                        <span className="hidden md:block">{sport}</span>
+                    </TooltipProvider>
                 </span>
             );
         },
