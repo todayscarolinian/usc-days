@@ -72,6 +72,9 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
             setLoading(false);
             if (axios.isAxiosError(error)) {
                 console.error("Axios error:", error);
+                error &&
+                    error.response &&
+                    setError(error.response.data.error[0].message);
             }
         }
     }
