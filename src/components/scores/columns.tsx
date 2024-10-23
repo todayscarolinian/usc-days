@@ -262,7 +262,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
     {
         id: "score",
         accessorFn: (row) =>
-            `${row.score.teamAScore} vs ${row.score.teamBScore}`,
+            `${row.score.teamAScore != -1 ? row.score.teamAScore : "XX"} vs ${row.score.teamBScore != -1 ? row.score.teamBScore : "XX"}`,
         header: () => <span className="font-bold sm:text-lg">Score</span>,
         cell: (info) => {
             const teamAScore = Number(info.row.original.score.teamAScore);
@@ -277,7 +277,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
                                 : ""
                         }
                     >
-                        {teamAScore}
+                        {teamAScore != -1 ? teamAScore : "XX"}
                     </span>{" "}
                     <span className="opacity-50">vs</span>{" "}
                     <span
@@ -287,7 +287,7 @@ export const scoreColumns: ColumnDef<Scores>[] = [
                                 : ""
                         }
                     >
-                        {teamBScore}
+                        {teamBScore != -1 ? teamBScore : "XX"}
                     </span>
                 </span>
             );
