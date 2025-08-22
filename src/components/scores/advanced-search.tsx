@@ -65,7 +65,7 @@ export function AdvancedSearch() {
       },
     });
 
-     // Reset the form fields once applied button is clicked
+    // Reset the form fields once applied button is clicked
     form.reset({
       date: undefined,
       game: "",

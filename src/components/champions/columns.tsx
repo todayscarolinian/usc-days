@@ -1,34 +1,34 @@
-"use client";
+'use client';
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Champions } from "@/types/types";
+import { ColumnDef } from '@tanstack/react-table';
+import { Champions } from '@/types/types';
 
-import Badminton from "@/assets/icons/Diamond/Badminton.svg";
-import Basketball from "@/assets/icons/Diamond/Basketball.svg";
-import Cheerdance from "@/assets/icons/Diamond/Cheerdance.svg";
-import Chess from "@/assets/icons/Diamond/Chess.svg";
-import Esports from "@/assets/icons/Diamond/Esports.svg";
-import FlagFootball from "@/assets/icons/Diamond/Flag Football.svg";
-import Football from "@/assets/icons/Diamond/Football.svg";
-import Frisbee from "@/assets/icons/Diamond/Frisbee.svg";
-import Futsal from "@/assets/icons/Diamond/Futsal.svg";
-import LawnTennis from "@/assets/icons/Diamond/Lawn Tennis.svg";
-import MrIntrams from "@/assets/icons/Diamond/Mr Intrams.svg";
-import MsIntrams from "@/assets/icons/Diamond/Ms Intrams.svg";
-import Swimming from "@/assets/icons/Diamond/Swimming.svg";
-import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
-import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
-import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
-import Image from "next/image";
+import Badminton from '@/assets/icons/Diamond/Badminton.svg';
+import Basketball from '@/assets/icons/Diamond/Basketball.svg';
+import Cheerdance from '@/assets/icons/Diamond/Cheerdance.svg';
+import Chess from '@/assets/icons/Diamond/Chess.svg';
+import Esports from '@/assets/icons/Diamond/Esports.svg';
+import FlagFootball from '@/assets/icons/Diamond/Flag Football.svg';
+import Football from '@/assets/icons/Diamond/Football.svg';
+import Frisbee from '@/assets/icons/Diamond/Frisbee.svg';
+import Futsal from '@/assets/icons/Diamond/Futsal.svg';
+import LawnTennis from '@/assets/icons/Diamond/Lawn Tennis.svg';
+import MrIntrams from '@/assets/icons/Diamond/Mr Intrams.svg';
+import MsIntrams from '@/assets/icons/Diamond/Ms Intrams.svg';
+import Swimming from '@/assets/icons/Diamond/Swimming.svg';
+import TableTennis from '@/assets/icons/Diamond/Table Tennis.svg';
+import ThreeByThreeBasketball from '@/assets/icons/Diamond/ThreeByThreeBasketball.svg';
+import Volleyball from '@/assets/icons/Diamond/Volleyball.svg';
+import Image from 'next/image';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useState } from "react";
+} from '@/components/ui/tooltip';
+import { useState } from 'react';
 
-const sportIcons: Record<string, JSX.Element> = {
+const sportIcons: Record<string, React.JSX.Element> = {
     Badminton: (
         <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
     ),
@@ -39,7 +39,7 @@ const sportIcons: Record<string, JSX.Element> = {
             alt="Basketball"
         />
     ),
-    "Cheer Dance": (
+    'Cheer Dance': (
         <Image
             src={Cheerdance}
             className="inline mr-2 size-6"
@@ -47,10 +47,10 @@ const sportIcons: Record<string, JSX.Element> = {
         />
     ),
     Chess: <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
-    "E-Sports": (
+    'E-Sports': (
         <Image src={Esports} className="inline mr-2 size-6" alt="Esports" />
     ),
-    "Flag Football": (
+    'Flag Football': (
         <Image
             src={FlagFootball}
             className="inline mr-2 size-6"
@@ -64,21 +64,21 @@ const sportIcons: Record<string, JSX.Element> = {
         <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
     ),
     Futsal: <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
-    "Lawn Tennis": (
+    'Lawn Tennis': (
         <Image
             src={LawnTennis}
             className="inline mr-2 size-6"
             alt="Lawn Tennis"
         />
     ),
-    "Mr. USC Days": (
+    'Mr. USC Days': (
         <Image
             src={MrIntrams}
             className="inline mr-2 size-6"
             alt="Mr. USC Days"
         />
     ),
-    "Ms. USC Days": (
+    'Ms. USC Days': (
         <Image
             src={MsIntrams}
             className="inline mr-2 size-6"
@@ -100,18 +100,18 @@ const sportIcons: Record<string, JSX.Element> = {
     Relay: (
         <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
     ),
-    "Table Tennis": (
+    'Table Tennis': (
         <Image
             src={TableTennis}
             className="inline mr-2 size-6"
             alt="Table Tennis"
         />
     ),
-    "3x3 Basketball": (
+    '3x3 Basketball': (
         <Image
             src={ThreeByThreeBasketball}
             className="inline mr-2 size-6"
-            alt={"3x3 Basketball"}
+            alt={'3x3 Basketball'}
         />
     ),
     Volleyball: (
@@ -125,8 +125,8 @@ const sportIcons: Record<string, JSX.Element> = {
 
 export const championColumns: ColumnDef<Champions>[] = [
     {
-        id: "sport",
-        accessorKey: "sport",
+        id: 'sport',
+        accessorKey: 'sport',
         accessorFn: (row) => row.gameType.gameName,
         header: () => <span className="font-bold sm:text-lg">Sport</span>,
 
@@ -162,24 +162,24 @@ export const championColumns: ColumnDef<Champions>[] = [
         },
     },
     {
-        accessorKey: "team",
+        accessorKey: 'team',
         accessorFn: (row) => row.team.teamName,
         header: () => <span className="font-bold sm:text-lg">Team</span>,
     },
     {
-        accessorKey: "rank",
+        accessorKey: 'rank',
         accessorFn: (row) =>
             row.rank === 1
-                ? "Champion"
+                ? 'Champion'
                 : row.rank === 2
-                ? "First Runner Up"
-                : "Second Runner Up",
+                ? 'First Runner Up'
+                : 'Second Runner Up',
         header: () => <span className="font-bold sm:text-lg">Rank</span>,
         cell: (info) => {
             const data = info.getValue<string>();
 
             return (
-                <span className={`${data === "Champion" && "font-bold"}`}>
+                <span className={`${data === 'Champion' && 'font-bold'}`}>
                     {data}
                 </span>
             );

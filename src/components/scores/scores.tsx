@@ -63,7 +63,7 @@ export default function ScoresPage() {
     if (loading) {
         return (
             <div className="p-4 sm:py-10">
-                <div className="mx-auto sm:max-w-[90rem]">
+                <div className="mx-auto sm:max-w-360">
                     <div className="rounded-md border">
                         <div className="p-6 bg-black flex gap-4 justify-between items-center">
                             <h1 className="uppercase text-white text-3xl font-bold">
@@ -118,7 +118,7 @@ export default function ScoresPage() {
     if (error) {
         return (
             <div className="p-4 sm:py-10">
-                <div className="mx-auto sm:max-w-[90rem]">
+                <div className="mx-auto sm:max-w-360">
                     <div className="rounded-md border">
                         <div className="p-6 bg-black flex gap-4 justify-between items-center">
                             <h1 className="uppercase text-white text-3xl font-bold">
@@ -174,7 +174,7 @@ export default function ScoresPage() {
 
     return (
         <div className="p-4 sm:py-10">
-            <div className="mx-auto sm:max-w-[90rem]">
+            <div className="mx-auto sm:max-w-360">
                 <DataTable
                     columns={scoreColumns}
                     data={gamesData}

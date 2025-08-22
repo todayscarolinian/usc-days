@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# USC Days Web Application
 
-## Getting Started
+> A modern web application for managing, viewing, and ranking sports teams, scores, schedules, and champions at the University of South Carolina. Built with Next.js, TypeScript, Prisma, and Supabase.
 
-First, run the development server:
+---
+
+## Table of Contents
+
+-   [Features](#features)
+-   [Project Structure](#project-structure)
+-   [Setup & Installation](#setup--installation)
+-   [Development](#development)
+-   [Database](#database)
+-   [Authentication](#authentication)
+-   [API Routes](#api-routes)
+-   [Components](#components)
+-   [Deployment](#deployment)
+-   [Contributing](#contributing)
+-   [License](#license)
+
+---
+
+## Features
+
+-   View and manage sports teams, scores, schedules, and champions
+-   Rankings and advanced search for teams and scores
+-   Authentication (login/logout/session)
+-   Modern UI with reusable components
+-   Prisma ORM for database management
+-   Supabase integration for authentication and data
+
+## Project Structure
+
+```
+usc-days/
+├── prisma/           # Prisma schema and migrations
+├── public/           # Static assets (logos, images)
+├── src/
+│   ├── app/          # Next.js app directory (routing, pages, API)
+│   ├── assets/       # Project-specific assets
+│   ├── components/   # UI and feature components
+│   ├── constants/    # Mock data and constants
+│   ├── lib/          # Utility functions and Prisma client
+│   ├── services/     # Business logic and data services
+│   ├── stores/       # State management (Zustand)
+│   ├── types/        # TypeScript types
+│   └── utils/        # Utility functions and Supabase integration
+├── package.json      # Project dependencies and scripts
+├── tsconfig.json     # TypeScript configuration
+├── next.config.mjs   # Next.js configuration
+└── README.md         # Project documentation
+```
+
+## Setup & Installation
+
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/todayscarolinian/usc-days.git
+    cd usc-days
+    ```
+2. **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+3. **Configure environment variables:**
+    - Copy `.env.example` to `.env` and fill in required values (Supabase, database, etc).
+4. **Set up the database:**
+    ```bash
+    npx prisma migrate dev
+    ```
+
+## Development
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Prisma** is used for database schema and migrations (`prisma/schema.prisma`).
+-   Migrations are stored in `prisma/migrations/`.
+-   Update schema and run migrations with:
+    ```bash
+    npx prisma migrate dev
+    ```
 
-## Learn More
+## Authentication
 
-To learn more about Next.js, take a look at the following resources:
+-   Uses Supabase for authentication and session management.
+-   Related files: `src/utils/supabase/`, `src/app/user/`, `src/services/auth.service.ts`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Located in `src/app/api/`:
 
-## Deploy on Vercel
+-   `/champions` - Champions data
+-   `/games` - Games data
+-   `/scores` - Scores data
+-   `/sports` - Sports data
+-   `/teams` - Teams data
+-   `/user` - User authentication and session
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   UI components: `src/components/ui/`
+-   Feature components: `src/components/champions/`, `src/components/scores/`, etc.
+-   Layout: `src/components/layout/navbar.tsx`, `src/app/layout.tsx`
+
+## Deployment
+
+-   Recommended: [Vercel](https://vercel.com/)
+-   See Next.js [deployment docs](https://nextjs.org/docs/app/building-your-application/deploying)
+
+## Contributing
+
+Pull requests and issues are welcome! Please follow conventional commit messages and code style.
+
+## License
+
+MIT
