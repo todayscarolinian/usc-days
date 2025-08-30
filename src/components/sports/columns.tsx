@@ -29,101 +29,75 @@ export type SportInfo = {
   }[];
 };
 
-const sportIcons: Record<string, JSX.Element> = {
-    "Badminton": (
-        <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
-    ),
-    "Basketball": (
-        <Image
-            src={Basketball}
-            className="inline mr-2 size-6"
-            alt="Basketball"
-        />
-    ),
-    "Cheer Dance": (
-        <Image
-            src={Cheerdance}
-            className="inline mr-2 size-6"
-            alt="Cheer Dance"
-        />
-    ),
-    "Chess": <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
-    "E-Sports": (
-        <Image src={Esports} className="inline mr-2 size-6" alt="Esports" />
-    ),
-    "Flag Football": (
-        <Image
-            src={FlagFootball}
-            className="inline mr-2 size-6"
-            alt="Flag Football"
-        />
-    ),
-    "Football": (
-        <Image src={Football} className="inline mr-2 size-6" alt="Football" />
-    ),
-    "Frisbee": (
-        <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />
-    ),
-    "Futsal": <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
-    "Lawn Tennis": (
-        <Image
-            src={LawnTennis}
-            className="inline mr-2 size-6"
-            alt="Lawn Tennis"
-        />
-    ),
-    "Mr. USC Days": (
-        <Image
-            src={MrIntrams}
-            className="inline mr-2 size-6"
-            alt="Mr. USC Days"
-        />
-    ),
-    "Ms. USC Days": (
-        <Image
-            src={MsIntrams}
-            className="inline mr-2 size-6"
-            alt="Ms. USC Days"
-        />
-    ),
-    "Swimming": (
-        <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
-    ),
-    "Table Tennis": (
-        <Image
-            src={TableTennis}
-            className="inline mr-2 size-6"
-            alt="Table Tennis"
-        />
-    ),
-    "3x3 Basketball": (
-        <Image
-            src={ThreeByThreeBasketball}
-            className="inline mr-2 size-6"
-            alt={"3x3 Basketball"}
-        />
-    ),
-    "Volleyball": (
-        <Image
-            src={Volleyball}
-            className="inline mr-2 size-6"
-            alt="Volleyball"
-        />
-    ),
+const sportIcons: Record<string, React.JSX.Element> = {
+  Badminton: (
+    <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
+  ),
+  Basketball: (
+    <Image src={Basketball} className="inline mr-2 size-6" alt="Basketball" />
+  ),
+  "Cheer Dance": (
+    <Image src={Cheerdance} className="inline mr-2 size-6" alt="Cheer Dance" />
+  ),
+  Chess: <Image src={Chess} className="inline mr-2 size-6" alt="Chess" />,
+  "E-Sports": (
+    <Image src={Esports} className="inline mr-2 size-6" alt="Esports" />
+  ),
+  "Flag Football": (
+    <Image
+      src={FlagFootball}
+      className="inline mr-2 size-6"
+      alt="Flag Football"
+    />
+  ),
+  Football: (
+    <Image src={Football} className="inline mr-2 size-6" alt="Football" />
+  ),
+  Frisbee: <Image src={Frisbee} className="inline mr-2 size-6" alt="Frisbee" />,
+  Futsal: <Image src={Futsal} className="inline mr-2 size-6" alt="Futsal" />,
+  "Lawn Tennis": (
+    <Image src={LawnTennis} className="inline mr-2 size-6" alt="Lawn Tennis" />
+  ),
+  "Mr. USC Days": (
+    <Image src={MrIntrams} className="inline mr-2 size-6" alt="Mr. USC Days" />
+  ),
+  "Ms. USC Days": (
+    <Image src={MsIntrams} className="inline mr-2 size-6" alt="Ms. USC Days" />
+  ),
+  Swimming: (
+    <Image src={Swimming} className="inline mr-2 size-6" alt="Swimming" />
+  ),
+  "Table Tennis": (
+    <Image
+      src={TableTennis}
+      className="inline mr-2 size-6"
+      alt="Table Tennis"
+    />
+  ),
+  "3x3 Basketball": (
+    <Image
+      src={ThreeByThreeBasketball}
+      className="inline mr-2 size-6"
+      alt={"3x3 Basketball"}
+    />
+  ),
+  Volleyball: (
+    <Image src={Volleyball} className="inline mr-2 size-6" alt="Volleyball" />
+  ),
 };
 
 export const sportColumns: ColumnDef<SportInfo>[] = [
   {
     accessorKey: "name",
-        cell: (info) => {
-            const sport = info.getValue<string>();
+    cell: (info) => {
+      const sport = info.getValue<string>();
 
-            // Find a matching sport key that is contained within the sport name
-            const matchingSportKey = Object.keys(sportIcons).find((key) =>
-                sport.includes(key)
-            );
+      // Find a matching sport key that is contained within the sport name
+      const matchingSportKey = Object.keys(sportIcons).find((key) =>
+        sport.includes(key)
+      );
 
-            const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
+      const Icon = matchingSportKey ? sportIcons[matchingSportKey] : null; // Retrieve the icon from the mapping
       return (
         <div className="flex items-center">
           {Icon}

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { GoogleUserMetadata } from "@/types/auth.types";
-import { useUserStore } from "@/stores/user-store";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { GoogleUserMetadata } from '@/types/auth.types';
+import { useUserStore } from '@/stores/user-store';
 
 export default function Page() {
     const router = useRouter();
@@ -14,11 +14,11 @@ export default function Page() {
     useEffect(() => {
         const exchangeCodeForSession = async () => {
             const code = new URLSearchParams(window.location.search).get(
-                "code"
+                'code'
             );
 
             if (!code) {
-                setError("Authorization code not found.");
+                setError('Authorization code not found.');
                 return;
             }
 
@@ -36,16 +36,14 @@ export default function Page() {
                     setHasFetched(true);
 
                     localStorage.setItem(
-                        "user",
+                        'user',
                         JSON.stringify({
                             email: currentUser.email,
                             name: currentUser.full_name,
                             picture: currentUser.picture,
                         })
                     );
-
-                    console.log("USER: ", localStorage.getItem("user"))
-
+                    
                     // On success, redirect the user to the success page
                     router.push(data.redirectTo);
                 } else {
@@ -53,12 +51,12 @@ export default function Page() {
                     if (data.redirectTo) {
                         router.push(data.redirectTo);
                     } else {
-                        setError(data.error || "Unknown error occurred.");
+                        setError(data.error || 'Unknown error occurred.');
                     }
                 }
             } catch (err) {
-                console.error("Error exchanging code for session:", err);
-                setError("An error occurred while exchanging the code.");
+                console.error('Error exchanging code for session:', err);
+                setError('An error occurred while exchanging the code.');
             }
         };
         if (!hasFetched) {

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -9,11 +9,11 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
-import { Scores } from "@/types/types";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { FaRegEdit } from "react-icons/fa";
+} from '@/components/ui/dialog';
+import { Scores } from '@/types/types';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { FaRegEdit } from 'react-icons/fa';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -24,9 +24,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { DeleteScorePayload, EditScorePayload } from "@/types/scores.types";
-import axios from "axios";
+} from '@/components/ui/alert-dialog';
+import { DeleteScorePayload, EditScorePayload } from '@/types/scores.types';
+import axios from 'axios';
 
 interface ScoreInputs {
     teamA: {
@@ -44,12 +44,12 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
         teamA: { teamId: game.teamA.id, score: game.score.teamAScore },
         teamB: { teamId: game.teamB.id, score: game.score.teamBScore },
     });
-    const [error, setError] = useState<string>("");
+    const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
     async function editScore() {
         setLoading(true);
-        setError("");
+        setError('');
         if (!game) return;
 
         const data: EditScorePayload = {
@@ -65,23 +65,23 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
 
             setLoading(false);
             if (newScore.status != 200) {
-                setError("An error occurred");
+                setError('An error occurred');
                 console.log(newScore.data.error);
             } else window.location.reload();
         } catch (error) {
             setLoading(false);
             if (axios.isAxiosError(error)) {
-                console.error("Axios error:", error);
-                error &&
-                    error.response &&
+                console.error('Axios error:', error);
+                if (error && error.response) {
                     setError(error.response.data.error[0].message);
+                }
             }
         }
     }
 
     async function deleteScore() {
         setLoading(true);
-        setError("");
+        setError('');
         if (!game) return;
 
         const data: DeleteScorePayload = {
@@ -93,13 +93,13 @@ export default function EditScoreDialog({ game }: { game: Scores }) {
 
             setLoading(false);
             if (deletedScore.status != 200) {
-                setError("An error occurred");
+                setError('An error occurred');
                 console.log(deletedScore.data.error);
             } else window.location.reload();
         } catch (error) {
             setLoading(false);
             if (axios.isAxiosError(error)) {
-                console.error("Axios error:", error);
+                console.error('Axios error:', error);
             }
         }
     }

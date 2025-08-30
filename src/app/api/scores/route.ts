@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         const result = AddScoreSchema.safeParse(body);
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+            return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
         const validatedBody = result.data;
@@ -42,7 +42,7 @@ export async function PUT(req: Request) {
         const body = await req.json();
         const result = EditScoreSchema.safeParse(body);
 
-        if (!result.success) return NextResponse.json({ error: result.error.errors }, { status: 400 });
+        if (!result.success) return NextResponse.json({ error: result.error }, { status: 400 });
 
         const validatedBody = result.data;
 
@@ -62,7 +62,7 @@ export async function DELETE(req: Request) {
         const result = DeleteScoreSchema.safeParse(body);
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+            return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
         const validatedBody = result.data;
