@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         const result = AddGameSchema.safeParse(body);
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+            return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
         const validatedBody = result.data;
@@ -32,7 +32,7 @@ export async function PUT(req: Request) {
         const result = EditGameSchema.safeParse(body);
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+            return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
         const validatedBody = result.data;
@@ -50,7 +50,7 @@ export async function DELETE(req: Request) {
         const result = DeleteGameSchema.safeParse(body)
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.errors }, { status: 400 });
+            return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
         const validatedBody = result.data;

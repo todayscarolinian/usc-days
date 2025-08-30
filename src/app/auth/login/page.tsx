@@ -1,25 +1,19 @@
-"use client";
+'use client';
 
-import { Suspense, useEffect } from "react";
-import { LoginForm } from "@/app/auth/login/login-form";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/components/hooks/use-toast";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from 'react';
+import { LoginForm } from '@/app/auth/login/login-form';
+import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
 
 function SearchParamsHandler() {
     const searchParams = useSearchParams();
-    const { toast } = useToast();
 
     useEffect(() => {
-        const error = searchParams.get("error");
-        if (error === "no_account") {
-            toast({
-                variant: "destructive",
-                title: "Login Failed!",
-                description: "User not found. Please contact support.",
-            });
+        const error = searchParams.get('error');
+        if (error === 'no_account') {
+            toast.error('User not found. Please contact support.');
         }
-    }, [searchParams, toast]);
+    }, [searchParams]);
 
     return null; // This component does not render anything
 }
@@ -33,7 +27,6 @@ export default function LoginPage() {
 
             <Suspense fallback={<div>Loading...</div>}>
                 <SearchParamsHandler />
-                <Toaster />
             </Suspense>
         </div>
     );
