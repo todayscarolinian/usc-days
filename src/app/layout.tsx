@@ -15,6 +15,16 @@ export const metadata: Metadata = {
     title: "USC Days 2024 Scoreboard - Today's Carolinian",
     description:
         'Scoreboard of the different school teams per game for USC Days 2024',
+    keywords: ['USC Days', 'scoreboard', 'sports', 'University of San Carlos', 'intramurals', 'competition'],
+    authors: [{ name: "Today's Carolinian" }],
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+        },
+    },
 };
 
 export default function RootLayout({
@@ -24,6 +34,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <meta name="theme-color" content="#8B1538" />
+                <meta name="google-site-verification" content="fUlRQaR1gKTOPdr-F-kQFz3T4qAa1MM3fOrb2-s616Y" />
+                <link rel="icon" href="/favicon.ico" />
+                <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+            </head>
             <body className={`${robotoCondensed.variable}`}>
                 <Navbar />
                 {children}
