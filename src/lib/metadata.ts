@@ -17,7 +17,7 @@ export function generateMetadata(options: MetadataOptions): Metadata {
     type = 'website'
   } = options;
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://usc-days.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
   const imageUrl = image.startsWith('http') ? image : `${baseUrl}${image}`;
 
