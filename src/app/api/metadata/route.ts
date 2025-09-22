@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     // Default metadata if no valid type provided
     metadata = generateMetadata({
       title: "USC Days 2025 Scoreboard - Today's Carolinian",
-      description: 'Scoreboard of the different school teams per game for USC Days 2024',
+      description: 'Scoreboard of the different school teams per game for USC Days 2025',
       url: '/',
     });
   }
