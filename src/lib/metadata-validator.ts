@@ -4,7 +4,55 @@ interface ValidationResult {
   warnings: string[];
 }
 
-export function validateMetadata(metadata: any): ValidationResult {
+export interface ExtractedMetadata {
+  title?: string | null;
+  description?: string | null;
+  openGraph?: {
+    title?: string | null;
+    description?: string | null;
+    url?: string | null;
+    images?: {
+      url?: string | null;
+      width?: number;
+      height?: number;
+    }[];
+  };
+  twitter?: {
+    card?: string | null;
+    title?: string | null;
+    description?: string | null;
+    images?: string[];
+  };
+}
+
+// Union type to accept both Next.js Metadata and ExtractedMetadata
+type ValidatableMetadata = ExtractedMetadata | {
+  title?: string;
+  description?: string;
+  openGraph?: {
+    title?: string;
+    description?: string;
+    url?: string;
+    images?: {
+      url?: string;
+      width?: number;
+      height?: number;
+      alt?: string;
+    }[];
+    type?: string;
+    siteName?: string;
+  };
+  twitter?: {
+    card?: string;
+    title?: string;
+    description?: string;
+    images?: string[];
+    creator?: string;
+    site?: string;
+  };
+};
+
+export function validateMetadata(metadata: ValidatableMetadata): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -63,7 +111,7 @@ export function validateMetadata(metadata: any): ValidationResult {
 }
 
 // Development helper function
-export function logMetadataValidation(metadata: any, pageName: string) {
+export function logMetadataValidation(metadata: ValidatableMetadata, pageName: string) {
   if (process.env.NODE_ENV === 'development') {
     const validation = validateMetadata(metadata);
     
