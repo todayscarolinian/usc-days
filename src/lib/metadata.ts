@@ -1,12 +1,5 @@
 import { Metadata } from 'next';
-
-interface MetadataOptions {
-  title: string;
-  description: string;
-  image?: string;
-  url?: string;
-  type?: 'website' | 'article';
-}
+import { MetadataOptions } from '@/types/metadata.types';
 
 export function generateMetadata(options: MetadataOptions): Metadata {
   const {

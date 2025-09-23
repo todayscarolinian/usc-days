@@ -1,56 +1,4 @@
-interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-}
-
-export interface ExtractedMetadata {
-  title?: string | null;
-  description?: string | null;
-  openGraph?: {
-    title?: string | null;
-    description?: string | null;
-    url?: string | null;
-    images?: {
-      url?: string | null;
-      width?: number;
-      height?: number;
-    }[];
-  };
-  twitter?: {
-    card?: string | null;
-    title?: string | null;
-    description?: string | null;
-    images?: string[];
-  };
-}
-
-// Union type to accept both Next.js Metadata and ExtractedMetadata
-type ValidatableMetadata = ExtractedMetadata | {
-  title?: string;
-  description?: string;
-  openGraph?: {
-    title?: string;
-    description?: string;
-    url?: string;
-    images?: {
-      url?: string;
-      width?: number;
-      height?: number;
-      alt?: string;
-    }[];
-    type?: string;
-    siteName?: string;
-  };
-  twitter?: {
-    card?: string;
-    title?: string;
-    description?: string;
-    images?: string[];
-    creator?: string;
-    site?: string;
-  };
-};
+import { ValidationResult, ExtractedMetadata, ValidatableMetadata } from '@/types/metadata.types';
 
 export function validateMetadata(metadata: ValidatableMetadata): ValidationResult {
   const errors: string[] = [];
@@ -130,3 +78,6 @@ export function logMetadataValidation(metadata: ValidatableMetadata, pageName: s
     console.groupEnd();
   }
 }
+
+// Re-export types for convenience
+export type { ExtractedMetadata, ValidatableMetadata, ValidationResult };
