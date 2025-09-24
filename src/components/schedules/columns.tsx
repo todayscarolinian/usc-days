@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 
-const sportIcons: Record<string, React.JSX.Element> = {
+export const sportIcons: Record<string, React.JSX.Element> = {
   Badminton: (
     <Image src={Badminton} className="inline mr-2 size-6" alt="Badminton" />
   ),
