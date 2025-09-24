@@ -96,12 +96,12 @@ export const EditGameSchema = z
                         : 'teamBScore must be a number.',
             })
             .min(-1, 'teamBScore cannot be negative.'),
-        winnerID: z
+        winnerId: z
             .number({
                 error: (issue) =>
                     issue.input === undefined
-                        ? 'winnerID is required.'
-                        : 'winnerID must be a number.',
+                        ? 'winnerId is required.'
+                        : 'winnerId must be a number.',
         }),
         startDate: z
             .string({

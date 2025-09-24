@@ -38,7 +38,7 @@ class GameService {
             throw new Error('An unexpected error occurred while adding the game.');
         }
     }
-    async editGame({ id, gameTypeId, teamAId, teamBId, teamAScore, teamBScore, startDate, endDate, location }: EditGamePayload) {
+    async editGame({ id, gameTypeId, teamAId, teamBId, teamAScore, teamBScore, winnerId, startDate, endDate, location }: EditGamePayload) {
         try {
             const updatedGame = await prisma.game.update({
                 where: { id },
@@ -48,6 +48,7 @@ class GameService {
                     teamBId,
                     teamAScore,
                     teamBScore,
+                    winnerId,
                     startDate,
                     endDate,
                     location,
