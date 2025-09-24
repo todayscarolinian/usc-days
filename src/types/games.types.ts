@@ -102,7 +102,9 @@ export const EditGameSchema = z
                     issue.input === undefined
                         ? 'winnerId is required.'
                         : 'winnerId must be a number.',
-        }),
+        })
+        .nullable()
+        .optional(),
         startDate: z
             .string({
                 error: (issue) =>
@@ -128,6 +130,15 @@ export const EditGameSchema = z
     .refine((data) => data.teamAId !== data.teamBId, {
         message: 'teamAId and teamBId cannot be the same.',
         path: ['teamBId'],
+    })
+    .refine((data) => {
+        if (data.winnerId !== null && data.winnerId !== undefined) {
+            return data.winnerId === data.teamAId || data.winnerId === data.teamBId;
+        }
+        return true;
+    }, {
+        message: 'winnerId must be either teamAId, teamBId, or null for unfinished games.',
+        path: ['winnerId'],
     });
 
 // Schema for DeleteGame

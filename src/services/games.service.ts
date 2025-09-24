@@ -40,6 +40,20 @@ class GameService {
     }
     async editGame({ id, gameTypeId, teamAId, teamBId, teamAScore, teamBScore, winnerId, startDate, endDate, location }: EditGamePayload) {
         try {
+            if(winnerId !== null && winnerId !== undefined){
+              const validTeam = await prisma.team.findUnique({
+                where: { id: winnerId }
+              });
+
+              if(!validTeam){
+                throw new Error('winnerId must be either teamAId, teamBId, or null for unfinished games.');
+              }
+
+              if (winnerId !== teamAId && winnerId !== teamBId) {
+                throw new Error('winnerId must be either teamAId, teamBId, or null for unfinished games.');
+              }
+            }
+
             const updatedGame = await prisma.game.update({
                 where: { id },
                 data: {
@@ -48,7 +62,7 @@ class GameService {
                     teamBId,
                     teamAScore,
                     teamBScore,
-                    winnerId,
+                    winnerId: winnerId || null,
                     startDate,
                     endDate,
                     location,
