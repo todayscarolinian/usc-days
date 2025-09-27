@@ -20,6 +20,16 @@ export const metadata: Metadata = {
         url: '/',
         image: '/og-default.png'
     }),
+    keywords: ['USC Days', 'scoreboard', 'sports', 'University of San Carlos', 'intramurals', 'competition'],
+    authors: [{ name: "Today's Carolinian" }],
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+        },
+    },
 };
 
 export default function RootLayout({
