@@ -13,10 +13,6 @@ export type Games = {
     teamAScore: number | null,
     teamBScore: number | null,
     location?: string | null,
-    score: {
-        teamAScore: number,
-        teamBScore: number,
-    },
     winner: Team | null,
 }
 
