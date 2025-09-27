@@ -17,8 +17,6 @@ class GameService {
                 },
             });
 
-            console.log("GAMES: ", games);
-
             return games;
         } catch (error) {
             console.error("Error fetching games:", error);
