@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { generateMetadata as generateMeta } from "@/lib/metadata";
-import Management from "@/components/management/management";
 
 export const metadata: Metadata = generateMeta({
     title: "Management Dashboard - USC Days 2025",
@@ -11,11 +10,7 @@ export const metadata: Metadata = generateMeta({
 });
 
 const ManagementPage = () => {
-    return (
-        <div>
-            <Management />
-        </div>
-    );
+    return <div></div>;
 };
 
 export default ManagementPage;
