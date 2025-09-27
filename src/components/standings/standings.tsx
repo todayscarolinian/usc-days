@@ -25,10 +25,23 @@ type Standing = {
 
 export default function Standings() {
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
-    const [champions, setChampions] = useState<ChampionCard[]>([]); // 🔧 Initialize as empty array
+    const [champions, setChampions] = useState<ChampionCard[]>([]);
     const [standings, setStandings] = useState<Standing[]>([]);
+    const [gameTypes, setGameTypes] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchSports = async () => {
+            try {
+                const response = await axios.get("/api/sports");
+                setGameTypes(response.data.sports);
+            } catch (err) {
+                console.error("Error fetching sports:", err);
+            }
+        };
+        fetchSports();
+    }, []);
 
     useEffect(() => {
         if (!selectedSport) {
@@ -66,11 +79,6 @@ export default function Standings() {
                 teamsData.forEach((team: any) => {
                     teamIdToName[team.id] = team.teamName;
                 });
-
-                // 🗑️ Remove this - redundant since teamsData has all teams
-                // championsData.forEach((c) => {
-                //     teamIdToName[c.team.id] = c.team.teamName;
-                // });
 
                 // Early return if no data to process
                 if (gamesFiltered.length === 0) {
@@ -136,8 +144,11 @@ export default function Standings() {
                         };
                     });
 
+                // UNCOMMENT THIS LINE TO TEST STANDINGS PROCESSING ERROR:
+                // throw new Error("Failed to process standings data");
+
                 setStandings(standingsProcessed);
-                setChampions(championsProcessed); // 🔧 Always set array (empty or with data)
+                setChampions(championsProcessed);
             } catch (err) {
                 console.error("Error fetching data:", err);
                 setError("Failed to load data.");
@@ -151,6 +162,10 @@ export default function Standings() {
         fetchData();
     }, [selectedSport]);
 
+    // Get current sport name (this is for TBD cards)
+    const currentSport = gameTypes.find((sport) => sport.id === selectedSport);
+    const currentSportName = currentSport?.gameName || "";
+
     return (
         <div className="p-4 sm:py-10">
             <div className="mx-auto max-w-[96%] space-y-6">
@@ -162,7 +177,10 @@ export default function Standings() {
                 {error && <p>Error: {error}</p>}
                 {selectedSport && !loading && !error && (
                     <>
-                        {/* <Cards data={champions} /> */}
+                        <Cards
+                            data={champions}
+                            currentSport={currentSportName}
+                        />
                         <DataTable columns={standingColumns} data={standings} />
                     </>
                 )}
