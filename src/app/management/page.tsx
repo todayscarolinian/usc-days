@@ -1,3 +1,13 @@
+import { Metadata } from 'next';
+import { generateMetadata as generateMeta } from '@/lib/metadata';
+
+export const metadata: Metadata = generateMeta({
+  title: 'Management Dashboard - USC Days 2025',
+  description: 'Administrative dashboard for managing USC Days 2025 teams, sports, and competition data.',
+  url: '/management',
+  image: '/tc-logo-red.png'
+});
+
 "use client";
 
 import { useEffect, useState } from "react";
