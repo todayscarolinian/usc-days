@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /auth
 Disallow: /auth/
 
-Sitemap: https://usc-days.vercel.app/sitemap.xml
+Sitemap: https://uscdays.todayscarolinian.com/sitemap.xml
