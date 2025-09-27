@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         title: "USC Days 2025 Scoreboard - Today's Carolinian",
         description: 'Scoreboard of the different school teams per game for USC Days 2025',
         url: '/',
-        image: '/tc-logo-white.png'
+        image: '/tc-logo-red.png'
     }),
     keywords: ['USC Days', 'scoreboard', 'sports', 'University of San Carlos', 'intramurals', 'competition'],
     authors: [{ name: "Today's Carolinian" }],
