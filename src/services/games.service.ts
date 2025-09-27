@@ -9,7 +9,6 @@ class GameService {
                     gameType: true,
                     teamA: true,
                     teamB: true,
-                    score: true,
                 },
             });
 
@@ -19,7 +18,7 @@ class GameService {
             throw new Error('Could not fetch games');
         }
     }
-    async addGame({ gameTypeId, teamAId, teamBId, startDate, endDate, location }: AddGamePayload) {
+    async addGame({ gameTypeId, teamAId, teamBId, startDate, endDate, location, createdById }: AddGamePayload) {
         try {
 
             const newGame = await prisma.game.create({
@@ -30,6 +29,7 @@ class GameService {
                     startDate,
                     endDate,
                     location,
+                    createdById,
                 },
             });
             return newGame;
@@ -38,14 +38,31 @@ class GameService {
             throw new Error('An unexpected error occurred while adding the game.');
         }
     }
-    async editGame({ id, gameTypeId, teamAId, teamBId, startDate, endDate, location }: EditGamePayload) {
+    async editGame({ id, gameTypeId, teamAId, teamBId, teamAScore, teamBScore, winnerId, startDate, endDate, location }: EditGamePayload) {
         try {
+            if(winnerId !== null && winnerId !== undefined){
+              const validTeam = await prisma.team.findUnique({
+                where: { id: winnerId }
+              });
+
+              if(!validTeam){
+                throw new Error('winnerId must be either teamAId, teamBId, or null for unfinished games.');
+              }
+
+              if (winnerId !== teamAId && winnerId !== teamBId) {
+                throw new Error('winnerId must be either teamAId, teamBId, or null for unfinished games.');
+              }
+            }
+
             const updatedGame = await prisma.game.update({
                 where: { id },
                 data: {
                     gameTypeId,
                     teamAId,
                     teamBId,
+                    teamAScore,
+                    teamBScore,
+                    winnerId: winnerId || null,
                     startDate,
                     endDate,
                     location,
