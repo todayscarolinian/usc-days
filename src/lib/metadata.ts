@@ -5,12 +5,12 @@ export function generateMetadata(options: MetadataOptions): Metadata {
   const {
     title,
     description,
-    image = '/og-default.png',
+    image = '/tc-logo-white.png',
     url,
     type = 'website'
   } = options;
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://usc-days.vercel.app';
   const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
   const imageUrl = image.startsWith('http') ? image : `${baseUrl}${image}`;
 
