@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /auth
+Disallow: /auth/
+
+Sitemap: https://usc-days.vercel.app/sitemap.xml
