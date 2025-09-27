@@ -18,7 +18,7 @@ import axios from "axios";
 const nav_items = [
     {
         href: "/",
-        name: "Scores",
+        name: "Home",
         protected: false,
     },
     {
@@ -26,19 +26,14 @@ const nav_items = [
         name: "Schedules",
         protected: false,
     },
-    // {
-    //     href: "/rankings",
-    //     name: "Rankings",
-    //     protected: false,
-    // },
     {
-        href: "/champions",
-        name: "Champions",
+        href: "/leaderboard",
+        name: "Leaderboard",
         protected: false,
     },
     {
-        href: "/management",
-        name: "Management",
+        href: "/standings",
+        name: "Standings",
         protected: false,
     },
 ];
@@ -100,7 +95,7 @@ export default function Navbar() {
                         )
                     )}
                 </nav>
-                <Sheet>
+                <Sheet defaultOpen={false}>
                     <SheetTrigger asChild>
                         <Button
                             size="icon"
