@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import SportSelector from "@/components/standings/sport-selector";
 import Cards from "@/components/standings/standings-cards";
 import DataTable from "@/components/standings/standings-table";
@@ -23,72 +24,62 @@ type Standing = {
 };
 
 export default function Standings() {
-    const [selectedSport, setSelectedSport] = useState<string | null>(null);
-    const [champions, setChampions] = useState<ChampionCard[] | null>(null);
+    const [selectedSport, setSelectedSport] = useState<number | null>(null);
+    const [champions, setChampions] = useState<ChampionCard[]>([]); // 🔧 Initialize as empty array
     const [standings, setStandings] = useState<Standing[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!selectedSport) return;
+        if (!selectedSport) {
+            setChampions([]);
+            setStandings([]);
+            return;
+        }
 
         const fetchData = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                // --- Fetch champions & games in parallel ---
-                const [championsRes, gamesRes] = await Promise.all([
-                    fetch("/api/champions"),
-                    fetch("/api/games"),
+                const [championsRes, gamesRes, teamsRes] = await Promise.all([
+                    axios.get("/api/champions"),
+                    axios.get("/api/games"),
+                    axios.get("/api/teams"),
                 ]);
 
-                if (!championsRes.ok)
-                    throw new Error("Failed to fetch champions");
-                if (!gamesRes.ok) throw new Error("Failed to fetch games");
+                const championsData: Champions[] = championsRes.data.champions;
+                const gamesData = gamesRes.data.games;
+                const teamsData = teamsRes.data.teams;
 
-                const championsJson = await championsRes.json();
-                const gamesJson = await gamesRes.json();
-
-                console.log("Raw champions data:", championsJson);
-                console.log("Raw games data:", gamesJson);
-
-                const championsData: Champions[] = championsJson.champions;
-                const gamesData = gamesJson.games; // array of games
-
-                // --- CHECK ALL GAME TYPES ---
-                console.log(
-                    "All champion game types:",
-                    championsData.map((c) => c.gameType.gameName)
-                );
-                console.log(
-                    "All game game types:",
-                    gamesData.map((g: any) => g.gameType.gameName)
-                );
-
-                // --- Filter by selected sport ---
+                // Filter by selected sport
                 const championsFiltered = championsData.filter(
-                    (c) => c.gameType.gameName === selectedSport
+                    (c) => c.gameType.id === selectedSport
                 );
 
                 const gamesFiltered = gamesData.filter(
-                    (g: any) => g.gameType.gameName === selectedSport
+                    (g: any) => g.gameType?.id === selectedSport
                 );
 
-                console.log("Filtered champions:", championsFiltered);
-                console.log("Filtered games:", gamesFiltered);
-
-                // --- Build a team ID → name map ---
+                // Build team mapping from teams API
                 const teamIdToName: Record<number, string> = {};
-                championsData.forEach((c) => {
-                    teamIdToName[c.team.id] = c.team.teamName;
-                });
-                gamesData.forEach((g: any) => {
-                    teamIdToName[g.teamAId] ??= g.teamAName; // if you include teamAName in response
-                    teamIdToName[g.teamBId] ??= g.teamBName; // same
+                teamsData.forEach((team: any) => {
+                    teamIdToName[team.id] = team.teamName;
                 });
 
-                // --- Compute standings ---
+                // 🗑️ Remove this - redundant since teamsData has all teams
+                // championsData.forEach((c) => {
+                //     teamIdToName[c.team.id] = c.team.teamName;
+                // });
+
+                // Early return if no data to process
+                if (gamesFiltered.length === 0) {
+                    setStandings([]);
+                    setChampions([]);
+                    return;
+                }
+
+                // Process games into standings
                 const teamStats: Record<
                     string,
                     { wins: number; losses: number }
@@ -113,22 +104,24 @@ export default function Standings() {
                     }
                 });
 
-                console.log("Computed team stats:", teamStats);
-
+                // Prepare standings for table
                 const standingsProcessed: Standing[] = Object.entries(
                     teamStats
                 ).map(([team, { wins, losses }]) => {
                     const total = wins + losses;
                     const winPct =
                         total > 0
-                            ? `${Math.round((wins / total) * 100)}%`
+                            ? (() => {
+                                  const pct = (wins / total) * 100;
+                                  if (pct === 0 || pct === 100)
+                                      return `${Math.round(pct)}%`;
+                                  return `${parseFloat(pct.toFixed(2))}%`;
+                              })()
                             : "0%";
                     return { team, wins, losses, winPct };
                 });
 
-                console.log("Processed standings:", standingsProcessed);
-
-                // --- Prepare champions for cards ---
+                // Prepare champions for cards
                 const championsProcessed: ChampionCard[] =
                     championsFiltered.map((c) => {
                         const stats = standingsProcessed.find(
@@ -143,16 +136,13 @@ export default function Standings() {
                         };
                     });
 
-                console.log(
-                    "Processed champions for cards:",
-                    championsProcessed
-                );
-
                 setStandings(standingsProcessed);
-                setChampions(championsProcessed);
+                setChampions(championsProcessed); // 🔧 Always set array (empty or with data)
             } catch (err) {
                 console.error("Error fetching data:", err);
                 setError("Failed to load data.");
+                setStandings([]);
+                setChampions([]);
             } finally {
                 setLoading(false);
             }
@@ -170,9 +160,9 @@ export default function Standings() {
                 />
                 {loading && <p>Loading...</p>}
                 {error && <p>Error: {error}</p>}
-                {selectedSport && !loading && champions && (
+                {selectedSport && !loading && !error && (
                     <>
-                        <Cards data={champions} />
+                        {/* <Cards data={champions} /> */}
                         <DataTable columns={standingColumns} data={standings} />
                     </>
                 )}
