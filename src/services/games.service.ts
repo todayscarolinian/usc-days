@@ -13,7 +13,6 @@ class GameService {
                     gameType: true,
                     teamA: true,
                     teamB: true,
-                    winner: true
                 },
             });
 
