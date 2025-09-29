@@ -4,16 +4,18 @@ import { GameType, Team } from "@prisma/client"
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
 */
 export type Games = {
-    id: number,
-    startDate: string,
-    endDate: string,
-    gameType: GameType,
-    teamA: Team,
-    teamB: Team,
-    teamAScore: number | null,
-    teamBScore: number | null,
-    location?: string | null,
-    winner: Team | null,
+    id: number;
+    startDate: string;
+    endDate: string;
+    gameTypeId: number;
+    teamAId: number;
+    teamBId: number;
+    teamAScore: number | null;
+    teamBScore: number | null;
+    location?: string | null;
+    winnerId?: number | null;
+    createdAt?: string;
+    createdBy?: number;
 }
 
 export type Champions = {
