@@ -26,11 +26,11 @@ const nav_items = [
         name: "Schedules",
         protected: false,
     },
-    // {
-    //     href: "/rankings",
-    //     name: "Rankings",
-    //     protected: false,
-    // },
+    {
+         href: "/leaderboards",
+         name: "Leaderboards",
+         protected: false,
+    },
     {
         href: "/champions",
         name: "Champions",

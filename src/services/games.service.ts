@@ -2,22 +2,42 @@ import { prisma } from "@/lib/prisma";
 import { AddGamePayload, DeleteGamePayload, EditGamePayload } from "@/types/games.types";
 
 class GameService {
-    async getGames() {
-        try {
-            const games = await prisma.game.findMany({
-                include: {
-                    gameType: true,
-                    teamA: true,
-                    teamB: true,
-                    score: true,
-                },
-            });
 
-            return games;
-        } catch (error) {
-            console.error('Error fetching games:', error);
-            throw new Error('Could not fetch games');
-        }
+    async getGames() {
+    try {
+        const games = await prisma.game.findMany({
+        include: {
+            gameType: true,
+            teamA: { include: { teamSchools: { include: { school: true } } } },
+            teamB: { include: { teamSchools: { include: { school: true } } } },
+            winner: { include: { teamSchools: { include: { school: true } } } },
+        },
+        });
+        return games;
+    } catch (error) {
+        console.error("Error fetching games:", error);
+        throw new Error("Could not fetch games");
+    }
+
+    // I CHANGED THIS CUZ I CANT ACCESS SCHOOLS THROUGH TEAM ALONE 
+    //async getGames() {
+    //    try {
+    //        const games = await prisma.game.findMany({
+    //            include: {
+    //                gameType: true,
+    //                teamA: true,
+    //                teamB: true,
+    //                score: true,
+    //            },
+    //        });
+
+    //        return games;
+    //    } catch (error) {
+    //        console.error('Error fetching games:', error);
+    //        throw new Error('Could not fetch games');
+    //    }
+    //}
+
     }
     async addGame({ gameTypeId, teamAId, teamBId, startDate, endDate, location }: AddGamePayload) {
         try {
