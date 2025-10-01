@@ -20,10 +20,10 @@ export function SchedulesCard({ date, games }: ScheduleCardProps) {
   return (
     <Card className="w-full py-4">
       <CardHeader>
-        <CardTitle className="text-xl font-bold">
+        <CardTitle className="text-2xl md:text-3xl font-bold">
           {format(parsedDate, "MMM d, yyyy").toUpperCase()}
         </CardTitle>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm md:text-base text-gray-500">
           {format(parsedDate, "EEEE").toUpperCase()}
         </p>
       </CardHeader>
