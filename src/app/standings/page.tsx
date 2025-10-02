@@ -2,13 +2,15 @@ import { Metadata } from "next";
 import { generateMetadata as generateMeta } from "@/lib/metadata";
 
 export const metadata: Metadata = generateMeta({
-    title: "Scores - USC Days 2025",
+    title: "Standings - USC Days 2025",
     description:
-        "View scores and results from USC Days 2025 intramural competitions. Follow your favorite teams across all sports.",
-    url: "/",
+        "View the latest standings for USC Days 2025 intramural competitions.",
+    url: "/standings",
     image: "/tc-logo-red.png",
 });
 
-export default function Home() {
+const StandingsPage = () => {
     return <div></div>;
-}
+};
+
+export default StandingsPage;
