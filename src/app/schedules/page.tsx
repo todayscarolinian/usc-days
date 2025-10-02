@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { generateMetadata as generateMeta } from "@/lib/metadata";
+import SchedulesPageClient from "@/components/schedules/schedules";
 
 export const metadata: Metadata = generateMeta({
     title: "Game Schedules - USC Days 2025",
@@ -10,5 +11,5 @@ export const metadata: Metadata = generateMeta({
 });
 
 export default function SchedulesPage() {
-    return <div></div>;
+    return <div><SchedulesPageClient /></div>;
 }
