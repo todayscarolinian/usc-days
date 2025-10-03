@@ -166,12 +166,13 @@ export default function GameDetailsDialog({
   
   const goEditSchedule = async () => {
     try {
-      setBusy("edit");
-      if (onEditSchedule) onEditSchedule(game);
-      else router.push(`/schedules/edit?gameId=${game.id}`);
-    } finally {
-      setBusy(false);
-    }
+        setBusy("edit");
+        if (onEditSchedule) {
+          onEditSchedule(game);
+        }
+      } finally {
+        setBusy(false);
+      }
   };
 
   // Show a "pending" preview only if user actually changed values in score mode

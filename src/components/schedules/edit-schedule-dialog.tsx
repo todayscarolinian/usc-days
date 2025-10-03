@@ -64,9 +64,13 @@ interface SportTeam {
 
 export default function EditScheduleDialog({
     schedule,
-}: {
+    open,
+    onOpenChange,
+  }: {
     schedule: Schedules;
-}) {
+    open: boolean;
+    onOpenChange: (v: boolean) => void;
+  }) {
     const [selectedSport, setSelectedSport] = useState<number>(
         schedule.gameType.id
     );
@@ -154,7 +158,7 @@ export default function EditScheduleDialog({
                 teamBScore: schedule.score?.teamBScore ?? 0,
             };
 
-            const newSchedule = await axios.put(`/api/games`, data);
+            const newSchedule = await axios.put(`/api/games/${schedule.id}`, data);
 
             setLoading(false);
             if (newSchedule.status != 200) {
@@ -178,7 +182,7 @@ export default function EditScheduleDialog({
         };
 
         try {
-            const deletedScore = await axios.delete(`/api/games`, { data });
+            const deletedScore = await axios.delete(`/api/games/${schedule.id}`);
 
             setLoading(false);
             if (deletedScore.status != 200) {
@@ -195,8 +199,9 @@ export default function EditScheduleDialog({
 
     return (
         <Dialog
-            onOpenChange={(open) => {
-                if (!open) {
+            open={open}
+            onOpenChange={(v) => {
+                if (!v) {
                     setSelectedSport(schedule.gameType.id);
                     setSportTeams([]);
                     setScheduleInputs({
@@ -234,8 +239,11 @@ export default function EditScheduleDialog({
                             ? schedule.location
                             : undefined,
                     });
+                    onOpenChange(false);
+                } else {
+                  onOpenChange(true);
                 }
-            }}
+              }}
         >
             <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
                 <FaRegEdit />
@@ -260,7 +268,7 @@ export default function EditScheduleDialog({
                             <Input
                                 type="date"
                                 placeholder="Start Date"
-                                value={scheduleInputs.startDate}
+                                value={scheduleInputs.startDate ?? ""}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -279,7 +287,7 @@ export default function EditScheduleDialog({
                             <Input
                                 type="date"
                                 placeholder="End Date"
-                                value={scheduleInputs.endDate}
+                                value={scheduleInputs.endDate ?? ""}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -300,7 +308,7 @@ export default function EditScheduleDialog({
                             <Input
                                 type="time"
                                 placeholder="Start Time"
-                                value={scheduleInputs.startTime}
+                                value={scheduleInputs.startTime ?? ""} 
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -319,7 +327,7 @@ export default function EditScheduleDialog({
                             <Input
                                 type="time"
                                 placeholder="End Time"
-                                value={scheduleInputs.endTime}
+                                value={scheduleInputs.endTime ?? ""}
                                 onChange={(e) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
@@ -334,7 +342,7 @@ export default function EditScheduleDialog({
                             value={
                                 sports.length > 0
                                     ? selectedSport.toString()
-                                    : undefined
+                                    : ""
                             }
                             onValueChange={(value: string) =>
                                 setSelectedSport(Number(value))
@@ -370,7 +378,7 @@ export default function EditScheduleDialog({
                                 value={
                                     sportTeams.length > 0
                                         ? scheduleInputs.teamAId.toString()
-                                        : undefined
+                                        : ""
                                 }
                                 onValueChange={(value: string) =>
                                     setScheduleInputs({
@@ -409,7 +417,7 @@ export default function EditScheduleDialog({
                                 value={
                                     sportTeams.length > 0
                                         ? scheduleInputs.teamBId.toString()
-                                        : undefined
+                                        : ""
                                 }
                                 onValueChange={(value: string) =>
                                     setScheduleInputs({
@@ -447,7 +455,7 @@ export default function EditScheduleDialog({
                         <Input
                             type="text"
                             placeholder="Location"
-                            value={scheduleInputs.location}
+                            value={scheduleInputs.location ?? ""}
                             onChange={(e) =>
                                 setScheduleInputs({
                                     ...scheduleInputs,
@@ -460,7 +468,7 @@ export default function EditScheduleDialog({
                 <DialogFooter className="flex items-center">
                     {error && <span className="text-red-500">{error}</span>}
                     <AlertDialog>
-                        <AlertDialogTrigger disabled={loading}>
+                        <AlertDialogTrigger asChild>
                             <Button
                                 className="bg-transparent border border-tc_primary text-tc_primary hover:text-white"
                                 type="button"
@@ -482,11 +490,7 @@ export default function EditScheduleDialog({
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                onClick={deleteSchedule}
-                                >
-                                    Delete
-                                </AlertDialogAction>
+                                <AlertDialogAction onClick={deleteSchedule}>Delete</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

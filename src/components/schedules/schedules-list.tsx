@@ -5,6 +5,7 @@ import { SchedulesCard } from "./schedules-card";
 import { format } from "date-fns";
 import { useState } from "react";
 import GameDetailsDialog from "./game-details-dialog";
+import EditScheduleDialog from "./edit-schedule-dialog"; 
 type SchedulesListProps = {
   games: Schedules[];
 };
@@ -12,6 +13,7 @@ type SchedulesListProps = {
 export default function SchedulesList({ games }: SchedulesListProps) {
     const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
     const [open, setOpen] = useState(false);
+    const [editGame, setEditGame] = useState<Schedules | null>(null);
     const grouped = games.reduce<Record<string, Schedules[]>>((acc, game) => {
         const dayKey = format(new Date(game.startDate), "yyyy-MM-dd");
         if (!acc[dayKey]) acc[dayKey] = [];
@@ -44,7 +46,21 @@ export default function SchedulesList({ games }: SchedulesListProps) {
           open={open}
           onOpenChange={setOpen}
           game={selectedGame}
+          onEditSchedule={(g) => {
+            setEditGame(g);
+            setOpen(false); // close details dialog
+          }}
         />
+        {editGame && (
+        <EditScheduleDialog
+          schedule={editGame}
+          open={!!editGame}
+          onOpenChange={(v) => {
+            if (!v) setEditGame(null); // close edit dialog
+          }}
+        />
+        )}
+
       </div>
     );
 }
