@@ -12,13 +12,24 @@ import { format } from "date-fns"
 
 type ScheduleCardProps = {
   game: Schedules;
+  onOpen?: (g: Schedules) => void;
 };
 
-export function GameCard({ game }: ScheduleCardProps) {
+export function GameCard({ game, onOpen }: ScheduleCardProps) {
   const start = new Date(game.startDate);
 
   return (
-    <Card className="w-full p-0 overflow-hidden">
+    <Card className="w-full p-0 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
+    role="button"
+      tabIndex={0}
+      onClick={() => onOpen?.(game)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen?.(game);
+        }
+      }}
+      >
       <div className="grid grid-cols-[1fr_auto_auto] md:grid-cols-[1fr_auto_1fr] p-4 mt-4">
         <CardHeader className="col-span-1 flex items-center p-0">
           <CardTitle>

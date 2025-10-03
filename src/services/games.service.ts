@@ -117,6 +117,12 @@ class GameService {
             );
         }
     }
+    async getGameById(id: number) {
+        return prisma.game.findUnique({
+          where: { id },
+          include: { gameType: true, teamA: true, teamB: true },
+        });
+      }
 }
 
 export default GameService;

@@ -2,7 +2,7 @@ import GameService from "@/services/games.service";
 import { AddGameSchema, EditGameSchema, DeleteGameSchema } from "@/types/games.types";
 import { NextResponse } from "next/server";
 
-const gameService = new GameService
+const gameService = new GameService()
 export async function GET() {
     const games = await gameService.getGames()
     return NextResponse.json({ games, count: games.length }, { status: 200 });

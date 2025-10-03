@@ -3,12 +3,15 @@
 import { Schedules } from "@/types/types"; // replace with API later
 import { SchedulesCard } from "./schedules-card";
 import { format } from "date-fns";
-
+import { useState } from "react";
+import GameDetailsDialog from "./game-details-dialog";
 type SchedulesListProps = {
   games: Schedules[];
 };
 
 export default function SchedulesList({ games }: SchedulesListProps) {
+    const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
+    const [open, setOpen] = useState(false);
     const grouped = games.reduce<Record<string, Schedules[]>>((acc, game) => {
         const dayKey = format(new Date(game.startDate), "yyyy-MM-dd");
         if (!acc[dayKey]) acc[dayKey] = [];
@@ -25,10 +28,23 @@ export default function SchedulesList({ games }: SchedulesListProps) {
     const sortedDates = Object.keys(grouped).sort();
 
     return (
-    <div className="flex flex-col items-center gap-6">
-      {sortedDates.map((date) => (
-        <SchedulesCard key={date} date={date} games={grouped[date]} />
-      ))}
-    </div>
-  );
+      <div className="flex flex-col items-center gap-6">
+        {sortedDates.map((date) => (
+          <SchedulesCard
+          key={date}
+          date={date}
+          games={grouped[date]}
+          onOpenGame={(g) => {
+            setSelectedGame(g);
+            setOpen(true);
+          }}
+        />
+        ))}
+        <GameDetailsDialog
+          open={open}
+          onOpenChange={setOpen}
+          game={selectedGame}
+        />
+      </div>
+    );
 }
