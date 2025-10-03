@@ -34,9 +34,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   game: GameLike | null;
-  /** Parent should update selectedGame + (optionally) router.refresh() */
   onSaved?: (updated: any) => void;
-  /** Optional: open a controlled EditSchedule dialog or navigate */
   onEditSchedule?: (game: GameLike) => void;
 };
 
@@ -56,26 +54,20 @@ export default function GameDetailsDialog({
   const [error, setError] = React.useState<string | null>(null);
 
   const getDbScores = (g: GameLike) => {
-    const a =
-      (g as any).teamAScore ??
-      (g as any)?.score?.teamAScore ??
-      null;
-    const b =
-      (g as any).teamBScore ??
-      (g as any)?.score?.teamBScore ??
-      null;
+    const a = (g as any).teamAScore ?? (g as any)?.score?.teamAScore ?? null;
+    const b = (g as any).teamBScore ?? (g as any)?.score?.teamBScore ?? null;
     return { a, b };
   };
-  // Sync local score inputs whenever a new game is shown
+
   React.useEffect(() => {
     if (open && game) {
-        const { a, b } = getDbScores(game);
-        setAScore(typeof a === "number" ? a : "");
-        setBScore(typeof b === "number" ? b : "");
-        setMode("view");
-        setError(null);
-      }
-    }, [open, game?.id]);
+      const { a, b } = getDbScores(game);
+      setAScore(typeof a === "number" ? a : "");
+      setBScore(typeof b === "number" ? b : "");
+      setMode("view");
+      setError(null);
+    }
+  }, [open, game?.id]);
 
   if (!game) return null;
 
@@ -97,7 +89,6 @@ export default function GameDetailsDialog({
 
   const { a: dbA, b: dbB } = getDbScores(game);
   const hasDbScores = typeof dbA === "number" && typeof dbB === "number";
-  
 
   const now = new Date();
   const status = hasDbScores
@@ -132,7 +123,14 @@ export default function GameDetailsDialog({
       const a = aScore === "" ? null : Number(aScore);
       const b = bScore === "" ? null : Number(bScore);
 
-      if (a === null || b === null || a < 0 || b < 0 || !Number.isFinite(a) || !Number.isFinite(b)) {
+      if (
+        a === null ||
+        b === null ||
+        a < 0 ||
+        b < 0 ||
+        !Number.isFinite(a) ||
+        !Number.isFinite(b)
+      ) {
         setError("Please enter valid non-negative numbers for both scores.");
         setBusy(false);
         return;
@@ -152,7 +150,9 @@ export default function GameDetailsDialog({
       const updated = await res.json();
       // Update parent (so dialog receives fresh DB game in props)
       onSaved?.(updated);
-      try { router.refresh(); } catch {}
+      try {
+        window.location.reload();
+      } catch {}
       setAScore(typeof updated.teamAScore === "number" ? updated.teamAScore : "");
       setBScore(typeof updated.teamBScore === "number" ? updated.teamBScore : "");
       setMode("view");
@@ -163,24 +163,22 @@ export default function GameDetailsDialog({
     }
   };
 
-  
   const goEditSchedule = async () => {
     try {
-        setBusy("edit");
-        if (onEditSchedule) {
-          onEditSchedule(game);
-        }
-      } finally {
-        setBusy(false);
+      setBusy("edit");
+      if (onEditSchedule) {
+        onEditSchedule(game);
       }
+    } finally {
+      setBusy(false);
+    }
   };
 
-  // Show a "pending" preview only if user actually changed values in score mode
   const editingChanged =
-  mode === "score" &&
-  typeof aScore === "number" &&
-  typeof bScore === "number" &&
-  (aScore !== dbA || bScore !== dbB);
+    mode === "score" &&
+    typeof aScore === "number" &&
+    typeof bScore === "number" &&
+    (aScore !== dbA || bScore !== dbB);
 
   return (
     <Dialog
@@ -213,7 +211,8 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Date</span>
             <span className="col-span-2">
-              {format(start, "MMM d, yyyy")} · {format(start, "h:mm a")} – {format(end, "h:mm a")}
+              {format(start, "MMM d, yyyy")} · {format(start, "h:mm a")} –{" "}
+              {format(end, "h:mm a")}
             </span>
           </div>
 
@@ -242,13 +241,12 @@ export default function GameDetailsDialog({
             <span className="col-span-2">{status}</span>
           </div>
 
-          {/* Always show current DB score (from props) */}
-        <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Score</span>
             <span className="col-span-2">
-                {hasDbScores ? `${home} ${dbA} – ${dbB} ${away}` : ""}
+              {hasDbScores ? `${home} ${dbA} – ${dbB} ${away}` : ""}
             </span>
-        </div>
+          </div>
 
           {/* Inline editor (appears when Add Score is clicked) */}
           {mode === "score" && (
@@ -270,6 +268,7 @@ export default function GameDetailsDialog({
                   />
                 </div>
               </div>
+
               <div className="grid grid-cols-3 items-center gap-2">
                 <span className="text-muted-foreground">{away} score</span>
                 <div className="col-span-2">
@@ -287,14 +286,16 @@ export default function GameDetailsDialog({
                   />
                 </div>
               </div>
+
               {error && <p className="text-xs text-red-600">{error}</p>}
             </div>
           )}
 
-          {/* Optional: show a "pending" preview if user changed values */}
           {editingChanged && (
             <div className="mt-2 rounded-md border p-3 text-center">
-              <div className="text-xs text-muted-foreground">New score (not saved)</div>
+              <div className="text-xs text-muted-foreground">
+                New score (not saved)
+              </div>
               <div className="text-lg font-semibold">
                 {aScore} – {bScore}
               </div>
@@ -313,6 +314,7 @@ export default function GameDetailsDialog({
               >
                 Cancel
               </Button>
+
               <Button
                 onClick={saveScore}
                 disabled={busy === "save" || busy === "clear"}
@@ -330,6 +332,7 @@ export default function GameDetailsDialog({
               >
                 Close
               </Button>
+
               <Button
                 onClick={goEditSchedule}
                 disabled={busy === "edit"}
@@ -337,6 +340,7 @@ export default function GameDetailsDialog({
               >
                 {busy === "edit" ? "Opening…" : "Edit Schedule"}
               </Button>
+
               <Button onClick={beginScoring} className="w-full sm:w-auto">
                 Add Score
               </Button>

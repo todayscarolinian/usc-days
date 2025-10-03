@@ -15,12 +15,8 @@ export default function SchedulesPage() {
     useEffect(() => {
         (async () => {
           try {
-            const { data } = await axios.get("/api/games", { headers: { "cache-control": "no-store" } });
-      
-            // If your API returns { games: [...] }
+            const { data } = await axios.get("/api/games");
             const rows: any[] = Array.isArray(data) ? data : data.games;
-      
-            // Map rows into your Schedules[] shape if needed
             const mapped: Schedules[] = rows.map((g: any) => ({
               id: g.id,
               startDate: g.startDate,
