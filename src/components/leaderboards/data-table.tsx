@@ -1,7 +1,6 @@
 "use client"
 import React, { useState } from "react"
 import {
-  // ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -18,27 +17,42 @@ import {
 import { Input } from "@/components/ui/input"
 import { CustomColumnDef } from "./columns";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData> {
   columns: CustomColumnDef<TData>[];
   data: TData[]
   title?: string
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TValue>({
   columns,
   data,
   title = "USC DAYS",
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TValue>) {
   const [keyword, setKeyword] = useState("")
+
+  //const filteredData = React.useMemo(() => {
+  //  if (!keyword.trim()) return []
+  //  return data
+  //    .filter((row: any) =>
+  //      row.sport.toLowerCase().includes(keyword.toLowerCase())
+  //    )
+  //    .slice()
+  //    .sort((a: any, b: any) => b.winPercentage - a.winPercentage)
+  //}, [keyword, data])
 
   const filteredData = React.useMemo(() => {
     if (!keyword.trim()) return []
     return data
-      .filter((row: any) =>
-        row.sport.toLowerCase().includes(keyword.toLowerCase())
-      )
+      .filter((row) => {
+        const sport = (row as Record<string, unknown>).sport
+        return typeof sport === "string" && sport.toLowerCase().includes(keyword.toLowerCase())
+      })
       .slice()
-      .sort((a: any, b: any) => b.winPercentage - a.winPercentage)
+      .sort((a, b) => {
+        const aWin = (a as Record<string, unknown>).winPercentage as number
+        const bWin = (b as Record<string, unknown>).winPercentage as number
+        return bWin - aWin
+      })
   }, [keyword, data])
 
   const table = useReactTable({
@@ -51,11 +65,12 @@ export function DataTable<TData, TValue>({
   return (
     <div className="rounded-md border">
       <div className="p-6 bg-black flex gap-4 justify-between items-center">
-        
+        {/* Title */}
         <h1 className="uppercase text-white text-2xl font-bold">{title}</h1>
 
+        {/* Search input */}
         <Input
-          placeholder="Keyword Search"
+          placeholder="Search sport (e.g., Volleyball)"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           className="max-w-sm bg-black text-white"
@@ -64,12 +79,13 @@ export function DataTable<TData, TValue>({
 
       {/* Data table */}
       <Table>
+        {/* Show headers only if there are rows */}
         {table.getRowModel().rows?.length > 0 && (
           <TableHeader className="bg-gray text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-none">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={`p-4 md:p-6 font-bold bg-gray-50 ${header.column.columnDef.meta?.className ?? ""}`}>
+                  <TableHead key={header.id} className={`p-4 md:p-6 font-bold bg-gray-50 ${(header.column.columnDef.meta as { className?: string })?.className ?? ""}`}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -88,7 +104,7 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className="border-none">
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className={`p-4 md:p-6 ${cell.column.columnDef.meta?.className ?? ""}`}>
+                  <TableCell key={cell.id} className={`p-4 md:p-6 ${(cell.column.columnDef.meta as { className?: string })?.className ?? ""}`}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
