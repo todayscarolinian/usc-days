@@ -150,6 +150,8 @@ export default function EditScheduleDialog({
                 location: scheduleInputs.location
                     ? scheduleInputs.location
                     : undefined,
+                teamAScore: schedule.score?.teamAScore ?? 0, 
+                teamBScore: schedule.score?.teamBScore ?? 0,
             };
 
             const newSchedule = await axios.put(`/api/games`, data);

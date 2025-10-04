@@ -116,6 +116,7 @@ export default function AddScheduleDialog() {
                 location: scheduleInputs.location
                     ? scheduleInputs.location
                     : undefined,
+                createdById: 1, // mock user ID for now
             };
 
             const newSchedule = await axios.post(`/api/games`, data);
