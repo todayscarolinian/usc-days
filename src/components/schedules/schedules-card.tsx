@@ -32,7 +32,7 @@ export function SchedulesCard({ date, games }: ScheduleCardProps) {
             games.map((game) => <GameCard key={game.id} game={game} />)
         ) : isToday ? (
             <p className="text-gray-600 text-lg text-center mb-6">
-                There's no games for today.
+                There&apos;s no games for today.
             </p>
         ) : null}
       </CardContent>
