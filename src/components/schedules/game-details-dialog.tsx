@@ -74,30 +74,16 @@ export default function GameDetailsDialog({
   const start = new Date(game.startDate);
   const end = new Date(game.endDate);
 
-  const sport = game.gameType?.gameName ?? game.gameType?.name ?? "—";
-  const home =
-    game.teamA?.teamName ??
-    game.teamA?.name ??
-    (game as any).teamAName ??
-    `Team A${game.teamAId ? ` #${game.teamAId}` : ""}`;
-  const away =
-    game.teamB?.teamName ??
-    game.teamB?.name ??
-    (game as any).teamBName ??
-    `Team B${game.teamBId ? ` #${game.teamBId}` : ""}`;
+  const sport = game.gameType?.gameName ?? "-";
+  const home = game.teamA?.teamName ?? game.teamA?.name ?? (game as any).teamAName ?? `Team A${game.teamAId ? ` #${game.teamAId}` : ""}`;
+  const away = game.teamB?.teamName ?? game.teamB?.name ?? (game as any).teamBName ?? `Team B${game.teamBId ? ` #${game.teamBId}` : ""}`;
   const location = game.location ?? "TBA";
 
   const { a: dbA, b: dbB } = getDbScores(game);
   const hasDbScores = typeof dbA === "number" && typeof dbB === "number";
 
   const now = new Date();
-  const status = hasDbScores
-    ? "Finished"
-    : start > now
-    ? "Scheduled"
-    : end > now
-    ? "Ongoing"
-    : "Finished";
+  const status = hasDbScores ? "Finished" : start > now ? "Scheduled" : end > now ? "Ongoing" : "Finished";
 
   const beginScoring = () => {
     setMode("score");
@@ -192,16 +178,6 @@ export default function GameDetailsDialog({
       }}
     >
       <DialogContent className="sm:max-w-[560px]">
-        <div className="absolute right-3 top-3">
-          <button
-            aria-label="Close"
-            className="rounded-md p-2 hover:bg-muted"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
         <DialogHeader>
           <DialogTitle className="text-xl">Game Details</DialogTitle>
           <DialogDescription>Quick view & actions</DialogDescription>
@@ -244,7 +220,7 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Score</span>
             <span className="col-span-2">
-              {hasDbScores ? `${home} ${dbA} – ${dbB} ${away}` : ""}
+              {hasDbScores ? ` ${dbA} – ${dbB} ` : ""}
             </span>
           </div>
 

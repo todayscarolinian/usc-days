@@ -21,7 +21,7 @@ export default function SchedulesPage() {
               id: g.id,
               startDate: g.startDate,
               endDate: g.endDate,
-              gameType: { id: g.gameTypeId, gameName: g.gameType?.name ?? "—" },
+              gameType: { id: g.gameTypeId, gameName: g.gameType?.gameName?.trim()},
               teamA: { id: g.teamAId, teamName: g.teamA?.name ?? `Team ${g.teamAId}` },
               teamB: { id: g.teamBId, teamName: g.teamB?.name ?? `Team ${g.teamBId}` },
               score:
