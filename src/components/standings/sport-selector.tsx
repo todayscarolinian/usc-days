@@ -10,6 +10,7 @@ import {
     SelectItem,
     SelectTrigger,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Roboto } from "next/font/google";
 
 import Badminton from "@/assets/icons/Diamond/Badminton.svg";
@@ -144,14 +145,11 @@ export default function SportSelector({
     if (loading) {
         return (
             <div className="relative inline-block min-w-[272px]">
-                <div
-                    className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-gray-100 shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] animate-pulse`}
-                    style={baseTextStyle}
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
+                <div className="flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px]">
+                    <div className="flex items-center gap-3 flex-1">
+                        <Skeleton className="h-4 w-32" />
                     </div>
-                    <div className="w-6 h-6 bg-gray-300 rounded animate-pulse"></div>
+                    <Skeleton className="h-6 w-6" />
                 </div>
             </div>
         );
