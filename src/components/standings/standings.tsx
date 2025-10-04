@@ -1,9 +1,12 @@
+//TO-DO: add logos and missing icons (contemporary dance and fallback icon)
+
 "use client";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
 import SportSelector from "@/components/standings/sport-selector";
 import Cards from "@/components/standings/standings-cards";
+import StandingsCardsSkeleton from "@/components/standings/standings-cards-skeleton";
 import DataTable from "@/components/standings/standings-table";
 import standingColumns from "@/components/standings/columns";
 import { Champions } from "@/types/types";
@@ -144,9 +147,6 @@ export default function Standings() {
                         };
                     });
 
-                // UNCOMMENT THIS LINE TO TEST STANDINGS PROCESSING ERROR:
-                // throw new Error("Failed to process standings data");
-
                 setStandings(standingsProcessed);
                 setChampions(championsProcessed);
             } catch (err) {
@@ -173,8 +173,13 @@ export default function Standings() {
                     selected={selectedSport}
                     onSelect={setSelectedSport}
                 />
-                {loading && <p>Loading...</p>}
-                {error && <p>Error: {error}</p>}
+                {loading && selectedSport && (
+                    <>
+                        <StandingsCardsSkeleton />
+                        <p>Loading table...</p>
+                    </>
+                )}
+                {error && <p className="text-red-600">Error: {error}</p>}
                 {selectedSport && !loading && !error && (
                     <>
                         <Cards
