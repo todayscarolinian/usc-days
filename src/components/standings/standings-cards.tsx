@@ -21,7 +21,7 @@ import Swimming from "@/assets/icons/Diamond/Swimming.svg";
 import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
 import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
-import Default from "@/assets/icons/Diamond/Esports.svg";
+import Default from "@/assets/tc-logo-red.png"; //temporary for testing - change once fallback icon is ready
 
 const roboto = Roboto({
     subsets: ["latin"],
@@ -157,7 +157,20 @@ const sportIcons: Record<string, React.JSX.Element> = {
     ),
 };
 
+const swimmingAliases = [
+    "Freestyle",
+    "Backstroke",
+    "Butterfly",
+    "Breaststroke",
+    "Medley",
+    "Relay",
+];
+
 const getIconFor = (name: string) => {
+    if (swimmingAliases.some((alias) => name.includes(alias))) {
+        return sportIcons["Swimming"];
+    }
+
     const key = Object.keys(sportIcons).find((k) => name.includes(k));
     return key ? (
         sportIcons[key]
@@ -188,10 +201,7 @@ const getRankInfo = (rank: number) => {
                 bgColor: "#683C13",
             };
         default:
-            return {
-                title: `RANK ${rank}`,
-                bgColor: "#6b7280",
-            };
+            throw new Error(`Invalid rank: ${rank}`);
     }
 };
 
