@@ -8,6 +8,7 @@ import SportSelector from "@/components/standings/sport-selector";
 import Cards from "@/components/standings/standings-cards";
 import StandingsCardsSkeleton from "@/components/standings/standings-cards-skeleton";
 import DataTable from "@/components/standings/standings-table";
+import StandingsTableSkeleton from "@/components/standings/standings-table-skeleton";
 import standingColumns from "@/components/standings/columns";
 import { Champions } from "@/types/types";
 
@@ -176,7 +177,7 @@ export default function Standings() {
                 {loading && selectedSport && (
                     <>
                         <StandingsCardsSkeleton />
-                        <p>Loading table...</p>
+                        <StandingsTableSkeleton rows={6} />
                     </>
                 )}
                 {error && <p className="text-red-600">Error: {error}</p>}

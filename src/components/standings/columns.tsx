@@ -11,7 +11,7 @@ export type Standing = {
     winPct: string;
 };
 
-// Team icons mapping - add your team logos here when available
+// Team icons mapping - add team logos here when available
 const teamIcons: Record<string, React.JSX.Element> = {
     // Add team mappings like:
     // "Team A": <Image src={TeamALogo} className="inline mr-2 size-6" alt="Team A" />,
