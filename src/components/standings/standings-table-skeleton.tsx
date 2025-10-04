@@ -9,21 +9,26 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({
+    subsets: ["latin"],
+    weight: ["400", "500", "700"],
+});
 
 interface StandingsTableSkeletonProps {
-    rows?: number; // Number of skeleton rows to display
+    rows?: number;
 }
 
 export default function StandingsTableSkeleton({
     rows = 8,
 }: StandingsTableSkeletonProps) {
     return (
-        <div className={`border overflow-x-auto`}>
+        <div className={`border overflow-x-auto ${roboto.className}`}>
             <Table
                 className="w-full border-collapse text-sm [&_th]:!border-0 [&_td]:!border-0 [&_tr]:!border-0 [&_thead]:!border-0 [&_tbody]:!border-0"
                 style={{ borderCollapse: "collapse" }}
             >
-                {/* Table Header - Keep actual headers */}
                 <TableHeader
                     className="bg-[#FAFAFA] text-[#080808] [&_tr]:!border-0 [&_th]:!border-0"
                     style={{ border: "none" }}
@@ -59,7 +64,6 @@ export default function StandingsTableSkeleton({
                     </TableRow>
                 </TableHeader>
 
-                {/* Skeleton Table Body */}
                 <TableBody
                     className="text-[#3A3A3A] [&_tr]:!border-0 [&_td]:!border-0"
                     style={{ border: "none" }}
@@ -70,7 +74,7 @@ export default function StandingsTableSkeleton({
                             className="h-[60px] !border-0"
                             style={{ border: "none" }}
                         >
-                            {/* Team column with icon + text skeleton */}
+                            {/* Team column */}
                             <TableCell
                                 className="h-[60px] px-4 w-[942px] text-left !border-0"
                                 style={{ border: "none" }}
