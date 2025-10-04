@@ -20,11 +20,11 @@ export function SchedulesCard({ date, games, onOpenGame }: ScheduleCardProps) {
 
   return (
     <Card className="w-full py-4">
-      <CardHeader>
-        <CardTitle className="text-2xl md:text-3xl font-bold">
+      <CardHeader className="flex flex-row md:flex-col">
+        <CardTitle className="flex-1 text-lg md:text-2xl">
           {format(parsedDate, "MMM d, yyyy").toUpperCase()}
         </CardTitle>
-        <p className="text-sm md:text-base text-gray-500">
+        <p className="flex-1 text-right text-xs text-gray-500">
           {format(parsedDate, "EEEE").toUpperCase()}
         </p>
       </CardHeader>
@@ -32,8 +32,8 @@ export function SchedulesCard({ date, games, onOpenGame }: ScheduleCardProps) {
         {games.length > 0 ? (
             games.map((game) => <GameCard key={game.id} game={game} onOpen={onOpenGame} />)
         ) : isToday ? (
-            <p className="text-gray-500 text-sm text-center">
-                There's no games for today.
+            <p className="text-gray-600 text-lg text-center mb-6">
+                There&apos;s no games for today.
             </p>
         ) : null}
       </CardContent>

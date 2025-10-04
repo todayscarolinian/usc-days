@@ -56,13 +56,6 @@ export default function SchedulesPage() {
                 </div>
                 <SchedulesList games={gamesData} />
             </div>
-            {/* <div className="mx-auto sm:max-w-360">
-                <DataTable
-                    columns={scheduleColumns}
-                    data={gamesData}
-                    actionButton={<AddScheduleDialog />}
-                />
-            </div> */}
         </div>
     );
 }
