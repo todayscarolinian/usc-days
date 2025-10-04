@@ -2,9 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import * as Select from "@radix-ui/react-select";
-import { ListFilter, RefreshCw } from "lucide-react";
 import axios from "axios";
+import { ListFilter, RefreshCw } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+} from "@/components/ui/select";
+import { Roboto } from "next/font/google";
 
 import Badminton from "@/assets/icons/Diamond/Badminton.svg";
 import Basketball from "@/assets/icons/Diamond/Basketball.svg";
@@ -22,7 +28,12 @@ import Swimming from "@/assets/icons/Diamond/Swimming.svg";
 import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
 import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
-import Default from "@/assets/icons/Diamond/Esports.svg";
+import Default from "@/assets/tc-logo-red.png"; //temporary for testing - change once fallback icon is ready
+
+const roboto = Roboto({
+    weight: "300",
+    subsets: ["latin"],
+});
 
 interface SportSelectorProps {
     onSelect: (id: number | null) => void;
@@ -71,8 +82,22 @@ const sportIcons: Record<string, React.JSX.Element> = {
     Volleyball: <Image src={Volleyball} alt="Volleyball" className="size-6" />,
 };
 
+const swimmingAliases = [
+    "Freestyle",
+    "Backstroke",
+    "Butterfly",
+    "Breaststroke",
+    "Medley",
+    "Relay",
+];
+
 const getIconFor = (name: string) => {
+    if (swimmingAliases.some((alias) => name.includes(alias))) {
+        return sportIcons["Swimming"];
+    }
+
     const key = Object.keys(sportIcons).find((k) => name.includes(k));
+
     return key ? (
         sportIcons[key]
     ) : (
@@ -91,13 +116,12 @@ export default function SportSelector({
     const selectedSport = gameTypes.find((g) => g.id === selected);
 
     const baseTextStyle = {
-        fontFamily: "'Roboto', sans-serif",
+        fontFamily: roboto.style.fontFamily,
         fontWeight: 300,
         fontSize: "14px",
         textTransform: "uppercase" as const,
     };
 
-    //kinda takes a while if we fetch so might change this to static data later or other solution
     const fetchSports = async () => {
         try {
             setLoading(true);
@@ -117,12 +141,11 @@ export default function SportSelector({
         fetchSports();
     }, []);
 
-    // Show UI skeleton while loading since it takes a bit to load
     if (loading) {
         return (
             <div className="relative inline-block min-w-[272px]">
                 <div
-                    className="flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-gray-100 shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] animate-pulse"
+                    className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-gray-100 shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] animate-pulse`}
                     style={baseTextStyle}
                 >
                     <div className="flex items-center gap-3">
@@ -134,12 +157,11 @@ export default function SportSelector({
         );
     }
 
-    // Show error state
     if (error || gameTypes.length === 0) {
         return (
             <div className="relative inline-block min-w-[272px]">
                 <div
-                    className="flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500"
+                    className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
                     style={baseTextStyle}
                 >
                     <span className="text-red-600">
@@ -160,82 +182,58 @@ export default function SportSelector({
 
     return (
         <div className="relative inline-block min-w-[272px]">
-            <style jsx global>{`
-                @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
-
-                .sport-select-content::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .sport-select-content::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .sport-select-content::-webkit-scrollbar-thumb {
-                    background-color: #999999;
-                    border-radius: 9999px;
-                }
-                .sport-select-content::-webkit-scrollbar-thumb:hover {
-                    background-color: #777777;
-                }
-            `}</style>
-
-            <Select.Root
+            <Select
                 value={selected ? selected.toString() : ""}
                 onValueChange={(value) =>
                     onSelect(value ? parseInt(value) : null)
                 }
             >
-                <Select.Trigger
-                    className="flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none"
+                <SelectTrigger
+                    size={undefined}
+                    className={`${roboto.className} flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] w-full bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden`}
                     style={baseTextStyle}
                 >
-                    <Select.Value placeholder="Select a sport">
+                    <div className="flex items-center gap-3 flex-1 text-left">
                         {selectedSport ? (
-                            <div className="flex items-center gap-3 flex-1 text-left">
+                            <>
                                 {getIconFor(selectedSport.gameName)}
                                 <span className="whitespace-nowrap">
                                     {selectedSport.gameName}
                                 </span>
-                            </div>
+                            </>
                         ) : (
                             <span className="text-neutral-500">
                                 Select a sport
                             </span>
                         )}
-                    </Select.Value>
-                    <Select.Icon asChild>
-                        <ListFilter className="h-6 w-6 text-neutral-400 mb-.7 ml-4 shrink-0" />
-                    </Select.Icon>
-                </Select.Trigger>
+                    </div>
 
-                <Select.Portal>
-                    <Select.Content
-                        className="sport-select-content z-50 mt-2 w-[var(--radix-select-trigger-width)] max-h-56 overflow-y-auto bg-white shadow-lg border border-neutral-200 rounded-none"
-                        position="popper"
-                        sideOffset={8}
-                    >
-                        <Select.Viewport className="p-0">
-                            {gameTypes.map((sport) => (
-                                <Select.Item
-                                    key={sport.id}
-                                    value={sport.id.toString()}
-                                    className="relative flex items-center justify-between p-4 text-left border-l-2 border-neutral-600 transition-colors hover:border-l-tc_primary-500 data-[highlighted]:border-l-tc_primary-500 data-[state=checked]:border-l-gray-400 overflow-hidden cursor-pointer outline-none"
-                                    style={baseTextStyle}
-                                >
-                                    <Select.ItemText asChild>
-                                        <span
-                                            className="flex-1 text-left"
-                                            style={baseTextStyle}
-                                        >
-                                            {sport.gameName}
-                                        </span>
-                                    </Select.ItemText>
-                                    {getIconFor(sport.gameName)}
-                                </Select.Item>
-                            ))}
-                        </Select.Viewport>
-                    </Select.Content>
-                </Select.Portal>
-            </Select.Root>
+                    <ListFilter className="!h-6 !w-6 text-neutral-400 ml-3 shrink-0" />
+                </SelectTrigger>
+
+                <SelectContent
+                    className="z-50 mt-2 bg-white shadow-lg border border-neutral-200 rounded-none w-[var(--radix-select-trigger-width)] min-w-[var(--radix-select-trigger-width)] max-h-56 overflow-y-auto [&>[data-radix-select-viewport]]:p-0"
+                    position="popper"
+                    sideOffset={8}
+                >
+                    {gameTypes.map((sport) => (
+                        <SelectItem
+                            key={sport.id}
+                            value={sport.id.toString()}
+                            style={baseTextStyle}
+                            className="relative flex items-start w-full pl-4 pr-0 py-4 text-left border-l-2 border-neutral-600 transition-colors hover:border-l-tc_primary-500 data-[state=checked]:border-l-gray-400 cursor-pointer outline-none rounded-none [&>span:first-of-type]:!opacity-0 [&>span:first-of-type]:!w-0 [&>span:first-of-type]:!h-0 [&>span:first-of-type]:!overflow-hidden"
+                        >
+                            <span className="block whitespace-normal break-words pr-10">
+                                {sport.gameName}
+                            </span>
+
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex-shrink-0 pointer-events-none">
+                                {getIconFor(sport.gameName)}
+                            </div>
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
     );
 }
