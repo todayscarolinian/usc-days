@@ -42,7 +42,7 @@ export default function SchedulesList({ games }: SchedulesListProps) {
     ];
 
     // state to control how many days to show
-    const [visibleCount, setVisibleCount] = useState(2); // show today + 1 more initially
+    const [visibleCount, setVisibleCount] = useState(1); // show today initially
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -53,7 +53,7 @@ export default function SchedulesList({ games }: SchedulesListProps) {
             (entries) => {
                 if (entries[0].isIntersecting) {
                     setVisibleCount(
-                        (prev) => Math.min(prev + 2, orderedDates.length) // load max of 2 more
+                        (prev) => Math.min(prev + 1, orderedDates.length) // load max of 1 more
                     );
                 }
             },
