@@ -267,7 +267,7 @@ export default function Cards({ data, currentSport }: CardsProps) {
                                         fontSize: "32px",
                                         fontWeight: "700",
                                     }}
-                                    title={isEmpty ? "TBD" : champion.team} // Show full name on hover
+                                    title={isEmpty ? "TBD" : champion.team}
                                 >
                                     {isEmpty ? "TBD" : champion.team}
                                 </h3>
@@ -330,13 +330,7 @@ export default function Cards({ data, currentSport }: CardsProps) {
                                         </span>
                                     </div>
                                 ) : (
-                                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span className="text-xl font-bold text-gray-600">
-                                            {champion.team
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </span>
-                                    </div>
+                                    getTeamLogo(champion.team)
                                 )}
                             </div>
                         </CardContent>

@@ -40,7 +40,7 @@ export default function StandingsCardsSkeleton() {
 
                         <div className="ml-4">
                             {/* Team logo */}
-                            <Skeleton className="w-20 h-20 rounded-full" />
+                            <Skeleton className="w-20 h-20 mt-3 rounded-full" />
                         </div>
                     </CardContent>
 

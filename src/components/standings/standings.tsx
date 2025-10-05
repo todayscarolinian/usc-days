@@ -12,6 +12,23 @@ import StandingsTableSkeleton from "@/components/standings/standings-table-skele
 import standingColumns from "@/components/standings/columns";
 import { Champions } from "@/types/types";
 
+type GameType = {
+    id: number;
+    gameName: string;
+};
+
+type Team = {
+    id: number;
+    teamName: string;
+};
+
+type Game = {
+    gameType: GameType | null;
+    teamAId: number;
+    teamBId: number;
+    winnerId: number | null;
+};
+
 type ChampionCard = {
     team: string;
     wins: number;
@@ -31,7 +48,7 @@ export default function Standings() {
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
     const [champions, setChampions] = useState<ChampionCard[]>([]);
     const [standings, setStandings] = useState<Standing[]>([]);
-    const [gameTypes, setGameTypes] = useState<any[]>([]);
+    const [gameTypes, setGameTypes] = useState<GameType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -75,12 +92,12 @@ export default function Standings() {
                 );
 
                 const gamesFiltered = gamesData.filter(
-                    (g: any) => g.gameType?.id === selectedSport
+                    (g: Game) => g.gameType?.id === selectedSport
                 );
 
                 // Build team mapping from teams API
                 const teamIdToName: Record<number, string> = {};
-                teamsData.forEach((team: any) => {
+                teamsData.forEach((team: Team) => {
                     teamIdToName[team.id] = team.teamName;
                 });
 
@@ -97,7 +114,7 @@ export default function Standings() {
                     { wins: number; losses: number }
                 > = {};
 
-                gamesFiltered.forEach((game: any) => {
+                gamesFiltered.forEach((game: Game) => {
                     const teamA = teamIdToName[game.teamAId];
                     const teamB = teamIdToName[game.teamBId];
                     const winner = game.winnerId
