@@ -30,16 +30,6 @@ export function DataTable<TValue>({
 }: DataTableProps<TValue>) {
   const [keyword, setKeyword] = useState("")
 
-  //const filteredData = React.useMemo(() => {
-  //  if (!keyword.trim()) return []
-  //  return data
-  //    .filter((row: any) =>
-  //      row.sport.toLowerCase().includes(keyword.toLowerCase())
-  //    )
-  //    .slice()
-  //    .sort((a: any, b: any) => b.winPercentage - a.winPercentage)
-  //}, [keyword, data])
-
   const filteredData = React.useMemo(() => {
     if (!keyword.trim()) return []
     return data
