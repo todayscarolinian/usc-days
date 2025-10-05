@@ -1,27 +1,19 @@
+import { GameType, Team } from "@prisma/client"
+
 /*
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
 */
-export type Scores = {
+export type Games = {
     id: number,
     startDate: string,
     endDate: string,
-    gameType: {
-        id: number,
-        gameName: string,
-    },
-    teamA: {
-        id: number,
-        teamName: string,
-    }
-    teamB: {
-        id: number,
-        teamName: string,
-    },
-    score: {
-        teamAScore: number,
-        teamBScore: number,
-    },
-    winner: string,
+    gameType: GameType,
+    teamA: Team,
+    teamB: Team,
+    teamAScore: number | null,
+    teamBScore: number | null,
+    location?: string | null,
+    winner: Team | null,
 }
 
 export type Champions = {
