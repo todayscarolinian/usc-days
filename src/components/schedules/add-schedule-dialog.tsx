@@ -98,11 +98,12 @@ export default function AddScheduleDialog() {
                 );
                 if (!fetchedSportTeamData)
                     return setError("Failed to load sports data");
-                setFetchingTeams(false);
                 setSportTeams(fetchedSportTeamData);
             } catch (err) {
                 console.error("Error fetching sports data:", err);
                 setError("Failed to load sports data");
+            } finally {
+                setFetchingTeams(false);
             }
         };
 
@@ -342,9 +343,7 @@ export default function AddScheduleDialog() {
                     {error && <span className="text-red-500">{error}</span>}
                     <Button
                         type="submit"
-                        onClick={async () => {
-                            await createSchedule();
-                        }}
+                        onClick={createSchedule}
                         disabled={selectedSport === null || loading}
                     >
                         Submit
