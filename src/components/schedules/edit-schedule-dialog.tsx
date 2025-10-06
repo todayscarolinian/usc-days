@@ -6,26 +6,26 @@ import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { EditGamePayload } from "@/types/games.types";
 import { Schedules } from "@/types/types";
@@ -33,27 +33,27 @@ import { getSportsTeamData } from "@/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
 
 interface ScheduleInputs {
-    teamAId: number;
-    teamBId: number;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
-    location?: string | undefined;
+  teamAId: number;
+  teamBId: number;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  location?: string | undefined;
 }
 
 interface Sport {
-    id: number;
-    gameName: string;
+  id: number;
+  gameName: string;
 }
 
 interface SportTeam {
-    id: number;
-    gameTypeId: number;
-    teamId: number;
-    team: {
-        teamName: string;
-    };
+  id: number;
+  gameTypeId: number;
+  teamId: number;
+  team: {
+    teamName: string;
+  };
 }
 
 export default function EditScheduleDialog({
@@ -65,39 +65,39 @@ export default function EditScheduleDialog({
     open: boolean;
     onOpenChange: (v: boolean) => void;
 }) {
-    const [selectedSport, setSelectedSport] = useState<number>(
-        schedule.gameType.id
-    );
-    const [sports, setSports] = useState<Sport[]>([]);
-    const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
+  const [selectedSport, setSelectedSport] = useState<number>(
+    schedule.gameType.id
+  );
+  const [sports, setSports] = useState<Sport[]>([]);
+  const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-    const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
-        teamAId: schedule.teamA.id,
-        teamBId: schedule.teamB.id,
-        startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
-            timeZone: "Asia/Manila",
-        }),
-        endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
-            timeZone: "Asia/Manila",
-        }),
-        startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Manila",
-        }),
-        endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Manila",
-        }),
-        location: schedule.location ? schedule.location : undefined,
-    });
-
+  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
+    teamAId: schedule.teamA.id,
+    teamBId: schedule.teamB.id,
+    startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    }),
+    endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    }),
+    startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Manila",
+    }),
+    endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Manila",
+    }),
+    location: schedule.location ? schedule.location : undefined,
+  });
+    
     const sportsOptions: SelectOption[] = sports.map((sport) => ({
         value: sport.id.toString(),
         label: sport.gameName,
@@ -123,8 +123,8 @@ export default function EditScheduleDialog({
             }
         };
 
-        fetchSportsData();
-    }, []);
+    fetchSportsData();
+  }, []);
 
     useEffect(() => {
         const fetchSportTeamsData = async () => {
@@ -147,13 +147,13 @@ export default function EditScheduleDialog({
             }
         };
 
-        fetchSportTeamsData();
-    }, [selectedSport]);
+    fetchSportTeamsData();
+  }, [selectedSport]);
 
-    async function editSchedule() {
-        try {
-            setLoading(true);
-            if (!selectedSport) return;
+  async function editSchedule() {
+    try {
+      setLoading(true);
+      if (!selectedSport) return;
 
             const data: EditGamePayload = {
                 id: schedule.id,
@@ -186,31 +186,29 @@ export default function EditScheduleDialog({
         }
     }
 
-    async function deleteSchedule() {
-        try {
-            setLoading(true);
-            setError("");
+  async function deleteSchedule() {
+    try {
+      setLoading(true);
+      setError("");
 
-            const res = await axios.delete(`/api/games`, {
-                data: { id: schedule.id },
-            });
-            setLoading(false);
+      const res = await axios.delete(`/api/games`, { data: { id: schedule.id } });
+      setLoading(false);
 
-            if (res.status !== 200) {
-                setError("An error occurred");
-                console.log(res.data.error);
-            } else {
-                window.location.reload();
-            }
-        } catch (err) {
-            setLoading(false);
-            if (axios.isAxiosError(err)) {
-                console.error("Axios error:", err);
-            } else {
-                console.error(err);
-            }
-        }
+      if (res.status !== 200) {
+        setError("An error occurred");
+        console.log(res.data.error);
+      } else {
+        window.location.reload();
+      }
+    } catch (err) {
+      setLoading(false);
+      if (axios.isAxiosError(err)) {
+        console.error("Axios error:", err);
+      } else {
+        console.error(err);
+      }
     }
+  }
 
     return (
         <Dialog
