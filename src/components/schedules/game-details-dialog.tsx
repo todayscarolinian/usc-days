@@ -31,7 +31,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   game: GameLike | null;
-  onSaved?: (updated: any) => void;                
+  onSaved?: (updated: Schedules) => void;                
   onEditSchedule?: (game: GameLike) => void;
   onAddScore?: (game: Schedules) => void;       
 };

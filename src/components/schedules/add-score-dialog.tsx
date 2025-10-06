@@ -71,7 +71,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   game: GameWithScore | null;
-  onSaved?: (updated: any) => void; // keep as any if your parent already expects any
+  onSaved?: (updated: Schedules) => void;
 };
 
 export default function AddScoreDialog({ open, onOpenChange, game, onSaved }: Props) {
