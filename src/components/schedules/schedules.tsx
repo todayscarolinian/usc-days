@@ -7,12 +7,16 @@ import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 import { games } from "@/constants/mockData"; // mock data
 import DayNavigation from "./day-navigation";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
+
+    useInitializeUserStore();
+    const { email } = useUserStore();
 
     useEffect(() => {
         const fetchGamesData = async () => {
@@ -57,9 +61,11 @@ export default function SchedulesPage() {
             />
             <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
                 <div className="flex flex-col gap-4">
-                    <div className="flex justify-end">
-                        <AddScheduleDialog />
-                    </div>
+                    {email && (
+                        <div className="flex justify-end">
+                            <AddScheduleDialog />
+                        </div>
+                    )}
                     <SchedulesList games={gamesData} />
                 </div>
             </div>
