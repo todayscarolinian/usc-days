@@ -1,5 +1,4 @@
 "use client"
-import React, { useState } from "react"
 import {
   flexRender,
   getCoreRowModel,
@@ -14,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
 import { CustomColumnDef } from "./columns";
 
 interface DataTableProps<TData> {
@@ -28,25 +26,9 @@ export function DataTable<TValue>({
   data,
   title = "USC DAYS",
 }: DataTableProps<TValue>) {
-  const [keyword, setKeyword] = useState("")
-
-  const filteredData = React.useMemo(() => {
-    if (!keyword.trim()) return []
-    return data
-      .filter((row) => {
-        const sport = (row as Record<string, unknown>).sport
-        return typeof sport === "string" && sport.toLowerCase().includes(keyword.toLowerCase())
-      })
-      .slice()
-      .sort((a, b) => {
-        const aWin = (a as Record<string, unknown>).winPercentage as number
-        const bWin = (b as Record<string, unknown>).winPercentage as number
-        return bWin - aWin
-      })
-  }, [keyword, data])
 
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -57,14 +39,6 @@ export function DataTable<TValue>({
       <div className="p-6 bg-black flex gap-4 justify-between items-center">
         {/* Title */}
         <h1 className="uppercase text-white text-2xl font-bold">{title}</h1>
-
-        {/* Search input */}
-        <Input
-          placeholder="Search sport (e.g., Volleyball)"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          className="max-w-sm bg-black text-white"
-        />
       </div>
 
       {/* Data table */}
