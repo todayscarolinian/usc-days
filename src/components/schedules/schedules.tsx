@@ -6,6 +6,7 @@ import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 import { games } from "@/constants/mockData"; // mock data
+import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
@@ -61,8 +62,17 @@ export default function SchedulesPage() {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
-    }
+      return (
+          <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto">
+              <div className="flex flex-col gap-4">
+                  <div className="flex justify-end">
+                      <AddScheduleDialog />
+                  </div>
+                  <SchedulesListSkeleton days={1} rowsPerDay={2} />
+              </div>
+          </div>
+      );
+  }
 
     if (error) {
         return <div>Error: {error}</div>;
