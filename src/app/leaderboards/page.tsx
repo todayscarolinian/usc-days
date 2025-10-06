@@ -36,7 +36,6 @@ export default function RankingsPage() {
             } catch (err) {
                 console.error("Error fetching rankings:", err);
                 setError("Error fetching rankings");
-                setError("Error fetching rankings");
             } finally {
                 setLoading(false);
             }
@@ -45,10 +44,6 @@ export default function RankingsPage() {
         fetchRankings();
     }, [selectedSport]);
 
-    if (error) {
-        return <div className="p-4 text-red-500">Error Fetching Data</div>;
-    }
-
     return (
         <div className="p-4 sm:py-10">
             <div className="mx-auto max-w-[96%] space-y-6">
@@ -56,8 +51,8 @@ export default function RankingsPage() {
                     selected={selectedSport}
                     onSelect={setSelectedSport}
                 />
-                {loading ? (
-                    <LeaderboardsTableSkeleton />
+                {error || loading ? (
+                    <LeaderboardsTableSkeleton error={error} />
                 ) : (
                     <DataTable
                         columns={columns}
@@ -69,4 +64,3 @@ export default function RankingsPage() {
         </div>
     );
 }
-
