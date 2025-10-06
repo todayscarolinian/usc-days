@@ -31,40 +31,8 @@ export default function SchedulesPage() {
 
                 setGamesData(filteredData);
             } catch (err) {
-                // console.error("Error fetching games data:", err);
-                // setError("Failed to load games data");
-                console.error(
-                    "Error fetching mock games data, using mock:",
-                    err
-                );
-                const schedulesMock: Schedules[] = games.map((g) => ({
-                    id: g.id,
-                    startDate: g.startDate,
-                    endDate: g.endDate,
-                    gameType: {
-                        id: g.gameTypeId,
-                        gameName: "Mock Sport", // TODO: look up from mock gameTypes
-                    },
-                    teamA: {
-                        id: g.teamAId,
-                        teamName: "Mock Team A", // TODO: look up from mock teams
-                    },
-                    teamB: {
-                        id: g.teamBId,
-                        teamName: "Mock Team B", // TODO: look up from mock teams
-                    },
-                    score:
-                        g.teamAScore !== null && g.teamBScore !== null
-                            ? {
-                                  teamAScore: g.teamAScore,
-                                  teamBScore: g.teamBScore,
-                              }
-                            : null,
-                    location: g.location ?? undefined,
-                }));
-
-                setGamesData(schedulesMock);
-                setError(null);
+                console.error("Error fetching games data:", err);
+                setError("Failed to load games data");
             } finally {
                 setLoading(false);
             }
