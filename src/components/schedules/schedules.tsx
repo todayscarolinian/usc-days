@@ -6,6 +6,7 @@ import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 import { games } from "@/constants/mockData"; // mock data
+import DayNavigation from "./day-navigation";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
@@ -23,7 +24,10 @@ export default function SchedulesPage() {
             } catch (err) {
                 // console.error("Error fetching games data:", err);
                 // setError("Failed to load games data");
-                console.error("Error fetching mock games data, using mock:", err);
+                console.error(
+                    "Error fetching mock games data, using mock:",
+                    err
+                );
                 const schedulesMock: Schedules[] = games.map((g) => ({
                     id: g.id,
                     startDate: g.startDate,
@@ -42,11 +46,11 @@ export default function SchedulesPage() {
                     },
                     score:
                         g.teamAScore !== null && g.teamBScore !== null
-                        ? {
-                            teamAScore: g.teamAScore,
-                            teamBScore: g.teamBScore,
-                            }
-                        : null,
+                            ? {
+                                  teamAScore: g.teamAScore,
+                                  teamBScore: g.teamBScore,
+                              }
+                            : null,
                     location: g.location ?? undefined,
                 }));
 
@@ -69,13 +73,16 @@ export default function SchedulesPage() {
     }
 
     return (
-        <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto">
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-end">
-                    <AddScheduleDialog />
+        <>
+            <DayNavigation />
+            <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
+                <div className="flex flex-col gap-4">
+                    <div className="flex justify-end">
+                        <AddScheduleDialog />
+                    </div>
+                    <SchedulesList games={gamesData} />
                 </div>
-                <SchedulesList games={gamesData} />
             </div>
-        </div>
+        </>
     );
 }
