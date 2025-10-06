@@ -6,6 +6,7 @@ import {
 } from "@/types/games.types";
 
 class GameService {
+
     async getGames() {
         try {
             const games = await prisma.game.findMany({

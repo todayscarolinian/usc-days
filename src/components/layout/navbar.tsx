@@ -27,9 +27,9 @@ const nav_items = [
         protected: false,
     },
     {
-        href: "/leaderboard",
-        name: "Leaderboard",
-        protected: false,
+         href: "/leaderboards",
+         name: "Leaderboards",
+         protected: false,
     },
     {
         href: "/standings",
