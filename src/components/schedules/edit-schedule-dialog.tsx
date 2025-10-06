@@ -157,8 +157,8 @@ export default function EditScheduleDialog({
         startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
         endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
         location: scheduleInputs.location ? scheduleInputs.location : undefined,
-        teamAScore: schedule.score?.teamAScore ?? 0,
-        teamBScore: schedule.score?.teamBScore ?? 0,
+        teamAScore: schedule.teamAScore ?? 0,
+        teamBScore: schedule.teamBScore ?? 0,
       };
 
       const { id, ...restData } = data;
