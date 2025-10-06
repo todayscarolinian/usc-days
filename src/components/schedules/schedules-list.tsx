@@ -6,7 +6,7 @@ import { Schedules } from "@/types/types"; // replace with API later
 import { SchedulesCard } from "./schedules-card";
 import GameDetailsDialog from "./game-details-dialog";
 import EditScheduleDialog from "./edit-schedule-dialog";
-
+import AddScoreDialog from "./add-score-dialog";
 type SchedulesListProps = {
     games: Schedules[];
 };
@@ -15,6 +15,8 @@ export default function SchedulesList({ games }: SchedulesListProps) {
   const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
   const [open, setOpen] = useState(false);
   const [editGame, setEditGame] = useState<Schedules | null>(null);
+  const [showAddScore, setShowAddScore] = useState(false);
+
     const grouped = games.reduce<Record<string, Schedules[]>>((acc, game) => {
         const dayKey = format(new Date(game.startDate), "yyyy-MM-dd");
         if (!acc[dayKey]) acc[dayKey] = [];
@@ -97,7 +99,11 @@ export default function SchedulesList({ games }: SchedulesListProps) {
         game={selectedGame}
         onEditSchedule={(g) => {
           setEditGame(g);
-          setOpen(false); // close details dialog
+          setOpen(false);
+        }}
+        onAddScore={(g) => {
+          setSelectedGame(g);
+          setShowAddScore(true); 
         }}
       />
 
@@ -110,6 +116,14 @@ export default function SchedulesList({ games }: SchedulesListProps) {
           }}
         />
       )}
+      <AddScoreDialog
+        open={showAddScore}
+        onOpenChange={setShowAddScore}
+        game={selectedGame}
+        onSaved={(updated) => {
+          // future improvements can be made here
+        }}
+      />
     </div>
     );
 }
