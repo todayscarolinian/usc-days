@@ -21,7 +21,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
 
     return (
         <Card
-            className="w-full p-0 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full p-0 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring hover:shadow-lg transition-shadow hover:bg-gray-50"
             role="button"
             tabIndex={0}
             onClick={() => onOpen?.(game)}
