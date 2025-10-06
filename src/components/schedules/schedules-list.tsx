@@ -1,15 +1,22 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { format } from "date-fns";
 import { Schedules } from "@/types/types"; // replace with API later
 import { SchedulesCard } from "./schedules-card";
-import { format } from "date-fns";
-
+import GameDetailsDialog from "./game-details-dialog";
+import EditScheduleDialog from "./edit-schedule-dialog";
+import AddScoreDialog from "./add-score-dialog";
 type SchedulesListProps = {
     games: Schedules[];
 };
 
 export default function SchedulesList({ games }: SchedulesListProps) {
+  const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
+  const [open, setOpen] = useState(false);
+  const [editGame, setEditGame] = useState<Schedules | null>(null);
+  const [showAddScore, setShowAddScore] = useState(false);
+
     const grouped = games.reduce<Record<string, Schedules[]>>((acc, game) => {
         const dayKey = format(new Date(game.startDate), "yyyy-MM-dd");
         if (!acc[dayKey]) acc[dayKey] = [];
@@ -26,13 +33,14 @@ export default function SchedulesList({ games }: SchedulesListProps) {
         });
     });
 
+
     const todayKey = format(new Date(), "yyyy-MM-dd");
 
     if (!grouped[todayKey]) {
         grouped[todayKey] = [];
     }
 
-    const sortedDates = Object.keys(grouped).sort(
+  const sortedDates = Object.keys(grouped).sort(
         (a, b) => new Date(b).getTime() - new Date(a).getTime()
     );
 
@@ -67,15 +75,55 @@ export default function SchedulesList({ games }: SchedulesListProps) {
         };
     }, [orderedDates.length]);
 
-    return (
+  return (
         <div className="flex flex-col items-center gap-15 w-full">
             {orderedDates.slice(0, visibleCount).map((date) => (
-                <SchedulesCard key={date} date={date} games={grouped[date]} />
+                <SchedulesCard
+          key={date}
+          date={date}
+          games={grouped[date]}
+          onOpenGame={(g) => {
+            setSelectedGame(g);
+            setOpen(true);
+          }}
+        />
             ))}
 
             {visibleCount < orderedDates.length && (
                 <div ref={loadMoreRef} className="h-10 w-full" />
             )}
-        </div>
+    
+      <GameDetailsDialog
+        open={open}
+        onOpenChange={setOpen}
+        game={selectedGame}
+        onEditSchedule={(g) => {
+          setEditGame(g);
+          setOpen(false);
+        }}
+        onAddScore={(g) => {
+          setSelectedGame(g);
+          setShowAddScore(true); 
+        }}
+      />
+
+      {editGame && (
+        <EditScheduleDialog
+          schedule={editGame}
+          open={!!editGame}
+          onOpenChange={(v) => {
+            if (!v) setEditGame(null); // close edit dialog
+          }}
+        />
+      )}
+      <AddScoreDialog
+        open={showAddScore}
+        onOpenChange={setShowAddScore}
+        game={selectedGame}
+        // onSaved={(_updated) => {
+        //   // future improvements can be made here
+        // }}
+      />
+    </div>
     );
 }
