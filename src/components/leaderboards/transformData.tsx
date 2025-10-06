@@ -23,9 +23,9 @@ export function transformGamesToSchoolRank(
     const leaderboard: Record<
         string,
         { schoolName: string; wins: number; losses: number; sport: string }
-        > = {};
-    
-    games = games.filter(g => g.gameType.id === sportId);
+    > = {};
+
+    games = games.filter((g) => g.gameType.id === sportId);
 
     for (const g of games) {
         const sport = g.gameType.gameName;
@@ -51,7 +51,25 @@ export function transformGamesToSchoolRank(
                 sport,
             };
         }
+        // Team A entry
+        if (!leaderboard[`${schoolA}-${sport}`]) {
+            leaderboard[`${schoolA}-${sport}`] = {
+                schoolName: schoolA,
+                wins: 0,
+                losses: 0,
+                sport,
+            };
+        }
 
+        // Team B entry
+        if (!leaderboard[`${schoolB}-${sport}`]) {
+            leaderboard[`${schoolB}-${sport}`] = {
+                schoolName: schoolB,
+                wins: 0,
+                losses: 0,
+                sport,
+            };
+        }
         // Team B entry
         if (!leaderboard[`${schoolB}-${sport}`]) {
             leaderboard[`${schoolB}-${sport}`] = {
@@ -66,8 +84,7 @@ export function transformGamesToSchoolRank(
         if (winnerSchool === schoolA) {
             leaderboard[`${schoolA}-${sport}`].wins++;
             leaderboard[`${schoolB}-${sport}`].losses++;
-        }
-        else if (winnerSchool === schoolB) {
+        } else if (winnerSchool === schoolB) {
             leaderboard[`${schoolA}-${sport}`].losses++;
             leaderboard[`${schoolB}-${sport}`].wins++;
         }

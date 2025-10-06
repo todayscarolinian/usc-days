@@ -36,6 +36,7 @@ export default function RankingsPage() {
             } catch (err) {
                 console.error("Error fetching rankings:", err);
                 setError("Error fetching rankings");
+                setError("Error fetching rankings");
             } finally {
                 setLoading(false);
             }
@@ -68,3 +69,4 @@ export default function RankingsPage() {
         </div>
     );
 }
+
