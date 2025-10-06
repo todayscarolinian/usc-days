@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -10,11 +13,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { AddGamePayload } from "@/types/games.types";
 import { Label } from "@/components/ui/label";
+
+import { AddGamePayload } from "@/types/games.types";
 import { getSportsTeamData } from "@/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
 
@@ -77,13 +79,10 @@ export default function AddScheduleDialog() {
                 const {
                     data: { sports: fetchedSportsData },
                 } = await axios.get("/api/sports");
-
                 setSports(fetchedSportsData);
             } catch (err) {
                 console.error("Error fetching sports data:", err);
                 setError("Failed to load sports data");
-
-                fetchSportsData();
             }
         };
 
@@ -107,7 +106,7 @@ export default function AddScheduleDialog() {
             }
         };
 
-        fetchSportTeamsData();
+        if (selectedSport) fetchSportTeamsData();
     }, [selectedSport]);
 
     async function createSchedule() {
@@ -128,12 +127,14 @@ export default function AddScheduleDialog() {
             };
 
             const newSchedule = await axios.post(`/api/games`, data);
-
             setLoading(false);
-            if (newSchedule.status != 201) {
+
+            if (newSchedule.status !== 201) {
                 setError("An error occurred");
                 console.log(newSchedule.data.error);
-            } else window.location.reload();
+            } else {
+                window.location.reload();
+            }
         } catch (error) {
             setLoading(false);
             setError("An error occurred.");
@@ -147,7 +148,6 @@ export default function AddScheduleDialog() {
                 if (!open) {
                     setSelectedSport(null);
                     setSportTeams([]);
-                    setError("");
                     setScheduleInputs({
                         teamAId: -1,
                         teamBId: -1,

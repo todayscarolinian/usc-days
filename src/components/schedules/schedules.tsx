@@ -18,6 +18,8 @@ export default function SchedulesPage() {
                     data: { games: fetchedGamesData },
                 } = await axios.get("/api/games");
 
+                console.log("Fetched games data:", fetchedGamesData);
+
                 setGamesData(fetchedGamesData);
             } catch (err) {
                 console.error("Error fetching games data:", err);

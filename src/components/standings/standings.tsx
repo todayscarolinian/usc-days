@@ -150,6 +150,13 @@ export default function Standings() {
                     return { team, wins, losses, winPct };
                 });
 
+                // Sort by Win% in descending order (highest to lowest)
+                standingsProcessed.sort((a, b) => {
+                    const pctA = parseFloat(a.winPct.replace("%", ""));
+                    const pctB = parseFloat(b.winPct.replace("%", ""));
+                    return pctB - pctA;
+                });
+
                 // Prepare champions for cards
                 const championsProcessed: ChampionCard[] =
                     championsFiltered.map((c) => {
