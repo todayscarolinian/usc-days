@@ -27,9 +27,9 @@ const nav_items = [
         protected: false,
     },
     {
-         href: "/leaderboards",
-         name: "Leaderboards",
-         protected: false,
+        href: "/leaderboards",
+        name: "Leaderboards",
+        protected: false,
     },
     {
         href: "/standings",
@@ -54,32 +54,17 @@ export default function Navbar() {
     };
 
     return (
-        <div>
-            <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary">
-                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-                    <Image
-                        src="/tc-logo-red.png"
-                        alt="tc-logo"
-                        width={50}
-                        height={50}
-                    />
-                    {nav_items.map((n) =>
-                        n.protected ? (
-                            email && (
-                                <Button
-                                    key={n.name}
-                                    className="bg-tc_primary shadow-none"
-                                    asChild
-                                >
-                                    <Link
-                                        href={n.href}
-                                        className="text-white transition-colors hover:text-white"
-                                    >
-                                        {n.name}
-                                    </Link>
-                                </Button>
-                            )
-                        ) : (
+        <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary backdrop-blur-sm">
+            <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+                <Image
+                    src="/tc-logo-red.png"
+                    alt="tc-logo"
+                    width={50}
+                    height={50}
+                />
+                {nav_items.map((n) =>
+                    n.protected ? (
+                        email && (
                             <Button
                                 key={n.name}
                                 className="bg-tc_primary shadow-none"
@@ -93,77 +78,86 @@ export default function Navbar() {
                                 </Link>
                             </Button>
                         )
-                    )}
-                </nav>
-                <Sheet defaultOpen={false}>
-                    <SheetTrigger asChild>
+                    ) : (
                         <Button
-                            size="icon"
-                            className="shrink-0 bg-tc_primary-600 md:hidden"
+                            key={n.name}
+                            className="bg-tc_primary shadow-none"
+                            asChild
                         >
-                            <Menu />
-                            <span className="sr-only">
-                                Toggle navigation menu
-                            </span>
+                            <Link
+                                href={n.href}
+                                className="text-white transition-colors hover:text-white"
+                            >
+                                {n.name}
+                            </Link>
                         </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="bg-tc_primary">
-                        <nav className="grid gap-6 text-lg font-medium">
-                            <Image
-                                src="/tc-logo-white.png"
-                                alt="tc-logo"
-                                width={50}
-                                height={50}
-                            />
-                            {nav_items.map((i) => (
-                                <Link
-                                    key={i.href}
-                                    href={i.href}
-                                    className="text-white"
-                                >
-                                    {i.name}
-                                </Link>
-                            ))}
-                        </nav>
-                    </SheetContent>
-                </Sheet>
-                {email ? (
-                    <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-                        <div className="ml-auto flex-1 sm:flex-initial"></div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="secondary"
-                                    size="icon"
-                                    className="rounded-full"
-                                >
-                                    <CircleUser className="h-5 w-5" />
-                                    <span className="sr-only">
-                                        Toggle user menu
-                                    </span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>
-                                    My Account
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Settings</DropdownMenuItem>
-                                <DropdownMenuItem>Support</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    onClick={async () => {
-                                        const status = await signOut();
-                                        if (status == 200) resetUser();
-                                    }}
-                                >
-                                    Logout
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                ) : null}
-            </header>
-        </div>
+                    )
+                )}
+            </nav>
+            <Sheet defaultOpen={false}>
+                <SheetTrigger asChild>
+                    <Button
+                        size="icon"
+                        className="shrink-0 bg-tc_primary-600 md:hidden"
+                    >
+                        <Menu />
+                        <span className="sr-only">Toggle navigation menu</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="bg-tc_primary">
+                    <nav className="grid gap-6 text-lg font-medium">
+                        <Image
+                            src="/tc-logo-white.png"
+                            alt="tc-logo"
+                            width={50}
+                            height={50}
+                        />
+                        {nav_items.map((i) => (
+                            <Link
+                                key={i.href}
+                                href={i.href}
+                                className="text-white"
+                            >
+                                {i.name}
+                            </Link>
+                        ))}
+                    </nav>
+                </SheetContent>
+            </Sheet>
+            {email ? (
+                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                    <div className="ml-auto flex-1 sm:flex-initial"></div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="rounded-full"
+                            >
+                                <CircleUser className="h-5 w-5" />
+                                <span className="sr-only">
+                                    Toggle user menu
+                                </span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>Settings</DropdownMenuItem>
+                            <DropdownMenuItem>Support</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={async () => {
+                                    const status = await signOut();
+                                    if (status == 200) resetUser();
+                                }}
+                            >
+                                Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            ) : null}
+        </header>
     );
 }
