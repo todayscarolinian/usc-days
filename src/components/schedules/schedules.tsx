@@ -12,6 +12,7 @@ export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedSport, setSelectedSport] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchGamesData = async () => {
@@ -20,7 +21,15 @@ export default function SchedulesPage() {
                     data: { games: fetchedGamesData },
                 } = await axios.get("/api/games");
 
-                setGamesData(fetchedGamesData);
+                let filteredData = fetchedGamesData;
+
+                if (selectedSport && selectedSport !== 0) {
+                    filteredData = fetchedGamesData.filter(
+                        (game: Schedules) => game.gameType.id === selectedSport
+                    );
+                }
+
+                setGamesData(filteredData);
             } catch (err) {
                 // console.error("Error fetching games data:", err);
                 // setError("Failed to load games data");
@@ -62,7 +71,7 @@ export default function SchedulesPage() {
         };
 
         fetchGamesData();
-    }, []);
+    }, [selectedSport]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -74,7 +83,10 @@ export default function SchedulesPage() {
 
     return (
         <>
-            <DayNavigation />
+            <DayNavigation
+                onSelect={setSelectedSport}
+                selected={selectedSport}
+            />
             <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-end">
