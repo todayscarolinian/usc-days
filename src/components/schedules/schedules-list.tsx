@@ -120,9 +120,9 @@ export default function SchedulesList({ games }: SchedulesListProps) {
         open={showAddScore}
         onOpenChange={setShowAddScore}
         game={selectedGame}
-        onSaved={(updated) => {
-          // future improvements can be made here
-        }}
+        // onSaved={(_updated) => {
+        //   // future improvements can be made here
+        // }}
       />
     </div>
     );

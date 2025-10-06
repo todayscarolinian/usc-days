@@ -162,7 +162,7 @@ export default function EditScheduleDialog({
       };
 
       const { id, ...restData } = data;
-      const res = await axios.put(`/api/games`, { id: schedule.id, ...restData });
+      const res = await axios.put(`/api/games`, { id: id, ...restData });
       setLoading(false);
 
       if (res.status !== 200) {

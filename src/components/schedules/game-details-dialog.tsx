@@ -12,37 +12,19 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Schedules } from "@/types/types";
 
-type GameLike = Schedules & {
-  teamAScore?: number | null;
-  teamBScore?: number | null;
-  winnerId?: number | null;
-  teamAId?: number;
-  teamBId?: number;
-  gameType?: { gameName?: string; name?: string } | null;
-  teamA?: { teamName?: string; name?: string } | null;
-  teamB?: { teamName?: string; name?: string } | null;
-  location?: string | null;
-  startDate: string | Date;
-  endDate: string | Date;
-  id: number | string;
-};
-
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  game: GameLike | null;
+  game: Schedules | null;
   onSaved?: (updated: Schedules) => void;                
-  onEditSchedule?: (game: GameLike) => void;
+  onEditSchedule?: (game: Schedules) => void;
   onAddScore?: (game: Schedules) => void;       
 };
 
-type GameWithScore = GameLike & {
-  score?: { teamAScore?: number | null; teamBScore?: number | null } | null;
-};
 
-function getDbScores(g: GameWithScore) {
-  const a = g.teamAScore ?? g.score?.teamAScore ?? null;
-  const b = g.teamBScore ?? g.score?.teamBScore ?? null;
+function getDbScores(g: Schedules) {
+  const a = g.score?.teamAScore ?? null;
+  const b = g.score?.teamBScore ?? null;
   return { a, b };
 }
 
@@ -56,30 +38,24 @@ export default function GameDetailsDialog({
   const [busyEdit, setBusyEdit] = React.useState(false);
 
   if (!game) return null;
+  const s = game;
+  const start = new Date(game.startDate);
+  const end = new Date(game.endDate);
+  const sport = game.gameType?.gameName ?? "-";
+  const home = game.teamA.teamName ?? "-";
+  const away = game.teamB.teamName ?? "-";
+  const location = game.location ?? "TBA";
 
-  type WithAltNames = GameWithScore & { teamAName?: string; teamBName?: string };
-  const g = game as WithAltNames;
-
-  const start = new Date(g.startDate);
-  const end = new Date(g.endDate);
-  const sport = g.gameType?.gameName ?? g.gameType?.name ?? "-";
-  const home =
-    g.teamA?.teamName ?? g.teamA?.name ?? g.teamAName ?? `Team A${g.teamAId ? ` #${g.teamAId}` : ""}`;
-  const away =
-    g.teamB?.teamName ?? g.teamB?.name ?? g.teamBName ?? `Team B${g.teamBId ? ` #${g.teamBId}` : ""}`;
-  const location = g.location ?? "TBA";
-
-  const { a: dbA, b: dbB } = getDbScores(g);
+  const { a: dbA, b: dbB } = getDbScores(game);
   const hasDbScores = typeof dbA === "number" && typeof dbB === "number";
 
   const now = new Date();
-  const status =
-    hasDbScores ? "Finished" : start > now ? "Scheduled" : end > now ? "Ongoing" : "Finished";
+  const status = hasDbScores ? "Finished" : start > now ? "Scheduled" : end > now ? "Ongoing" : "Finished";
 
   function goEditSchedule() {
     try {
       setBusyEdit(true);
-      onEditSchedule?.(g);
+      onEditSchedule?.(s);
     } finally {
       setBusyEdit(false);
     }

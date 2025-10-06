@@ -5,44 +5,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Schedules } from "@/types/types";
-import { useState } from "react";
-type GameLike = Schedules & {
-  id: number | string;
-  startDate: string | Date;
-  endDate: string | Date;
-  teamAScore?: number | null;
-  teamBScore?: number | null;
-  gameTypeId?: number;
-  teamAId?: number;
-  teamBId?: number;
-  gameType?: { id?: number; name?: string; gameName?: string } | null;
-  teamA?: { id?: number; name?: string; teamName?: string } | null;
-  teamB?: { id?: number; name?: string; teamName?: string } | null;
-  teamAName?: string;
-  teamBName?: string;
-  location?: string | null;
-};
 
-type GameWithScore = GameLike & {
-    score?: { teamAScore?: number | null; teamBScore?: number | null } | null;
-};
-
-type WithOptionalRefs = GameWithScore & {
-  gameType?: { id?: number };
-  teamA?: { id?: number };
-  teamB?: { id?: number };
-};
-
-function getDbScores(g: GameWithScore) {
-  const a = g.teamAScore ?? g.score?.teamAScore ?? null;
-  const b = g.teamBScore ?? g.score?.teamBScore ?? null;
+function getDbScores(g: Schedules) {
+  const a = g.score?.teamAScore ?? null;
+  const b = g.score?.teamBScore ?? null;
   return { a, b };
 }
 
-function toEditPayload(game: WithOptionalRefs, a: number, b: number) {
-  const gameTypeId = game.gameTypeId ?? game.gameType?.id;
-  const teamAId = game.teamAId ?? game.teamA?.id;
-  const teamBId = game.teamBId ?? game.teamB?.id;
+function toEditPayload(game: Schedules, a: number, b: number) {
+  const gameTypeId = game.gameType.id;
+  const teamAId = game.teamA.id;
+  const teamBId = game.teamB.id;
 
   if (typeof gameTypeId !== "number" || typeof teamAId !== "number" || typeof teamBId !== "number") {
     throw new Error("Missing required IDs (gameTypeId, teamAId, teamBId).");
@@ -70,7 +43,7 @@ function toEditPayload(game: WithOptionalRefs, a: number, b: number) {
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  game: GameWithScore | null;
+  game: Schedules | null;
   onSaved?: (updated: Schedules) => void;
 };
 
@@ -79,7 +52,6 @@ export default function AddScoreDialog({ open, onOpenChange, game, onSaved }: Pr
   const [bScore, setBScore] = React.useState<number | "">("");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [showAddScore, setShowAddScore] = useState(false);
 
   React.useEffect(() => {
     if (open && game) {
@@ -88,16 +60,15 @@ export default function AddScoreDialog({ open, onOpenChange, game, onSaved }: Pr
       setBScore(typeof b === "number" ? b : 0);
       setError(null);
     }
-  }, [open, game?.id]);
+  }, [open, game]);
 
   if (!game) return null;
 
-  const home = game.teamA?.teamName ?? game.teamA?.name ?? game.teamAName ?? `Team A${game.teamAId ? ` #${game.teamAId}` : ""}`;
-  const away = game.teamB?.teamName ?? game.teamB?.name ?? game.teamBName ?? `Team B${game.teamBId ? ` #${game.teamBId}` : ""}`;
+  const home = game.teamA.teamName ?? `Team A${game.teamA.id}`;
+  const away = game.teamB.teamName ?? `Team B${game.teamB.id}`;
 
   const { a: dbA, b: dbB } = getDbScores(game);
-  const editingChanged =
-    typeof aScore === "number" && typeof bScore === "number" && (dbA !== aScore || dbB !== bScore);
+  const editingChanged = typeof aScore === "number" && typeof bScore === "number" && (dbA !== aScore || dbB !== bScore);
 
   async function save() {
     try {
@@ -113,7 +84,7 @@ export default function AddScoreDialog({ open, onOpenChange, game, onSaved }: Pr
         return;
       }
 
-      const payload = toEditPayload(game as WithOptionalRefs, a, b);
+      const payload = toEditPayload(game as Schedules, a, b);
 
       const res = await fetch(`/api/games`, {
         method: "PUT",

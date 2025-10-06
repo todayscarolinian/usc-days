@@ -7,38 +7,74 @@ import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 
 
+type Row = {
+    id: number | string;
+    startDate: string | Date;
+    endDate: string | Date;
+    gameTypeId: number;
+    teamAId: number;
+    teamBId: number;
+    teamAScore?: number | string | null;
+    teamBScore?: number | string | null;
+    gameType?: { gameName?: string; name?: string } | null;
+    teamA?: { name?: string; teamName?: string } | null;
+    teamB?: { name?: string; teamName?: string } | null;
+    location?: string | null;
+  };
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
+      
+      type ApiGamesResponse = { games: Row[]; count: number };
+      
+      const toNumOrNull = (v: unknown): number | null => {
+        if (v == null) return null;
+        const n = typeof v === "string" ? Number(v.trim()) : typeof v === "number" ? v : NaN;
+        return Number.isFinite(n) ? n : null;
+      };
+      
+      const toISO = (v: string | Date) => (typeof v === "string" ? v : new Date(v).toISOString());
+      
+      const toSchedules = (g: Row): Schedules => {
+        const a = toNumOrNull(g.teamAScore);
+        const b = toNumOrNull(g.teamBScore);
+        return {
+          id: Number(g.id),
+          startDate: toISO(g.startDate),
+          endDate: toISO(g.endDate),
+          gameType: {
+            id: g.gameTypeId,
+            gameName: (g.gameType?.gameName ?? g.gameType?.name ?? "").trim(),
+          },
+          teamA: {
+            id: g.teamAId,
+            teamName: (g.teamA?.teamName ?? g.teamA?.name ?? `Team ${g.teamAId}`).trim(),
+          },
+          teamB: {
+            id: g.teamBId,
+            teamName: (g.teamB?.teamName ?? g.teamB?.name ?? `Team ${g.teamBId}`).trim(),
+          },
+          score: a == null || b == null ? null : { teamAScore: a, teamBScore: b },
+          location: g.location ?? undefined,
+        };
+      };
+      
+      useEffect(() => {
         (async () => {
           try {
-            const { data } = await axios.get("/api/games");
-            const rows: any[] = Array.isArray(data) ? data : data.games;
-            const mapped: Schedules[] = rows.map((g: any) => ({
-              id: g.id,
-              startDate: g.startDate,
-              endDate: g.endDate,
-              gameType: { id: g.gameTypeId, gameName: g.gameType?.gameName?.trim()},
-              teamA: { id: g.teamAId, teamName: g.teamA?.name ?? `Team ${g.teamAId}` },
-              teamB: { id: g.teamBId, teamName: g.teamB?.name ?? `Team ${g.teamBId}` },
-              score:
-                g.teamAScore != null && g.teamBScore != null
-                ? { teamAScore: Number(g.teamAScore), teamBScore: Number(g.teamBScore) }
-                  : null,
-              location: g.location ?? undefined,
-            }));
-      
+            const { data } = await axios.get<ApiGamesResponse>("/api/games");
+            const rows = Array.isArray(data) ? (data as Row[]) : data.games;
+            const mapped: Schedules[] = rows.map(toSchedules);
             setGamesData(mapped);
-          } catch (e: any) {
-            setError(e?.message ?? "Failed to load games");
+          } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : "Failed to load games");
           } finally {
             setLoading(false);
           }
         })();
       }, []);
+      
 
     if (loading) {
         return <div>Loading...</div>;
