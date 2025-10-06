@@ -37,6 +37,10 @@ type Props = {
   onSaved?: (updated: any) => void;
   onEditSchedule?: (game: GameLike) => void;
 };
+type GameWithScore = GameLike & {
+  score?: { teamAScore?: number | null; teamBScore?: number | null };
+};
+
 
 export default function GameDetailsDialog({
   open,
@@ -52,16 +56,14 @@ export default function GameDetailsDialog({
   const [bScore, setBScore] = React.useState<number | "">("");
   const [busy, setBusy] = React.useState<false | "save" | "clear" | "edit">(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  const getDbScores = (g: GameLike) => {
-    const a = (g as any).teamAScore ?? (g as any)?.score?.teamAScore ?? null;
-    const b = (g as any).teamBScore ?? (g as any)?.score?.teamBScore ?? null;
-    return { a, b };
-  };
+  type GameWithAltNames = GameWithScore & { teamAName?: string; teamBName?: string };
+  const g = game as GameWithAltNames;
+  
+  const getDbScores = (g: GameWithScore) => { const a = g.teamAScore ?? g.score?.teamAScore ?? null; const b = g.teamBScore ?? g.score?.teamBScore ?? null; return { a, b }; };
 
   React.useEffect(() => {
     if (open && game) {
-      const { a, b } = getDbScores(game);
+      const { a, b } = getDbScores(g);
       setAScore(typeof a === "number" ? a : "");
       setBScore(typeof b === "number" ? b : "");
       setMode("view");
@@ -71,15 +73,14 @@ export default function GameDetailsDialog({
 
   if (!game) return null;
 
-  const start = new Date(game.startDate);
-  const end = new Date(game.endDate);
+  const start = new Date(g.startDate);
+  const end = new Date(g.endDate);
+  const sport = g.gameType?.gameName ?? g.gameType?.name ?? "-";
+  const home = g.teamA?.teamName ?? g.teamA?.name ?? g.teamAName ?? `Team A${g.teamAId ? ` #${g.teamAId}` : ""}`;
+  const away = g.teamB?.teamName ?? g.teamB?.name ?? g.teamBName ?? `Team B${g.teamBId ? ` #${g.teamBId}` : ""}`;
+  const location = g.location ?? "TBA";
 
-  const sport = game.gameType?.gameName ?? "-";
-  const home = game.teamA?.teamName ?? game.teamA?.name ?? (game as any).teamAName ?? `Team A${game.teamAId ? ` #${game.teamAId}` : ""}`;
-  const away = game.teamB?.teamName ?? game.teamB?.name ?? (game as any).teamBName ?? `Team B${game.teamBId ? ` #${game.teamBId}` : ""}`;
-  const location = game.location ?? "TBA";
-
-  const { a: dbA, b: dbB } = getDbScores(game);
+  const { a: dbA, b: dbB } = getDbScores(g);
   const hasDbScores = typeof dbA === "number" && typeof dbB === "number";
 
   const now = new Date();
@@ -87,7 +88,7 @@ export default function GameDetailsDialog({
 
   const beginScoring = () => {
     setMode("score");
-    const { a, b } = getDbScores(game);
+    const { a, b } = getDbScores(g);
     setAScore(typeof a === "number" ? a : 0);
     setBScore(typeof b === "number" ? b : 0);
     setError(null);
@@ -95,7 +96,7 @@ export default function GameDetailsDialog({
 
   const cancelScoring = () => {
     setMode("view");
-    const { a, b } = getDbScores(game);
+    const { a, b } = getDbScores(g);
     setAScore(typeof a === "number" ? a : "");
     setBScore(typeof b === "number" ? b : "");
     setError(null);
@@ -121,12 +122,14 @@ export default function GameDetailsDialog({
         setBusy(false);
         return;
       }
+      const payload = toEditPayload(g, a, b);
 
-      const res = await fetch(`/api/games/${game.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamAScore: a, teamBScore: b }),
-      });
+        const res = await fetch(`/api/games`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
 
       if (!res.ok) {
         const msg = await res.text();
@@ -134,16 +137,13 @@ export default function GameDetailsDialog({
       }
 
       const updated = await res.json();
-      // Update parent (so dialog receives fresh DB game in props)
       onSaved?.(updated);
-      try {
-        window.location.reload();
-      } catch {}
       setAScore(typeof updated.teamAScore === "number" ? updated.teamAScore : "");
       setBScore(typeof updated.teamBScore === "number" ? updated.teamBScore : "");
       setMode("view");
-    } catch (e: any) {
-      setError(e?.message ?? "Something went wrong while saving.");
+      window.location.reload();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Something went wrong while saving.");
     } finally {
       setBusy(false);
     }
@@ -326,4 +326,52 @@ export default function GameDetailsDialog({
       </DialogContent>
     </Dialog>
   );
+}
+type WithOptionalRefs = GameLike & {
+  gameTypeId?: number;
+  teamAId?: number;
+  teamBId?: number;
+  gameType?: { id: number };
+  teamA?: { id: number };
+  teamB?: { id: number };
+};
+
+function toEditPayload(game: WithOptionalRefs, a: number | null, b: number | null) {
+  const gameTypeId = game.gameTypeId ?? game.gameType?.id;
+  const teamAId = game.teamAId ?? game.teamA?.id;
+  const teamBId = game.teamBId ?? game.teamB?.id;
+
+  if (
+    typeof gameTypeId !== "number" ||
+    typeof teamAId !== "number" ||
+    typeof teamBId !== "number"
+  ) {
+    throw new Error("Missing required IDs (gameTypeId, teamAId, teamBId).");
+  }
+
+  const winnerId =
+    a == null || b == null ? null : a === b ? null : a > b ? teamAId : teamBId;
+
+  const startDate =
+    typeof game.startDate === "string"
+      ? game.startDate
+      : new Date(game.startDate).toISOString();
+
+  const endDate =
+    typeof game.endDate === "string"
+      ? game.endDate
+      : new Date(game.endDate).toISOString();
+
+  return {
+    id: Number(game.id),
+    gameTypeId,
+    teamAId,
+    teamBId,
+    startDate,
+    endDate,
+    location: game.location ?? undefined,
+    teamAScore: a,
+    teamBScore: b,
+    winnerId,
+  };
 }

@@ -161,7 +161,8 @@ export default function EditScheduleDialog({
         teamBScore: schedule.score?.teamBScore ?? 0,
       };
 
-      const res = await axios.put(`/api/games/${schedule.id}`, data);
+      const { id, ...restData } = data;
+      const res = await axios.put(`/api/games`, { id: schedule.id, ...restData });
       setLoading(false);
 
       if (res.status !== 200) {
@@ -182,7 +183,7 @@ export default function EditScheduleDialog({
       setLoading(true);
       setError("");
 
-      const res = await axios.delete(`/api/games/${schedule.id}`);
+      const res = await axios.delete(`/api/games`, { data: { id: schedule.id } });
       setLoading(false);
 
       if (res.status !== 200) {
