@@ -10,20 +10,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectTrigger,
-    SelectValue,
-    SelectItem,
-} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { AddGamePayload } from "@/types/games.types";
 import { Label } from "@/components/ui/label";
 import { getSportsTeamData } from "@/lib/actions";
+import { SearchableSelect, SelectOption } from "./searchable-select";
 
 interface ScheduleInputs {
     teamAId: number;
@@ -66,6 +59,18 @@ export default function AddScheduleDialog() {
         location: undefined,
     });
 
+    const sportsOptions: SelectOption[] = sports.map((sport) => ({
+        value: sport.id.toString(),
+        label: sport.gameName,
+        id: sport.id,
+    }));
+
+    const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+        value: team.teamId.toString(),
+        label: team.team.teamName,
+        id: team.teamId,
+    }));
+
     useEffect(() => {
         const fetchSportsData = async () => {
             try {
@@ -89,8 +94,11 @@ export default function AddScheduleDialog() {
         const fetchSportTeamsData = async () => {
             try {
                 setFetchingTeams(true);
-                const fetchedSportTeamData = await getSportsTeamData(Number(selectedSport));
-                if(!fetchedSportTeamData) return setError("Failed to load sports data");
+                const fetchedSportTeamData = await getSportsTeamData(
+                    Number(selectedSport)
+                );
+                if (!fetchedSportTeamData)
+                    return setError("Failed to load sports data");
                 setFetchingTeams(false);
                 setSportTeams(fetchedSportTeamData);
             } catch (err) {
@@ -112,7 +120,7 @@ export default function AddScheduleDialog() {
                 teamAId: scheduleInputs.teamAId,
                 teamBId: scheduleInputs.teamBId,
                 startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-                 endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+                endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
                 location: scheduleInputs.location
                     ? scheduleInputs.location
                     : undefined,
@@ -138,6 +146,8 @@ export default function AddScheduleDialog() {
             onOpenChange={(open) => {
                 if (!open) {
                     setSelectedSport(null);
+                    setSportTeams([]);
+                    setError("");
                     setScheduleInputs({
                         teamAId: -1,
                         teamBId: -1,
@@ -241,27 +251,18 @@ export default function AddScheduleDialog() {
                         </div>
                     </div>
                     <div className="w-full">
-                        <Select
-                            onValueChange={(value: string) =>
-                                setSelectedSport(Number(value))
+                        <SearchableSelect
+                            placeholder="Select a Sport"
+                            searchPlaceholder="Search sports..."
+                            emptyMessage="No sports found."
+                            options={sportsOptions}
+                            value={selectedSport?.toString() || ""}
+                            onChange={(value) =>
+                                setSelectedSport(value ? Number(value) : null)
                             }
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a Sport" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    {sports.map((sport) => (
-                                        <SelectItem
-                                            key={sport.id}
-                                            value={sport.id.toString()}
-                                        >
-                                            {sport.gameName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                            disabled={loading}
+                            width="w-fit"
+                        />
                     </div>
                     <div className="w-full flex justify-between items-center gap-4">
                         <div className="flex flex-col gap-1 w-full">
@@ -271,31 +272,24 @@ export default function AddScheduleDialog() {
                             >
                                 Team
                             </Label>
-                            <Select
-                                onValueChange={(value: string) =>
+                            <SearchableSelect
+                                placeholder="Select Team"
+                                searchPlaceholder="Search teams..."
+                                emptyMessage="No teams found."
+                                options={teamOptions}
+                                value={
+                                    scheduleInputs.teamAId !== -1
+                                        ? scheduleInputs.teamAId.toString()
+                                        : ""
+                                }
+                                onChange={(value) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
-                                        teamAId: Number(value),
+                                        teamAId: value ? Number(value) : -1,
                                     })
                                 }
                                 disabled={!selectedSport || fetchingTeams}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Team" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {sportTeams.map((team) => (
-                                            <SelectItem
-                                                key={team.id}
-                                                value={team.teamId.toString()}
-                                            >
-                                                {team.team.teamName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            />
                         </div>
                         <span className="font-bold opacity-50">vs</span>
                         <div className="flex flex-col gap-1 w-full">
@@ -305,31 +299,24 @@ export default function AddScheduleDialog() {
                             >
                                 Team
                             </Label>
-                            <Select
-                                onValueChange={(value: string) =>
+                            <SearchableSelect
+                                placeholder="Select Team"
+                                searchPlaceholder="Search teams..."
+                                emptyMessage="No teams found."
+                                options={teamOptions}
+                                value={
+                                    scheduleInputs.teamBId !== -1
+                                        ? scheduleInputs.teamBId.toString()
+                                        : ""
+                                }
+                                onChange={(value) =>
                                     setScheduleInputs({
                                         ...scheduleInputs,
-                                        teamBId: Number(value),
+                                        teamBId: value ? Number(value) : -1,
                                     })
                                 }
                                 disabled={!selectedSport || fetchingTeams}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Team" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {sportTeams.map((team) => (
-                                            <SelectItem
-                                                key={team.id}
-                                                value={team.teamId.toString()}
-                                            >
-                                                {team.team.teamName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            />
                         </div>
                     </div>
                     <div className="w-full flex flex-col gap-1">
