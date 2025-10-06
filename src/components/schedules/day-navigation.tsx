@@ -14,7 +14,7 @@ export default function DayNavigation({
     return (
         <div className="sticky top-16 z-40 flex flex-col bg-white">
             <div className="flex flex-col gap-4 w-full px-4 py-8 sm:max-w-5xl mx-auto relative">
-                <div className="flex justify-between">
+                <div className="flex flex-col md:flex-row justify-between">
                     <div className="flex flex-col">
                         <h2
                             className="text-2xl md:text-4xl font-semibold uppercase"
@@ -32,7 +32,7 @@ export default function DayNavigation({
                             })}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 ml-auto">
+                    <div className="flex items-center justify-center w-full md:w-fit gap-2 ml-auto">
                         <div className="flex items-center gap-1">
                             <button
                                 className="p-2 hover:bg-gray-100 rounded-md transition-colors"

@@ -151,7 +151,7 @@ export default function SportSelector({
 
     if (loading) {
         return (
-            <div className="relative inline-block w-fit">
+            <div className="relative inline-block max-w-64">
                 <div className="flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px]">
                     <div className="flex items-center gap-3 flex-1">
                         <Skeleton className="h-4 w-32" />
@@ -164,7 +164,7 @@ export default function SportSelector({
 
     if (error || gameTypes.length === 0) {
         return (
-            <div className="relative inline-block w-fit">
+            <div className="relative inline-block max-w-64">
                 <div
                     className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
                     style={baseTextStyle}
@@ -186,7 +186,7 @@ export default function SportSelector({
     }
 
     return (
-        <div className="relative inline-block w-fit">
+        <div className="relative inline-block max-w-64">
             <Select
                 value={selected === null ? "0" : selected.toString()}
                 onValueChange={(value) =>
