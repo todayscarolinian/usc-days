@@ -5,7 +5,6 @@ import SchedulesList from "@/components/schedules/schedules-list"; // cards view
 import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
-import { games } from "@/constants/mockData"; // mock data
 import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
@@ -20,39 +19,12 @@ export default function SchedulesPage() {
                     data: { games: fetchedGamesData },
                 } = await axios.get("/api/games");
 
+                console.log("Fetched games data:", fetchedGamesData);
+
                 setGamesData(fetchedGamesData);
             } catch (err) {
-                // console.error("Error fetching games data:", err);
-                // setError("Failed to load games data");
-                console.error("Error fetching mock games data, using mock:", err);
-                const schedulesMock: Schedules[] = games.map((g) => ({
-                    id: g.id,
-                    startDate: g.startDate,
-                    endDate: g.endDate,
-                    gameType: {
-                        id: g.gameTypeId,
-                        gameName: "Mock Sport", // TODO: look up from mock gameTypes
-                    },
-                    teamA: {
-                        id: g.teamAId,
-                        teamName: "Mock Team A", // TODO: look up from mock teams
-                    },
-                    teamB: {
-                        id: g.teamBId,
-                        teamName: "Mock Team B", // TODO: look up from mock teams
-                    },
-                    score:
-                        g.teamAScore !== null && g.teamBScore !== null
-                        ? {
-                            teamAScore: g.teamAScore,
-                            teamBScore: g.teamBScore,
-                            }
-                        : null,
-                    location: g.location ?? undefined,
-                }));
-
-                setGamesData(schedulesMock);
-                setError(null);
+                console.error("Error fetching games data:", err);
+                setError("Failed to load games data");
             } finally {
                 setLoading(false);
             }
