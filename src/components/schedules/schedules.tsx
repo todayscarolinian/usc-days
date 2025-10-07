@@ -5,6 +5,7 @@ import SchedulesList from "@/components/schedules/schedules-list"; // cards view
 import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
+import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
@@ -32,21 +33,21 @@ export default function SchedulesPage() {
         fetchGamesData();
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
     return (
         <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto">
             <div className="flex flex-col gap-4">
                 <div className="flex justify-end">
                     <AddScheduleDialog />
                 </div>
-                <SchedulesList games={gamesData} />
+                {loading || error ? (
+                    <SchedulesListSkeleton
+                        days={1}
+                        rowsPerDay={2}
+                        error={error}
+                    />
+                ) : (
+                    <SchedulesList games={gamesData} />
+                )}
             </div>
         </div>
     );
