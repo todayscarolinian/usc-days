@@ -8,6 +8,7 @@ import AddScheduleDialog from "./add-schedule-dialog";
 import { games } from "@/constants/mockData"; // mock data
 import DayNavigation from "./day-navigation";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
+import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
@@ -66,8 +67,16 @@ export default function SchedulesPage() {
                             <AddScheduleDialog />
                         </div>
                     )}
+                    {loading || error ? (
+                    <SchedulesListSkeleton
+                        days={1}
+                        rowsPerDay={2}
+                        error={error}
+                    />
+                ) : (
                     <SchedulesList games={gamesData} />
-                </div>
+                    )}
+            </div>
             </div>
         </>
     );
