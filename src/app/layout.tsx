@@ -56,7 +56,7 @@ export default function RootLayout({
             </head>
             <body className={`${robotoCondensed.variable}`}>
                 <Navbar />
-                {children}
+                <main className="relative z-0">{children}</main>
                 <Toaster />
             </body>
         </html>

@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { AddGamePayload } from "@/types/games.types";
 import { getSportsTeamData } from "@/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 interface ScheduleInputs {
     teamAId: number;
@@ -73,6 +74,9 @@ export default function AddScheduleDialog() {
         id: team.teamId,
     }));
 
+    useInitializeUserStore();
+    const user = useUserStore();
+
     useEffect(() => {
         const fetchSportsData = async () => {
             try {
@@ -114,6 +118,13 @@ export default function AddScheduleDialog() {
         try {
             setLoading(true);
             if (!selectedSport) return;
+            const {
+                data: { userId },
+            } = await axios.get(`/api/user/services`, {
+                params: {
+                    email: user.email,
+                },
+            });
 
             const data: AddGamePayload = {
                 gameTypeId: selectedSport,
@@ -124,7 +135,7 @@ export default function AddScheduleDialog() {
                 location: scheduleInputs.location
                     ? scheduleInputs.location
                     : undefined,
-                createdById: 1, // mock user ID for now
+                createdById: userId,
             };
 
             const newSchedule = await axios.post(`/api/games`, data);

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { Schedules } from "@/types/types";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 
 type Props = {
     open: boolean;
@@ -35,6 +36,9 @@ export default function GameDetailsDialog({
     onAddScore,
 }: Props) {
     const [busyEdit, setBusyEdit] = React.useState(false);
+
+    useInitializeUserStore();
+    const { email } = useUserStore();
 
     if (!game) return null;
     const s = game;
@@ -130,20 +134,24 @@ export default function GameDetailsDialog({
                         Close
                     </Button>
 
-                    <Button
-                        onClick={goEditSchedule}
-                        disabled={busyEdit}
-                        className="w-full sm:w-auto"
-                    >
-                        {busyEdit ? "Opening…" : "Edit Schedule"}
-                    </Button>
+                    {email && (
+                        <>
+                            <Button
+                                onClick={goEditSchedule}
+                                disabled={busyEdit}
+                                className="w-full sm:w-auto"
+                            >
+                                {busyEdit ? "Opening…" : "Edit Schedule"}
+                            </Button>
 
-                    <Button
-                        onClick={() => onAddScore?.(game)}
-                        className="w-full sm:w-auto"
-                    >
-                        Add Score
-                    </Button>
+                            <Button
+                                onClick={() => onAddScore?.(game)}
+                                className="w-full sm:w-auto"
+                            >
+                                Add Score
+                            </Button>
+                        </>
+                    )}
                 </div>
             </DialogContent>
         </Dialog>

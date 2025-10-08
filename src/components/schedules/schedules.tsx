@@ -5,12 +5,18 @@ import SchedulesList from "@/components/schedules/schedules-list"; // cards view
 import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
+import DayNavigation from "./day-navigation";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedSport, setSelectedSport] = useState<number | null>(null);
+
+    useInitializeUserStore();
+    const { email } = useUserStore();
 
     useEffect(() => {
         const fetchGamesData = async () => {
@@ -19,9 +25,15 @@ export default function SchedulesPage() {
                     data: { games: fetchedGamesData },
                 } = await axios.get("/api/games");
 
-                console.log("Fetched games data:", fetchedGamesData);
+                let filteredData = fetchedGamesData;
 
-                setGamesData(fetchedGamesData);
+                if (selectedSport && selectedSport !== 0) {
+                    filteredData = fetchedGamesData.filter(
+                        (game: Schedules) => game.gameType.id === selectedSport
+                    );
+                }
+
+                setGamesData(filteredData);
             } catch (err) {
                 console.error("Error fetching games data:", err);
                 setError("Failed to load games data");
@@ -31,24 +43,32 @@ export default function SchedulesPage() {
         };
 
         fetchGamesData();
-    }, []);
+    }, [selectedSport]);
 
     return (
-        <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto">
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-end">
-                    <AddScheduleDialog />
+        <>
+            <DayNavigation
+                onSelect={setSelectedSport}
+                selected={selectedSport}
+            />
+            <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
+                <div className="flex flex-col gap-4">
+                    {email && (
+                        <div className="flex justify-end">
+                            <AddScheduleDialog />
+                        </div>
+                    )}
+                    {loading || error ? (
+                        <SchedulesListSkeleton
+                            days={1}
+                            rowsPerDay={2}
+                            error={error}
+                        />
+                    ) : (
+                        <SchedulesList games={gamesData} />
+                    )}
                 </div>
-                {loading || error ? (
-                    <SchedulesListSkeleton
-                        days={1}
-                        rowsPerDay={2}
-                        error={error}
-                    />
-                ) : (
-                    <SchedulesList games={gamesData} />
-                )}
             </div>
-        </div>
+        </>
     );
 }
