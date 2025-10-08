@@ -5,7 +5,6 @@ import SchedulesList from "@/components/schedules/schedules-list"; // cards view
 import axios from "axios";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
-import { games } from "@/constants/mockData"; // mock data
 import DayNavigation from "./day-navigation";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import SchedulesListSkeleton from "./schedules-list-skeleton";
@@ -46,14 +45,6 @@ export default function SchedulesPage() {
         fetchGamesData();
     }, [selectedSport]);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
     return (
         <>
             <DayNavigation
@@ -68,15 +59,15 @@ export default function SchedulesPage() {
                         </div>
                     )}
                     {loading || error ? (
-                    <SchedulesListSkeleton
-                        days={1}
-                        rowsPerDay={2}
-                        error={error}
-                    />
-                ) : (
-                    <SchedulesList games={gamesData} />
+                        <SchedulesListSkeleton
+                            days={1}
+                            rowsPerDay={2}
+                            error={error}
+                        />
+                    ) : (
+                        <SchedulesList games={gamesData} />
                     )}
-            </div>
+                </div>
             </div>
         </>
     );

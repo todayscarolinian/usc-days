@@ -106,7 +106,6 @@ export default function AddScheduleDialog() {
             } catch (err) {
                 console.error("Error fetching sports data:", err);
                 setError("Failed to load sports data");
-                setFetchingTeams(false);
             } finally {
                 setFetchingTeams(false);
             }
