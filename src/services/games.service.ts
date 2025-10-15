@@ -6,6 +6,7 @@ import {
 } from "@/types/games.types";
 
 class GameService {
+
     async getGames() {
         try {
             const games = await prisma.game.findMany({
@@ -117,6 +118,12 @@ class GameService {
             );
         }
     }
+    async getGameById(id: number) {
+        return prisma.game.findUnique({
+          where: { id },
+          include: { gameType: true, teamA: true, teamB: true },
+        });
+      }
 }
 
 export default GameService;

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { generateMetadata as generateMeta } from "@/lib/metadata";
+import Standings from "@/components/standings/standings";
 
 export const metadata: Metadata = generateMeta({
     title: "Standings - USC Days 2025",
@@ -10,7 +11,11 @@ export const metadata: Metadata = generateMeta({
 });
 
 const StandingsPage = () => {
-    return <div></div>;
+    return (
+        <div>
+            <Standings />
+        </div>
+    );
 };
 
 export default StandingsPage;
