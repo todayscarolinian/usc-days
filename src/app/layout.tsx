@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { generateMetadata as generateMeta } from "@/lib/metadata";
+import QueryProvider from "@/components/provider";
 
 const robotoCondensed = Roboto_Condensed({
     subsets: ["latin"],
@@ -55,9 +56,11 @@ export default function RootLayout({
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
             </head>
             <body className={`${robotoCondensed.variable}`}>
-                <Navbar />
-                <main className="relative z-0">{children}</main>
-                <Toaster />
+                <QueryProvider>
+                    <Navbar />
+                    <main className="relative z-0">{children}</main>
+                    <Toaster />
+                </QueryProvider>
             </body>
         </html>
     );

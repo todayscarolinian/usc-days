@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import SportSelector from "@/components/standings/sport-selector";
 import Cards from "@/components/standings/standings-cards";
@@ -44,151 +45,161 @@ type Standing = {
     winPct: string;
 };
 
+/*
+    MAIN OPTIMIZATION: Loads all data on render, timeout is set to simulate loading
+*/
+
 export default function Standings() {
+    const STALE_TIME = 1000 * 60 * 5;
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
     const [champions, setChampions] = useState<ChampionCard[]>([]);
     const [standings, setStandings] = useState<Standing[]>([]);
-    const [gameTypes, setGameTypes] = useState<GameType[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const { data: sportsData = [], error: sportsError } = useQuery<GameType[]>({
+        queryKey: ["sports"],
+        queryFn: async () => {
+            const response = await axios.get("/api/sports");
+            return response.data.sports;
+        },
+        staleTime: STALE_TIME,
+    });
+
+    const { data: championsData = [], error: championsError } = useQuery({
+        queryKey: ["champions"],
+        queryFn: async () => {
+            const response = await axios.get("/api/champions");
+            return response.data.champions;
+        },
+        staleTime: STALE_TIME,
+    });
+
+    const { data: gamesData = [], error: gamesError } = useQuery({
+        queryKey: ["games"],
+        queryFn: async () => {
+            const response = await axios.get("/api/games");
+            return response.data.games;
+        },
+        staleTime: STALE_TIME,
+    });
+
+    const { data: teamsData = [], error: teamsError } = useQuery({
+        queryKey: ["teams"],
+        queryFn: async () => {
+            const response = await axios.get("/api/teams");
+            return response.data.teams;
+        },
+        staleTime: STALE_TIME,
+    });
+
+    const error = sportsError || championsError || gamesError || teamsError;
 
     useEffect(() => {
-        const fetchSports = async () => {
-            try {
-                const response = await axios.get("/api/sports");
-                setGameTypes(response.data.sports);
-            } catch (err) {
-                console.error("Error fetching sports:", err);
-            }
-        };
-        fetchSports();
-    }, []);
-
-    useEffect(() => {
-        if (!selectedSport) {
-            setChampions([]);
-            setStandings([]);
+        if (!selectedSport) return;
+        if (!gamesData || !championsData || !teamsData) return;
+        if (
+            gamesData.length === 0 &&
+            standings.length === 0 &&
+            champions.length === 0
+        )
             return;
-        }
 
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+        setLoading(true);
 
-                const [championsRes, gamesRes, teamsRes] = await Promise.all([
-                    axios.get("/api/champions"),
-                    axios.get("/api/games"),
-                    axios.get("/api/teams"),
-                ]);
+        const load = setTimeout(() => {
+            const championsFiltered = championsData.filter(
+                (c: Champions) => c.gameType.id === selectedSport
+            );
 
-                const championsData: Champions[] = championsRes.data.champions;
-                const gamesData = gamesRes.data.games;
-                const teamsData = teamsRes.data.teams;
+            const gamesFiltered = gamesData.filter(
+                (g: Game) => g.gameType?.id === selectedSport
+            );
 
-                // Filter by selected sport
-                const championsFiltered = championsData.filter(
-                    (c) => c.gameType.id === selectedSport
-                );
+            // Build team mapping from teams API
+            const teamIdToName: Record<number, string> = {};
+            teamsData.forEach((team: Team) => {
+                teamIdToName[team.id] = team.teamName;
+            });
 
-                const gamesFiltered = gamesData.filter(
-                    (g: Game) => g.gameType?.id === selectedSport
-                );
-
-                // Build team mapping from teams API
-                const teamIdToName: Record<number, string> = {};
-                teamsData.forEach((team: Team) => {
-                    teamIdToName[team.id] = team.teamName;
-                });
-
-                // Early return if no data to process
-                if (gamesFiltered.length === 0) {
-                    setStandings([]);
-                    setChampions([]);
-                    return;
-                }
-
-                // Process games into standings
-                const teamStats: Record<
-                    string,
-                    { wins: number; losses: number }
-                > = {};
-
-                gamesFiltered.forEach((game: Game) => {
-                    const teamA = teamIdToName[game.teamAId];
-                    const teamB = teamIdToName[game.teamBId];
-                    const winner = game.winnerId
-                        ? teamIdToName[game.winnerId]
-                        : null;
-
-                    if (!teamStats[teamA])
-                        teamStats[teamA] = { wins: 0, losses: 0 };
-                    if (!teamStats[teamB])
-                        teamStats[teamB] = { wins: 0, losses: 0 };
-
-                    if (winner) {
-                        teamStats[winner].wins += 1;
-                        const loser = winner === teamA ? teamB : teamA;
-                        teamStats[loser].losses += 1;
-                    }
-                });
-
-                // Prepare standings for table
-                const standingsProcessed: Standing[] = Object.entries(
-                    teamStats
-                ).map(([team, { wins, losses }]) => {
-                    const total = wins + losses;
-                    const winPct =
-                        total > 0
-                            ? (() => {
-                                  const pct = (wins / total) * 100;
-                                  if (pct === 0 || pct === 100)
-                                      return `${Math.round(pct)}%`;
-                                  return `${parseFloat(pct.toFixed(2))}%`;
-                              })()
-                            : "0%";
-                    return { team, wins, losses, winPct };
-                });
-
-                // Sort by Win% in descending order (highest to lowest)
-                standingsProcessed.sort((a, b) => {
-                    const pctA = parseFloat(a.winPct.replace("%", ""));
-                    const pctB = parseFloat(b.winPct.replace("%", ""));
-                    return pctB - pctA;
-                });
-
-                // Prepare champions for cards
-                const championsProcessed: ChampionCard[] =
-                    championsFiltered.map((c) => {
-                        const stats = standingsProcessed.find(
-                            (s) => s.team === c.team.teamName
-                        );
-                        return {
-                            team: c.team.teamName,
-                            wins: stats?.wins ?? 0,
-                            winPct: stats?.winPct ?? "0%",
-                            rank: c.rank,
-                            gameType: c.gameType.gameName,
-                        };
-                    });
-
-                setStandings(standingsProcessed);
-                setChampions(championsProcessed);
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                setError("Failed to load data.");
+            // Early return if no data to process
+            if (gamesFiltered.length === 0) {
                 setStandings([]);
                 setChampions([]);
-            } finally {
                 setLoading(false);
+                return;
             }
-        };
 
-        fetchData();
-    }, [selectedSport]);
+            // Process games into standings
+            const teamStats: Record<string, { wins: number; losses: number }> =
+                {};
 
-    // Get current sport name (this is for TBD cards)
-    const currentSport = gameTypes.find((sport) => sport.id === selectedSport);
+            gamesFiltered.forEach((game: Game) => {
+                const teamA = teamIdToName[game.teamAId];
+                const teamB = teamIdToName[game.teamBId];
+                const winner = game.winnerId
+                    ? teamIdToName[game.winnerId]
+                    : null;
+
+                if (!teamStats[teamA])
+                    teamStats[teamA] = { wins: 0, losses: 0 };
+                if (!teamStats[teamB])
+                    teamStats[teamB] = { wins: 0, losses: 0 };
+
+                if (winner) {
+                    teamStats[winner].wins += 1;
+                    const loser = winner === teamA ? teamB : teamA;
+                    teamStats[loser].losses += 1;
+                }
+            });
+
+            // Prepare standings for table
+            const standingsProcessed: Standing[] = Object.entries(
+                teamStats
+            ).map(([team, { wins, losses }]) => {
+                const total = wins + losses;
+                const winPct =
+                    total > 0
+                        ? (() => {
+                              const pct = (wins / total) * 100;
+                              if (pct === 0 || pct === 100)
+                                  return `${Math.round(pct)}%`;
+                              return `${parseFloat(pct.toFixed(2))}%`;
+                          })()
+                        : "0%";
+                return { team, wins, losses, winPct };
+            });
+
+            // Sort by Win% in descending order (highest to lowest)
+            standingsProcessed.sort((a, b) => {
+                const pctA = parseFloat(a.winPct.replace("%", ""));
+                const pctB = parseFloat(b.winPct.replace("%", ""));
+                return pctB - pctA;
+            });
+
+            // Prepare champions for cards
+            const championsProcessed: ChampionCard[] = championsFiltered.map(
+                (c: Champions) => {
+                    const stats = standingsProcessed.find(
+                        (s) => s.team === c.team.teamName
+                    );
+                    return {
+                        team: c.team.teamName,
+                        wins: stats?.wins ?? 0,
+                        winPct: stats?.winPct ?? "0%",
+                        rank: c.rank,
+                        gameType: c.gameType.gameName,
+                    };
+                }
+            );
+            setStandings(standingsProcessed);
+            setChampions(championsProcessed);
+            setLoading(false);
+        }, 500);
+
+        return () => clearTimeout(load);
+    }, [championsData, gamesData, teamsData, selectedSport]);
+
+    const currentSport = sportsData.find((sport) => sport.id === selectedSport);
     const currentSportName = currentSport?.gameName || "";
 
     return (
@@ -204,7 +215,9 @@ export default function Standings() {
                         <StandingsTableSkeleton rows={6} />
                     </>
                 )}
-                {error && <p className="text-red-600">Error: {error}</p>}
+                {error && (
+                    <p className="text-red-600">Error: {error.message}</p>
+                )}
                 {selectedSport && !loading && !error && (
                     <>
                         <Cards

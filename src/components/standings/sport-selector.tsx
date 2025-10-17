@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ListFilter, RefreshCw } from "lucide-react";
 import {
@@ -110,9 +111,8 @@ export default function SportSelector({
     onSelect,
     selected,
 }: SportSelectorProps) {
+    const STALE_TIME = 1000 * 60 * 5;
     const [gameTypes, setGameTypes] = useState<GameType[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const selectedSport = gameTypes.find((g) => g.id === selected);
 
@@ -123,24 +123,26 @@ export default function SportSelector({
         textTransform: "uppercase" as const,
     };
 
-    const fetchSports = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await axios.get("/api/sports");
-            setGameTypes(response.data.sports);
-        } catch (err) {
-            console.error("Error fetching sports:", err);
-            setError("Failed to load sports.");
-            setGameTypes([]);
-        } finally {
-            setLoading(false);
-        }
+    const fetchSports = async (): Promise<GameType[]> => {
+        const response = await axios.get("/api/sports");
+        return response.data.sports;
     };
 
+    const {
+        data: sportsData = [],
+        error,
+        isLoading: loading,
+    } = useQuery({
+        queryKey: ["sports"],
+        queryFn: fetchSports,
+        staleTime: STALE_TIME,
+    });
+
     useEffect(() => {
-        fetchSports();
-    }, []);
+        if (sportsData.length > 0) {
+            setGameTypes(sportsData);
+        }
+    }, [sportsData]);
 
     if (loading) {
         return (
@@ -163,7 +165,7 @@ export default function SportSelector({
                     style={baseTextStyle}
                 >
                     <span className="text-red-600">
-                        {error || "No sports available"}
+                        {error?.message || "No sports available"}
                     </span>
                     <button
                         onClick={fetchSports}
