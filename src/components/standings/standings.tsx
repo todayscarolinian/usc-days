@@ -11,6 +11,10 @@ import DataTable from "@/components/standings/standings-table";
 import StandingsTableSkeleton from "@/components/standings/standings-table-skeleton";
 import standingColumns from "@/components/standings/columns";
 import { Champions } from "@/types/types";
+import StandingFormDialog from "@/components/standings/standing-dialog-form";
+import DeleteConfirmDialog from "@/components/standings/delete-confirm-dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type GameType = {
     id: number;
@@ -51,6 +55,21 @@ export default function Standings() {
     const [gameTypes, setGameTypes] = useState<GameType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showAddDialog, setShowAddDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [editingStanding, setEditingStanding] = useState<Standing | null>(null);
+    const isAdmin = false;
+
+    const handleDeleteStanding = () => {
+        if (!editingStanding) return;
+        setStandings((prev) =>
+            prev.filter((s) => s.team !== editingStanding.team)
+        );
+        toast.error(`${editingStanding.team} deleted successfully`);
+        setEditingStanding(null);
+        setShowDeleteDialog(false);
+        setShowAddDialog(false);
+    };
 
     useEffect(() => {
         const fetchSports = async () => {
@@ -194,10 +213,21 @@ export default function Standings() {
     return (
         <div className="p-4 sm:py-10">
             <div className="mx-auto max-w-[96%] space-y-6">
-                <SportSelector
+                <div className="flex justify-between items-center">
+                    <SportSelector
                     selected={selectedSport}
                     onSelect={setSelectedSport}
-                />
+                    />
+                    {isAdmin && (
+                        <Button
+                            variant="default"   
+                            onClick={() => setShowAddDialog(true)}
+                        >
+                            Add Standing
+                        </Button>
+                    )}
+                </div>
+
                 {loading && selectedSport && (
                     <>
                         <StandingsCardsSkeleton />
@@ -211,10 +241,52 @@ export default function Standings() {
                             data={champions}
                             currentSport={currentSportName}
                         />
-                        <DataTable columns={standingColumns} data={standings} />
+                        <DataTable 
+                            columns={standingColumns} 
+                            data={standings} 
+                            onRowClick={(row) => {
+                                if (!isAdmin) return;
+                                setEditingStanding(row); // Save the clicked row data
+                                setShowAddDialog(true); // Reuse the same dialog, but now in edit mode
+                            }}/>
                     </>
                 )}
             </div>
+            <StandingFormDialog
+                open={showAddDialog}
+                mode={editingStanding ? "edit" : "add"}
+                initialData={editingStanding} // pass data to prefill form
+                onClose={() => {
+                    setShowAddDialog(false);
+                    setEditingStanding(null); // clear edit state
+                }}
+                onSubmit={(data) => {
+                    if (editingStanding) {
+                    // Editing existing entry
+                    setStandings((prev) =>
+                        prev.map((s) =>
+                        s.team === editingStanding.team ? { ...s, ...data } : s
+                        )
+                    );
+                    toast.success(`${data.team} updated successfully`);
+                    } else {
+                    // Adding new entry
+                    setStandings((prev) => [...prev, data]);
+                    toast.success(`${data.team} added successfully`);
+                    }
+                    setShowAddDialog(false);
+                    setEditingStanding(null);
+                }}
+                onDelete={() => setShowDeleteDialog(true)}
+            />
+
+            <DeleteConfirmDialog
+            open={showDeleteDialog}
+            itemName={editingStanding?.team}
+            onClose={() => setShowDeleteDialog(false)}
+            onConfirm={handleDeleteStanding}
+            />
+
         </div>
     );
 }

@@ -31,9 +31,10 @@ type TeamStanding = {
 interface DataTableProps {
     columns: ColumnDef<TeamStanding>[];
     data: TeamStanding[];
+    onRowClick?: (row: TeamStanding) => void;
 }
 
-export default function DataTable({ columns, data }: DataTableProps) {
+export default function DataTable({ columns, data, onRowClick }: DataTableProps) {
     const table = useReactTable({
         data,
         columns,
@@ -86,6 +87,7 @@ export default function DataTable({ columns, data }: DataTableProps) {
                         table.getRowModel().rows.map((row) => (
                             <TableRow
                                 key={row.id}
+                                onClick={() => onRowClick?.(row.original)}
                                 className="h-[60px] !border-0"
                                 style={{ border: "none" }}
                             >
