@@ -53,7 +53,9 @@ export default function RankingsPage() {
                 />
                 {error || loading ? (
                     <LeaderboardsTableSkeleton error={error} />
-                ) : (
+                    ) : selectedSport === null ? (
+                    <div></div>
+                    ) : (
                     <DataTable
                         columns={columns}
                         data={rankingsData}
