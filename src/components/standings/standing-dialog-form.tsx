@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormField,
@@ -21,17 +20,24 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import StandingSchema from "@/lib/standings-validator";
+import { Input } from "@/components/ui/input";
+import { AddChampionSchema, EditChampionSchema } from "@/types/champions.types";
 
-type StandingFormData = z.input<typeof StandingSchema>;
+type FormMode = "add" | "edit";
+
+type ChampionFormData =
+  | z.infer<typeof AddChampionSchema>
+  | (z.infer<typeof EditChampionSchema> & { id?: number });
 
 type StandingFormDialogProps = {
   open: boolean;
-  mode: "add" | "edit";
-  initialData?: z.output<typeof StandingSchema> | null;
+  mode: FormMode;
+  initialData?: ChampionFormData | null;
   onClose: () => void;
-  onSubmit: (data: z.output<typeof StandingSchema>) => void;
+  onSubmit: (data: z.infer<typeof AddChampionSchema>) => void;
   onDelete?: () => void;
+  sports?: { id: number; name: string }[];
+  teams?: { id: number; name: string }[];
 };
 
 export default function StandingFormDialog({
@@ -42,35 +48,51 @@ export default function StandingFormDialog({
   onSubmit,
   onDelete,
 }: StandingFormDialogProps) {
-  const form = useForm<StandingFormData>({
-    resolver: zodResolver(StandingSchema),
-    defaultValues: initialData || {
-      team: "",
-      wins: 0,
-      losses: 0,
-      winPct: "0%",
-    },
+  const schema = mode === "add" ? AddChampionSchema : EditChampionSchema;
+  const today = new Date().toISOString().split("T")[0];
+
+  const form = useForm<z.infer<typeof AddChampionSchema>>({
+    resolver: zodResolver(mode === "add" ? AddChampionSchema : EditChampionSchema),
+    defaultValues:
+      mode === "edit" && initialData
+        ? initialData
+        : {
+            gameTypeId: 0,
+            teamId: 0,
+            startDate: today,
+            endDate: today,
+            rank: 1,
+          },
   });
 
-  // Reset form when editing a new record
-  React.useEffect(() => {
-    form.reset(initialData || {
-      team: "",
-      wins: 0,
-      losses: 0,
-      winPct: "0%",
-    });
-  }, [initialData, form]);
+  useEffect(() => {
+    if (mode === "add") {
+      form.reset({
+        gameTypeId: 0,
+        teamId: 0,
+        startDate: today,
+        endDate: today,
+        rank: 1,
+      });
+    } else if (initialData) {
+      form.reset(initialData);
+    }
+  }, [mode, initialData, form, today]);
 
-  const handleSubmit = (data: StandingFormData) => {
-    const result = StandingSchema.parse(data);
-    onSubmit(result);
-    onClose();
+  const handleSubmit = (data: z.infer<typeof schema>) => {
+    const payload: z.infer<typeof AddChampionSchema> = {
+      gameTypeId: data.gameTypeId,
+      teamId: data.teamId,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      rank: data.rank,
+    };
+    onSubmit(payload);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             {mode === "add" ? "Add Standing" : "Edit Standing"}
@@ -78,37 +100,58 @@ export default function StandingFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4 mt-2"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="team"
+              name="gameTypeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Team</FormLabel>
+                  <FormLabel>Sport ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter team name" {...field} />
+                    <Input
+                      type="number"
+                      placeholder="Enter sport ID"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="teamId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Team ID</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter team ID"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-4">
               <FormField
                 control={form.control}
-                name="wins"
+                name="startDate"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Wins</FormLabel>
+                    <FormLabel>Start Date</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number"
-                        {...field}
-                        value={field.value?.toString() || "0"}
-                      />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -117,16 +160,12 @@ export default function StandingFormDialog({
 
               <FormField
                 control={form.control}
-                name="losses"
+                name="endDate"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Losses</FormLabel>
+                    <FormLabel>End Date</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number"
-                        {...field}
-                        value={field.value?.toString() || "0"}
-                      />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -134,33 +173,52 @@ export default function StandingFormDialog({
               />
             </div>
 
-            <DialogFooter className="mt-4 flex justify-between">
-              <div className="flex gap-2">
-                <Button variant="outline" type="button" onClick={onClose}>
-                  Cancel
-                </Button>
+            <FormField
+              control={form.control}
+              name="rank"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rank (1–3)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={3}
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 1)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                {mode === "edit" && (
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onDelete?.();
-                    }}
-                    className="text-red-600 border-red-600 hover:bg-red-50"
-                  >
-                    Delete
-                  </Button>
-                )}
-
+            <DialogFooter>
+              {mode === "edit" && onDelete && (
                 <Button
-                  type="submit"
-                  className="bg-blue-600 text-white hover:bg-blue-700"
+                  type="button"
+                  variant="destructive"
+                  onClick={onDelete}
+                  className="mr-auto"
                 >
-                  {mode === "edit" ? "Save" : "Add"}
+                  Delete
                 </Button>
-              </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  form.reset();
+                  onClose();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">
+                {mode === "add" ? "Add Standing" : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

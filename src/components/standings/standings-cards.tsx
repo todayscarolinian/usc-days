@@ -40,6 +40,7 @@ type ChampionCard = {
 interface CardsProps {
     data: ChampionCard[];
     currentSport?: string;
+    onCardClick?: (champion: ChampionCard) => void;
 }
 
 const sportIcons: Record<string, React.JSX.Element> = {
@@ -216,7 +217,7 @@ const getTeamLogo = (teamName: string): React.JSX.Element => {
     );
 };
 
-export default function Cards({ data, currentSport }: CardsProps) {
+export default function Cards({ data, currentSport, onCardClick }: CardsProps) {
     const sortedData = [...data].sort((a, b) => a.rank - b.rank);
 
     // array with placeholders for missing ranks
@@ -251,7 +252,10 @@ export default function Cards({ data, currentSport }: CardsProps) {
                 return (
                     <Card
                         key={index}
-                        className="h-[191px] overflow-hidden flex flex-col"
+                        onClick={() => onCardClick?.(champion)}
+                        className={`h-[191px] overflow-hidden flex flex-col ${
+                            onCardClick ? "cursor-pointer hover:scale-[1.01] transition" : ""
+                        }`}
                     >
                         <CardContent
                             className={cn(

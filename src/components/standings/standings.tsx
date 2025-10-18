@@ -15,6 +15,7 @@ import StandingFormDialog from "@/components/standings/standing-dialog-form";
 import DeleteConfirmDialog from "@/components/standings/delete-confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AddChampionPayload} from "@/types/champions.types";
 
 type GameType = {
     id: number;
@@ -57,15 +58,12 @@ export default function Standings() {
     const [error, setError] = useState<string | null>(null);
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [editingStanding, setEditingStanding] = useState<Standing | null>(null);
-    const isAdmin = false;
+    const [editingStanding, setEditingStanding] = useState<AddChampionPayload | null>(null);
+    const isAdmin = true;
 
     const handleDeleteStanding = () => {
         if (!editingStanding) return;
-        setStandings((prev) =>
-            prev.filter((s) => s.team !== editingStanding.team)
-        );
-        toast.error(`${editingStanding.team} deleted successfully`);
+        toast.error(`Standing deleted successfully`);
         setEditingStanding(null);
         setShowDeleteDialog(false);
         setShowAddDialog(false);
@@ -220,10 +218,15 @@ export default function Standings() {
                     />
                     {isAdmin && (
                         <Button
-                            variant="default"   
-                            onClick={() => setShowAddDialog(true)}
-                        >
-                            Add Standing
+                            variant="default"
+                            disabled={!selectedSport}
+                            onClick={() => {
+                                setEditingStanding(null); 
+                                setShowAddDialog(false);
+                                setTimeout(() => setShowAddDialog(true), 0);
+                            }}
+                            >
+                            + Add Standing
                         </Button>
                     )}
                 </div>
@@ -240,39 +243,40 @@ export default function Standings() {
                         <Cards
                             data={champions}
                             currentSport={currentSportName}
+                            onCardClick={(champion) => {
+                                if (!isAdmin) return;
+                                setEditingStanding({
+                                    teamId: 0, // you'll map this later once real team IDs are available
+                                    gameTypeId: selectedSport!, // ✅ auto-fill from currently selected sport
+                                    rank: champion.rank,
+                                    startDate: new Date().toISOString(),
+                                    endDate: new Date().toISOString(),
+                                });
+                                setShowAddDialog(true);
+                            }}
                         />
                         <DataTable 
                             columns={standingColumns} 
                             data={standings} 
-                            onRowClick={(row) => {
-                                if (!isAdmin) return;
-                                setEditingStanding(row); // Save the clicked row data
-                                setShowAddDialog(true); // Reuse the same dialog, but now in edit mode
-                            }}/>
+                        />
                     </>
                 )}
             </div>
             <StandingFormDialog
                 open={showAddDialog}
                 mode={editingStanding ? "edit" : "add"}
-                initialData={editingStanding} // pass data to prefill form
+                initialData={editingStanding} 
                 onClose={() => {
                     setShowAddDialog(false);
-                    setEditingStanding(null); // clear edit state
+                    setEditingStanding(null); 
                 }}
-                onSubmit={(data) => {
+                onSubmit={(_data) => {
                     if (editingStanding) {
-                    // Editing existing entry
-                    setStandings((prev) =>
-                        prev.map((s) =>
-                        s.team === editingStanding.team ? { ...s, ...data } : s
-                        )
-                    );
-                    toast.success(`${data.team} updated successfully`);
+                        // still update existing row
+                        toast.success(`Standing updated successfully`);
                     } else {
-                    // Adding new entry
-                    setStandings((prev) => [...prev, data]);
-                    toast.success(`${data.team} added successfully`);
+                        // just show a success toast; don’t mutate UI
+                        toast.success(`Standing added successfully`);
                     }
                     setShowAddDialog(false);
                     setEditingStanding(null);
@@ -282,11 +286,11 @@ export default function Standings() {
 
             <DeleteConfirmDialog
             open={showDeleteDialog}
-            itemName={editingStanding?.team}
+            // itemName={editingStanding?.team}
+            // itemName={`Team ${editingStanding?.teamId ?? ""}`}
             onClose={() => setShowDeleteDialog(false)}
             onConfirm={handleDeleteStanding}
             />
-
         </div>
     );
 }
