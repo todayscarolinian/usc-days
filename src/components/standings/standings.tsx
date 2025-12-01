@@ -54,6 +54,7 @@ export default function Standings() {
     const [champions, setChampions] = useState<ChampionCard[]>([]);
     const [standings, setStandings] = useState<Standing[]>([]);
     const [gameTypes, setGameTypes] = useState<GameType[]>([]);
+    const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAddDialog, setShowAddDialog] = useState(false);
@@ -81,14 +82,7 @@ export default function Standings() {
         fetchSports();
     }, []);
 
-    useEffect(() => {
-        if (!selectedSport) {
-            setChampions([]);
-            setStandings([]);
-            return;
-        }
-
-        const fetchData = async () => {
+    const fetchData = async () => {
             try {
                 setLoading(true);
                 setError(null);
@@ -112,6 +106,9 @@ export default function Standings() {
                     (g: Game) => g.gameType?.id === selectedSport
                 );
 
+                // Set teams state
+                setTeams(teamsData);
+
                 // Build team mapping from teams API
                 const teamIdToName: Record<number, string> = {};
                 teamsData.forEach((team: Team) => {
@@ -120,9 +117,9 @@ export default function Standings() {
 
                 // Early return if no data to process
                 if (gamesFiltered.length === 0) {
-                    setStandings([]);
-                    setChampions([]);
-                    return;
+                    // setStandings([]);
+                    // setChampions([]);
+                    // return;
                 }
 
                 // Process games into standings
@@ -188,6 +185,8 @@ export default function Standings() {
                             gameType: c.gameType.gameName,
                         };
                     });
+                
+                console.log("Processed Champions: ", championsProcessed);
 
                 setStandings(standingsProcessed);
                 setChampions(championsProcessed);
@@ -200,6 +199,13 @@ export default function Standings() {
                 setLoading(false);
             }
         };
+
+    useEffect(() => {
+        if (!selectedSport) {
+            setChampions([]);
+            setStandings([]);
+            return;
+        }
 
         fetchData();
     }, [selectedSport]);
@@ -237,7 +243,7 @@ export default function Standings() {
                         <StandingsTableSkeleton rows={6} />
                     </>
                 )}
-                {error && <p className="text-red-600">Error: {error}</p>}
+                {error && <p className="text-red-600" onClick={fetchData}>Error: {error}</p>}
                 {selectedSport && !loading && !error && (
                     <>
                         <Cards
@@ -266,6 +272,8 @@ export default function Standings() {
                 open={showAddDialog}
                 mode={editingStanding ? "edit" : "add"}
                 initialData={editingStanding} 
+                selectedSport={selectedSport ?? 0}
+                teams={teams}
                 onClose={() => {
                     setShowAddDialog(false);
                     setEditingStanding(null); 

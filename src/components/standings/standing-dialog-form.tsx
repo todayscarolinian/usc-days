@@ -1,228 +1,243 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
+    Form,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { AddChampionSchema, EditChampionSchema } from "@/types/champions.types";
+import {
+    AddChampionPayload,
+    AddChampionSchema,
+    EditChampionSchema,
+} from "@/types/champions.types";
+import { SearchableSelect } from "../schedules/searchable-select";
+import { Team } from "@prisma/client";
+import { Label } from "../ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "../ui/select";
+import axios from "axios";
 
 type FormMode = "add" | "edit";
 
 type ChampionFormData =
-  | z.infer<typeof AddChampionSchema>
-  | (z.infer<typeof EditChampionSchema> & { id?: number });
+    | z.infer<typeof AddChampionSchema>
+    | (z.infer<typeof EditChampionSchema> & { id?: number });
 
 type StandingFormDialogProps = {
-  open: boolean;
-  mode: FormMode;
-  initialData?: ChampionFormData | null;
-  onClose: () => void;
-  onSubmit: (data: z.infer<typeof AddChampionSchema>) => void;
-  onDelete?: () => void;
-  sports?: { id: number; name: string }[];
-  teams?: { id: number; name: string }[];
+    open: boolean;
+    mode: FormMode;
+    initialData?: ChampionFormData | null;
+    selectedSport?: number;
+    teams: Team[];
+    onClose: () => void;
+    onSubmit: (data: z.infer<typeof AddChampionSchema>) => void;
+    onDelete?: () => void;
 };
 
 export default function StandingFormDialog({
-  open,
-  mode,
-  initialData,
-  onClose,
-  onSubmit,
-  onDelete,
+    open,
+    mode,
+    initialData,
+    selectedSport,
+    teams,
+    onClose,
+    onSubmit,
+    onDelete,
 }: StandingFormDialogProps) {
-  const schema = mode === "add" ? AddChampionSchema : EditChampionSchema;
-  const today = new Date().toISOString().split("T")[0];
-
-  const form = useForm<z.infer<typeof AddChampionSchema>>({
-    resolver: zodResolver(mode === "add" ? AddChampionSchema : EditChampionSchema),
-    defaultValues:
-      mode === "edit" && initialData
-        ? initialData
-        : {
-            gameTypeId: 0,
-            teamId: 0,
-            startDate: today,
-            endDate: today,
-            rank: 1,
-          },
-  });
-
-  useEffect(() => {
-    if (mode === "add") {
-      form.reset({
-        gameTypeId: 0,
-        teamId: 0,
+    const today = new Date().toISOString().split("T")[0];
+    const [scheduleInputs, setScheduleInputs] = useState<AddChampionPayload>({
+        gameTypeId: selectedSport || 0,
         startDate: today,
         endDate: today,
         rank: 1,
-      });
-    } else if (initialData) {
-      form.reset(initialData);
+        teamId: -1,
+    });
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
+    async function createStanding() {
+        try {
+            setLoading(true);
+            if (!selectedSport) return;
+
+            const data: AddChampionPayload = {
+                gameTypeId: selectedSport,
+                teamId: scheduleInputs.teamId,
+                startDate: new Date(scheduleInputs.startDate).toISOString(),
+                endDate: new Date(scheduleInputs.endDate).toISOString(),
+                rank: scheduleInputs.rank,
+            };
+
+            const newSchedule = await axios.post(`/api/champions`, data);
+            setLoading(false);
+
+            if (newSchedule.status !== 201) {
+                setError("An error occurred");
+                console.log(newSchedule.data.error);
+            } else {
+                window.location.reload();
+            }
+        } catch (error) {
+            setLoading(false);
+            setError("An error occurred.");
+            console.log(error);
+        }
     }
-  }, [mode, initialData, form, today]);
 
-  const handleSubmit = (data: z.infer<typeof schema>) => {
-    const payload: z.infer<typeof AddChampionSchema> = {
-      gameTypeId: data.gameTypeId,
-      teamId: data.teamId,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      rank: data.rank,
-    };
-    onSubmit(payload);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "add" ? "Add Standing" : "Edit Standing"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="gameTypeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sport ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter sport ID"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(Number(e.target.value) || 0)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="teamId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Team ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter team ID"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(Number(e.target.value) || 0)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Start Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>End Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="rank"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rank (1–3)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={3}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(Number(e.target.value) || 1)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              {mode === "edit" && onDelete && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={onDelete}
-                  className="mr-auto"
-                >
-                  Delete
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  form.reset();
-                  onClose();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">
-                {mode === "add" ? "Add Standing" : "Save Changes"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>
+                        {mode === "add" ? "Add Standing" : "Edit Standing"}
+                    </DialogTitle>
+                </DialogHeader>
+                <div className="w-full grid grid-cols-2 gap-4">
+                    <div className="w-full flex flex-col gap-1 col-span-full">
+                        <Label
+                            htmlFor="teamId"
+                            className="font-bold opacity-50"
+                        >
+                            Team ID
+                        </Label>
+                        <SearchableSelect
+                            placeholder="Select Team"
+                            searchPlaceholder="Search teams..."
+                            emptyMessage="No teams found."
+                            options={teams.map((team) => ({
+                                value: team.id.toString(),
+                                label: team.teamName,
+                            }))}
+                            value={scheduleInputs.teamId?.toString() || ""}
+                            onChange={(value) =>
+                                setScheduleInputs({
+                                    ...scheduleInputs,
+                                    teamId: Number(value),
+                                })
+                            }
+                            disabled={teams.length <= 0}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Label
+                            htmlFor="startDate"
+                            className="font-bold opacity-50"
+                        >
+                            Start Date
+                        </Label>
+                        <Input
+                            type="date"
+                            placeholder="Start Date"
+                            value={scheduleInputs.startDate}
+                            onChange={(e) =>
+                                setScheduleInputs({
+                                    ...scheduleInputs,
+                                    startDate: e.target.value,
+                                })
+                            }
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Label
+                            htmlFor="endDate"
+                            className="font-bold opacity-50"
+                        >
+                            End Date
+                        </Label>
+                        <Input
+                            type="date"
+                            placeholder="End Date"
+                            value={scheduleInputs.endDate}
+                            onChange={(e) =>
+                                setScheduleInputs({
+                                    ...scheduleInputs,
+                                    endDate: e.target.value,
+                                })
+                            }
+                        />
+                    </div>
+                    <div className="w-full flex flex-col gap-1 col-span-full">
+                        <Label
+                            htmlFor="standing"
+                            className="font-bold opacity-50"
+                        >
+                            Standing
+                        </Label>
+                        <Select
+                            value={scheduleInputs.rank.toString()}
+                            onValueChange={(value) =>
+                                setScheduleInputs({
+                                    ...scheduleInputs,
+                                    rank: Number(value),
+                                })
+                            }
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Standing" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Standing</SelectLabel>
+                                    <SelectItem value="1">Champion</SelectItem>
+                                    <SelectItem value="2">
+                                        First Runner-Up
+                                    </SelectItem>
+                                    <SelectItem value="3">
+                                        Second Runner-Up
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <DialogFooter>
+                    {mode === "edit" && onDelete && (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={onDelete}
+                            className="mr-auto"
+                        >
+                            Delete
+                        </Button>
+                    )}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                            onClose();
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={createStanding}>
+                        {mode === "add" ? "Add Standing" : "Save Changes"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }

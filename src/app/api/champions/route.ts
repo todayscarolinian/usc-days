@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const result = AddChampionSchema.safeParse(body);
 
-        console.log('RESULT: ', result.success);
+        console.log('RESULT: ', result);
 
         if (!result.success) {
             return NextResponse.json({ error: result.error }, { status: 400 });
