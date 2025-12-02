@@ -1,27 +1,69 @@
-import ChampionService from '@/services/champions.service';
+import ChampionService, {
+    GetChampionsParams,
+} from "@/services/champions.service";
 import {
     AddChampionSchema,
     DeleteChampionSchema,
     EditChampionSchema,
-} from '@/types/champions.types';
-import { NextResponse } from 'next/server';
+} from "@/types/champions.types";
+import { NextRequest, NextResponse } from "next/server";
 
 const championService = new ChampionService();
 
-export async function GET() {
-    const champions = await championService.getChampions();
-    return NextResponse.json(
-        { champions, count: champions.length },
-        { status: 200 }
-    );
+export async function GET(req: NextRequest) {
+    try {
+        const searchParams = req.nextUrl.searchParams;
+
+        const params: GetChampionsParams = {};
+
+        const teamId = searchParams.get("teamId");
+        if (teamId) {
+            const parsed = parseInt(teamId, 10);
+            if (!isNaN(parsed)) params.teamId = parsed;
+        }
+
+        const gameTypeId = searchParams.get("gameTypeId");
+        if (gameTypeId) {
+            const parsed = parseInt(gameTypeId, 10);
+            if (!isNaN(parsed)) params.gameTypeId = parsed;
+        }
+
+        const rank = searchParams.get("rank");
+        if (rank) {
+            const parsed = parseInt(rank, 10);
+            if(!isNaN(parsed)) params.rank = parsed;
+        }
+
+        const startDate = searchParams.get("startDate");
+        if (startDate) {
+            const parsed = new Date(startDate);
+            if (!isNaN(parsed.getTime())) params.startDate = parsed;
+        }
+
+        const endDate = searchParams.get("endDate");
+        if (endDate) {
+            const parsed = new Date(endDate);
+            if (!isNaN(parsed.getTime())) params.endDate = parsed;
+        }
+
+        const champions = await championService.getChampions(params);
+        return NextResponse.json(
+            { champions, count: champions.length },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error fetching champions:", error);
+        return NextResponse.json(
+            { error: "An unexpected error occurred while fetching champions." },
+            { status: 500 }
+        );
+    }
 }
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const result = AddChampionSchema.safeParse(body);
-
-        console.log('RESULT: ', result);
 
         if (!result.success) {
             return NextResponse.json({ error: result.error }, { status: 400 });
@@ -31,7 +73,7 @@ export async function POST(req: Request) {
         const newChampion = await championService.addChampion(validatedBody);
         return NextResponse.json({ newChampion }, { status: 201 });
     } catch (error) {
-        console.error('Error adding champion:', error);
+        console.error("Error adding champion:", error);
         return NextResponse.json({ error: `${error}` }, { status: 500 });
     }
 }
@@ -51,7 +93,7 @@ export async function PUT(req: Request) {
         );
         return NextResponse.json({ updatedChampion }, { status: 200 });
     } catch (error) {
-        console.error('Error updating champion:', error);
+        console.error("Error updating champion:", error);
         return NextResponse.json({ error: `${error}` }, { status: 500 });
     }
 }
@@ -71,10 +113,10 @@ export async function DELETE(req: Request) {
         );
         return NextResponse.json({ deletedChampion }, { status: 200 });
     } catch (error) {
-        console.error('Error deleting champion:', error);
+        console.error("Error deleting champion:", error);
         return NextResponse.json(
             {
-                error: 'An unexpected error occurred while deleting the champion.',
+                error: "An unexpected error occurred while deleting the champion.",
             },
             { status: 500 }
         );
