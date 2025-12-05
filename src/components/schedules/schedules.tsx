@@ -5,7 +5,7 @@ import SchedulesList from "@/src/components/schedules/schedules-list"; // cards 
 import axios from "axios";
 import { Schedules } from "@/src/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
-import DayNavigation from "./day-navigation";
+import ScheduleFilter from "./schedule-filter";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import SchedulesListSkeleton from "./schedules-list-skeleton";
 
@@ -47,7 +47,7 @@ export default function SchedulesPage() {
 
   return (
     <>
-      <DayNavigation onSelect={setSelectedSport} selected={selectedSport} />
+      <ScheduleFilter onSelect={setSelectedSport} selected={selectedSport} />
       <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
         <div className="flex flex-col gap-4">
           {email && (
