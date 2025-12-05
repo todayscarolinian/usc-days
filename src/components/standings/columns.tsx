@@ -3,13 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Default from "@/assets/tc-logo-red.png"; //temporary for testing
-
-export type Standing = {
-    team: string;
-    wins: number;
-    losses: number;
-    winPct: string;
-};
+import { StandingData } from "@/types/types";
 
 // Team icons mapping - add team logos here when available
 const teamIcons: Record<string, React.JSX.Element> = {
@@ -40,7 +34,7 @@ const getTeamIcon = (teamName: string): React.JSX.Element => {
     );
 };
 
-const standingColumns: ColumnDef<Standing>[] = [
+const standingColumns: ColumnDef<StandingData>[] = [
     {
         accessorKey: "team",
         header: "TEAM",
@@ -65,9 +59,10 @@ const standingColumns: ColumnDef<Standing>[] = [
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: "winPct",
+        accessorKey: "winPercentage",
         header: "WIN %",
-        cell: (info) => info.getValue(),
+        // convert to string with 2 decimal places and %
+        cell: (info) => (info.getValue() as number).toFixed(2) + "%",
     },
 ];
 

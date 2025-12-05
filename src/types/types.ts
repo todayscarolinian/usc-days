@@ -16,19 +16,13 @@ export type Games = {
     createdBy?: number;
 };
 
-export type Champions = {
+export type StandingData = {
     id: number;
-    gameType: {
-        id: number;
-        gameName: string;
-    };
-    team: {
-        id: number;
-        teamName: string;
-    };
-    startDate: string;
-    endDate: string;
-    rank: number;
+    team: string;
+    wins: number;
+    losses: number;
+    winPercentage: number;
+    sport: string;
 };
 
 export type Schedules = {
