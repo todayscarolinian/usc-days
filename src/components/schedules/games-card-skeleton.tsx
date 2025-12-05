@@ -1,5 +1,11 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
 export default function GamesCardSkeleton() {
   return (
@@ -21,7 +27,9 @@ export default function GamesCardSkeleton() {
 
             <div className="flex gap-2 items-center">
               <Skeleton className="h-4 w-5" />
-              <span><b>/</b></span>
+              <span>
+                <b>/</b>
+              </span>
               <Skeleton className="h-4 w-5" />
             </div>
 
@@ -43,5 +51,5 @@ export default function GamesCardSkeleton() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

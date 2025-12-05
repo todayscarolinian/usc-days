@@ -1,18 +1,19 @@
-import { Metadata } from 'next';
-import { MetadataOptions } from '@/types/metadata.types';
+import { Metadata } from "next";
+import { MetadataOptions } from "@/src/types/metadata.types";
 
 export function generateMetadata(options: MetadataOptions): Metadata {
   const {
     title,
     description,
-    image = '/tc-logo-white.png',
+    image = "/tc-logo-white.png",
     url,
-    type = 'website'
+    type = "website",
   } = options;
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://usc-days.vercel.app';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || "https://usc-days.vercel.app";
   const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
-  const imageUrl = image.startsWith('http') ? image : `${baseUrl}${image}`;
+  const imageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
 
   return {
     title,
@@ -33,24 +34,25 @@ export function generateMetadata(options: MetadataOptions): Metadata {
       siteName: "USC Days 2025 Scoreboard - Today's Carolinian",
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title,
       description,
       images: [imageUrl],
-      creator: '@todayscarolinian',
-      site: '@todayscarolinian',
+      creator: "@todayscarolinian",
+      site: "@todayscarolinian",
     },
     alternates: {
       canonical: fullUrl,
     },
     verification: {
-      google: 'fUlRQaR1gKTOPdr-F-kQFz3T4qAa1MM3fOrb2-s616Y',
-    }
+      google: "fUlRQaR1gKTOPdr-F-kQFz3T4qAa1MM3fOrb2-s616Y",
+    },
   };
 }
 
 export const defaultMetadata = generateMetadata({
   title: "USC Days 2025 Scoreboard - Today's Carolinian",
-  description: 'Scoreboard of the different school teams per game for USC Days 2025',
-  url: '/',
+  description:
+    "Scoreboard of the different school teams per game for USC Days 2025",
+  url: "/",
 });
