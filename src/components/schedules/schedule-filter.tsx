@@ -7,14 +7,14 @@ interface SportSelectorProps {
     selected: number | null;
 }
 
-export default function DayNavigation({
+export default function ScheduleFilter({
     onSelect,
     selected,
 }: SportSelectorProps) {
     return (
         <div className="sticky top-16 z-40 flex flex-col bg-white">
             <div className="flex flex-col gap-4 w-full px-4 py-8 sm:max-w-5xl mx-auto relative">
-                <div className="flex flex-col md:flex-row justify-between">
+                {/* <div className="flex flex-col md:flex-row justify-between">
                     <div className="flex flex-col">
                         <h2
                             className="text-2xl md:text-4xl font-semibold uppercase"
@@ -78,7 +78,7 @@ export default function DayNavigation({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <SportSelector onSelect={onSelect} selected={selected} />
             </div>
         </div>
