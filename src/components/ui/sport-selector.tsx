@@ -3,13 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
-import { ListFilter, RefreshCw } from "lucide-react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-} from "@/components/ui/select";
+import { RefreshCw } from "lucide-react";
+import { SearchableSelect } from "@/components/schedules/searchable-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Roboto } from "next/font/google";
 
@@ -29,17 +24,12 @@ import Swimming from "@/assets/icons/Diamond/Swimming.svg";
 import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
 import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
 import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
-import Default from "@/assets/tc-logo-red.png"; //temporary for testing - change once fallback icon is ready
+import Default from "@/assets/tc-logo-red.png";
 
 const roboto = Roboto({
     weight: "300",
     subsets: ["latin"],
 });
-
-interface SportSelectorProps {
-    onSelect: (id: number | null) => void;
-    selected: number | null;
-}
 
 type GameType = {
     id: number;
@@ -106,22 +96,20 @@ const getIconFor = (name: string) => {
     );
 };
 
+interface SportSelectorProps {
+    onSelect: (id: number | null) => void;
+    selected: number | null;
+    triggerClassName?: string;
+}
+
 export default function SportSelector({
     onSelect,
     selected,
+    triggerClassName = "",
 }: SportSelectorProps) {
     const [gameTypes, setGameTypes] = useState<GameType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const selectedSport = gameTypes.find((g) => g.id === selected);
-
-    const baseTextStyle = {
-        fontFamily: roboto.style.fontFamily,
-        fontWeight: 300,
-        fontSize: "14px",
-        textTransform: "uppercase" as const,
-    };
 
     const fetchSports = async () => {
         try {
@@ -161,7 +149,12 @@ export default function SportSelector({
             <div className="relative inline-block min-w-[272px]">
                 <div
                     className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
-                    style={baseTextStyle}
+                    style={{
+                        fontFamily: roboto.style.fontFamily,
+                        fontWeight: 300,
+                        fontSize: "14px",
+                        textTransform: "uppercase" as const,
+                    }}
                 >
                     <span className="text-red-600">
                         {error || "No sports available"}
@@ -181,58 +174,20 @@ export default function SportSelector({
 
     return (
         <div className="relative inline-block min-w-[272px]">
-            <Select
+            <SearchableSelect
+                placeholder="Select a sport"
+                searchPlaceholder="Search sports..."
+                emptyMessage="No sports found."
+                options={gameTypes.map((sport) => ({
+                    value: sport.id.toString(),
+                    label: sport.gameName,
+                    id: sport.id,
+                }))}
                 value={selected ? selected.toString() : ""}
-                onValueChange={(value) =>
-                    onSelect(value ? parseInt(value) : null)
-                }
-            >
-                <SelectTrigger
-                    size={undefined}
-                    className={`${roboto.className} flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] w-full bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden`}
-                    style={baseTextStyle}
-                >
-                    <div className="flex items-center gap-3 flex-1 text-left">
-                        {selectedSport ? (
-                            <>
-                                {getIconFor(selectedSport.gameName)}
-                                <span className="whitespace-nowrap">
-                                    {selectedSport.gameName}
-                                </span>
-                            </>
-                        ) : (
-                            <span className="text-neutral-500">
-                                Select a sport
-                            </span>
-                        )}
-                    </div>
-
-                    <ListFilter className="!h-6 !w-6 text-neutral-400 ml-3 shrink-0" />
-                </SelectTrigger>
-
-                <SelectContent
-                    className="z-50 mt-2 bg-white shadow-lg border border-neutral-200 rounded-none w-[var(--radix-select-trigger-width)] min-w-[var(--radix-select-trigger-width)] max-h-56 overflow-y-auto [&>[data-radix-select-viewport]]:p-0"
-                    position="popper"
-                    sideOffset={8}
-                >
-                    {gameTypes.map((sport) => (
-                        <SelectItem
-                            key={sport.id}
-                            value={sport.id.toString()}
-                            style={baseTextStyle}
-                            className="relative flex items-start w-full pl-4 pr-0 py-4 text-left border-l-2 border-neutral-600 transition-colors hover:border-l-tc_primary-500 data-[state=checked]:border-l-gray-400 cursor-pointer outline-none rounded-none [&>span:first-of-type]:!opacity-0 [&>span:first-of-type]:!w-0 [&>span:first-of-type]:!h-0 [&>span:first-of-type]:!overflow-hidden"
-                        >
-                            <span className="block whitespace-normal break-words pr-10">
-                                {sport.gameName}
-                            </span>
-
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex-shrink-0 pointer-events-none">
-                                {getIconFor(sport.gameName)}
-                            </div>
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+                onChange={(value) => onSelect(value ? parseInt(value) : null)}
+                renderIcon={(option) => getIconFor(option.label)}
+                triggerClassName={triggerClassName}
+            />
         </div>
     );
 }

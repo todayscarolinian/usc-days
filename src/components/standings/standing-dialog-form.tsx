@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
     Dialog,
@@ -20,15 +19,12 @@ import {
     FormControl,
     FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
-    AddChampionPayload,
-    AddChampionSchema,
+    EditChampionPayload,
     EditChampionSchema,
 } from "@/types/champions.types";
 import { SearchableSelect } from "../schedules/searchable-select";
 import { Team } from "@prisma/client";
-import { Label } from "../ui/label";
 import {
     Select,
     SelectContent,
@@ -38,205 +34,318 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
-import axios from "axios";
+import { Loader2 } from "lucide-react";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
+import DatePicker from "../ui/date-picker";
 
 type FormMode = "add" | "edit";
-
-type ChampionFormData =
-    | z.infer<typeof AddChampionSchema>
-    | (z.infer<typeof EditChampionSchema> & { id?: number });
 
 type StandingFormDialogProps = {
     open: boolean;
     mode: FormMode;
-    initialData?: ChampionFormData | null;
-    selectedSport?: number;
+    initialData: EditChampionPayload;
     teams: Team[];
-    onClose: () => void;
-    onSubmit: (data: z.infer<typeof AddChampionSchema>) => void;
-    onDelete?: () => void;
+    onCloseAction: (dataChanged?: boolean) => void;
 };
 
 export default function StandingFormDialog({
     open,
     mode,
     initialData,
-    selectedSport,
     teams,
-    onClose,
-    onSubmit,
-    onDelete,
+    onCloseAction,
 }: StandingFormDialogProps) {
-    const today = new Date().toISOString().split("T")[0];
-    const [scheduleInputs, setScheduleInputs] = useState<AddChampionPayload>({
-        gameTypeId: selectedSport || 0,
-        startDate: today,
-        endDate: today,
-        rank: 1,
-        teamId: -1,
+    const form = useForm<EditChampionPayload>({
+        resolver: zodResolver(EditChampionSchema),
+        defaultValues: initialData,
     });
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
 
-    async function createStanding() {
+    const {
+        handleSubmit,
+        reset,
+        formState: { isSubmitting, errors },
+        setError,
+    } = form;
+
+    // Sync form with initialData when it changes
+    useEffect(() => {
+        const formattedData = {
+            ...initialData,
+            startDate: initialData.startDate.split("T")[0],
+            endDate: initialData.endDate.split("T")[0],
+        };
+        reset(formattedData);
+    }, [initialData, reset]);
+
+    // Prevent dialog close during submission
+    const handleOpenChange = (open: boolean) => {
+        if (!open && !isSubmitting) {
+            onCloseAction(false);
+        }
+    };
+
+    const onSubmit = async (data: EditChampionPayload) => {
         try {
-            setLoading(true);
-            if (!selectedSport) return;
+            // Validate team selection
+            if (data.teamId === -1) {
+                setError("teamId", {
+                    type: "manual",
+                    message: "Please select a team",
+                });
+                return;
+            }
 
-            const data: AddChampionPayload = {
-                gameTypeId: selectedSport,
-                teamId: scheduleInputs.teamId,
-                startDate: new Date(scheduleInputs.startDate).toISOString(),
-                endDate: new Date(scheduleInputs.endDate).toISOString(),
-                rank: scheduleInputs.rank,
+            // Format dates to ISO string with same date for start and end
+            const selectedDate = new Date(data.startDate);
+            const formattedData: EditChampionPayload = {
+                ...data,
+                startDate: selectedDate.toISOString(),
+                endDate: selectedDate.toISOString(),
             };
 
-            const newSchedule = await axios.post(`/api/champions`, data);
-            setLoading(false);
-
-            if (newSchedule.status !== 201) {
-                setError("An error occurred");
-                console.log(newSchedule.data.error);
+            let response;
+            if (mode === "add") {
+                response = await axios.post(`/api/champions`, formattedData);
             } else {
-                window.location.reload();
+                response = await axios.put(`/api/champions`, formattedData);
+            }
+
+            if (response.status === 200 || response.status === 201) {
+                toast.success(
+                    mode === "add"
+                        ? "Standing added successfully"
+                        : "Standing updated successfully"
+                );
+                onCloseAction(true);
             }
         } catch (error) {
-            setLoading(false);
-            setError("An error occurred.");
-            console.log(error);
+            console.error("Error saving standing:", error);
+
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<{ error?: string }>;
+                const errorMessage =
+                    axiosError.response?.data?.error ||
+                    "Failed to save standing. Please try again.";
+                toast.error(errorMessage);
+
+                // Set form-level error
+                setError("root", {
+                    type: "manual",
+                    message: errorMessage,
+                });
+            } else {
+                toast.error("An unexpected error occurred");
+                setError("root", {
+                    type: "manual",
+                    message: "An unexpected error occurred",
+                });
+            }
         }
-    }
+    };
+
+    const handleDelete = async () => {
+        if (initialData.id === -1) return;
+
+        try {
+            const response = await axios.delete(`/api/champions`, {
+                data: { id: initialData.id },
+            });
+
+            if (response.status === 200) {
+                toast.success("Standing deleted successfully");
+                onCloseAction(true);
+            }
+        } catch (error) {
+            console.error("Error deleting standing:", error);
+
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<{ error?: string }>;
+                const errorMessage =
+                    axiosError.response?.data?.error ||
+                    "Failed to delete standing. Please try again.";
+                toast.error(errorMessage);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
+    };
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>
                         {mode === "add" ? "Add Standing" : "Edit Standing"}
                     </DialogTitle>
                 </DialogHeader>
-                <div className="w-full grid grid-cols-2 gap-4">
-                    <div className="w-full flex flex-col gap-1 col-span-full">
-                        <Label
-                            htmlFor="teamId"
-                            className="font-bold opacity-50"
-                        >
-                            Team ID
-                        </Label>
-                        <SearchableSelect
-                            placeholder="Select Team"
-                            searchPlaceholder="Search teams..."
-                            emptyMessage="No teams found."
-                            options={teams.map((team) => ({
-                                value: team.id.toString(),
-                                label: team.teamName,
-                            }))}
-                            value={scheduleInputs.teamId?.toString() || ""}
-                            onChange={(value) =>
-                                setScheduleInputs({
-                                    ...scheduleInputs,
-                                    teamId: Number(value),
-                                })
-                            }
-                            disabled={teams.length <= 0}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <Label
-                            htmlFor="startDate"
-                            className="font-bold opacity-50"
-                        >
-                            Start Date
-                        </Label>
-                        <Input
-                            type="date"
-                            placeholder="Start Date"
-                            value={scheduleInputs.startDate}
-                            onChange={(e) =>
-                                setScheduleInputs({
-                                    ...scheduleInputs,
-                                    startDate: e.target.value,
-                                })
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <Label
-                            htmlFor="endDate"
-                            className="font-bold opacity-50"
-                        >
-                            End Date
-                        </Label>
-                        <Input
-                            type="date"
-                            placeholder="End Date"
-                            value={scheduleInputs.endDate}
-                            onChange={(e) =>
-                                setScheduleInputs({
-                                    ...scheduleInputs,
-                                    endDate: e.target.value,
-                                })
-                            }
-                        />
-                    </div>
-                    <div className="w-full flex flex-col gap-1 col-span-full">
-                        <Label
-                            htmlFor="standing"
-                            className="font-bold opacity-50"
-                        >
-                            Standing
-                        </Label>
-                        <Select
-                            value={scheduleInputs.rank.toString()}
-                            onValueChange={(value) =>
-                                setScheduleInputs({
-                                    ...scheduleInputs,
-                                    rank: Number(value),
-                                })
-                            }
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Standing" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Standing</SelectLabel>
-                                    <SelectItem value="1">Champion</SelectItem>
-                                    <SelectItem value="2">
-                                        First Runner-Up
-                                    </SelectItem>
-                                    <SelectItem value="3">
-                                        Second Runner-Up
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                <DialogFooter>
-                    {mode === "edit" && onDelete && (
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={onDelete}
-                            className="mr-auto"
-                        >
-                            Delete
-                        </Button>
-                    )}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                            onClose();
-                        }}
+
+                <Form {...form}>
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="space-y-4"
                     >
-                        Cancel
-                    </Button>
-                    <Button onClick={createStanding}>
-                        {mode === "add" ? "Add Standing" : "Save Changes"}
-                    </Button>
-                </DialogFooter>
+                        {/* Root Error Message */}
+                        {errors.root && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                                {errors.root.message}
+                            </div>
+                        )}
+
+                        {/* Date Field */}
+                        <FormField
+                            control={form.control}
+                            name="startDate"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Date</FormLabel>
+                                    <FormControl>
+                                        <DatePicker
+                                            label=""
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : new Date()
+                                            }
+                                            onChange={(date) =>
+                                                field.onChange(
+                                                    date
+                                                        ? date
+                                                              .toISOString()
+                                                              .split("T")[0]
+                                                        : ""
+                                                )
+                                            }
+                                            disabled={isSubmitting}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Team Selection */}
+                        <FormField
+                            control={form.control}
+                            name="teamId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Team</FormLabel>
+                                    <FormControl>
+                                        <SearchableSelect
+                                            placeholder="Select Team"
+                                            searchPlaceholder="Search teams..."
+                                            emptyMessage="No teams found."
+                                            options={teams.map((team) => ({
+                                                value: team.id.toString(),
+                                                label: team.teamName,
+                                            }))}
+                                            value={
+                                                field.value !== -1
+                                                    ? field.value.toString()
+                                                    : ""
+                                            }
+                                            onChange={(value) =>
+                                                field.onChange(
+                                                    value ? Number(value) : -1
+                                                )
+                                            }
+                                            disabled={
+                                                // teams.length === 0 ||
+                                                isSubmitting
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Rank Selection */}
+                        <FormField
+                            control={form.control}
+                            name="rank"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Standing</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            value={field.value.toString()}
+                                            onValueChange={(value) =>
+                                                field.onChange(Number(value))
+                                            }
+                                            disabled={isSubmitting}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select Standing" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>
+                                                        Standing
+                                                    </SelectLabel>
+                                                    <SelectItem value="1">
+                                                        Champion
+                                                    </SelectItem>
+                                                    <SelectItem value="2">
+                                                        First Runner-Up
+                                                    </SelectItem>
+                                                    <SelectItem value="3">
+                                                        Second Runner-Up
+                                                    </SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <DialogFooter>
+                            {mode === "edit" && initialData.id !== -1 && (
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={handleDelete}
+                                    disabled={isSubmitting}
+                                    className="mr-auto"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Deleting...
+                                        </>
+                                    ) : (
+                                        "Delete"
+                                    )}
+                                </Button>
+                            )}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onCloseAction(false)}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        {mode === "add"
+                                            ? "Adding..."
+                                            : "Saving..."}
+                                    </>
+                                ) : mode === "add" ? (
+                                    "Add Standing"
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     );

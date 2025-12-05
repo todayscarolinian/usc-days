@@ -15,22 +15,16 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Roboto } from "next/font/google";
+import { StandingData } from "@/types/types";
 
 const roboto = Roboto({
     subsets: ["latin"],
     weight: ["400", "500", "700"],
 });
 
-type TeamStanding = {
-    team: string;
-    wins: number;
-    losses: number;
-    winPct: string;
-};
-
 interface DataTableProps {
-    columns: ColumnDef<TeamStanding>[];
-    data: TeamStanding[];
+    columns: ColumnDef<StandingData>[];
+    data: StandingData[];
 }
 
 export default function DataTable({ columns, data }: DataTableProps) {
