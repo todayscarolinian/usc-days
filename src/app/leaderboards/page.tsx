@@ -4,30 +4,15 @@ import { useEffect, useState } from "react";
 import { DataTable } from "@/components/leaderboards/data-table";
 import { columns, SchoolRank } from "@/components/leaderboards/columns";
 import { transformGamesToSchoolRank } from "@/components/leaderboards/transformData";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { getGamesQuery } from "@/queries/games.queries";
 import SportSelector from "@/components/leaderboards/sport-selector";
 import LeaderboardsTableSkeleton from "@/components/leaderboards/leaderboards-table-skeleton";
 
 export default function RankingsPage() {
-    const STALE_TIME = 1000 * 60 * 5;
     const [rankingsData, setRankingsData] = useState<SchoolRank[]>([]);
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
 
-    const fetchGamesData = async () => {
-        const response = await axios.get("/api/games");
-        return response.data.games;
-    };
-
-    const {
-        data: games = [],
-        error,
-        isLoading: loading,
-    } = useQuery({
-        queryKey: ["games"],
-        queryFn: fetchGamesData,
-        staleTime: STALE_TIME,
-    });
+    const { data: games = [], error, isLoading: loading } = getGamesQuery();
 
     useEffect(() => {
         if (!selectedSport) {

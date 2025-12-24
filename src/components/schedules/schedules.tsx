@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SchedulesList from "@/components/schedules/schedules-list"; // cards view
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { getGamesQuery } from "@/queries/games.queries";
 import { Schedules } from "@/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 import DayNavigation from "./day-navigation";
@@ -11,27 +10,17 @@ import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
-    const STALE_TIME = 1000 * 60 * 5;
     const [gamesData, setGamesData] = useState<Schedules[]>([]);
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
 
     useInitializeUserStore();
     const { email } = useUserStore();
 
-    const fetchGamesData = async () => {
-        const response = await axios.get("/api/games");
-        return response.data.games;
-    };
-
     const {
         data: fetchedGamesData = [],
         error,
         isLoading: loading,
-    } = useQuery({
-        queryKey: ["games"],
-        queryFn: fetchGamesData,
-        staleTime: STALE_TIME,
-    });
+    } = getGamesQuery();
 
     useEffect(() => {
         if (!fetchedGamesData || fetchedGamesData.length === 0) return;

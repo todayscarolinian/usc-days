@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { getGameTypesQuery } from "@/queries/gametypes.queries";
 import { ListFilter, RefreshCw } from "lucide-react";
 import {
     Select,
@@ -111,7 +110,6 @@ export default function SportSelector({
     onSelect,
     selected,
 }: SportSelectorProps) {
-    const STALE_TIME = 1000 * 60 * 5;
     const [gameTypes, setGameTypes] = useState<GameType[]>([]);
 
     const selectedSport = gameTypes.find((g) => g.id === selected);
@@ -122,21 +120,11 @@ export default function SportSelector({
         fontSize: "14px",
         textTransform: "uppercase" as const,
     };
-
-    const fetchSports = async (): Promise<GameType[]> => {
-        const response = await axios.get("/api/sports");
-        return response.data.sports;
-    };
-
     const {
         data: sportsData = [],
         error,
         isLoading: loading,
-    } = useQuery({
-        queryKey: ["sports"],
-        queryFn: fetchSports,
-        staleTime: STALE_TIME,
-    });
+    } = getGameTypesQuery();
 
     useEffect(() => {
         if (sportsData.length > 0) {
@@ -168,7 +156,7 @@ export default function SportSelector({
                         {error?.message || "No sports available"}
                     </span>
                     <button
-                        onClick={fetchSports}
+                        onClick={getGameTypesQuery}
                         className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
                         title="Retry loading sports"
                     >

@@ -3,8 +3,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { getChampionsQuery } from "@/queries/champions.queries";
+import { getGameTypesQuery } from "@/queries/gametypes.queries";
+import { getGamesQuery } from "@/queries/games.queries";
+import { getTeamsQuery } from "@/queries/teams.queries";
 import SportSelector from "@/components/standings/sport-selector";
 import Cards from "@/components/standings/standings-cards";
 import StandingsCardsSkeleton from "@/components/standings/standings-cards-skeleton";
@@ -50,47 +52,16 @@ type Standing = {
 */
 
 export default function Standings() {
-    const STALE_TIME = 1000 * 60 * 5;
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
     const [champions, setChampions] = useState<ChampionCard[]>([]);
     const [standings, setStandings] = useState<Standing[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { data: sportsData = [], error: sportsError } = useQuery<GameType[]>({
-        queryKey: ["sports"],
-        queryFn: async () => {
-            const response = await axios.get("/api/sports");
-            return response.data.sports;
-        },
-        staleTime: STALE_TIME,
-    });
-
-    const { data: championsData = [], error: championsError } = useQuery({
-        queryKey: ["champions"],
-        queryFn: async () => {
-            const response = await axios.get("/api/champions");
-            return response.data.champions;
-        },
-        staleTime: STALE_TIME,
-    });
-
-    const { data: gamesData = [], error: gamesError } = useQuery({
-        queryKey: ["games"],
-        queryFn: async () => {
-            const response = await axios.get("/api/games");
-            return response.data.games;
-        },
-        staleTime: STALE_TIME,
-    });
-
-    const { data: teamsData = [], error: teamsError } = useQuery({
-        queryKey: ["teams"],
-        queryFn: async () => {
-            const response = await axios.get("/api/teams");
-            return response.data.teams;
-        },
-        staleTime: STALE_TIME,
-    });
+    const { data: sportsData = [], error: sportsError } = getGameTypesQuery();
+    const { data: championsData = [], error: championsError } =
+        getChampionsQuery();
+    const { data: gamesData = [], error: gamesError } = getGamesQuery();
+    const { data: teamsData = [], error: teamsError } = getTeamsQuery();
 
     const error = sportsError || championsError || gamesError || teamsError;
 

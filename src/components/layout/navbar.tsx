@@ -13,7 +13,7 @@ import {
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
-import axios from "axios";
+import { useSignOut } from "@/queries/auth.queries";
 
 const nav_items = [
     {
@@ -41,17 +41,8 @@ const nav_items = [
 export default function Navbar() {
     useInitializeUserStore();
     const { email, resetUser } = useUserStore();
-
-    const signOut = async () => {
-        try {
-            const response = await axios.get("/api/user/logout");
-            const { status } = response.data;
-            localStorage.removeItem("user");
-            return status;
-        } catch (error) {
-            console.error("Error during login", error);
-        }
-    };
+    const { mutate: signOut, isPending } = useSignOut();
+    const handleLogout = () => {};
 
     return (
         <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary backdrop-blur-sm">
@@ -147,10 +138,8 @@ export default function Navbar() {
                             <DropdownMenuItem>Support</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                                onClick={async () => {
-                                    const status = await signOut();
-                                    if (status == 200) resetUser();
-                                }}
+                                onClick={handleLogout}
+                                disabled={isPending}
                             >
                                 Logout
                             </DropdownMenuItem>

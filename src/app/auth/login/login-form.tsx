@@ -1,34 +1,21 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 
-import axios from 'axios';
-import { useState } from 'react';
+import { useSignIn } from "@/queries/auth.queries";
+import axios from "axios";
+import { useState } from "react";
 
 export function LoginForm() {
-    const [loading, setLoading] = useState<boolean>(false);
-    const handleLoginWithGoogle = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get('/api/user/login');
-            const { url } = response.data;
-
-            // Redirect to Google OAuth URL
-            window.location.href = url;
-            setLoading(false);
-        } catch (error) {
-            console.error('Error during login', error);
-            setLoading(false);
-        }
-    };
+    const handleLoginWithGoogle = useSignIn();
 
     return (
         <Card className="mx-auto w-md max-w-md">
@@ -40,14 +27,14 @@ export function LoginForm() {
             </CardHeader>
             <CardContent>
                 <Button
-                    onClick={handleLoginWithGoogle}
+                    onClick={() => handleLoginWithGoogle.mutate}
                     className="w-full mt-3 hover:cursor-pointer"
-                    disabled={loading}
+                    disabled={handleLoginWithGoogle.isPending}
                 >
                     Login with Google
                 </Button>
                 <div className="mt-4 text-center text-sm">
-                    Don&apos;t have an account?{' '}
+                    Don&apos;t have an account?{" "}
                     <Link href="#" className="underline">
                         Contact us
                     </Link>

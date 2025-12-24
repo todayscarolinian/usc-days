@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getGameTypesQuery } from "@/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/queries/teamgametypes.queries";
+import { useAddGamesQuery } from "@/queries/games.queries";
+import { getUserId } from "@/queries/auth.queries";
 import axios from "axios";
 
 import { Button } from "@/components/ui/button";
@@ -49,9 +53,7 @@ export default function AddScheduleDialog() {
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
     const [sports, setSports] = useState<Sport[]>([]);
     const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
     const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
     const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
         teamAId: -1,
         teamBId: -1,
@@ -77,82 +79,51 @@ export default function AddScheduleDialog() {
     useInitializeUserStore();
     const user = useUserStore();
 
-    useEffect(() => {
-        const fetchSportsData = async () => {
-            try {
-                const {
-                    data: { sports: fetchedSportsData },
-                } = await axios.get("/api/sports");
-                setSports(fetchedSportsData);
-            } catch (err) {
-                console.error("Error fetching sports data:", err);
-                setError("Failed to load sports data");
-            }
-        };
+    const {
+        data: fetchedSportsData = [],
+        error: sportsError,
+        isLoading: sportsLoading,
+    } = getGameTypesQuery();
 
-        fetchSportsData();
-    }, []);
+    const {
+        data: fetchedTeamSportsData = [],
+        error: teamSportsError,
+        isLoading: teamLoading,
+    } = getTeamGameTypesQuery(Number(selectedSport));
 
-    useEffect(() => {
-        const fetchSportTeamsData = async () => {
-            try {
-                setFetchingTeams(true);
-                const fetchedSportTeamData = await getSportsTeamData(
-                    Number(selectedSport)
-                );
-                if (!fetchedSportTeamData)
-                    return setError("Failed to load sports data");
-                setSportTeams(fetchedSportTeamData);
-            } catch (err) {
-                console.error("Error fetching sports data:", err);
-                setError("Failed to load sports data");
-            } finally {
-                setFetchingTeams(false);
-            }
-        };
+    const {
+        data: userId,
+        error: userError,
+        isLoading: userLoading,
+    } = getUserId(user.email);
 
-        if (selectedSport) fetchSportTeamsData();
-    }, [selectedSport]);
+    const add = useAddGamesQuery();
 
     async function createSchedule() {
-        try {
-            setLoading(true);
-            if (!selectedSport) return;
-            const {
-                data: { userId },
-            } = await axios.get(`/api/user/services`, {
-                params: {
-                    email: user.email,
-                },
-            });
+        if (!selectedSport) return;
 
-            const data: AddGamePayload = {
-                gameTypeId: selectedSport,
-                teamAId: scheduleInputs.teamAId,
-                teamBId: scheduleInputs.teamBId,
-                startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-                endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
-                location: scheduleInputs.location
-                    ? scheduleInputs.location
-                    : undefined,
-                createdById: userId,
-            };
+        const data: AddGamePayload = {
+            gameTypeId: selectedSport,
+            teamAId: scheduleInputs.teamAId,
+            teamBId: scheduleInputs.teamBId,
+            startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
+            endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+            location: scheduleInputs.location
+                ? scheduleInputs.location
+                : undefined,
+            createdById: userId,
+        };
 
-            const newSchedule = await axios.post(`/api/games`, data);
-            setLoading(false);
-
-            if (newSchedule.status !== 201) {
-                setError("An error occurred");
-                console.log(newSchedule.data.error);
-            } else {
+        add.mutate(data, {
+            onSuccess: () => {
                 window.location.reload();
-            }
-        } catch (error) {
-            setLoading(false);
-            setError("An error occurred.");
-            console.log(error);
-        }
+            },
+        });
     }
+
+    const loading =
+        sportsLoading || teamLoading || userLoading || add.isPending;
+    const error = sportsError || teamSportsError || userError || add.error;
 
     return (
         <Dialog
@@ -351,7 +322,9 @@ export default function AddScheduleDialog() {
                     </div>
                 </div>
                 <DialogFooter className="flex items-center">
-                    {error && <span className="text-red-500">{error}</span>}
+                    {error && (
+                        <span className="text-red-500">{error?.message}</span>
+                    )}
                     <Button
                         type="submit"
                         onClick={createSchedule}
