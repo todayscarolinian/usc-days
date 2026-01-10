@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { ListFilter, RefreshCw } from "lucide-react";
 import {
   Select,
@@ -111,8 +111,6 @@ export default function SportSelector({
   selected,
 }: SportSelectorProps) {
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const selectedSport = gameTypes.find((g) => g.id === selected);
 
@@ -123,24 +121,17 @@ export default function SportSelector({
     textTransform: "uppercase" as const,
   };
 
-  const fetchSports = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axios.get("/api/sports");
-      setGameTypes(response.data.sports);
-    } catch (err) {
-      console.error("Error fetching sports:", err);
-      setError("Failed to load sports.");
-      setGameTypes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: sportsData = [],
+    error,
+    isLoading: loading,
+  } = getGameTypesQuery();
 
   useEffect(() => {
-    fetchSports();
-  }, []);
+    if (sportsData.length > 0) {
+      setGameTypes(sportsData);
+    }
+  }, [sportsData]);
 
   // Set default to "All Sports" when component mounts
   useEffect(() => {
@@ -169,9 +160,11 @@ export default function SportSelector({
           className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
           style={baseTextStyle}
         >
-          <span className="text-red-600">{error || "No sports available"}</span>
+          <span className="text-red-600">
+            {error?.message || "No sports available"}
+          </span>
           <button
-            onClick={fetchSports}
+            onClick={getGameTypesQuery}
             className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
             title="Retry loading sports"
           >

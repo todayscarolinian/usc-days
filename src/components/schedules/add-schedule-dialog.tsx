@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { useAddGamesQuery } from "@/src/queries/games.queries";
+import { getUserId } from "@/src/queries/auth.queries";
 import axios from "axios";
 
 import { Button } from "@/src/components/ui/button";
@@ -17,7 +21,6 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
-import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
@@ -45,132 +48,95 @@ interface SportTeam {
   };
 }
 
-export default function AddScheduleDialog() {
-  const [selectedSport, setSelectedSport] = useState<number | null>(null);
-  const [sports, setSports] = useState<Sport[]>([]);
-  const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
+const defaultInputs: ScheduleInputs = {
     teamAId: -1,
     teamBId: -1,
-    startDate: "",
-    endDate: "",
-    startTime: "",
-    endTime: "",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
+    startTime: new Date().toISOString().split("T")[1].substring(0, 5),
+    endTime: new Date(new Date().getTime() + 60 * 60 * 1000) // +1 hour
+        .toISOString()
+        .split("T")[1]
+        .substring(0, 5),
     location: undefined,
-  });
+};
 
-  const sportsOptions: SelectOption[] = sports.map((sport) => ({
+export default function AddScheduleDialog() {
+    const [selectedSport, setSelectedSport] = useState<number | null>(null);
+    const [open, setOpen] = useState(false);
+  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>(defaultInputs);
+
+  useInitializeUserStore();
+  const user = useUserStore();
+
+  const {
+    data: fetchedSportsData = [],
+    error: sportsError,
+    isLoading: sportsLoading,
+  } = getGameTypesQuery();
+
+  const {
+    data: fetchedTeamSportsData = [],
+    error: teamSportsError,
+    isLoading: teamLoading,
+  } = getTeamGameTypesQuery(Number(selectedSport));
+
+  const {
+    data: userId,
+    error: userError,
+    isLoading: userLoading,
+  } = getUserId(user.email);
+
+  const add = useAddGamesQuery();
+
+  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
-  useInitializeUserStore();
-  const user = useUserStore();
-
-  useEffect(() => {
-    const fetchSportsData = async () => {
-      try {
-        const {
-          data: { sports: fetchedSportsData },
-        } = await axios.get("/api/sports");
-        setSports(fetchedSportsData);
-      } catch (err) {
-        console.error("Error fetching sports data:", err);
-        setError("Failed to load sports data");
-      }
-    };
-
-    fetchSportsData();
-  }, []);
-
-  useEffect(() => {
-    const fetchSportTeamsData = async () => {
-      try {
-        setFetchingTeams(true);
-        const fetchedSportTeamData = await getSportsTeamData(
-          Number(selectedSport)
-        );
-        if (!fetchedSportTeamData)
-          return setError("Failed to load sports data");
-        setSportTeams(fetchedSportTeamData);
-      } catch (err) {
-        console.error("Error fetching sports data:", err);
-        setError("Failed to load sports data");
-      } finally {
-        setFetchingTeams(false);
-      }
-    };
-
-    if (selectedSport) fetchSportTeamsData();
-  }, [selectedSport]);
-
   async function createSchedule() {
-    try {
-      setLoading(true);
-      if (!selectedSport) return;
-      const {
-        data: { userId },
-      } = await axios.get(`/api/user/services`, {
-        params: {
-          email: user.email,
-        },
-      });
+    if (!selectedSport) return;
 
-      const data: AddGamePayload = {
-        gameTypeId: selectedSport,
-        teamAId: scheduleInputs.teamAId,
-        teamBId: scheduleInputs.teamBId,
-        startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-        endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
-        location: scheduleInputs.location ? scheduleInputs.location : undefined,
-        createdById: userId,
-      };
+    const data: AddGamePayload = {
+      gameTypeId: selectedSport,
+      teamAId: scheduleInputs.teamAId,
+      teamBId: scheduleInputs.teamBId,
+      startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
+      endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+      location: scheduleInputs.location ? scheduleInputs.location : undefined,
+      createdById: userId,
+    };
 
-      const newSchedule = await axios.post(`/api/games`, data);
-      setLoading(false);
-
-      if (newSchedule.status !== 201) {
-        setError("An error occurred");
-        console.log(newSchedule.data.error);
-      } else {
-        window.location.reload();
-      }
-    } catch (error) {
-      setLoading(false);
-      setError("An error occurred.");
-      console.log(error);
-    }
+      add.mutate(data, {
+        onSuccess: () => {
+            setSelectedSport(null);
+              setScheduleInputs(defaultInputs);
+              setOpen(false);
+        }
+    });
   }
 
+  const loading = sportsLoading || teamLoading || userLoading || add.isPending;
+  const error = sportsError || teamSportsError || userError || add.error;
+
   return (
-    <Dialog
+      <Dialog
+        open={open}
       onOpenChange={(open) => {
         if (!open) {
           setSelectedSport(null);
-          setSportTeams([]);
-          setScheduleInputs({
-            teamAId: -1,
-            teamBId: -1,
-            startDate: "",
-            endDate: "",
-            startTime: "",
-            endTime: "",
-            location: undefined,
-          });
+          setScheduleInputs(defaultInputs);
         }
       }}
     >
-      <DialogTrigger asChild>
+      <DialogTrigger asChild onClick={() => setOpen(true)}>
         <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
           Add Schedule
         </Button>
@@ -191,6 +157,7 @@ export default function AddScheduleDialog() {
               <Input
                 type="date"
                 placeholder="Start Date"
+                value={scheduleInputs.startDate}
                 onChange={(e) =>
                   setScheduleInputs({
                     ...scheduleInputs,
@@ -206,6 +173,7 @@ export default function AddScheduleDialog() {
               <Input
                 type="date"
                 placeholder="End Date"
+                value={scheduleInputs.endDate}
                 onChange={(e) =>
                   setScheduleInputs({
                     ...scheduleInputs,
@@ -223,6 +191,7 @@ export default function AddScheduleDialog() {
               <Input
                 type="time"
                 placeholder="Start Time"
+                value={scheduleInputs.startTime}
                 onChange={(e) =>
                   setScheduleInputs({
                     ...scheduleInputs,
@@ -238,6 +207,7 @@ export default function AddScheduleDialog() {
               <Input
                 type="time"
                 placeholder="End Time"
+                value={scheduleInputs.endTime}
                 onChange={(e) =>
                   setScheduleInputs({
                     ...scheduleInputs,
@@ -258,7 +228,7 @@ export default function AddScheduleDialog() {
                 setSelectedSport(value ? Number(value) : null)
               }
               disabled={loading}
-              width="w-fit"
+              width="w-full"
             />
           </div>
           <div className="w-full flex justify-between items-center gap-4">
@@ -282,7 +252,7 @@ export default function AddScheduleDialog() {
                     teamAId: value ? Number(value) : -1,
                   })
                 }
-                disabled={!selectedSport || fetchingTeams}
+                disabled={!selectedSport || loading}
               />
             </div>
             <span className="font-bold opacity-50">vs</span>
@@ -306,7 +276,7 @@ export default function AddScheduleDialog() {
                     teamBId: value ? Number(value) : -1,
                   })
                 }
-                disabled={!selectedSport || fetchingTeams}
+                disabled={!selectedSport || loading}
               />
             </div>
           </div>
@@ -327,7 +297,7 @@ export default function AddScheduleDialog() {
           </div>
         </div>
         <DialogFooter className="flex items-center">
-          {error && <span className="text-red-500">{error}</span>}
+          {error && <span className="text-red-500">{error.message}</span>}
           <Button
             type="submit"
             onClick={createSchedule}

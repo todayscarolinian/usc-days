@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import {
+  useEditGamesQuery,
+  useDeleteGamesQuery,
+} from "@/src/queries/games.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/src/components/ui/button";
@@ -27,7 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload } from "@/src/types/games.types";
+import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
@@ -65,16 +70,7 @@ export default function EditScheduleDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const [selectedSport, setSelectedSport] = useState<number>(
-    schedule.gameType.id
-  );
-  const [sports, setSports] = useState<Sport[]>([]);
-  const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-
-  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
+  const defaultInputs: ScheduleInputs = {
     teamAId: schedule.teamA.id,
     teamBId: schedule.teamB.id,
     startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
@@ -96,119 +92,75 @@ export default function EditScheduleDialog({
       timeZone: "Asia/Manila",
     }),
     location: schedule.location ? schedule.location : undefined,
-  });
+    };
+    
+  const [selectedSport, setSelectedSport] = useState<number>(
+    schedule.gameType.id
+  );
+  const [scheduleInputs, setScheduleInputs] =
+    useState<ScheduleInputs>(defaultInputs);
 
-  const sportsOptions: SelectOption[] = sports.map((sport) => ({
+  const {
+    data: fetchedSportsData = [],
+    error: sportsError,
+    isLoading: sportsLoading,
+  } = getGameTypesQuery();
+
+  const {
+    data: fetchedTeamSportsData = [],
+    error: teamSportsError,
+    isLoading: teamLoading,
+  } = getTeamGameTypesQuery(Number(selectedSport));
+
+  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
-  useEffect(() => {
-    const fetchSportsData = async () => {
-      try {
-        const {
-          data: { sports: fetchedSportsData },
-        } = await axios.get("/api/sports");
-        setSports(fetchedSportsData);
-      } catch (err) {
-        console.error("Error fetching sports data:", err);
-        setError("Failed to load sports data");
-      }
+  const edit = useEditGamesQuery();
+  const editSchedule = () => {
+    if (!selectedSport) return;
+    const data: EditGamePayload = {
+      id: schedule.id,
+      gameTypeId: selectedSport,
+      teamAId: scheduleInputs.teamAId,
+      teamBId: scheduleInputs.teamBId,
+      startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
+      endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+      location: scheduleInputs.location ? scheduleInputs.location : undefined,
+      teamAScore: schedule.teamAScore,
+      teamBScore: schedule.teamBScore,
     };
 
-    fetchSportsData();
-  }, []);
+    edit.mutate(data, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+    });
+  };
 
-  useEffect(() => {
-    const fetchSportTeamsData = async () => {
-      try {
-        setFetchingTeams(true);
-        const fetchedSportTeamData = await getSportsTeamData(
-          Number(selectedSport)
-        );
-        if (!fetchedSportTeamData) {
-          setError("Failed to load sports data");
-          setFetchingTeams(false);
-          return;
-        }
-        setSportTeams(fetchedSportTeamData);
-        setFetchingTeams(false);
-      } catch (err) {
-        console.error("Error fetching sports data:", err);
-        setError("Failed to load sports data");
-        setFetchingTeams(false);
+  const del = useDeleteGamesQuery();
+  const deleteSchedule = () => {
+    del.mutate(
+      { scheduleId: schedule.id },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+        },
       }
-    };
+    );
+  };
 
-    fetchSportTeamsData();
-  }, [selectedSport]);
-
-  async function editSchedule() {
-    try {
-      setLoading(true);
-      if (!selectedSport) return;
-
-      const data: EditGamePayload = {
-        id: schedule.id,
-        gameTypeId: selectedSport,
-        teamAId: scheduleInputs.teamAId,
-        teamBId: scheduleInputs.teamBId,
-        startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-        endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
-        location: scheduleInputs.location ? scheduleInputs.location : undefined,
-        teamAScore: schedule.teamAScore ?? 0,
-        teamBScore: schedule.teamBScore ?? 0,
-      };
-
-      const { id, ...restData } = data;
-      const res = await axios.put(`/api/games`, { id: id, ...restData });
-      setLoading(false);
-
-      if (res.status !== 200) {
-        setError("An error occurred");
-        console.log(res.data.error);
-      } else {
-        window.location.reload();
-      }
-    } catch (err) {
-      setLoading(false);
-      setError("An error occurred.");
-      console.log(err);
-    }
-  }
-
-  async function deleteSchedule() {
-    try {
-      setLoading(true);
-      setError("");
-
-      const res = await axios.delete(`/api/games`, {
-        data: { id: schedule.id },
-      });
-      setLoading(false);
-
-      if (res.status !== 200) {
-        setError("An error occurred");
-        console.log(res.data.error);
-      } else {
-        window.location.reload();
-      }
-    } catch (err) {
-      setLoading(false);
-      if (axios.isAxiosError(err)) {
-        console.error("Axios error:", err);
-      } else {
-        console.error(err);
-      }
-    }
-  }
+  const loading =
+    sportsLoading || teamLoading || edit.isPending || del.isPending;
+  const error = sportsError || teamSportsError || edit.error || del.error;
 
   return (
     <Dialog
@@ -216,7 +168,6 @@ export default function EditScheduleDialog({
       onOpenChange={(v) => {
         if (!v) {
           setSelectedSport(schedule.gameType.id);
-          setSportTeams([]);
           setScheduleInputs({
             teamAId: schedule.teamA.id,
             teamBId: schedule.teamB.id,
@@ -345,8 +296,8 @@ export default function EditScheduleDialog({
               options={sportsOptions}
               value={selectedSport.toString()}
               onChange={(value) => setSelectedSport(Number(value))}
-              disabled={sports.length <= 0 || loading}
-              width="w-fit"
+              disabled={sportsOptions.length <= 0 || sportsLoading}
+              width="w-full"
             />
           </div>
 
@@ -367,7 +318,7 @@ export default function EditScheduleDialog({
                     teamAId: Number(value),
                   }))
                 }
-                disabled={sportTeams.length <= 0 || fetchingTeams}
+                disabled={teamOptions.length <= 0 || teamLoading}
               />
             </div>
 
@@ -389,7 +340,7 @@ export default function EditScheduleDialog({
                     teamBId: Number(value),
                   }))
                 }
-                disabled={sportTeams.length <= 0 || fetchingTeams}
+                disabled={teamOptions.length <= 0 || teamLoading}
               />
             </div>
           </div>
@@ -413,7 +364,7 @@ export default function EditScheduleDialog({
         </div>
 
         <DialogFooter className="flex items-center">
-          {error && <span className="text-red-500">{error}</span>}
+          {error && <span className="text-red-500">{error?.message}</span>}
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -448,7 +399,9 @@ export default function EditScheduleDialog({
             type="submit"
             className="px-8"
             onClick={editSchedule}
-            disabled={loading || sportTeams.length <= 0 || sports.length <= 0}
+            disabled={
+              loading || teamOptions.length <= 0 || sportsOptions.length <= 0
+            }
           >
             Save
           </Button>

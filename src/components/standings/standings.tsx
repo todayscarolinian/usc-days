@@ -3,7 +3,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import axios from "axios";
+import { getChampionsQuery } from "@/src/queries/champions.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getGamesQuery } from "@/src/queries/games.queries";
+import { getTeamsQuery } from "@/src/queries/teams.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
 import Cards from "@/src/components/standings/standings-cards";
 import StandingsCardsSkeleton from "@/src/components/standings/standings-cards-skeleton";
@@ -13,22 +16,11 @@ import standingColumns from "@/src/components/standings/columns";
 import { Button } from "@/src/components/ui/button";
 import { Champion, GameType, Team } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
-import { StandingData } from "@/src/types/types";
+import { Champions, StandingData } from "@/src/types/types";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
 import { toast } from "sonner";
-
-type ChampionData = Champion & {
-  gameType: {
-    id: number;
-    gameName: string;
-  };
-  team: {
-    id: number;
-    teamName: string;
-  };
-};
 
 export type StandingWithRank = StandingData & {
   rank: number;
@@ -45,13 +37,13 @@ type CardData = {
 };
 
 export default function Standings() {
-  // Static data (fetched once)
-  const [gameTypes, setGameTypes] = useState<GameType[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
+  // Static data (fetched once using TanStack Query)
+  const { data: gameTypes = [], error: gameTypesError } = getGameTypesQuery();
+  const { data: teams = [], error: teamsError } = getTeamsQuery();
 
   // Dynamic data (changes per sport selection)
   const [selectedSport, setSelectedSport] = useState<number | null>(null);
-  const [championsData, setChampionsData] = useState<ChampionData[]>([]);
+  const [championsData, setChampionsData] = useState<Champions[]>([]);
   const [standingsData, setStandingsData] = useState<StandingWithRank[]>([]);
 
   // UI state
@@ -63,44 +55,34 @@ export default function Standings() {
   const { email } = useUserStore();
   const isAdmin = !!email;
 
-  // Fetch static data once on mount
-  useEffect(() => {
-    const fetchStaticData = async () => {
-      try {
-        const [sportsRes, teamsRes] = await Promise.all([
-          axios.get("/api/sports"),
-          axios.get("/api/teams"),
-        ]);
+  // Fetch dynamic data using TanStack Query
+  const { data: championsQueryData = [], error: championsError } =
+    getChampionsQuery();
+  const { data: gamesQueryData = [], error: gamesError } = getGamesQuery();
 
-        setGameTypes(sportsRes.data.sports || []);
-        setTeams(teamsRes.data.teams || []);
-      } catch (err) {
-        console.error("Error fetching static data:", err);
-        toast.error("Failed to load sports and teams data");
-      }
-    };
-
-    fetchStaticData();
-  }, []);
-
-  // Fetch dynamic data when sport changes
-  const fetchStandingsData = useCallback(async () => {
+  // Process data when sport selection or query data changes
+  const fetchStandingsData = useCallback(() => {
     if (!selectedSport) {
       setStandingsData([]);
       setChampionsData([]);
       return;
     }
 
+    if (gameTypesError || teamsError || championsError || gamesError) {
+      toast.error("Failed to load standings data");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const [championsRes, gamesRes] = await Promise.all([
-        axios.get(`/api/champions?gameTypeId=${selectedSport}`),
-        axios.get(`/api/games?gameTypeId=${selectedSport}`),
-      ]);
-
-      const champions: ChampionData[] = championsRes.data.champions || [];
-      const games = gamesRes.data.games || [];
+      // Filter data by selected sport
+      const champions: Champions[] = championsQueryData.filter(
+        (c: any) => c.gameType.id === selectedSport
+      );
+      const games = gamesQueryData.filter(
+        (g: any) => g.gameType?.id === selectedSport
+      );
 
       setChampionsData(champions);
 
@@ -142,14 +124,22 @@ export default function Standings() {
 
       setStandingsData(allStandings);
     } catch (err) {
-      console.error("Error fetching standings data:", err);
-      toast.error("Failed to load standings data");
+      console.error("Error processing standings data:", err);
+      toast.error("Failed to process standings data");
       setStandingsData([]);
       setChampionsData([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedSport]);
+  }, [
+    selectedSport,
+    championsQueryData,
+    gamesQueryData,
+    gameTypesError,
+    teamsError,
+    championsError,
+    gamesError,
+  ]);
 
   useEffect(() => {
     fetchStandingsData();
@@ -157,7 +147,9 @@ export default function Standings() {
 
   // Memoized computed values
   const sportName = useMemo(
-    () => gameTypes.find((sport) => sport.id === selectedSport)?.gameName || "",
+    () =>
+      gameTypes.find((sport: GameType) => sport.id === selectedSport)
+        ?.gameName || "",
     [gameTypes, selectedSport]
   );
 

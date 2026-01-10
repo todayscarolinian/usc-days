@@ -35,9 +35,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Loader2 } from "lucide-react";
-import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import DatePicker from "../ui/date-picker";
+import {
+  useAddChampionsQuery,
+  useEditChampionsQuery,
+  useDeleteChampionsQuery,
+} from "@/src/queries/champions.queries";
 
 type FormMode = "add" | "edit";
 
@@ -64,9 +68,15 @@ export default function StandingFormDialog({
   const {
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { errors },
     setError,
   } = form;
+
+  const add = useAddChampionsQuery();
+  const edit = useEditChampionsQuery();
+  const del = useDeleteChampionsQuery();
+
+  const isSubmitting = add.isPending || edit.isPending || del.isPending;
 
   // Sync form with initialData when it changes
   useEffect(() => {
@@ -86,89 +96,70 @@ export default function StandingFormDialog({
   };
 
   const onSubmit = async (data: EditChampionPayload) => {
-    try {
-      // Validate team selection
-      if (data.teamId === -1) {
-        setError("teamId", {
-          type: "manual",
-          message: "Please select a team",
-        });
-        return;
-      }
+    // Validate team selection
+    if (data.teamId === -1) {
+      setError("teamId", {
+        type: "manual",
+        message: "Please select a team",
+      });
+      return;
+    }
 
-      // Format dates to ISO string with same date for start and end
-      const selectedDate = new Date(data.startDate);
-      const formattedData: EditChampionPayload = {
-        ...data,
-        startDate: selectedDate.toISOString(),
-        endDate: selectedDate.toISOString(),
-      };
+    // Format dates to ISO string with same date for start and end
+    const selectedDate = new Date(data.startDate);
+    const formattedData: EditChampionPayload = {
+      ...data,
+      startDate: selectedDate.toISOString(),
+      endDate: selectedDate.toISOString(),
+    };
 
-      let response;
-      if (mode === "add") {
-        response = await axios.post(`/api/champions`, formattedData);
-      } else {
-        response = await axios.put(`/api/champions`, formattedData);
-      }
+    const mutation = mode === "add" ? add : edit;
 
-      if (response.status === 200 || response.status === 201) {
+    mutation.mutate(formattedData, {
+      onSuccess: () => {
         toast.success(
           mode === "add"
             ? "Standing added successfully"
             : "Standing updated successfully"
         );
         onCloseAction(true);
-      }
-    } catch (error) {
-      console.error("Error saving standing:", error);
+      },
+      onError: (error: any) => {
+        console.error("Error saving standing:", error);
 
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError<{ error?: string }>;
         const errorMessage =
-          axiosError.response?.data?.error ||
+          error.response?.data?.error ||
           "Failed to save standing. Please try again.";
         toast.error(errorMessage);
 
-        // Set form-level error
         setError("root", {
           type: "manual",
           message: errorMessage,
         });
-      } else {
-        toast.error("An unexpected error occurred");
-        setError("root", {
-          type: "manual",
-          message: "An unexpected error occurred",
-        });
-      }
-    }
+      },
+    });
   };
 
   const handleDelete = async () => {
     if (initialData.id === -1) return;
 
-    try {
-      const response = await axios.delete(`/api/champions`, {
-        data: { id: initialData.id },
-      });
+    del.mutate(
+      { id: initialData.id },
+      {
+        onSuccess: () => {
+          toast.success("Standing deleted successfully");
+          onCloseAction(true);
+        },
+        onError: (error: any) => {
+          console.error("Error deleting standing:", error);
 
-      if (response.status === 200) {
-        toast.success("Standing deleted successfully");
-        onCloseAction(true);
+          const errorMessage =
+            error.response?.data?.error ||
+            "Failed to delete standing. Please try again.";
+          toast.error(errorMessage);
+        },
       }
-    } catch (error) {
-      console.error("Error deleting standing:", error);
-
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError<{ error?: string }>;
-        const errorMessage =
-          axiosError.response?.data?.error ||
-          "Failed to delete standing. Please try again.";
-        toast.error(errorMessage);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
-    }
+    );
   };
 
   return (
