@@ -7,46 +7,46 @@ import { useAddGamesQuery } from "@/queries/games.queries";
 import { getUserId } from "@/queries/auth.queries";
 import axios from "axios";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/src/components/ui/dialog";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
 
-import { AddGamePayload } from "@/types/games.types";
-import { getSportsTeamData } from "@/lib/actions";
+import { AddGamePayload } from "@/src/types/games.types";
+import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
-import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
+import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
 interface ScheduleInputs {
-    teamAId: number;
-    teamBId: number;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
-    location?: string | undefined;
+  teamAId: number;
+  teamBId: number;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  location?: string | undefined;
 }
 
 interface Sport {
-    id: number;
-    gameName: string;
+  id: number;
+  gameName: string;
 }
 
 interface SportTeam {
-    id: number;
-    gameTypeId: number;
-    teamId: number;
-    team: {
-        teamName: string;
-    };
+  id: number;
+  gameTypeId: number;
+  teamId: number;
+  team: {
+    teamName: string;
+  };
 }
 
 export default function AddScheduleDialog() {
@@ -64,20 +64,20 @@ export default function AddScheduleDialog() {
         location: undefined,
     });
 
-    const sportsOptions: SelectOption[] = sports.map((sport) => ({
-        value: sport.id.toString(),
-        label: sport.gameName,
-        id: sport.id,
-    }));
+  const sportsOptions: SelectOption[] = sports.map((sport) => ({
+    value: sport.id.toString(),
+    label: sport.gameName,
+    id: sport.id,
+  }));
 
-    const teamOptions: SelectOption[] = sportTeams.map((team) => ({
-        value: team.teamId.toString(),
-        label: team.team.teamName,
-        id: team.teamId,
-    }));
+  const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+    value: team.teamId.toString(),
+    label: team.team.teamName,
+    id: team.teamId,
+  }));
 
-    useInitializeUserStore();
-    const user = useUserStore();
+  useInitializeUserStore();
+  const user = useUserStore();
 
     const {
         data: fetchedSportsData = [],

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SchedulesList from "@/components/schedules/schedules-list"; // cards view
-import { getGamesQuery } from "@/queries/games.queries";
-import { Schedules } from "@/types/types";
+import SchedulesList from "@/src/components/schedules/schedules-list"; // cards view
+import { getGamesQuery } from "@/src/queries/games.queries";
+import { Schedules } from "@/src/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
-import DayNavigation from "./day-navigation";
-import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
+import ScheduleFilter from "./schedule-filter";
+import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 export default function SchedulesPage() {
@@ -41,6 +41,7 @@ export default function SchedulesPage() {
 
     return (
         <>
+        <ScheduleFilter onSelect={setSelectedSport} selected={selectedSport} />
             <DayNavigation
                 onSelect={setSelectedSport}
                 selected={selectedSport}

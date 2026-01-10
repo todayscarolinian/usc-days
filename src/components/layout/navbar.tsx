@@ -1,41 +1,41 @@
 "use client";
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet";
+import { Button } from "@/src/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
 import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
 import { useSignOut } from "@/queries/auth.queries";
 
 const nav_items = [
-    {
-        href: "/",
-        name: "Home",
-        protected: false,
-    },
-    {
-        href: "/schedules",
-        name: "Schedules",
-        protected: false,
-    },
-    {
-        href: "/leaderboards",
-        name: "Leaderboards",
-        protected: false,
-    },
-    {
-        href: "/standings",
-        name: "Standings",
-        protected: false,
-    },
+  {
+    href: "/",
+    name: "Home",
+    protected: false,
+  },
+  {
+    href: "/schedules",
+    name: "Schedules",
+    protected: false,
+  },
+  {
+    href: "/leaderboards",
+    name: "Leaderboards",
+    protected: false,
+  },
+  {
+    href: "/standings",
+    name: "Standings",
+    protected: false,
+  },
 ];
 
 export default function Navbar() {

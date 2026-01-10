@@ -1,10 +1,10 @@
-"use client"
+"use client";
 import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -12,13 +12,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/src/components/ui/table";
 import { CustomColumnDef } from "./columns";
 
 interface DataTableProps<TData> {
   columns: CustomColumnDef<TData>[];
-  data: TData[]
-  title?: string
+  data: TData[];
+  title?: string;
 }
 
 export function DataTable<TValue>({
@@ -26,13 +26,12 @@ export function DataTable<TValue>({
   data,
   title = "USC DAYS",
 }: DataTableProps<TValue>) {
-
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-  })
+  });
 
   return (
     <div className="rounded-md border">
@@ -49,7 +48,13 @@ export function DataTable<TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-none">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={`p-4 md:p-6 font-bold bg-gray-50 ${(header.column.columnDef.meta as { className?: string })?.className ?? ""}`}>
+                  <TableHead
+                    key={header.id}
+                    className={`p-4 md:p-6 font-bold bg-gray-50 ${
+                      (header.column.columnDef.meta as { className?: string })
+                        ?.className ?? ""
+                    }`}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -68,7 +73,13 @@ export function DataTable<TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className="border-none">
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className={`p-4 md:p-6 ${(cell.column.columnDef.meta as { className?: string })?.className ?? ""}`}>
+                  <TableCell
+                    key={cell.id}
+                    className={`p-4 md:p-6 ${
+                      (cell.column.columnDef.meta as { className?: string })
+                        ?.className ?? ""
+                    }`}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -84,5 +95,5 @@ export function DataTable<TValue>({
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

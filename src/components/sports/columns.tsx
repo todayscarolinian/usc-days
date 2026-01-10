@@ -2,22 +2,22 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import Badminton from "@/assets/icons/Diamond/Badminton.svg";
-import Basketball from "@/assets/icons/Diamond/Basketball.svg";
-import Cheerdance from "@/assets/icons/Diamond/Cheerdance.svg";
-import Chess from "@/assets/icons/Diamond/Chess.svg";
-import Esports from "@/assets/icons/Diamond/Esports.svg";
-import FlagFootball from "@/assets/icons/Diamond/Flag Football.svg";
-import Football from "@/assets/icons/Diamond/Football.svg";
-import Frisbee from "@/assets/icons/Diamond/Frisbee.svg";
-import Futsal from "@/assets/icons/Diamond/Futsal.svg";
-import LawnTennis from "@/assets/icons/Diamond/Lawn Tennis.svg";
-import MrIntrams from "@/assets/icons/Diamond/Mr Intrams.svg";
-import MsIntrams from "@/assets/icons/Diamond/Ms Intrams.svg";
-import Swimming from "@/assets/icons/Diamond/Swimming.svg";
-import TableTennis from "@/assets/icons/Diamond/Table Tennis.svg";
-import ThreeByThreeBasketball from "@/assets/icons/Diamond/ThreeByThreeBasketball.svg";
-import Volleyball from "@/assets/icons/Diamond/Volleyball.svg";
+import Badminton from "@/src/assets/icons/Diamond/Badminton.svg";
+import Basketball from "@/src/assets/icons/Diamond/Basketball.svg";
+import Cheerdance from "@/src/assets/icons/Diamond/Cheerdance.svg";
+import Chess from "@/src/assets/icons/Diamond/Chess.svg";
+import Esports from "@/src/assets/icons/Diamond/Esports.svg";
+import FlagFootball from "@/src/assets/icons/Diamond/Flag Football.svg";
+import Football from "@/src/assets/icons/Diamond/Football.svg";
+import Frisbee from "@/src/assets/icons/Diamond/Frisbee.svg";
+import Futsal from "@/src/assets/icons/Diamond/Futsal.svg";
+import LawnTennis from "@/src/assets/icons/Diamond/Lawn Tennis.svg";
+import MrIntrams from "@/src/assets/icons/Diamond/Mr Intrams.svg";
+import MsIntrams from "@/src/assets/icons/Diamond/Ms Intrams.svg";
+import Swimming from "@/src/assets/icons/Diamond/Swimming.svg";
+import TableTennis from "@/src/assets/icons/Diamond/Table Tennis.svg";
+import ThreeByThreeBasketball from "@/src/assets/icons/Diamond/ThreeByThreeBasketball.svg";
+import Volleyball from "@/src/assets/icons/Diamond/Volleyball.svg";
 import Image from "next/image";
 
 export type SportInfo = {

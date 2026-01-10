@@ -1,10 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import GamesCardSkeleton from "./games-card-skeleton"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Skeleton } from "@/src/components/ui/skeleton";
+import GamesCardSkeleton from "./games-card-skeleton";
 
 type Props = {
-  rows?: number
-}
+  rows?: number;
+};
 
 export default function SchedulesCardSkeleton({ rows = 2 }: Props) {
   return (
@@ -23,5 +28,5 @@ export default function SchedulesCardSkeleton({ rows = 2 }: Props) {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }
