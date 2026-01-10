@@ -188,7 +188,7 @@ export default function AddScoreDialog({
 
           {error && <p className="text-xs text-red-600">{error}</p>}
 
-          {editingChanged && (
+          {editingChanged ? (
             <div className="mt-1 rounded-md border p-3 text-center">
               <div className="text-xs text-muted-foreground">
                 New score (not saved)
@@ -197,7 +197,7 @@ export default function AddScoreDialog({
                 {aScore} – {bScore}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

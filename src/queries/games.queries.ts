@@ -1,6 +1,6 @@
 "use client";
 
-import { AddGamePayload, EditGamePayload } from "@/types/games.types";
+import { AddGamePayload, EditGamePayload } from "@/src/types/games.types";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 const STALE_TIME = 1000 * 60 * 5;
@@ -25,15 +25,6 @@ export const useAddGamesQuery = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["games"] });
         },
-        onMutate: async (g) => {
-            await queryClient.cancelQueries({ queryKey: ["games"] });
-            const prevGames = queryClient.getQueryData<any[]>(["games"]);
-            if (prevGames) {
-                queryClient.setQueryData(["games"], [...prevGames, g]);
-            }
-
-            return { prevGames };
-        },
         onError: (err, g, context: any) => {
             if (context?.prevGames) {
                 queryClient.setQueryData(["games"], context.prevGames);
@@ -56,7 +47,7 @@ export const useEditGamesQuery = () => {
         },
 
         onError: (error) => {
-            console.error("Error editing game.");
+            console.error("Error editing game: ", error);
         },
     });
 };
@@ -67,7 +58,7 @@ export const useDeleteGamesQuery = () => {
     return useMutation<any, Error, { scheduleId: number }>({
         mutationFn: async ({ scheduleId }) => {
             const { data } = await axios.delete(`/api/games`, {
-                data: { scheduleId },
+                data: { id: scheduleId },
             });
             return data;
         },

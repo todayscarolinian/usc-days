@@ -16,22 +16,11 @@ import standingColumns from "@/src/components/standings/columns";
 import { Button } from "@/src/components/ui/button";
 import { Champion, GameType, Team } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
-import { StandingData } from "@/src/types/types";
+import { Champions, StandingData } from "@/src/types/types";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
 import { toast } from "sonner";
-
-type ChampionData = Champion & {
-  gameType: {
-    id: number;
-    gameName: string;
-  };
-  team: {
-    id: number;
-    teamName: string;
-  };
-};
 
 export type StandingWithRank = StandingData & {
   rank: number;
@@ -54,7 +43,7 @@ export default function Standings() {
 
   // Dynamic data (changes per sport selection)
   const [selectedSport, setSelectedSport] = useState<number | null>(null);
-  const [championsData, setChampionsData] = useState<ChampionData[]>([]);
+  const [championsData, setChampionsData] = useState<Champions[]>([]);
   const [standingsData, setStandingsData] = useState<StandingWithRank[]>([]);
 
   // UI state
@@ -88,7 +77,7 @@ export default function Standings() {
       setLoading(true);
 
       // Filter data by selected sport
-      const champions: ChampionData[] = championsQueryData.filter(
+      const champions: Champions[] = championsQueryData.filter(
         (c: any) => c.gameType.id === selectedSport
       );
       const games = gamesQueryData.filter(

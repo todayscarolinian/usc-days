@@ -1,4 +1,4 @@
-import { getSportsTeamData } from "@/lib/actions";
+import { getSportsTeamData } from "@/src/lib/actions";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -12,9 +12,9 @@ export async function GET(request: Request) {
             );
         }
 
-        const teamgametypes = await getSportsTeamData(Number(sportId));
+        const teams = await getSportsTeamData(Number(sportId));
 
-        return NextResponse.json({ teamgametypes }, { status: 200 });
+        return NextResponse.json({ teams }, { status: 200 });
     } catch (error) {
         console.error("Error in fetching team game types: ", error);
         return NextResponse.json(

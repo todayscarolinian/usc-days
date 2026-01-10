@@ -109,6 +109,7 @@ export async function PUT(req: Request) {
         const result = EditGameSchema.safeParse(body);
 
         if (!result.success) {
+            console.log("Error validating edit game data:", result.error);
             return NextResponse.json({ error: result.error }, { status: 400 });
         }
 

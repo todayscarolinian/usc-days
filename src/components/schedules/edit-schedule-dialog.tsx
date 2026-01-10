@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import {
-    useEditGamesQuery,
-    useDeleteGamesQuery,
-} from "@/queries/games.queries";
-import { getGameTypesQuery } from "@/queries/gametypes.queries";
-import { getTeamGameTypesQuery } from "@/queries/teamgametypes.queries";
+  useEditGamesQuery,
+  useDeleteGamesQuery,
+} from "@/src/queries/games.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/src/components/ui/button";
@@ -22,15 +22,15 @@ import {
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
 import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
@@ -38,27 +38,27 @@ import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
 
 interface ScheduleInputs {
-    teamAId: number;
-    teamBId: number;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
-    location?: string | undefined;
+  teamAId: number;
+  teamBId: number;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  location?: string | undefined;
 }
 
 interface Sport {
-    id: number;
-    gameName: string;
+  id: number;
+  gameName: string;
 }
 
 interface SportTeam {
-    id: number;
-    gameTypeId: number;
-    teamId: number;
-    team: {
-        teamName: string;
-    };
+  id: number;
+  gameTypeId: number;
+  teamId: number;
+  team: {
+    teamName: string;
+  };
 }
 
 export default function EditScheduleDialog({
@@ -70,99 +70,97 @@ export default function EditScheduleDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-    const [selectedSport, setSelectedSport] = useState<number>(
-        schedule.gameType.id
-    );
-    const [sports, setSports] = useState<Sport[]>([]);
-    const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-    const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-    const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
-        teamAId: schedule.teamA.id,
-        teamBId: schedule.teamB.id,
-        startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
-            timeZone: "Asia/Manila",
-        }),
-        endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
-            timeZone: "Asia/Manila",
-        }),
-        startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Manila",
-        }),
-        endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Manila",
-        }),
-        location: schedule.location ? schedule.location : undefined,
-    });
+  const defaultInputs: ScheduleInputs = {
+    teamAId: schedule.teamA.id,
+    teamBId: schedule.teamB.id,
+    startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    }),
+    endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    }),
+    startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Manila",
+    }),
+    endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Manila",
+    }),
+    location: schedule.location ? schedule.location : undefined,
+    };
+    
+  const [selectedSport, setSelectedSport] = useState<number>(
+    schedule.gameType.id
+  );
+  const [scheduleInputs, setScheduleInputs] =
+    useState<ScheduleInputs>(defaultInputs);
 
-    const sportsOptions: SelectOption[] = sports.map((sport) => ({
-        value: sport.id.toString(),
-        label: sport.gameName,
-        id: sport.id,
-    }));
+  const {
+    data: fetchedSportsData = [],
+    error: sportsError,
+    isLoading: sportsLoading,
+  } = getGameTypesQuery();
 
-  const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+  const {
+    data: fetchedTeamSportsData = [],
+    error: teamSportsError,
+    isLoading: teamLoading,
+  } = getTeamGameTypesQuery(Number(selectedSport));
+
+  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
+    value: sport.id.toString(),
+    label: sport.gameName,
+    id: sport.id,
+  }));
+
+  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
-    const {
-        data: fetchedSportsData = [],
-        error: sportsError,
-        isLoading: sportsLoading,
-    } = getGameTypesQuery();
-
-    const {
-        data: fetchedTeamSportsData = [],
-        error: teamSportsError,
-        isLoading: teamLoading,
-    } = getTeamGameTypesQuery(Number(selectedSport));
-
-    const edit = useEditGamesQuery();
-    const editSchedule = () => {
-        if (!selectedSport) return;
-        const data: EditGamePayload = {
-            id: schedule.id,
-            gameTypeId: selectedSport,
-            teamAId: scheduleInputs.teamAId,
-            teamBId: scheduleInputs.teamBId,
-            startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-            endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
-            location: scheduleInputs.location
-                ? scheduleInputs.location
-                : undefined,
-            teamAScore: schedule.teamAScore ?? 0,
-            teamBScore: schedule.teamBScore ?? 0,
-        };
-
-        edit.mutate(data, {
-            onSuccess: () => {
-                window.location.reload();
-            },
-        });
+  const edit = useEditGamesQuery();
+  const editSchedule = () => {
+    if (!selectedSport) return;
+    const data: EditGamePayload = {
+      id: schedule.id,
+      gameTypeId: selectedSport,
+      teamAId: scheduleInputs.teamAId,
+      teamBId: scheduleInputs.teamBId,
+      startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
+      endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+      location: scheduleInputs.location ? scheduleInputs.location : undefined,
+      teamAScore: schedule.teamAScore,
+      teamBScore: schedule.teamBScore,
     };
 
-    const del = useDeleteGamesQuery();
-    const deleteSchedule = () => {
-        del.mutate(
-            { scheduleId: schedule.id },
-            {
-                onSuccess: () => {
-                    window.location.reload();
-                },
-            }
-        );
-    };
+    edit.mutate(data, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+    });
+  };
 
-    const loading =
-        sportsLoading || teamLoading || edit.isPending || del.isPending;
-    const error = sportsError || teamSportsError || edit.error || del.error;
+  const del = useDeleteGamesQuery();
+  const deleteSchedule = () => {
+    del.mutate(
+      { scheduleId: schedule.id },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+        },
+      }
+    );
+  };
+
+  const loading =
+    sportsLoading || teamLoading || edit.isPending || del.isPending;
+  const error = sportsError || teamSportsError || edit.error || del.error;
 
   return (
     <Dialog
@@ -170,7 +168,6 @@ export default function EditScheduleDialog({
       onOpenChange={(v) => {
         if (!v) {
           setSelectedSport(schedule.gameType.id);
-          setSportTeams([]);
           setScheduleInputs({
             teamAId: schedule.teamA.id,
             teamBId: schedule.teamB.id,
@@ -299,8 +296,8 @@ export default function EditScheduleDialog({
               options={sportsOptions}
               value={selectedSport.toString()}
               onChange={(value) => setSelectedSport(Number(value))}
-              disabled={sports.length <= 0 || loading}
-              width="w-fit"
+              disabled={sportsOptions.length <= 0 || sportsLoading}
+              width="w-full"
             />
           </div>
 
@@ -321,7 +318,7 @@ export default function EditScheduleDialog({
                     teamAId: Number(value),
                   }))
                 }
-                disabled={sportTeams.length <= 0 || fetchingTeams}
+                disabled={teamOptions.length <= 0 || teamLoading}
               />
             </div>
 
@@ -343,7 +340,7 @@ export default function EditScheduleDialog({
                     teamBId: Number(value),
                   }))
                 }
-                disabled={sportTeams.length <= 0 || fetchingTeams}
+                disabled={teamOptions.length <= 0 || teamLoading}
               />
             </div>
           </div>
@@ -366,10 +363,8 @@ export default function EditScheduleDialog({
           </div>
         </div>
 
-                <DialogFooter className="flex items-center">
-                    {error && (
-                        <span className="text-red-500">{error?.message}</span>
-                    )}
+        <DialogFooter className="flex items-center">
+          {error && <span className="text-red-500">{error?.message}</span>}
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -404,7 +399,9 @@ export default function EditScheduleDialog({
             type="submit"
             className="px-8"
             onClick={editSchedule}
-            disabled={loading || sportTeams.length <= 0 || sports.length <= 0}
+            disabled={
+              loading || teamOptions.length <= 0 || sportsOptions.length <= 0
+            }
           >
             Save
           </Button>

@@ -12,8 +12,8 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
-import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
-import { useSignOut } from "@/queries/auth.queries";
+import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
+import { useSignOut } from "@/src/queries/auth.queries";
 
 const nav_items = [
   {

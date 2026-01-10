@@ -47,7 +47,7 @@ export const AddGameSchema = z
                     issue.input === undefined
                         ? 'createdById is required.'
                         : 'createdById must be a number.',
-        }),
+            }),
     })
     .refine((data) => data.teamAId !== data.teamBId, {
         message: 'teamAId and teamBId cannot be the same.',
@@ -87,7 +87,9 @@ export const EditGameSchema = z
                         ? 'teamAScore is required.'
                         : 'teamAScore must be a number.',
             })
-            .min(-1, 'teamAScore cannot be negative.'),
+            .min(-1, 'teamAScore cannot be negative.')
+            .nullable()
+            .optional(),
         teamBScore: z
             .number({
                 error: (issue) =>
@@ -95,16 +97,18 @@ export const EditGameSchema = z
                         ? 'teamBScore is required.'
                         : 'teamBScore must be a number.',
             })
-            .min(-1, 'teamBScore cannot be negative.'),
+            .min(-1, 'teamBScore cannot be negative.')
+            .nullable()
+            .optional(),
         winnerId: z
             .number({
                 error: (issue) =>
                     issue.input === undefined
                         ? 'winnerId is required.'
                         : 'winnerId must be a number.',
-        })
-        .nullable()
-        .optional(),
+            })
+            .nullable()
+            .optional(),
         startDate: z
             .string({
                 error: (issue) =>

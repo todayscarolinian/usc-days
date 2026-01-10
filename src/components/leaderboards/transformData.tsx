@@ -17,14 +17,17 @@ type GameWithRelations = Game & {
 };
 
 export function transformGamesToSchoolRank(
-  games: GameWithRelations[]
+  games: GameWithRelations[],
+  sportId?: number
 ): StandingData[] {
   const leaderboard: Record<
     string,
     { team: string; wins: number; losses: number; sport: string }
   > = {};
 
-  // games = games.filter((g) => g.gameType.id === sportId);
+  if (sportId !== undefined) {
+    games = games.filter((g) => g.gameType.id === sportId);
+  }
 
   for (const g of games) {
     const sport = g.gameType.gameName;

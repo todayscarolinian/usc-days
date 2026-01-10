@@ -42,10 +42,6 @@ export default function SchedulesPage() {
     return (
         <>
         <ScheduleFilter onSelect={setSelectedSport} selected={selectedSport} />
-            <DayNavigation
-                onSelect={setSelectedSport}
-                selected={selectedSport}
-            />
             <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
                 <div className="flex flex-col gap-4">
                     {email && (

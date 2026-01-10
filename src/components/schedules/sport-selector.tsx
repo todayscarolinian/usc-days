@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { getGameTypesQuery } from "@/queries/gametypes.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { ListFilter, RefreshCw } from "lucide-react";
 import {
   Select,
@@ -110,7 +110,7 @@ export default function SportSelector({
   onSelect,
   selected,
 }: SportSelectorProps) {
-    const [gameTypes, setGameTypes] = useState<GameType[]>([]);
+  const [gameTypes, setGameTypes] = useState<GameType[]>([]);
 
   const selectedSport = gameTypes.find((g) => g.id === selected);
 
@@ -121,17 +121,17 @@ export default function SportSelector({
     textTransform: "uppercase" as const,
   };
 
-    const {
-        data: sportsData = [],
-        error,
-        isLoading: loading,
-    } = getGameTypesQuery();
+  const {
+    data: sportsData = [],
+    error,
+    isLoading: loading,
+  } = getGameTypesQuery();
 
-    useEffect(() => {
-        if (sportsData.length > 0) {
-            setGameTypes(sportsData);
-        }
-    }, [sportsData]);
+  useEffect(() => {
+    if (sportsData.length > 0) {
+      setGameTypes(sportsData);
+    }
+  }, [sportsData]);
 
   // Set default to "All Sports" when component mounts
   useEffect(() => {
@@ -153,28 +153,28 @@ export default function SportSelector({
     );
   }
 
-    if (error || gameTypes.length === 0) {
-        return (
-            <div className="relative inline-block max-w-64">
-                <div
-                    className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
-                    style={baseTextStyle}
-                >
-                    <span className="text-red-600">
-                        {error?.message || "No sports available"}
-                    </span>
-                    <button
-                        onClick={getGameTypesQuery}
-                        className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
-                        title="Retry loading sports"
-                    >
-                        <RefreshCw className="h-4 w-4" />
-                        <span className="text-xs">Retry</span>
-                    </button>
-                </div>
-            </div>
-        );
-    }
+  if (error || gameTypes.length === 0) {
+    return (
+      <div className="relative inline-block max-w-64">
+        <div
+          className={`${roboto.className} flex items-center justify-between px-6 py-[5px] w-full h-[54px] bg-red-50 shadow-sm rounded-[2px] border border-red-200 border-l-[2px] border-l-red-500`}
+          style={baseTextStyle}
+        >
+          <span className="text-red-600">
+            {error?.message || "No sports available"}
+          </span>
+          <button
+            onClick={getGameTypesQuery}
+            className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
+            title="Retry loading sports"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span className="text-xs">Retry</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative inline-block max-w-64">

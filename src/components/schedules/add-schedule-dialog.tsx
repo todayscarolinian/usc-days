@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getGameTypesQuery } from "@/queries/gametypes.queries";
-import { getTeamGameTypesQuery } from "@/queries/teamgametypes.queries";
-import { useAddGamesQuery } from "@/queries/games.queries";
-import { getUserId } from "@/queries/auth.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { useAddGamesQuery } from "@/src/queries/games.queries";
+import { getUserId } from "@/src/queries/auth.queries";
 import axios from "axios";
 
 import { Button } from "@/src/components/ui/button";
@@ -21,7 +21,6 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
-import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "./searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
@@ -49,291 +48,265 @@ interface SportTeam {
   };
 }
 
+const defaultInputs: ScheduleInputs = {
+    teamAId: -1,
+    teamBId: -1,
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
+    startTime: new Date().toISOString().split("T")[1].substring(0, 5),
+    endTime: new Date(new Date().getTime() + 60 * 60 * 1000) // +1 hour
+        .toISOString()
+        .split("T")[1]
+        .substring(0, 5),
+    location: undefined,
+};
+
 export default function AddScheduleDialog() {
     const [selectedSport, setSelectedSport] = useState<number | null>(null);
-    const [sports, setSports] = useState<Sport[]>([]);
-    const [sportTeams, setSportTeams] = useState<SportTeam[]>([]);
-    const [fetchingTeams, setFetchingTeams] = useState<boolean>(false);
-    const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>({
-        teamAId: -1,
-        teamBId: -1,
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
-        location: undefined,
-    });
+    const [open, setOpen] = useState(false);
+  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>(defaultInputs);
 
-  const sportsOptions: SelectOption[] = sports.map((sport) => ({
+  useInitializeUserStore();
+  const user = useUserStore();
+
+  const {
+    data: fetchedSportsData = [],
+    error: sportsError,
+    isLoading: sportsLoading,
+  } = getGameTypesQuery();
+
+  const {
+    data: fetchedTeamSportsData = [],
+    error: teamSportsError,
+    isLoading: teamLoading,
+  } = getTeamGameTypesQuery(Number(selectedSport));
+
+  const {
+    data: userId,
+    error: userError,
+    isLoading: userLoading,
+  } = getUserId(user.email);
+
+  const add = useAddGamesQuery();
+
+  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = sportTeams.map((team) => ({
+  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
-  useInitializeUserStore();
-  const user = useUserStore();
+  async function createSchedule() {
+    if (!selectedSport) return;
 
-    const {
-        data: fetchedSportsData = [],
-        error: sportsError,
-        isLoading: sportsLoading,
-    } = getGameTypesQuery();
+    const data: AddGamePayload = {
+      gameTypeId: selectedSport,
+      teamAId: scheduleInputs.teamAId,
+      teamBId: scheduleInputs.teamBId,
+      startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
+      endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+      location: scheduleInputs.location ? scheduleInputs.location : undefined,
+      createdById: userId,
+    };
 
-    const {
-        data: fetchedTeamSportsData = [],
-        error: teamSportsError,
-        isLoading: teamLoading,
-    } = getTeamGameTypesQuery(Number(selectedSport));
+      add.mutate(data, {
+        onSuccess: () => {
+            setSelectedSport(null);
+              setScheduleInputs(defaultInputs);
+              setOpen(false);
+        }
+    });
+  }
 
-    const {
-        data: userId,
-        error: userError,
-        isLoading: userLoading,
-    } = getUserId(user.email);
+  const loading = sportsLoading || teamLoading || userLoading || add.isPending;
+  const error = sportsError || teamSportsError || userError || add.error;
 
-    const add = useAddGamesQuery();
-
-    async function createSchedule() {
-        if (!selectedSport) return;
-
-        const data: AddGamePayload = {
-            gameTypeId: selectedSport,
-            teamAId: scheduleInputs.teamAId,
-            teamBId: scheduleInputs.teamBId,
-            startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-            endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
-            location: scheduleInputs.location
-                ? scheduleInputs.location
-                : undefined,
-            createdById: userId,
-        };
-
-        add.mutate(data, {
-            onSuccess: () => {
-                window.location.reload();
-            },
-        });
-    }
-
-    const loading =
-        sportsLoading || teamLoading || userLoading || add.isPending;
-    const error = sportsError || teamSportsError || userError || add.error;
-
-    return (
-        <Dialog
-            onOpenChange={(open) => {
-                if (!open) {
-                    setSelectedSport(null);
-                    setSportTeams([]);
-                    setScheduleInputs({
-                        teamAId: -1,
-                        teamBId: -1,
-                        startDate: "",
-                        endDate: "",
-                        startTime: "",
-                        endTime: "",
-                        location: undefined,
-                    });
+  return (
+      <Dialog
+        open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          setSelectedSport(null);
+          setScheduleInputs(defaultInputs);
+        }
+      }}
+    >
+      <DialogTrigger asChild onClick={() => setOpen(true)}>
+        <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
+          Add Schedule
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Add Schedule</DialogTitle>
+          <DialogDescription>
+            Add a new game schedule. Click Submit when you&apos;re done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-8 py-4">
+          <div className="w-full grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="startDate" className="font-bold opacity-50">
+                Start Date
+              </Label>
+              <Input
+                type="date"
+                placeholder="Start Date"
+                value={scheduleInputs.startDate}
+                onChange={(e) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    startDate: e.target.value,
+                  })
                 }
-            }}
-        >
-            <DialogTrigger asChild>
-                <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-                    Add Schedule
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                    <DialogTitle>Add Schedule</DialogTitle>
-                    <DialogDescription>
-                        Add a new game schedule. Click Submit when you&apos;re
-                        done.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-8 py-4">
-                    <div className="w-full grid grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-1">
-                            <Label
-                                htmlFor="startDate"
-                                className="font-bold opacity-50"
-                            >
-                                Start Date
-                            </Label>
-                            <Input
-                                type="date"
-                                placeholder="Start Date"
-                                onChange={(e) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        startDate: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <Label
-                                htmlFor="endDate"
-                                className="font-bold opacity-50"
-                            >
-                                End Date
-                            </Label>
-                            <Input
-                                type="date"
-                                placeholder="End Date"
-                                onChange={(e) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        endDate: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="w-full grid grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-1">
-                            <Label
-                                htmlFor="startTime"
-                                className="font-bold opacity-50"
-                            >
-                                Start Time
-                            </Label>
-                            <Input
-                                type="time"
-                                placeholder="Start Time"
-                                onChange={(e) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        startTime: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <Label
-                                htmlFor="endTime"
-                                className="font-bold opacity-50"
-                            >
-                                End Time
-                            </Label>
-                            <Input
-                                type="time"
-                                placeholder="End Time"
-                                onChange={(e) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        endTime: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="w-full">
-                        <SearchableSelect
-                            placeholder="Select a Sport"
-                            searchPlaceholder="Search sports..."
-                            emptyMessage="No sports found."
-                            options={sportsOptions}
-                            value={selectedSport?.toString() || ""}
-                            onChange={(value) =>
-                                setSelectedSport(value ? Number(value) : null)
-                            }
-                            disabled={loading}
-                            width="w-fit"
-                        />
-                    </div>
-                    <div className="w-full flex justify-between items-center gap-4">
-                        <div className="flex flex-col gap-1 w-full">
-                            <Label
-                                htmlFor="teamA"
-                                className="font-bold opacity-50"
-                            >
-                                Team
-                            </Label>
-                            <SearchableSelect
-                                placeholder="Select Team"
-                                searchPlaceholder="Search teams..."
-                                emptyMessage="No teams found."
-                                options={teamOptions}
-                                value={
-                                    scheduleInputs.teamAId !== -1
-                                        ? scheduleInputs.teamAId.toString()
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        teamAId: value ? Number(value) : -1,
-                                    })
-                                }
-                                disabled={!selectedSport || fetchingTeams}
-                            />
-                        </div>
-                        <span className="font-bold opacity-50">vs</span>
-                        <div className="flex flex-col gap-1 w-full">
-                            <Label
-                                htmlFor="teamB"
-                                className="font-bold opacity-50"
-                            >
-                                Team
-                            </Label>
-                            <SearchableSelect
-                                placeholder="Select Team"
-                                searchPlaceholder="Search teams..."
-                                emptyMessage="No teams found."
-                                options={teamOptions}
-                                value={
-                                    scheduleInputs.teamBId !== -1
-                                        ? scheduleInputs.teamBId.toString()
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    setScheduleInputs({
-                                        ...scheduleInputs,
-                                        teamBId: value ? Number(value) : -1,
-                                    })
-                                }
-                                disabled={!selectedSport || fetchingTeams}
-                            />
-                        </div>
-                    </div>
-                    <div className="w-full flex flex-col gap-1">
-                        <Label
-                            htmlFor="location"
-                            className="font-bold opacity-50"
-                        >
-                            Location
-                        </Label>
-                        <Input
-                            type="text"
-                            placeholder="Location"
-                            onChange={(e) =>
-                                setScheduleInputs({
-                                    ...scheduleInputs,
-                                    location: e.target.value,
-                                })
-                            }
-                        />
-                    </div>
-                </div>
-                <DialogFooter className="flex items-center">
-                    {error && (
-                        <span className="text-red-500">{error?.message}</span>
-                    )}
-                    <Button
-                        type="submit"
-                        onClick={createSchedule}
-                        disabled={selectedSport === null || loading}
-                    >
-                        Submit
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="endDate" className="font-bold opacity-50">
+                End Date
+              </Label>
+              <Input
+                type="date"
+                placeholder="End Date"
+                value={scheduleInputs.endDate}
+                onChange={(e) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    endDate: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="w-full grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="startTime" className="font-bold opacity-50">
+                Start Time
+              </Label>
+              <Input
+                type="time"
+                placeholder="Start Time"
+                value={scheduleInputs.startTime}
+                onChange={(e) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    startTime: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="endTime" className="font-bold opacity-50">
+                End Time
+              </Label>
+              <Input
+                type="time"
+                placeholder="End Time"
+                value={scheduleInputs.endTime}
+                onChange={(e) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    endTime: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="w-full">
+            <SearchableSelect
+              placeholder="Select a Sport"
+              searchPlaceholder="Search sports..."
+              emptyMessage="No sports found."
+              options={sportsOptions}
+              value={selectedSport?.toString() || ""}
+              onChange={(value) =>
+                setSelectedSport(value ? Number(value) : null)
+              }
+              disabled={loading}
+              width="w-full"
+            />
+          </div>
+          <div className="w-full flex justify-between items-center gap-4">
+            <div className="flex flex-col gap-1 w-full">
+              <Label htmlFor="teamA" className="font-bold opacity-50">
+                Team
+              </Label>
+              <SearchableSelect
+                placeholder="Select Team"
+                searchPlaceholder="Search teams..."
+                emptyMessage="No teams found."
+                options={teamOptions}
+                value={
+                  scheduleInputs.teamAId !== -1
+                    ? scheduleInputs.teamAId.toString()
+                    : ""
+                }
+                onChange={(value) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    teamAId: value ? Number(value) : -1,
+                  })
+                }
+                disabled={!selectedSport || loading}
+              />
+            </div>
+            <span className="font-bold opacity-50">vs</span>
+            <div className="flex flex-col gap-1 w-full">
+              <Label htmlFor="teamB" className="font-bold opacity-50">
+                Team
+              </Label>
+              <SearchableSelect
+                placeholder="Select Team"
+                searchPlaceholder="Search teams..."
+                emptyMessage="No teams found."
+                options={teamOptions}
+                value={
+                  scheduleInputs.teamBId !== -1
+                    ? scheduleInputs.teamBId.toString()
+                    : ""
+                }
+                onChange={(value) =>
+                  setScheduleInputs({
+                    ...scheduleInputs,
+                    teamBId: value ? Number(value) : -1,
+                  })
+                }
+                disabled={!selectedSport || loading}
+              />
+            </div>
+          </div>
+          <div className="w-full flex flex-col gap-1">
+            <Label htmlFor="location" className="font-bold opacity-50">
+              Location
+            </Label>
+            <Input
+              type="text"
+              placeholder="Location"
+              onChange={(e) =>
+                setScheduleInputs({
+                  ...scheduleInputs,
+                  location: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+        <DialogFooter className="flex items-center">
+          {error && <span className="text-red-500">{error.message}</span>}
+          <Button
+            type="submit"
+            onClick={createSchedule}
+            disabled={selectedSport === null || loading}
+          >
+            Submit
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
