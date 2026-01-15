@@ -13,9 +13,19 @@ import { Button } from "@/components/ui/button";
 export default function ManagementTable() {
   // Data sets
   const sportsList = [
+    "Men's Basketball",
+    "Women's Volleyball",
+    "Men's Table Tennis",
+    "Women's Badminton",
+    "Men's Chess",
   ];
 
   const teamsList = [
+    "Team SBE",
+    "Team SAS",
+    "Team SLG",
+    "Team SOE",
+    "Team SAFAD",
   ];
 
   // States
