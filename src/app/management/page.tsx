@@ -1,133 +1,203 @@
 "use client";
+import { useState } from "react";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Globe,
+  Users2,
+  ChevronDown,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-import { useEffect, useState } from "react";
-import { sportColumns, SportInfo } from "@/components/sports/columns";
-import { SportsDataTable } from "@/components/sports/data-table";
-import { teamColumns, TeamInfo } from "@/components/teams/columns";
-import { TeamsDataTable } from "@/components/teams/data-table";
-import axios from "axios";
+export default function ManagementTable() {
+  // Data sets
+  const sportsList = [
+  ];
 
-type ExtractedData = {
-    id: number;
-    teamName: string;
-    gameTypes: [
-        {
-            gameType: {
-                id: number;
-                gameName: string;
-            };
-        }
-    ];
-    teamSchools: [
-        {
-            school: {
-                id: number;
-                schoolName: string;
-            };
-        }
-    ];
-};
+  const teamsList = [
+  ];
 
-export default function Home() {
-    const [teamsData, setTeamsData] = useState<TeamInfo[]>([]);
-    const [sportsData, setSportsData] = useState<SportInfo[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+  // States
+  const [filter, setFilter] = useState("Select an Option");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [search, setSearch] = useState("");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const {
-                    data: { teams: data },
-                } = await axios.get("/api/teams");
+  const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-                // Transform teams data
-                const transformedTeamsData: TeamInfo[] = data.map(
-                    (team: ExtractedData) => ({
-                        id: team.id,
-                        teamName: team.teamName,
-                        schools: team.teamSchools.map((school) => ({
-                            id: school.school.id,
-                            schoolName: school.school.schoolName,
-                        })),
-                    })
-                );
+  const handleSelect = (option: string) => {
+    setFilter(option);
+    setShowDropdown(false);
+    setSearch(""); // clear search when changing category
+  };
 
-                const sportInfoMap = new Map<number, SportInfo>();
+  // Choose base data
+  const baseData =
+    filter === "All Sports" ? sportsList : filter === "All Teams" ? teamsList : [];
 
-                // Process data to build sports data
-                data.forEach((team: ExtractedData) => {
-                    team.gameTypes.forEach((gameType) => {
-                        const gameTypeId = gameType.gameType.id;
-                        const gameTypeName = gameType.gameType.gameName;
+  // Filter based on search input
+  const data = baseData.filter((item) =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
 
-                        // If sport exists in map, add team to list
-                        if (sportInfoMap.has(gameTypeId)) {
-                            sportInfoMap.get(gameTypeId)?.teams.push({
-                                id: team.id,
-                                name: team.teamName,
-                            });
-                        } else {
-                            // else, make new SportInfo entry
-                            sportInfoMap.set(gameTypeId, {
-                                id: gameTypeId,
-                                name: gameTypeName,
-                                teams: [
-                                    {
-                                        id: team.id,
-                                        name: team.teamName,
-                                    },
-                                ],
-                            });
-                        }
-                    });
-                });
+  return (
+    <div className="min-h-screen bg-white text-gray-900 px-6 py-6">
+      {/* Top Filter + Add Button Row */}
+      <div className="flex justify-between items-center mb-6 relative">
+        {/* Filter Dropdown */}
+        <div className="relative inline-block">
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center gap-2 bg-white border border-gray-200 rounded-md px-4 py-2 shadow-sm cursor-pointer hover:bg-gray-50 min-w-[180px]"
+          >
+            {filter === "All Sports" ? (
+              <Globe size={16} className="text-gray-500" />
+            ) : filter === "All Teams" ? (
+              <Users2 size={16} className="text-gray-500" />
+            ) : (
+              <ChevronDown size={14} className="text-gray-500" />
+            )}
+            <span className="text-sm font-medium text-gray-700">{filter}</span>
+            <ChevronDown
+              size={14}
+              className={`text-gray-500 transition-transform ${
+                showDropdown ? "rotate-180" : ""
+              }`}
+            />
+          </button>
 
-                // Convert map to array
-                const transformedSportsData: SportInfo[] = Array.from(
-                    sportInfoMap.values()
-                );
-
-                // Update state
-                setTeamsData(transformedTeamsData);
-                setSportsData(transformedSportsData);
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                setError("Failed to load data");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
-    return (
-        <div className="p-4 sm:py-10">
-            <div className="mx-auto sm:max-w-360">
-                <div className="grid lg:grid-cols-7 gap-6">
-                    <div className="lg:col-span-3">
-                        <TeamsDataTable
-                            columns={teamColumns}
-                            data={teamsData}
-                        />
-                    </div>
-                    <div className="lg:col-span-4">
-                        <SportsDataTable
-                            columns={sportColumns}
-                            data={sportsData}
-                        />
-                    </div>
-                </div>
+          {/* Dropdown Menu */}
+          {showDropdown && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
+              <button
+                onClick={() => handleSelect("Select an Option")}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                Select an Option
+              </button>
+              <button
+                onClick={() => handleSelect("All Sports")}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                All Sports
+              </button>
+              <button
+                onClick={() => handleSelect("All Teams")}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                All Teams
+              </button>
             </div>
+          )}
         </div>
-    );
+
+        {/* Add Button (appears only after selection) */}
+        {filter !== "Select an Option" && (
+          <Button
+            className={`flex items-center gap-2 px-4 py-2 rounded-md shadow-sm text-white ${
+              filter === "All Sports"
+                ? "bg-red-700 hover:bg-red-800"
+                : "bg-blue-700 hover:bg-blue-800"
+            }`}
+          >
+            <Plus size={16} />
+            {filter === "All Sports" ? "Add Sport" : "Add Team"}
+          </Button>
+        )}
+      </div>
+
+      {/* Table + Header Section */}
+      <div className="border rounded-md overflow-hidden shadow-sm">
+        {/* Header */}
+        <div className="bg-black text-white flex justify-between items-center px-6 py-3">
+          <h2 className="text-lg font-bold uppercase">USC Days</h2>
+          <input
+            type="text"
+            placeholder="Keyword Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            disabled={filter === "Select an Option"}
+            className={`border text-sm px-3 py-1 rounded-md bg-black placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              filter === "Select an Option"
+                ? "border-gray-700 text-gray-500 cursor-not-allowed"
+                : "border-gray-500 text-white"
+            }`}
+          />
+        </div>
+
+        {/* Table */}
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 border-b">
+            <tr>
+              <th className="text-left px-6 py-2 text-xs font-semibold text-gray-700">
+                {filter === "All Teams"
+                  ? "TEAM"
+                  : filter === "All Sports"
+                  ? "SPORT"
+                  : "CATEGORY"}
+              </th>
+              <th className="text-right px-6 py-2 text-xs font-semibold text-gray-700">
+                ACTIONS
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filter === "Select an Option" ? (
+              <tr>
+                <td
+                  colSpan={2}
+                  className="text-center text-gray-500 py-8 text-sm"
+                >
+                  Please select a category to view items.
+                </td>
+              </tr>
+            ) : data.length > 0 ? (
+              data.map((item, index) => (
+                <tr
+                  key={index}
+                  className="border-b last:border-none hover:bg-gray-50 transition"
+                >
+                  <td className="flex items-center gap-2 px-6 py-3">
+                    {filter === "All Sports" ? (
+                      <Globe size={16} className="text-gray-500" />
+                    ) : (
+                      <Users2 size={16} className="text-gray-500" />
+                    )}
+                    {item}
+                  </td>
+                  <td className="text-right px-6 py-3">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-1 text-gray-700 border-gray-300 hover:bg-gray-100"
+                      >
+                        <Pencil size={14} />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-1 text-gray-700 border-gray-300 hover:bg-gray-100"
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={2}
+                  className="text-center text-gray-500 py-8 text-sm"
+                >
+                  No matches found for “{search}”.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
