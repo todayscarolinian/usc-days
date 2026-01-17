@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const DEFAULT_MEDIA = [
   { src: "/carousel/bball.jpg", alt: "USC Days highlight 1" },
@@ -20,8 +20,8 @@ export default function HeroSlideshow({ media = DEFAULT_MEDIA }: { media?: { src
   return (
     <section
       id="site-hero"
-      aria-label="Hero slideshow"
-      className="relative w-full h-screen overflow-hidden bg-black"
+      aria-label="Hero carousel"
+      className="relative w-full h-[90vh] overflow-hidden bg-black"
     >
       {media.map((m, i) => (
         <img

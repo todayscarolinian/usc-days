@@ -81,7 +81,7 @@ export default function MerchSection() {
 
   return (
     <>
-      <section className="py-12 px-4 md:px-6">
+      <section className="py-12">
         <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
           {MOCK_PRODUCTS.map((product) => (

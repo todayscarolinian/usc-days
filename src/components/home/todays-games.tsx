@@ -163,6 +163,7 @@ export default function TodaysGames() {
 
   return (
     <>
+    <div className="py-4">
       <h2 className="text-3xl font-bold mb-8">Today's Games</h2>
         <SchedulesCard
           date={todayKey}
@@ -178,6 +179,7 @@ export default function TodaysGames() {
           onOpenChange={setOpen}
           game={selectedGame}
         />
+    </div>
     </>
   );
 }

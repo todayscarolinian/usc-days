@@ -16,7 +16,7 @@ const SPORTS = Object.keys(sportIcons)
 
 export default function SportsSection() {
   return (
-    <div className="w-full">
+    <div className="w-full py-8">
       <h2 className="text-3xl font-bold mb-8">Sports</h2>
       <div className="overflow-x-auto">
         <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 items-center px-1">

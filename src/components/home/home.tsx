@@ -1,17 +1,15 @@
 "use client";
 
-import React from "react";
-import HeroSlideshow from "./hero-slideshow";
+import HeroCarousel from "./hero-carousel";
 import MerchSection from "./merch-section";
 import TodaysGames from "./todays-games";
 import SportsSection from "./sports-section";
 import ContactSection from "./contact-section";
-import FeedbackLink from "./feedback-link";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
-        <HeroSlideshow />
+        <HeroCarousel />
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
 
@@ -26,19 +24,13 @@ export default function Home() {
         <section id="sports" aria-labelledby="sports">
           <SportsSection />
         </section>
-
-        <section aria-labelledby="contact">
-          <h2 id="contact" className="text-2xl font-semibold">
-            Contact & Feedback
-          </h2>
-          <ContactSection />
-          <FeedbackLink />
-        </section>
       </main>
 
-      <footer className="border-t">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-600">
-          © {new Date().getFullYear()} USC Days — Scores • Schedules • Teams
+      <footer className="border-t bg-tc_primary mt-6">
+        <div className="max-w-6xl mx-auto px-4 py-16 space-y-6">
+          <section id="contact" aria-labelledby="contact">
+            <ContactSection />
+          </section>
         </div>
       </footer>
     </div>
