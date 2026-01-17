@@ -19,14 +19,11 @@ export default function Home() {
           <MerchSection />
         </section>
 
-        <section aria-labelledby="todays-games">
+        <section id="todays-games" aria-labelledby="todays-games">
           <TodaysGames />
         </section>
 
-        <section aria-labelledby="sports">
-          <h2 id="sports" className="text-2xl font-semibold">
-            Sports
-          </h2>
+        <section id="sports" aria-labelledby="sports">
           <SportsSection />
         </section>
 
