@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -36,19 +35,14 @@ export default function MerchandiseModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogContent showCloseButton={false} className="max-w-2xl p-6 bg-white rounded-lg">
-          <div className="flex justify-end mb-2">
-                <DialogClose className="rounded-md p-2 hover:bg-gray-100">
-                    <X className="h-5 w-5 text-black" />
-                </DialogClose>
-            </div>
+        <DialogContent showCloseButton={true} className="max-w-2xl p-10 bg-white rounded-lg">
           <div className="flex gap-6">
             {/* Left: Image */}
             <div className="flex-shrink-0">
               <img
                 src={product.image}
                 alt={product.title}
-                className="w-64 h-64 object-cover rounded-lg bg-gray-100"
+                className="w-48 h-48 object-cover rounded-lg bg-gray-100"
               />
             </div>
 
@@ -78,19 +72,22 @@ export default function MerchandiseModal({
                   {product.description}
                 </p>
               </div>
-
-              {/* Order Form Button */}
-              <Button
-                className="w-full bg-tc_primary text-white font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity"
-                onClick={() => {
-                  window.open("#", "_blank");
-                  onClose();
-                }}
-              >
-                Order Form
-              </Button>
             </div>
           </div>
+
+          {/* Order Form Button */}
+          <div className="flex justify-end">
+            <Button
+                className="w-full md:w-auto bg-tc_primary text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity"
+                onClick={() => {
+                    window.open("#", "_blank");
+                    onClose();
+                }}
+                >
+                Order Form
+            </Button>
+          </div>
+
         </DialogContent>
       </DialogPortal>
     </Dialog>
