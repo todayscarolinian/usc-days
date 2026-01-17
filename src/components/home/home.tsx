@@ -15,17 +15,11 @@ export default function Home() {
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
 
-        <section aria-labelledby="featured-merch">
-          <h2 id="featured-merch" className="text-2xl font-semibold">
-            Featured Merchandise
-          </h2>
+        <section id="featured-merch" aria-labelledby="featured-merch">
           <MerchSection />
         </section>
 
         <section aria-labelledby="todays-games">
-          <h2 id="todays-games" className="text-2xl font-semibold">
-            Today's Games
-          </h2>
           <TodaysGames />
         </section>
 
