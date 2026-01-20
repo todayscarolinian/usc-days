@@ -159,3 +159,18 @@ export const DeleteGameSchema = z.object({
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
 export type DeleteGamePayload = z.infer<typeof DeleteGameSchema>;
+
+// Pagination types
+export interface PaginationParams {
+  cursor?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaginatedGamesResponse {
+  games: any[];
+  hasMore: boolean;
+  nextCursor: string | null;
+  count: number;
+  total?: number;
+}

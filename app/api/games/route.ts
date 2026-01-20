@@ -1,4 +1,4 @@
-import GameService, { GetGamesParams } from "@/src/services/games.service";
+import GameService, { GetGamesWithPaginationParams } from "@/src/services/games.service";
 import {
     AddGameSchema,
     EditGameSchema,
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     try {
         const searchParams = req.nextUrl.searchParams;
 
-        const params: GetGamesParams = {};
+        const params: GetGamesWithPaginationParams = {};
 
         const gameTypeId = searchParams.get("gameTypeId");
         if (gameTypeId) {
@@ -71,11 +71,31 @@ export async function GET(req: NextRequest) {
             if (!isNaN(parsed.getTime())) params.endDate = parsed;
         }
 
-        const games = await gameService.getGames(params);
-        return NextResponse.json(
-            { games, count: games.length },
-            { status: 200 }
-        );
+        const cursor = searchParams.get("cursor");
+        if (cursor) {
+            if (!isNaN(Date.parse(cursor))) {
+                params.cursor = cursor;
+            }
+        }
+
+        const limit = searchParams.get("limit");
+        if (limit) {
+            const parsed = parseInt(limit, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+                params.limit = Math.min(parsed, 100);
+            }
+        }
+
+        const result = await gameService.getGames(params);
+
+        if (Array.isArray(result)) {
+            return NextResponse.json(
+                { games: result, count: result.length },
+                { status: 200 }
+            );
+        } else {
+            return NextResponse.json(result, { status: 200 });
+        }
     } catch (error) {
         console.error("Error fetching games:", error);
         return NextResponse.json(
