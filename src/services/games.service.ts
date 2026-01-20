@@ -98,7 +98,7 @@ class GameService {
         if (cursorDate) {
           where.AND = where.AND || [];
           (where.AND as any[]).push({
-            createdAt: { lt: cursorDate },
+            startDate: { lt: cursorDate },
           });
         }
 
@@ -117,7 +117,7 @@ class GameService {
 
         const hasMore = games.length > pageSize;
         const paginatedGames = games.slice(0, pageSize);
-        const nextCursor = hasMore ? paginatedGames[paginatedGames.length - 1]?.createdAt.toISOString() : null;
+        const nextCursor = hasMore ? paginatedGames[paginatedGames.length - 1]?.startDate.toISOString() : null;
 
         return {
           games: paginatedGames,
