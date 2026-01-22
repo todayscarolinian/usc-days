@@ -1,21 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { carouselImages } from "@/src/constants/carouselImages";
 
-const DEFAULT_MEDIA = [
-  { src: "/carousel/bball.jpg", alt: "USC Days highlight 1" },
-  { src: "/carousel/flag.jpg", alt: "USC Days highlight 2" },
-  { src: "/carousel/table-tennis.jpg", alt: "USC Days highlight 3" },
-  { src: "/carousel/vball.jpg", alt: "USC Days highlight 4" },
-];
-
-export default function HeroSlideshow({ media = DEFAULT_MEDIA }: { media?: { src: string; alt: string }[] }) {
+export default function HeroSlideshow() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % media.length), 5000);
+    const t = setInterval(() => setIndex((i) => (i + 1) % carouselImages.length), 5000);
     return () => clearInterval(t);
-  }, [media.length]);
+  }, []);
 
   return (
     <section
@@ -23,13 +18,15 @@ export default function HeroSlideshow({ media = DEFAULT_MEDIA }: { media?: { src
       aria-label="Hero carousel"
       className="relative w-full h-[90vh] overflow-hidden bg-black"
     >
-      {media.map((m, i) => (
-        <img
-          key={m.src}
-          src={m.src}
-          alt={m.alt}
-          loading={i === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === index ? "opacity-100 z-20" : "opacity-0 z-10 pointer-events-none"}`}
+      {carouselImages.map((image, i) => (
+        <Image
+          key={i}
+          src={image}
+          alt={`USC Days carousel slide ${i + 1}`}
+          fill
+          priority={i === 0}
+          sizes="100vw"
+          className={`object-cover transition-opacity duration-700 ${i === index ? "opacity-100 z-20" : "opacity-0 z-10 pointer-events-none"}`}
         />
       ))}
 s
@@ -43,7 +40,7 @@ s
       </div>
 
       <nav className="absolute right-6 bottom-6 z-50 flex gap-2" aria-hidden>
-        {media.map((_, i) => (
+        {carouselImages.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}
