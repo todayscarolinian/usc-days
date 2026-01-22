@@ -28,11 +28,19 @@ export const sportIcons: Record<string, StaticImageData> = {
   Frisbee,
   Futsal,
   "Lawn Tennis": LawnTennis,
-  "Mr. USC Days": MrIntrams,
-  "Ms. USC Days": MsIntrams,
+  "Mr. USC \nIntramurals": MrIntrams,
+  "Ms. USC \nIntramurals": MsIntrams,
   Swimming,
   "Table Tennis": TableTennis,
   "3x3 Basketball": ThreeByThreeBasketball,
   Volleyball,
   Default: TCRedLogo,
 };
+
+export const sports = Object.entries(sportIcons)
+  .filter(([key]) => key !== "Default")
+  .map(([key, icon]) => ({
+    id: key.toLowerCase().replace(/\s+/g, "-"),
+    name: key,
+    icon,
+  }));
