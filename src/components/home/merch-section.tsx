@@ -1,121 +1,60 @@
 "use client";
 
-import React, { useState } from "react";
-import MerchandiseModal from "./merch-modal";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import CATEGORIES from "@/src/constants/categories.json";
+import Image from "next/image";
+import MerchSectionSkeleton from "./merch-section-skeleton";
 
-type Product = {
-  id: string;
-  title: string;
-  size: string;
-  price: string;
-  stock: "In Stock" | "Sold Out";
-  image: string;
-  description: string;
+type Category = {
+  id: number;
+  name: string;
+  imgUrl: string;
 };
 
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "In Stock",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-  {
-    id: "2",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "Sold Out",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-  {
-    id: "3",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "In Stock",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-  {
-    id: "4",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "Sold Out",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-  {
-    id: "5",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "In Stock",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-  {
-    id: "6",
-    title: "Carolinian Coaster",
-    size: "2\" x 2\"",
-    price: "PHP 20.00",
-    stock: "In Stock",
-    image: "/images/Icon Logo Red.png",
-    description: "Durable coaster featuring the iconic USC Days logo. Perfect for protecting your surfaces while displaying your school spirit.",
-  },
-];
-
 export default function MerchSection() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
+  useEffect(() => {
+    // Simulate data load (remove when API ready)
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleCategoryClick = (categoryId: number) => {
+    router.push(`/merchandise/${categoryId}`);
   };
 
+  if (loading) {
+    return <MerchSectionSkeleton />;
+  }
+  
   return (
-    <>
-      <section className="py-12">
-        <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
-          {MOCK_PRODUCTS.map((product) => (
-            <button
-              key={product.id}
-              onClick={() => handleProductClick(product)}
-              className="text-left bg-white border border-gray-300 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
-            >
-              <img
-                src={product.image}
-                alt={product.title}
-                loading="lazy"
-                className="w-full h-32 object-cover bg-gray-100"
+    <section className="py-12">
+      <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
+        {CATEGORIES.map((category) => (
+          <button
+            key={category.id}
+            onClick={() => handleCategoryClick(category.id)}
+            className="text-left bg-tc_primary border border-gray-300 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col"
+          >
+            <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
+              <Image
+                src={category.imgUrl}
+                alt={category.name}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                className="object-cover"
               />
-              <div className="p-3">
-                <h3 className="font-semibold text-sm mb-1">{product.title}</h3>
-                <p className="text-xs text-gray-600 mb-2">{product.size}</p>
-                <p className="text-sm font-medium mb-1">{product.price}</p>
-                <p className={`text-xs ${product.stock === "In Stock" ? "text-green-600" : "text-red-600"}`}>
-                  {product.stock}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {selectedProduct && (
-        <MerchandiseModal
-          product={selectedProduct}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-    </>
+            </div>
+            <div className="p-3">
+              <h3 className="font-semibold text-lg text-center text-white">{category.name}</h3>
+            </div>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
