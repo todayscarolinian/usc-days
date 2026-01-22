@@ -79,3 +79,13 @@ export type Game = Prisma.GameModel
  * 
  */
 export type Champion = Prisma.ChampionModel
+/**
+ * Model MerchandiseCategory
+ * 
+ */
+export type MerchandiseCategory = Prisma.MerchandiseCategoryModel
+/**
+ * Model MerchandiseProduct
+ * 
+ */
+export type MerchandiseProduct = Prisma.MerchandiseProductModel

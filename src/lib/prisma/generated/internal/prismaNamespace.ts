@@ -391,7 +391,9 @@ export const ModelName = {
   GameType: 'GameType',
   TeamGameType: 'TeamGameType',
   Game: 'Game',
-  Champion: 'Champion'
+  Champion: 'Champion',
+  MerchandiseCategory: 'MerchandiseCategory',
+  MerchandiseProduct: 'MerchandiseProduct'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "team" | "school" | "teamSchool" | "gameType" | "teamGameType" | "game" | "champion"
+    modelProps: "user" | "team" | "school" | "teamSchool" | "gameType" | "teamGameType" | "game" | "champion" | "merchandiseCategory" | "merchandiseProduct"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1005,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MerchandiseCategory: {
+      payload: Prisma.$MerchandiseCategoryPayload<ExtArgs>
+      fields: Prisma.MerchandiseCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MerchandiseCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MerchandiseCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.MerchandiseCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MerchandiseCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.MerchandiseCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.MerchandiseCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.MerchandiseCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MerchandiseCategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.MerchandiseCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        update: {
+          args: Prisma.MerchandiseCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.MerchandiseCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MerchandiseCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MerchandiseCategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.MerchandiseCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.MerchandiseCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMerchandiseCategory>
+        }
+        groupBy: {
+          args: Prisma.MerchandiseCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MerchandiseCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MerchandiseCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MerchandiseCategoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    MerchandiseProduct: {
+      payload: Prisma.$MerchandiseProductPayload<ExtArgs>
+      fields: Prisma.MerchandiseProductFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MerchandiseProductFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MerchandiseProductFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        findFirst: {
+          args: Prisma.MerchandiseProductFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MerchandiseProductFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        findMany: {
+          args: Prisma.MerchandiseProductFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>[]
+        }
+        create: {
+          args: Prisma.MerchandiseProductCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        createMany: {
+          args: Prisma.MerchandiseProductCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MerchandiseProductCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>[]
+        }
+        delete: {
+          args: Prisma.MerchandiseProductDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        update: {
+          args: Prisma.MerchandiseProductUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        deleteMany: {
+          args: Prisma.MerchandiseProductDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MerchandiseProductUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MerchandiseProductUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>[]
+        }
+        upsert: {
+          args: Prisma.MerchandiseProductUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MerchandiseProductPayload>
+        }
+        aggregate: {
+          args: Prisma.MerchandiseProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMerchandiseProduct>
+        }
+        groupBy: {
+          args: Prisma.MerchandiseProductGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MerchandiseProductGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MerchandiseProductCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MerchandiseProductCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1122,12 +1272,52 @@ export const ChampionScalarFieldEnum = {
 export type ChampionScalarFieldEnum = (typeof ChampionScalarFieldEnum)[keyof typeof ChampionScalarFieldEnum]
 
 
+export const MerchandiseCategoryScalarFieldEnum = {
+  id: 'id',
+  categoryName: 'categoryName',
+  imgUrl: 'imgUrl',
+  createdAt: 'createdAt'
+} as const
+
+export type MerchandiseCategoryScalarFieldEnum = (typeof MerchandiseCategoryScalarFieldEnum)[keyof typeof MerchandiseCategoryScalarFieldEnum]
+
+
+export const MerchandiseProductScalarFieldEnum = {
+  id: 'id',
+  categoryId: 'categoryId',
+  productTitle: 'productTitle',
+  productSize: 'productSize',
+  productPrice: 'productPrice',
+  isAvailable: 'isAvailable',
+  imgUrls: 'imgUrls',
+  designers: 'designers',
+  createdAt: 'createdAt'
+} as const
+
+export type MerchandiseProductScalarFieldEnum = (typeof MerchandiseProductScalarFieldEnum)[keyof typeof MerchandiseProductScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1144,6 +1334,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1205,6 +1404,27 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1324,6 +1544,8 @@ export type GlobalOmitConfig = {
   teamGameType?: Prisma.TeamGameTypeOmit
   game?: Prisma.GameOmit
   champion?: Prisma.ChampionOmit
+  merchandiseCategory?: Prisma.MerchandiseCategoryOmit
+  merchandiseProduct?: Prisma.MerchandiseProductOmit
 }
 
 /* Types for Logging */

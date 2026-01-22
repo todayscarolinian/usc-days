@@ -58,7 +58,9 @@ export const ModelName = {
   GameType: 'GameType',
   TeamGameType: 'TeamGameType',
   Game: 'Game',
-  Champion: 'Champion'
+  Champion: 'Champion',
+  MerchandiseCategory: 'MerchandiseCategory',
+  MerchandiseProduct: 'MerchandiseProduct'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,12 +159,52 @@ export const ChampionScalarFieldEnum = {
 export type ChampionScalarFieldEnum = (typeof ChampionScalarFieldEnum)[keyof typeof ChampionScalarFieldEnum]
 
 
+export const MerchandiseCategoryScalarFieldEnum = {
+  id: 'id',
+  categoryName: 'categoryName',
+  imgUrl: 'imgUrl',
+  createdAt: 'createdAt'
+} as const
+
+export type MerchandiseCategoryScalarFieldEnum = (typeof MerchandiseCategoryScalarFieldEnum)[keyof typeof MerchandiseCategoryScalarFieldEnum]
+
+
+export const MerchandiseProductScalarFieldEnum = {
+  id: 'id',
+  categoryId: 'categoryId',
+  productTitle: 'productTitle',
+  productSize: 'productSize',
+  productPrice: 'productPrice',
+  isAvailable: 'isAvailable',
+  imgUrls: 'imgUrls',
+  designers: 'designers',
+  createdAt: 'createdAt'
+} as const
+
+export type MerchandiseProductScalarFieldEnum = (typeof MerchandiseProductScalarFieldEnum)[keyof typeof MerchandiseProductScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: 'JsonNull'
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull'
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -179,4 +221,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull',
+  AnyNull: 'AnyNull'
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
