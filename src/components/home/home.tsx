@@ -1,5 +1,3 @@
-"use client";
-
 import HeroCarousel from "./hero-carousel";
 import MerchSection from "./merch-section";
 import TodaysGames from "./todays-games";
