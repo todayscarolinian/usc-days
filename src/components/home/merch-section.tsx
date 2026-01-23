@@ -1,37 +1,48 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import CATEGORIES from "@/src/constants/categories.json";
 import Image from "next/image";
 import MerchSectionSkeleton from "./merch-section-skeleton";
 
-type Category = {
-  id: number;
-  name: string;
-  imgUrl: string;
-};
+type Category = { id: number; name: string; imgUrl: string };
 
 export default function MerchSection() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Simulate data load (remove when API ready)
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
+    const node = sectionRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 1.0 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
   }, []);
 
   const handleCategoryClick = (categoryId: number) => {
     router.push(`/merchandise/${categoryId}`);
   };
 
-  if (loading) {
-    return <MerchSectionSkeleton />;
+  if (!inView) {
+    return (
+      <div ref={sectionRef}>
+        <MerchSectionSkeleton />
+      </div>
+    );
   }
-  
+
   return (
-    <section className="py-12">
+    <section ref={sectionRef} className="py-12">
       <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
         {CATEGORIES.map((category) => (
@@ -50,7 +61,9 @@ export default function MerchSection() {
               />
             </div>
             <div className="p-3">
-              <h3 className="font-semibold text-lg text-center text-white">{category.name}</h3>
+              <h3 className="font-semibold text-lg text-center text-white">
+                {category.name}
+              </h3>
             </div>
           </button>
         ))}
