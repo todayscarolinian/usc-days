@@ -1,8 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { Facebook, Instagram, Youtube, Mail } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/src/components/ui/form";
+import { Input } from "@/src/components/ui/input";
+import { Button } from "@/src/components/ui/button";
+import { contactFormSchema, type ContactFormValues } from "@/src/types/contact.types";
 
 const PUBLICATION = {
   bio: "The Progressive Official Student Publication of the University of San Carlos",
@@ -15,64 +28,42 @@ const PUBLICATION = {
 };
 
 export default function ContactSection() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<null | "idle" | "sending" | "sent" | "error">(null);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [status, setStatus] = React.useState<null | "sending" | "sent" | "error">(null);
 
-  function validateForm() {
-    const newErrors: { [key: string]: string } = {};
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      message: "",
+    },
+  });
 
-    if (!firstName.trim()) {
-      newErrors.firstName = "First name is required";
+  useEffect(() => {
+    if (status === "sent") {
+      const timer = setTimeout(() => setStatus(null), 3000);
+      return () => clearTimeout(timer);
     }
+  }, [status]);
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!message.trim()) {
-      newErrors.message = "Message is required";
-    } else if (message.trim().length < 10) {
-      newErrors.message = "Message must be at least 10 characters";
-    } else if (message.trim().length > 500) {
-      newErrors.message = "Message must not exceed 500 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
+  async function onSubmit(values: ContactFormValues) {
     setStatus("sending");
     try {
-      await fetch("/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        body: JSON.stringify({ 
-          firstName, 
-          lastName, 
-          email, 
-          message 
-        }),
+        body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
+
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+
       setStatus("sent");
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setMessage("");
-      setErrors({});
+      form.reset();
     } catch (err) {
+      console.error("Contact form error:", err);
       setStatus("error");
     }
   }
@@ -98,7 +89,7 @@ export default function ContactSection() {
             className="text-sm text-white hover:underline"
           >
             {PUBLICATION.email}
-          </a>
+          </a> 
         </div>
 
         {/* Social Icons */}
@@ -138,18 +129,10 @@ export default function ContactSection() {
           <p className="text-sm text-gray-600 mb-4">
             Help us improve! Share your experience using the USC Days app. Your feedback is valuable.
           </p>
-
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block w-full bg-tc_primary text-white font-semibold py-2 px-4 rounded text-center hover:opacity-90 transition"
-            
-          >
+          <Button disabled className="w-full opacity-50 cursor-not-allowed">
             Share Your Feedback
-          </a>
+          </Button>
         </div>
-
       </div>
 
       {/* Contact Form */}
@@ -160,133 +143,90 @@ export default function ContactSection() {
             Have questions? Send us a message and we'll get back to you soon.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-3" noValidate>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="firstName" className="sr-only">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  type="text"
-                  placeholder="First Name"
-                  required
-                  value={firstName}
-                  onChange={(e) => {
-                    setFirstName(e.target.value);
-                    if (errors.firstName) {
-                      setErrors({ ...errors, firstName: "" });
-                    }
-                  }}
-                  aria-invalid={!!errors.firstName}
-                  aria-describedby={errors.firstName ? "firstName-error" : undefined}
-                  className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tc_primary ${
-                    errors.firstName ? "border-red-500" : "border-gray-300"
-                  }`}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="First Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.firstName && (
-                  <p id="firstName-error" className="text-xs text-red-600 mt-1">
-                    {errors.firstName}
-                  </p>
+
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Last Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Email" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="sr-only">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  placeholder="Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tc_primary"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Email"
-                required
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (errors.email) {
-                    setErrors({ ...errors, email: "" });
-                  }
-                }}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-                className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tc_primary ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                }`}
               />
-              {errors.email && (
-                <p id="email-error" className="text-xs text-red-600 mt-1">
-                  {errors.email}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label htmlFor="message" className="sr-only">
-                Message
-              </label>
-              <textarea
-                id="message"
-                placeholder="Message (10-500 characters)"
-                required
-                value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                  if (errors.message) {
-                    setErrors({ ...errors, message: "" });
-                  }
-                }}
-                aria-invalid={!!errors.message}
-                aria-describedby={errors.message ? "message-error" : undefined}
-                className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tc_primary ${
-                  errors.message ? "border-red-500" : "border-gray-300"
-                }`}
-                rows={4}
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <textarea
+                        placeholder="Message (10-500 characters)"
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription className="text-slate-500">
+                      {field.value.length}/500 characters
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.message && (
-                <p id="message-error" className="text-xs text-red-600 mt-1">
-                  {errors.message}
-                </p>
+
+              <Button
+                type="submit"
+                className="w-full bg-tc_primary text-white"
+                disabled={status === "sending"}
+              >
+                {status === "sending" ? "Sending…" : "Submit"}
+              </Button>
+
+              {status === "sent" && (
+                <div role="alert" className="text-sm text-green-600 p-2 bg-green-50 rounded">
+                  Message sent — thank you!
+                </div>
               )}
-              <p className="text-xs text-gray-500 mt-1">
-                {message.length}/500 characters
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-tc_primary text-white font-semibold py-2 rounded hover:opacity-90 transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-tc_primary focus:ring-offset-2"
-              disabled={status === "sending"}
-              aria-busy={status === "sending"}
-            >
-              {status === "sending" ? "Sending…" : "Submit"}
-            </button>
-
-            {status === "sent" && (
-              <div role="alert" className="text-sm text-green-600 p-2 bg-green-50 rounded">
-                Message sent — thank you!
-              </div>
-            )}
-            {status === "error" && (
-              <div role="alert" className="text-sm text-red-600 p-2 bg-red-50 rounded">
-                Error sending — please try again.
-              </div>
-            )}
-          </form>
+              {status === "error" && (
+                <div role="alert" className="text-sm text-red-600 p-2 bg-red-50 rounded">
+                  Error sending — please try again.
+                </div>
+              )}
+            </form>
+          </Form>
         </div>
       </div>
     </div>
