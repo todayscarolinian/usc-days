@@ -23,7 +23,7 @@ export default function MerchSection() {
           observer.disconnect();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0.6 }
     );
     observer.observe(node);
     return () => observer.disconnect();

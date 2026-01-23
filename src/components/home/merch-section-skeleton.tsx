@@ -4,7 +4,7 @@ export default function MerchSectionSkeleton() {
   return (
     <section className="py-12">
       <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
