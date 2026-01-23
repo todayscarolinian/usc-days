@@ -107,3 +107,30 @@ model Champion {
 
     @@map("champions")
 }
+
+model MerchandiseCategory {
+    id                  Int         @id @default(autoincrement())
+    categoryName        String      @db.VarChar(100) @map("category_name")
+    imgUrl              String      @db.VarChar(255) @map("img_url")
+    merchandiseProducts MerchandiseProduct[]
+    createdAt           DateTime    @default(now()) @map("created_at")
+
+    @@map("merchandise_categories")
+}
+
+model MerchandiseProduct {
+    id                  Int         @id @default(autoincrement())
+    categoryId          Int         @map("category_id")
+    productTitle        String      @db.VarChar(255) @map("product_title")
+    productSize         String?     @db.VarChar(50)  @map("product_size")
+    productPrice        Decimal     @db.Decimal(10, 2) @map("product_price")
+    isAvailable         Boolean     @default(true) @map("is_available")
+    imgUrls             Json        @map("img_urls")
+    designers           Json?       @map("designers")
+    merchandiseCategory MerchandiseCategory @relation(fields: [categoryId], references: [id])
+    createdAt           DateTime    @default(now()) @map("created_at")
+
+
+    @@index([categoryId])
+    @@map("merchandise_products")
+}
