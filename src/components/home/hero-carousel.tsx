@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { carouselImages } from "@/src/constants/carouselImages";
 
-export default function HeroSlideshow() {
+const SLIDE_INTERVAL = 5000;
+
+export default function HeroCarousel() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % carouselImages.length), 5000);
+    const t = setInterval(() => setIndex((i) => (i + 1) % carouselImages.length), SLIDE_INTERVAL);
     return () => clearInterval(t);
   }, []);
 
@@ -26,20 +28,20 @@ export default function HeroSlideshow() {
           fill
           priority={i === 0}
           sizes="100vw"
-          className={`object-cover transition-opacity duration-700 ${i === index ? "opacity-100 z-20" : "opacity-0 z-10 pointer-events-none"}`}
+          className={`object-cover transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         />
       ))}
-s
-      <div className="absolute inset-0 bg-black/35 z-30 pointer-events-none" />
 
-      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center px-6">
+      <div className="absolute inset-0 bg-black/35 z-10 pointer-events-none" />
+
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6">
         <h1 className="text-white text-6xl md:text-[8rem] font-extrabold leading-none drop-shadow-lg">
           USC <span className="block">DAYS</span>
         </h1>
-        <p className="mt-4 text-white/90 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p className="mt-4 text-white/90 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p> {/* TODO: Replace with actual tagline */} 
       </div>
 
-      <nav className="absolute right-6 bottom-6 z-50 flex gap-2" aria-hidden>
+      <div className="absolute right-6 bottom-6 z-30 flex gap-2">
         {carouselImages.map((_, i) => (
           <button
             key={i}
@@ -48,7 +50,7 @@ s
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
-      </nav>
+      </div>
     </section>
   );
 }
