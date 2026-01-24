@@ -36,7 +36,7 @@ function GamesContent({
   }
 
   return (
-    <SchedulesCard date={dateLabel} games={todaysGames} onOpenGame={onOpenGame} />
+    <SchedulesCard date={dateLabel} games={sortedGames} onOpenGame={onOpenGame} />
   );
 }
 
