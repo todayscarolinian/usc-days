@@ -6,11 +6,8 @@ import CATEGORIES from "@/src/constants/categories.json";
 export default async function CategoryPage({ params }: { params: Promise<{ categoryId: string }> }) {
   const { categoryId: categoryIdStr } = await params;
   const categoryId = parseInt(categoryIdStr);
-  console.log("categoryId:", categoryId);
-  console.log("CATEGORIES:", CATEGORIES);
   
   const category = CATEGORIES.find((c) => c.id === categoryId);
-  console.log("category:", category);
 
   if (!category) {
     return (
