@@ -316,7 +316,7 @@
   },
   {
     "id": 32,
-    "categoryId": 6,
+    "categoryId": 3,
     "title": "White",
     "size": "1.46 inches",
     "price": 15.00,
@@ -326,7 +326,7 @@
   },
   {
     "id": 33,
-    "categoryId": 6,
+    "categoryId": 3,
     "title": "Pride",
     "size": "1.46 inches",
     "price": 15.00,
