@@ -12,7 +12,7 @@ import { MerchandiseProduct } from "../lib/prisma/generated/client";
 const STALE_TIME = 1000 * 60 * 5;
 
 export const getProductsQuery = () => {
-  useQuery<MerchandiseProduct[]>({
+  return useQuery<MerchandiseProduct[]>({
     queryKey: ["products"],
     queryFn: async () => {
       const response = await axios.get("/api/products");
