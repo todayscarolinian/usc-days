@@ -38,7 +38,7 @@ export default function HeroCarousel() {
         <h1 className="text-white text-6xl md:text-[8rem] font-extrabold leading-none drop-shadow-lg">
           USC <span className="block">DAYS</span>
         </h1>
-        <p className="mt-4 text-white/90 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p> {/* TODO: Replace with actual tagline */} 
+        {/* <p className="mt-4 text-white/90 max-w-2xl">Replace with actual tagline.</p> */}
       </div>
 
       <div className="absolute right-6 bottom-6 z-30 flex gap-2">
