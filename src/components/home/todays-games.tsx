@@ -15,18 +15,17 @@ function GamesContent({
   onOpenGame: (g: Schedules) => void;
 }) {
 
-  const { data: allGames = [], error, isLoading: loading } = getGamesQuery();
+  const { data: todaysGames = [], error, isLoading: loading } = getGamesQuery({
+    startDate: dateLabel,
+    endDate: dateLabel,
+  });
 
-  const todaysGames = useMemo(() => {
-    if (!allGames || allGames.length === 0) return [];
-    const filtered = allGames.filter((game: Schedules) =>
-      game.startDate.includes(dateLabel)
-    );
-    return filtered.sort(
+  const sortedGames = useMemo(() => {
+    return [...todaysGames].sort(
       (a: Schedules, b: Schedules) =>
         new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
     );
-  }, [allGames, dateLabel]);
+  }, [todaysGames]);
 
   if (loading) return <SchedulesCardSkeleton rows={2} />;
 
@@ -63,15 +62,10 @@ export default function TodaysGames() {
     return () => observer.disconnect();
   }, []);
 
-  const todayString = useMemo(
-    () =>
-      new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }),
-    []
-  );
+  const todayString = useMemo(() => {
+    const date = new Date();
+    return date.toISOString().split('T')[0];
+  }, []);
 
   if (!inView) {
     return (
