@@ -78,7 +78,10 @@ export default function CategoryProductsClient({
         <ProductModal
           product={selectedProduct}
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedProduct(null)
+        }}
         />
       )}
     </>
