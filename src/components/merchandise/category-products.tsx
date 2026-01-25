@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import ProductModal from "@/src/components/merchandise/product-modal";
+import MerchandiseModal from "@/src/components/merchandise/merchandise-modal";
 import Breadcrumb from "@/src/components/merchandise/breadcrumb";
 import { getProductsQuery } from "@/src/queries/product.queries";
 import type { MerchandiseProduct } from "@/src/lib/prisma/generated/client";
@@ -75,7 +75,7 @@ export default function CategoryProductsClient({
       </section>
 
       {selectedProduct && (
-        <ProductModal
+        <MerchandiseModal
           product={selectedProduct}
           isOpen={isModalOpen}
           onClose={() => {
