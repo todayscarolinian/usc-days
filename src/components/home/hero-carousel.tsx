@@ -18,7 +18,7 @@ export default function HeroCarousel() {
     <section
       id="site-hero"
       aria-label="Hero carousel"
-      className="relative w-full h-[90vh] overflow-hidden bg-black"
+      className="relative w-full h-screen overflow-hidden bg-black"
     >
       {carouselImages.map((image, i) => (
         <Image
