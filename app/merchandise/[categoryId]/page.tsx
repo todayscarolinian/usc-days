@@ -3,6 +3,14 @@ import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import CategoryProductsClient from "@/src/components/merchandise/category-products";
 import CATEGORIES from "@/src/constants/categories.json";
 
+export const metadata: Metadata = generateMeta({
+  title: "Merchandise Category - USC Days 2025",
+    description:
+    "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
+  url: "/merchandise/[categoryId]",
+  image: "/tc-logo-red.png",
+});
+
 export default async function CategoryPage({ params }: { params: Promise<{ categoryId: string }> }) {
   const { categoryId: categoryIdStr } = await params;
   const categoryId = parseInt(categoryIdStr);
