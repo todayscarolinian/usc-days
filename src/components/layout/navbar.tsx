@@ -49,7 +49,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-        if (window.scrollY > window.innerHeight - 150) {
+      if (window.scrollY > window.innerHeight - 150) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -70,7 +70,9 @@ export default function Navbar() {
       className={`fixed w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary" : "bg-tc_primary md:bg-transparent"}`}
     >
       <nav className="hidden text-lg font-medium md:flex md:flex-row md:items-center md:justify-between w-full">
-        <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
+        <Link href="/">
+          <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
+        </Link>
         <div className="flex items-center lg:gap-6">
           {nav_items.map((n) =>
             n.protected ? (
@@ -112,7 +114,7 @@ export default function Navbar() {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="bg-tc_primary">
+        <SheetContent side="left" className="bg-tc_primary p-4">
           <nav className="grid gap-6 text-lg font-medium">
             <Image
               src="/tc-logo-white.png"
