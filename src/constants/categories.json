@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "categoryName": "Lanyard",
+    "imgUrl": "/merch/placeholder.png"
+  },
+  {
+    "id": 2,
+    "categoryName": "Stickers",
+    "imgUrl": "/merch/placeholder.png"
+  },
+  {
+    "id": 3,
+    "categoryName": "Pins",
+    "imgUrl": "/merch/placeholder.png"
+  },
+  {
+    "id": 4,
+    "categoryName": "Bookmarks",
+    "imgUrl": "/merch/placeholder.png"
+  },
+  {
+    "id": 5,
+    "categoryName": "Postcards",
+    "imgUrl": "/merch/placeholder.png"
+  },
+  {
+    "id": 6,
+    "categoryName": "TC Pins",
+    "imgUrl": "/merch/placeholder.png"
+  }
+]
