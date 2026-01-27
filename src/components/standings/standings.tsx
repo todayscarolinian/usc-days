@@ -205,6 +205,7 @@ export default function Standings() {
   // Handler functions
   const handleCardClick = useCallback(
     (rank: number) => {
+      if (!isAdmin) return;
       const champion = championsData.find((c) => c.rank === rank);
 
       setFormData({
