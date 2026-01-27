@@ -14,8 +14,8 @@ import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { useSignOut } from "@/src/queries/auth.queries";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const nav_items = [
   {
@@ -46,6 +46,13 @@ export default function Navbar() {
   const { mutate: signOut, isPending } = useSignOut();
   const [isScrolled, setIsScrolled] = useState(false);
   const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  // Preserve sport parameter across navigation
+  const sportParam = searchParams.get("sport");
+  const queryString = useMemo(() => {
+    return sportParam ? `?sport=${sportParam}` : "";
+  }, [sportParam]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,7 +74,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary" : "bg-tc_primary md:bg-transparent"}`}
+      className={`w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary sticky" : "fixed bg-tc_primary md:bg-transparent"}`}
     >
       <nav className="hidden text-lg font-medium md:flex md:flex-row md:items-center md:justify-between w-full">
         <Link href="/">
@@ -83,7 +90,7 @@ export default function Navbar() {
                   asChild
                 >
                   <Link
-                    href={n.href}
+                    href={`${n.href}${n.href === "/" ? "" : queryString}`}
                     className="text-white transition-colors hover:text-white"
                   >
                     {n.name}
@@ -97,7 +104,7 @@ export default function Navbar() {
                 asChild
               >
                 <Link
-                  href={n.href}
+                  href={`${n.href}${n.href === "/" ? "" : queryString}`}
                   className="text-white transition-colors hover:text-white"
                 >
                   {n.name}
@@ -123,7 +130,11 @@ export default function Navbar() {
               height={50}
             />
             {nav_items.map((i) => (
-              <Link key={i.href} href={i.href} className="text-white">
+              <Link
+                key={i.href}
+                href={`${i.href}${i.href === "/" ? "" : queryString}`}
+                className="text-white"
+              >
                 {i.name}
               </Link>
             ))}
