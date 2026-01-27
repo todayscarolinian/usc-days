@@ -1,40 +1,17 @@
-"use client";
+import { Metadata } from "next";
+import { generateMetadata as generateMeta } from "@/src/lib/metadata";
+import Leaderboards from "@/src/components/leaderboards/leaderboards";
 
-import { useEffect, useState } from "react";
-import { DataTable } from "@/src/components/leaderboards/data-table";
-import { columns } from "@/src/components/leaderboards/columns";
-import { transformGamesToSchoolRank } from "@/src/components/leaderboards/transformData";
-import { getGamesQuery } from "@/src/queries/games.queries";
-import SportSelector from "@/src/components/leaderboards/sport-selector";
-import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboards-table-skeleton";
-import { StandingData } from "@/src/types/types";
+export const metadata: Metadata = generateMeta({
+  title: "Leaderboards - USC Days 2025",
+    description:
+    "Explore the leaderboards for USC Days 2025 intramural competitions and see how the different teams rank.",
+  url: "/leaderboards",
+  image: "/tc-logo-red.png",
+});
 
-export default function RankingsPage() {
-  const [rankingsData, setRankingsData] = useState<StandingData[]>([]);
-  const [selectedSport, setSelectedSport] = useState<number | null>(null);
+const LeaderboardsPage = () => {
+    return <Leaderboards />;
+};
 
-  const { data: games = [], error, isLoading: loading } = getGamesQuery();
-
-  useEffect(() => {
-    if (!selectedSport) {
-      setRankingsData([]);
-      return;
-    }
-
-    const transformed = transformGamesToSchoolRank(games, selectedSport);
-    setRankingsData(transformed);
-  }, [selectedSport]);
-
-  return (
-    <div className="p-4 sm:py-10">
-      <div className="mx-auto max-w-[96%] space-y-6">
-        <SportSelector selected={selectedSport} onSelect={setSelectedSport} />
-        {error || loading ? (
-          <LeaderboardsTableSkeleton error={error?.message} />
-        ) : (
-          <DataTable columns={columns} data={rankingsData} title="USC DAYS" />
-        )}
-      </div>
-    </div>
-  );
-}
+export default LeaderboardsPage;

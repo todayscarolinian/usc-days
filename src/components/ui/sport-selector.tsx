@@ -176,11 +176,18 @@ export default function SportSelector({
         placeholder="Select a sport"
         searchPlaceholder="Search sports..."
         emptyMessage="No sports found."
-        options={gameTypes.map((sport) => ({
-          value: sport.id.toString(),
-          label: sport.gameName,
-          id: sport.id,
-        }))}
+        options={[
+          {
+            value: "",
+            label: "All Sports",
+            id: 0,
+          },
+          ...gameTypes.map((sport) => ({
+            value: sport.id.toString(),
+            label: sport.gameName,
+            id: sport.id,
+          })),
+        ]}
         value={selected ? selected.toString() : ""}
         onChange={(value) => onSelect(value ? parseInt(value) : null)}
         renderIcon={(option) => getIconFor(option.label)}

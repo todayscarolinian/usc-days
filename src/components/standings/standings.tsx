@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getChampionsQuery } from "@/src/queries/champions.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getGamesQuery } from "@/src/queries/games.queries";
@@ -37,12 +38,17 @@ type CardData = {
 };
 
 export default function Standings() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const selectedSport = searchParams.get("sport")
+    ? Number(searchParams.get("sport"))
+    : null;
+
   // Static data (fetched once using TanStack Query)
   const { data: gameTypes = [], error: gameTypesError } = getGameTypesQuery();
   const { data: teams = [], error: teamsError } = getTeamsQuery();
 
   // Dynamic data (changes per sport selection)
-  const [selectedSport, setSelectedSport] = useState<number | null>(null);
   const [championsData, setChampionsData] = useState<Champions[]>([]);
   const [standingsData, setStandingsData] = useState<StandingWithRank[]>([]);
 
@@ -78,10 +84,10 @@ export default function Standings() {
 
       // Filter data by selected sport
       const champions: Champions[] = championsQueryData.filter(
-        (c: any) => c.gameType.id === selectedSport
+        (c: any) => c.gameType.id === selectedSport,
       );
       const games = gamesQueryData.filter(
-        (g: any) => g.gameType?.id === selectedSport
+        (g: any) => g.gameType?.id === selectedSport,
       );
 
       setChampionsData(champions);
@@ -95,7 +101,7 @@ export default function Standings() {
       // Add teams with game statistics
       gameStandings.forEach((standing) => {
         const champion = champions.find(
-          (c) => c.team.teamName === standing.team
+          (c) => c.team.teamName === standing.team,
         );
         allStandings.push({
           ...standing,
@@ -106,7 +112,7 @@ export default function Standings() {
       // Add champions without game history
       champions.forEach((champion) => {
         const existingStanding = allStandings.find(
-          (s) => s.team === champion.team.teamName
+          (s) => s.team === champion.team.teamName,
         );
 
         if (!existingStanding) {
@@ -150,7 +156,7 @@ export default function Standings() {
     () =>
       gameTypes.find((sport: GameType) => sport.id === selectedSport)
         ?.gameName || "",
-    [gameTypes, selectedSport]
+    [gameTypes, selectedSport],
   );
 
   const topThreeCards = useMemo(() => {
@@ -159,7 +165,7 @@ export default function Standings() {
 
       if (champion) {
         const standing = standingsData.find(
-          (s) => s.team === champion.team.teamName
+          (s) => s.team === champion.team.teamName,
         );
 
         if (standing) {
@@ -199,6 +205,7 @@ export default function Standings() {
   // Handler functions
   const handleCardClick = useCallback(
     (rank: number) => {
+      if (!isAdmin) return;
       const champion = championsData.find((c) => c.rank === rank);
 
       setFormData({
@@ -215,7 +222,7 @@ export default function Standings() {
       });
       setShowDialog(true);
     },
-    [championsData, selectedSport]
+    [championsData, selectedSport],
   );
 
   const handleAddStanding = useCallback(() => {
@@ -241,8 +248,18 @@ export default function Standings() {
         fetchStandingsData();
       }
     },
-    [fetchStandingsData]
+    [fetchStandingsData],
   );
+
+  const handleSportSelect = (sportId: number | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (sportId) {
+      params.set("sport", sportId.toString());
+    } else {
+      params.delete("sport");
+    }
+    router.push(`?${params.toString()}`);
+  };
 
   return (
     <div className="p-4 sm:py-10">
@@ -250,7 +267,7 @@ export default function Standings() {
         <div className="flex justify-between items-center">
           <SportSelector
             selected={selectedSport}
-            onSelect={setSelectedSport}
+            onSelect={handleSportSelect}
             triggerClassName="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] min-w-full bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
           {isAdmin && (
