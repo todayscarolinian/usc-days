@@ -7,15 +7,20 @@ export const metadata: Metadata = generateMeta({
   title: "Merchandise Category - USC Days 2025",
     description:
     "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
-  url: "/merchandise/[categoryId]",
+  url: "/merchandise/[categoryName]",
   image: "/tc-logo-red.png",
 });
 
-export default async function CategoryPage({ params }: { params: Promise<{ categoryId: string }> }) {
-  const { categoryId: categoryIdStr } = await params;
-  const categoryId = parseInt(categoryIdStr);
+export default async function CategoryPage({ 
+  params 
+}: { 
+  params: Promise<{ categoryName: string }> 
+}) {
+  const { categoryName } = await params;
   
-  const category = CATEGORIES.find((c) => c.id === categoryId);
+  const category = CATEGORIES.find(
+    (c) => c.name.toLowerCase() === categoryName.toLowerCase()
+  );
 
   if (!category) {
     return (
@@ -27,7 +32,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   return (
     <div>
-      <CategoryProductsClient categoryId={categoryId} categoryName={category.name} />
+      <CategoryProductsClient categoryId={category.id} categoryName={category.name} />
     </div>
   );
 }

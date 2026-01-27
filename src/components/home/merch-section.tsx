@@ -12,7 +12,7 @@ export default function MerchSection() {
         {CATEGORIES.map((category) => (
           <Link
             key={category.id}
-            href={`/merchandise/${category.id}`}
+            href={`/merchandise/${category.name.toLowerCase()}`}
             className="text-left bg-tc_primary border border-gray-300 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col"
           >
             <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
