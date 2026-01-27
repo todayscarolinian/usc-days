@@ -25,7 +25,7 @@ export function LoginForm() {
             </CardHeader>
             <CardContent>
                 <Button
-                    onClick={() => handleLoginWithGoogle.mutate}
+                    onClick={() => handleLoginWithGoogle.mutate()}
                     className="w-full mt-3 hover:cursor-pointer"
                     disabled={handleLoginWithGoogle.isPending}
                 >

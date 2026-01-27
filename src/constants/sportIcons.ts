@@ -36,3 +36,11 @@ export const sportIcons: Record<string, StaticImageData> = {
   Volleyball,
   Default: TCRedLogo,
 };
+
+export const sports = Object.entries(sportIcons)
+  .filter(([key]) => key !== "Default")
+  .map(([key, icon]) => ({
+    id: key.toLowerCase().replace(/\s+/g, "-"),
+    name: key,
+    icon,
+  }));

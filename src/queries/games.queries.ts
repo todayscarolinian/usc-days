@@ -5,11 +5,16 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getGamesQuery = () =>
+export const getGamesQuery = (params?: { startDate?: string; endDate?: string }) =>
     useQuery<any>({
-        queryKey: ["games"],
+        queryKey: ["games", params],
         queryFn: async () => {
-            const response = await axios.get("/api/games");
+            const queryParams = new URLSearchParams();
+            if (params?.startDate) queryParams.append("startDate", params.startDate);
+            if (params?.endDate) queryParams.append("endDate", params.endDate);
+            
+            const url = `/api/games${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+            const response = await axios.get(url);
             return response.data.games;
         },
         staleTime: STALE_TIME,
