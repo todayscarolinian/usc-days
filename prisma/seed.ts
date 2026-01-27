@@ -12,7 +12,7 @@ async function main() {
       update: {},
       create: {
         id: cat.id,
-        categoryName: cat.categoryName,
+        categoryName: cat.name,
         imgUrl: cat.imgUrl,
       },
     });

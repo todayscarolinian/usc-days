@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import Standings from "@/src/components/standings/standings";
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = generateMeta({
 const StandingsPage = () => {
   return (
     <div>
-      <Standings />
+      <Suspense fallback={<div />}>
+        <Standings />
+      </Suspense>
     </div>
   );
 };

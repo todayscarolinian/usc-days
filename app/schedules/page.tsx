@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import SchedulesPageClient from "@/src/components/schedules/schedules";
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = generateMeta({
 export default function SchedulesPage() {
   return (
     <div>
-      <SchedulesPageClient />
+      <Suspense fallback={<div />}>
+        <SchedulesPageClient />
+      </Suspense>
     </div>
   );
 }
