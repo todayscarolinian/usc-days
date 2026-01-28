@@ -92,10 +92,10 @@ export default function EditScheduleDialog({
       timeZone: "Asia/Manila",
     }),
     location: schedule.location ? schedule.location : undefined,
-    };
-    
+  };
+
   const [selectedSport, setSelectedSport] = useState<number>(
-    schedule.gameType.id
+    schedule.gameType.id,
   );
   const [scheduleInputs, setScheduleInputs] =
     useState<ScheduleInputs>(defaultInputs);
@@ -137,6 +137,7 @@ export default function EditScheduleDialog({
       location: scheduleInputs.location ? scheduleInputs.location : undefined,
       teamAScore: Number(schedule.teamAScore),
       teamBScore: Number(schedule.teamBScore),
+      winnerId: schedule.winnerId ? Number(schedule.winnerId) : undefined,
     };
 
     edit.mutate(data, {
@@ -154,7 +155,7 @@ export default function EditScheduleDialog({
         onSuccess: () => {
           onOpenChange(false);
         },
-      }
+      },
     );
   };
 
@@ -175,7 +176,7 @@ export default function EditScheduleDialog({
               "en-CA",
               {
                 timeZone: "Asia/Manila",
-              }
+              },
             ),
             endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
               timeZone: "Asia/Manila",
@@ -187,7 +188,7 @@ export default function EditScheduleDialog({
                 minute: "2-digit",
                 hour12: false,
                 timeZone: "Asia/Manila",
-              }
+              },
             ),
             endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
               hour: "2-digit",
