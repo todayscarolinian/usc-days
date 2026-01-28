@@ -33,6 +33,10 @@ export default function ScheduleFilter({
             </span>
           </div>
         </div>
+
+        <p className="text-sm text-muted-foreground text-center">
+          Click on any game card to view full details
+        </p>
         <SportSelector
           onSelect={onSelect}
           selected={selected}
