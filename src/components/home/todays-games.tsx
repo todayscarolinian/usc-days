@@ -14,16 +14,30 @@ function GamesContent({
   dateLabel: string;
   onOpenGame: (g: Schedules) => void;
 }) {
+  const nextDay = useMemo(() => {
+    const [year, month, day] = dateLabel.split("-").map(Number);
+    const date = new Date(year, month - 1, day + 1);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }, [dateLabel]);
 
-  const { data: todaysGames = [], error, isLoading: loading } = getGamesQuery({
+  const {
+    data: todaysGames = [],
+    error,
+    isLoading: loading,
+  } = getGamesQuery({
     startDate: dateLabel,
-    endDate: dateLabel,
+    endDate: nextDay,
   });
+
+  console.log("Today's Games: ", todaysGames);
 
   const sortedGames = useMemo(() => {
     return [...todaysGames].sort(
       (a: Schedules, b: Schedules) =>
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
     );
   }, [todaysGames]);
 
@@ -36,7 +50,11 @@ function GamesContent({
   }
 
   return (
-    <SchedulesCard date={dateLabel} games={sortedGames} onOpenGame={onOpenGame} />
+    <SchedulesCard
+      date={dateLabel}
+      games={sortedGames}
+      onOpenGame={onOpenGame}
+    />
   );
 }
 
@@ -56,7 +74,7 @@ export default function TodaysGames() {
           observer.disconnect();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -64,7 +82,10 @@ export default function TodaysGames() {
 
   const todayString = useMemo(() => {
     const date = new Date();
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }, []);
 
   if (!inView) {
@@ -85,7 +106,11 @@ export default function TodaysGames() {
           setOpen(true);
         }}
       />
-      <GameDetailsDialog open={open} onOpenChange={setOpen} game={selectedGame} />
+      <GameDetailsDialog
+        open={open}
+        onOpenChange={setOpen}
+        game={selectedGame}
+      />
     </div>
   );
 }

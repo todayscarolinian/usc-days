@@ -61,13 +61,17 @@ export async function GET(req: NextRequest) {
 
         const startDate = searchParams.get("startDate");
         if (startDate) {
-            const parsed = new Date(startDate);
+            // Parse as local date at start of day (00:00:00)
+            const [year, month, day] = startDate.split('-').map(Number);
+            const parsed = new Date(year, month - 1, day, 0, 0, 0, 0);
             if (!isNaN(parsed.getTime())) params.startDate = parsed;
         }
 
         const endDate = searchParams.get("endDate");
         if (endDate) {
-            const parsed = new Date(endDate);
+            // Parse as local date at end of day (23:59:59.999)
+            const [year, month, day] = endDate.split('-').map(Number);
+            const parsed = new Date(year, month - 1, day, 23, 59, 59, 999);
             if (!isNaN(parsed.getTime())) params.endDate = parsed;
         }
 
