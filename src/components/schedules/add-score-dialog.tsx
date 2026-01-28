@@ -10,7 +10,15 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
 import type { Schedules } from "@/src/types/types";
+import { useEditGamesQuery } from "@/src/queries/games.queries";
 
 function getDbScores(g: Schedules) {
   const a = Number(g.teamAScore) ?? null;
@@ -18,7 +26,12 @@ function getDbScores(g: Schedules) {
   return { a, b };
 }
 
-function toEditPayload(game: Schedules, a: number, b: number) {
+function toEditPayload(
+  game: Schedules,
+  a: number,
+  b: number,
+  winnerId: number | null,
+) {
   const gameTypeId = game.gameType.id;
   const teamAId = game.teamA.id;
   const teamBId = game.teamB.id;
@@ -30,8 +43,6 @@ function toEditPayload(game: Schedules, a: number, b: number) {
   ) {
     throw new Error("Missing required IDs (gameTypeId, teamAId, teamBId).");
   }
-
-  const winnerId = a === b ? null : a > b ? teamAId : teamBId;
 
   const startDate =
     typeof game.startDate === "string"
@@ -60,19 +71,15 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   game: Schedules | null;
-  onSaved?: (updated: Schedules) => void;
 };
 
-export default function AddScoreDialog({
-  open,
-  onOpenChange,
-  game,
-  onSaved,
-}: Props) {
+export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   const [aScore, setAScore] = React.useState<number | "">("");
   const [bScore, setBScore] = React.useState<number | "">("");
-  const [busy, setBusy] = React.useState(false);
+  const [winnerId, setWinnerId] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  const editGameMutation = useEditGamesQuery();
 
   React.useEffect(() => {
     if (open && game) {
@@ -80,6 +87,7 @@ export default function AddScoreDialog({
       console.log("Initializing scores:", a, b);
       setAScore(a ?? 0);
       setBScore(b ?? 0);
+      setWinnerId(game.winnerId ?? null);
       setError(null);
     }
   }, [open, game]);
@@ -90,52 +98,42 @@ export default function AddScoreDialog({
   const away = game.teamB.teamName ?? `Team B${game.teamB.id}`;
 
   const { a: dbA, b: dbB } = getDbScores(game);
-  const editingChanged = aScore && bScore && (dbA !== aScore || dbB !== bScore);
+  const dbWinnerId = game.winnerId ?? null;
+  const editingChanged =
+    (aScore && bScore && (dbA !== aScore || dbB !== bScore)) ||
+    winnerId !== dbWinnerId;
 
   async function save() {
+    setError(null);
+
+    const a = aScore === "" ? null : Number(aScore);
+    const b = bScore === "" ? null : Number(bScore);
+
+    if (
+      a === null ||
+      b === null ||
+      a < 0 ||
+      b < 0 ||
+      !Number.isFinite(a) ||
+      !Number.isFinite(b)
+    ) {
+      setError("Please enter valid non-negative numbers for both scores.");
+      return;
+    }
+
+    if (winnerId === null) {
+      setError("Please select a winning team.");
+      return;
+    }
+
     try {
-      setBusy(true);
-      setError(null);
-
-      const a = aScore === "" ? null : Number(aScore);
-      const b = bScore === "" ? null : Number(bScore);
-
-      if (
-        a === null ||
-        b === null ||
-        a < 0 ||
-        b < 0 ||
-        !Number.isFinite(a) ||
-        !Number.isFinite(b)
-      ) {
-        setError("Please enter valid non-negative numbers for both scores.");
-        setBusy(false);
-        return;
-      }
-
-      const payload = toEditPayload(game as Schedules, a, b);
-
-      const res = await fetch(`/api/games`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Failed to save score");
-      }
-
-      const { updatedGame } = await res.json();
-      onSaved?.(updatedGame);
+      const payload = toEditPayload(game as Schedules, a, b, winnerId);
+      await editGameMutation.mutateAsync(payload);
       onOpenChange(false);
-      window.location.reload();
     } catch (e: unknown) {
       setError(
-        e instanceof Error ? e.message : "Something went wrong while saving."
+        e instanceof Error ? e.message : "Something went wrong while saving.",
       );
-    } finally {
-      setBusy(false);
     }
   }
 
@@ -163,7 +161,7 @@ export default function AddScoreDialog({
                   const v = e.currentTarget.value;
                   setAScore(v === "" ? "" : Number(v));
                 }}
-                disabled={busy}
+                disabled={editGameMutation.isPending}
               />
             </div>
           </div>
@@ -181,8 +179,33 @@ export default function AddScoreDialog({
                   const v = e.currentTarget.value;
                   setBScore(v === "" ? "" : Number(v));
                 }}
-                disabled={busy}
+                disabled={editGameMutation.isPending}
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 items-center gap-2">
+            <span className="text-muted-foreground">Winner</span>
+            <div className="col-span-2">
+              <Select
+                value={winnerId?.toString()}
+                onValueChange={(value) => {
+                  setWinnerId(Number(value));
+                }}
+                disabled={editGameMutation.isPending}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select winning team" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={game.teamA.id.toString()}>
+                    {home}
+                  </SelectItem>
+                  <SelectItem value={game.teamB.id.toString()}>
+                    {away}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -196,6 +219,9 @@ export default function AddScoreDialog({
               <div className="text-lg font-semibold">
                 {aScore} – {bScore}
               </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Winner: {winnerId === game.teamA.id ? home : away}
+              </div>
             </div>
           ) : null}
         </div>
@@ -204,17 +230,17 @@ export default function AddScoreDialog({
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
-            disabled={busy}
+            disabled={editGameMutation.isPending}
             className="w-full sm:w-auto"
           >
             Cancel
           </Button>
           <Button
             onClick={save}
-            disabled={busy || !editingChanged}
+            disabled={editGameMutation.isPending || !editingChanged}
             className="w-full sm:w-auto"
           >
-            {busy ? "Saving…" : "Save Score"}
+            {editGameMutation.isPending ? "Saving…" : "Save Score"}
           </Button>
         </div>
       </DialogContent>
