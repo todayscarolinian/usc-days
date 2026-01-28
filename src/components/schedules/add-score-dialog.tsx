@@ -13,8 +13,8 @@ import { Input } from "@/src/components/ui/input";
 import type { Schedules } from "@/src/types/types";
 
 function getDbScores(g: Schedules) {
-  const a = g.teamAScore ?? null;
-  const b = g.teamBScore ?? null;
+  const a = Number(g.teamAScore) ?? null;
+  const b = Number(g.teamBScore) ?? null;
   return { a, b };
 }
 

@@ -54,28 +54,28 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
                 height={24}
               />
             </div>
-            {game.teamAScore && game.teamBScore ? (
+            {Number(game.teamAScore) && Number(game.teamBScore) ? (
               <div className="flex gap-2">
                 <span
                   className={
-                    game.teamAScore > game.teamBScore
+                    game.winnerId === game.teamA.id
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {game.teamAScore}
+                  {Number(game.teamAScore)}
                 </span>
                 <span>
                   <b>/</b>
                 </span>
                 <span
                   className={
-                    game.teamBScore > game.teamAScore
+                    game.winnerId === game.teamB.id
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {game.teamBScore}
+                  {Number(game.teamBScore)}
                 </span>
               </div>
             ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/src/components/leaderboards/data-table";
 import { columns } from "@/src/components/leaderboards/columns";
@@ -20,15 +20,13 @@ export default function Leaderboards() {
 
   const { data: games = [], error, isLoading: loading } = getGamesQuery();
 
-  useEffect(() => {
-    if (!selectedSport) {
-      setRankingsData([]);
-      return;
-    }
+  const transformed = useMemo(() => {
+    return transformGamesToSchoolRank(games, selectedSport || undefined);
+  }, [games, selectedSport]);
 
-    const transformed = transformGamesToSchoolRank(games, selectedSport);
+  useEffect(() => {
     setRankingsData(transformed);
-  }, [selectedSport]);
+  }, [transformed]);
 
   const handleSportSelect = (sportId: number | null) => {
     const params = new URLSearchParams(searchParams.toString());

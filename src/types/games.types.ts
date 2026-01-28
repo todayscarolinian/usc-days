@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Schedules } from './types';
 
 export const AddGameSchema = z
     .object({
@@ -168,7 +169,7 @@ export interface PaginationParams {
 }
 
 export interface PaginatedGamesResponse {
-  games: any[];
+  games: Schedules[];
   hasMore: boolean;
   nextCursor: string | null;
   count: number;

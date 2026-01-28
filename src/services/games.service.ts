@@ -7,6 +7,7 @@ import {
   PaginatedGamesResponse,
 } from "@/src/types/games.types";
 import { Prisma } from "@/src/lib/prisma/generated/client";
+import { Schedules } from "../types/types";
 
 export interface GetGamesParams {
   gameTypeId?: number;
@@ -28,7 +29,7 @@ class GameService {
    * Fetch games with optional cursor-based pagination.
    * If no pagination params provided, returns all matching games (legacy behavior).
    */
-  async getGames(params?: GetGamesWithPaginationParams): Promise<any[] | PaginatedGamesResponse> {
+  async getGames(params?: GetGamesWithPaginationParams): Promise<Schedules[] | PaginatedGamesResponse> {
     try {
       const where: Prisma.GameWhereInput = {};
       const cursor = params?.cursor;
@@ -97,7 +98,7 @@ class GameService {
 
         if (cursorDate) {
           where.AND = where.AND || [];
-          (where.AND as any[]).push({
+          (where.AND as Prisma.GameWhereInput[]).push({
             startDate: { lt: cursorDate },
           });
         }

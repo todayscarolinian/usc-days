@@ -1,23 +1,8 @@
-import { Game } from "@/src/lib/prisma/generated/client";
+import { Schedules } from "@/src/types/types";
 import { StandingData } from "@/src/types/types";
 
-type GameWithRelations = Game & {
-  gameType: {
-    gameName: string;
-    id: number;
-  };
-  teamA: {
-    teamName: string;
-    id: number;
-  };
-  teamB: {
-    teamName: string;
-    id: number;
-  };
-};
-
 export function transformGamesToSchoolRank(
-  games: GameWithRelations[],
+  games: Schedules[],
   sportId?: number
 ): StandingData[] {
   const leaderboard: Record<
