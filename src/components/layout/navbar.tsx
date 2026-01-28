@@ -40,6 +40,35 @@ const nav_items = [
   },
 ];
 
+function UserAvatar({
+  handleLogout,
+  isPending,
+}: {
+  handleLogout: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+      <div className="ml-auto flex-1 sm:flex-initial"></div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="secondary" size="icon" className="rounded-full">
+            <CircleUser className="h-5 w-5" />
+            <span className="sr-only">Toggle user menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
 export default function Navbar() {
   useInitializeUserStore();
   const { email, resetUser } = useUserStore();
@@ -70,12 +99,19 @@ export default function Navbar() {
     };
   }, [pathName]);
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    signOut(undefined, {
+      onSuccess: () => {
+        resetUser();
+      },
+    });
+  };
 
   return (
     <header
       className={`w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary sticky" : "fixed bg-tc_primary md:bg-transparent"}`}
     >
+      {/* Desktop Nav */}
       <nav className="hidden text-lg font-medium md:flex md:flex-row md:items-center md:justify-between w-full">
         <Link href="/">
           <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
@@ -112,58 +148,45 @@ export default function Navbar() {
               </Button>
             ),
           )}
+          {email && (
+            <UserAvatar handleLogout={handleLogout} isPending={isPending} />
+          )}
         </div>
       </nav>
-      <Sheet defaultOpen={false}>
-        <SheetTrigger asChild>
-          <Button size="icon" className="shrink-0 bg-tc_primary-600 md:hidden">
-            <Menu />
-            <span className="sr-only">Toggle navigation menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="bg-tc_primary p-4">
-          <nav className="grid gap-6 text-lg font-medium">
-            <Image
-              src="/tc-logo-white.png"
-              alt="tc-logo"
-              width={50}
-              height={50}
-            />
-            {nav_items.map((i) => (
-              <Link
-                key={i.href}
-                href={`${i.href}${i.href === "/" ? "" : queryString}`}
-                className="text-white"
-              >
-                {i.name}
-              </Link>
-            ))}
-          </nav>
-        </SheetContent>
-      </Sheet>
-      {email ? (
-        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-          <div className="ml-auto flex-1 sm:flex-initial"></div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ) : null}
+
+      {/* Mobile Nav */}
+      <div className="md:hidden flex w-full items-center justify-between">
+        <Sheet defaultOpen={false}>
+          <SheetTrigger asChild>
+            <Button size="icon" className="shrink-0 bg-tc_primary-600">
+              <Menu />
+              <span className="sr-only">Toggle navigation menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="bg-tc_primary p-4">
+            <nav className="grid gap-6 text-lg font-medium">
+              <Image
+                src="/tc-logo-white.png"
+                alt="tc-logo"
+                width={50}
+                height={50}
+              />
+              {nav_items.map((i) => (
+                <Link
+                  key={i.href}
+                  href={`${i.href}${i.href === "/" ? "" : queryString}`}
+                  className="text-white"
+                >
+                  {i.name}
+                </Link>
+              ))}
+            </nav>
+          </SheetContent>
+        </Sheet>
+        {email && (
+          <UserAvatar handleLogout={handleLogout} isPending={isPending} />
+        )}
+      </div>
     </header>
   );
 }
