@@ -16,8 +16,33 @@ type ScheduleCardProps = {
   onOpen?: (g: Schedules) => void;
 };
 
+const swimmingAliases = [
+  "Freestyle",
+  "Backstroke",
+  "Butterfly",
+  "Breaststroke",
+  "Medley",
+  "Relay",
+];
+
+const getIconFor = (name: string) => {
+  if (swimmingAliases.some((alias) => name.includes(alias))) {
+    return sportIcons["Swimming"];
+  }
+
+  const key = Object.keys(sportIcons).find((k) => name.includes(k));
+
+  return key ? (
+    sportIcons[key]
+  ) : (
+    sportIcons["Default"]
+  );
+};
+
 export function GameCard({ game, onOpen }: ScheduleCardProps) {
-  const start = new Date(game.startDate);
+    const start = new Date(game.startDate);
+    
+    console.log("Rendering GameCard for game:", game);
 
   return (
     <Card
@@ -97,14 +122,12 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
         <div className="col-span-1 flex items-center">
           <Image
             src={
-              (sportIcons[game.gameType.gameName] || sportIcons["Default"]).src
+              getIconFor(game.gameType.gameName)
             }
             alt={`${game.gameType.gameName} icon`}
             width={20}
             height={20}
-            className={`mr-1 size-6 ${
-              sportIcons[game.gameType.gameName] ? "invert" : ""
-            }`}
+            className={`mr-1 invert size-6`}
           />
           <span>{game.gameType.gameName.toUpperCase()}</span>
         </div>
