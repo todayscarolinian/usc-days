@@ -32,17 +32,11 @@ const getIconFor = (name: string) => {
 
   const key = Object.keys(sportIcons).find((k) => name.includes(k));
 
-  return key ? (
-    sportIcons[key]
-  ) : (
-    sportIcons["Default"]
-  );
+  return key ? sportIcons[key] : sportIcons["Default"];
 };
 
 export function GameCard({ game, onOpen }: ScheduleCardProps) {
-    const start = new Date(game.startDate);
-    
-    console.log("Rendering GameCard for game:", game);
+  const start = new Date(game.startDate);
 
   return (
     <Card
@@ -57,9 +51,9 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
         }
       }}
     >
-      <div className="grid grid-cols-[1fr_auto_auto] md:grid-cols-[1fr_auto_1fr] p-4 mt-4">
-        <CardHeader className="col-span-1 flex items-center p-0">
-          <CardTitle>
+      <div className="flex flex-col md:flex-row md:items-center p-4 mt-4 gap-2 md:gap-0">
+        <CardHeader className="p-0 mb-2 md:mb-0 md:pl-12 flex flex-row md:flex-col items-center justify-center">
+          <CardTitle className="flex items-center md:gap-1">
             <span className="text-lg md:text-2xl font-semibold">
               {format(start, "h:mm")}
             </span>
@@ -68,8 +62,8 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="col-span-1 flex justify-center items-center p-0">
-          <div className="flex justify-center gap-2 sm:gap-6 items-center text-center">
+        <CardContent className="flex-1 flex justify-center items-center p-0">
+          <div className="flex justify-center gap-2 sm:gap-6 items-center text-center w-full">
             <div className="flex justify-center gap-3 md:gap-4 items-center text-sm md:text-base">
               {game.teamA.teamName}
               <Image
@@ -121,9 +115,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
       <CardFooter className="grid grid-cols-[auto_auto_1fr] md:grid-cols-[1fr_auto_1fr] bg-[#C02D2D] text-xs text-white py-2 px-2">
         <div className="col-span-1 flex items-center">
           <Image
-            src={
-              getIconFor(game.gameType.gameName)
-            }
+            src={getIconFor(game.gameType.gameName)}
             alt={`${game.gameType.gameName} icon`}
             width={20}
             height={20}
