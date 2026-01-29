@@ -21,7 +21,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
-import { SearchableSelect, SelectOption } from "./searchable-select";
+import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
 interface ScheduleInputs {
@@ -226,11 +226,12 @@ export default function AddScheduleDialog() {
               emptyMessage="No sports found."
               options={sportsOptions}
               value={selectedSport?.toString() || ""}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 setSelectedSport(value ? Number(value) : null)
               }
               disabled={loading}
-              width="w-full"
+              loading={sportsLoading}
+              className="w-full"
             />
           </div>
           <div className="w-full flex justify-between items-center gap-4">
@@ -248,13 +249,14 @@ export default function AddScheduleDialog() {
                     ? scheduleInputs.teamAId.toString()
                     : ""
                 }
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs({
                     ...scheduleInputs,
                     teamAId: value ? Number(value) : -1,
                   })
                 }
                 disabled={!selectedSport || loading}
+                loading={teamLoading}
               />
             </div>
             <span className="font-bold opacity-50">vs</span>
@@ -272,13 +274,14 @@ export default function AddScheduleDialog() {
                     ? scheduleInputs.teamBId.toString()
                     : ""
                 }
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs({
                     ...scheduleInputs,
                     teamBId: value ? Number(value) : -1,
                   })
                 }
                 disabled={!selectedSport || loading}
+                loading={teamLoading}
               />
             </div>
           </div>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { RefreshCw } from "lucide-react";
-import { SearchableSelect } from "@/src/components/schedules/searchable-select";
+import { SearchableSelect } from "@/src/components/ui/searchable-select";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { Roboto } from "next/font/google";
 
@@ -181,17 +181,19 @@ export default function SportSelector({
             value: "",
             label: "All Sports",
             id: 0,
+            icon: getIconFor("All Sports"),
           },
           ...gameTypes.map((sport) => ({
             value: sport.id.toString(),
             label: sport.gameName,
             id: sport.id,
+            icon: getIconFor(sport.gameName),
           })),
         ]}
         value={selected ? selected.toString() : ""}
-        onChange={(value) => onSelect(value ? parseInt(value) : null)}
-        renderIcon={(option) => getIconFor(option.label)}
-        triggerClassName={triggerClassName}
+        onValueChange={(value) => onSelect(value ? parseInt(value) : null)}
+        loading={loading}
+        className={triggerClassName}
       />
     </div>
   );

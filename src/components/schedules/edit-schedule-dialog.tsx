@@ -35,7 +35,7 @@ import {
 import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { getSportsTeamData } from "@/src/lib/actions";
-import { SearchableSelect, SelectOption } from "./searchable-select";
+import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
 interface ScheduleInputs {
   teamAId: number;
@@ -296,9 +296,10 @@ export default function EditScheduleDialog({
               emptyMessage="No sports found."
               options={sportsOptions}
               value={selectedSport.toString()}
-              onChange={(value) => setSelectedSport(Number(value))}
-              disabled={sportsOptions.length <= 0 || sportsLoading}
-              width="w-full"
+              onValueChange={(value) => setSelectedSport(Number(value))}
+              disabled={sportsOptions.length <= 0}
+              loading={sportsLoading}
+              className="w-full"
             />
           </div>
 
@@ -313,13 +314,14 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={scheduleInputs.teamAId.toString()}
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs((s) => ({
                     ...s,
                     teamAId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0 || teamLoading}
+                disabled={teamOptions.length <= 0}
+                loading={teamLoading}
               />
             </div>
 
@@ -335,13 +337,14 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={scheduleInputs.teamBId.toString()}
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs((s) => ({
                     ...s,
                     teamBId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0 || teamLoading}
+                disabled={teamOptions.length <= 0}
+                loading={teamLoading}
               />
             </div>
           </div>
