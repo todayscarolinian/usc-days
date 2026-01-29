@@ -31,7 +31,7 @@ export default async function CategoryPage({
 
   if (error) {
     return (
-      <div className="py-12">
+      <div className="p-12">
         <h2 className="text-3xl font-bold mb-4">Error loading category</h2>
         <p className="text-red-600">
           {error instanceof Error
