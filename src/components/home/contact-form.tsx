@@ -129,7 +129,7 @@ export default function ContactForm() {
 
           <Button
             type="submit"
-            className="w-full bg-tc_primary text-white"
+            className="w-full bg-tc_primary text-white cursor-pointer"
             disabled={status === "sending"}
           >
             {status === "sending" ? "Sending…" : "Submit"}
