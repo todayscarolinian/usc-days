@@ -266,9 +266,9 @@ export default function Standings() {
       <div className="mx-auto max-w-[96%] space-y-6">
         <div className="flex justify-between items-center">
           <SportSelector
-            selected={selectedSport}
-            onSelect={handleSportSelect}
-            triggerClassName="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] min-w-full bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
+            value={selectedSport}
+            onValueChangeAction={handleSportSelect}
+            className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] min-w-full bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
           {isAdmin && (
             <Button
