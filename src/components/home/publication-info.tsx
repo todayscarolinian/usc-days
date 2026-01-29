@@ -66,7 +66,7 @@ export default function PublicationInfo() {
           feedback is valuable.
         </p>
         <Button asChild className="w-full bg-primary">
-          <Link href={"https://forms.gle/7qTRkni7CAG13H1g8"}>
+          <Link href={"https://forms.gle/7qTRkni7CAG13H1g8"} target="_blank">
             Share Your Feedback
           </Link>
         </Button>

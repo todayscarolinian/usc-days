@@ -60,7 +60,7 @@ export default function ContactForm() {
     <div className="bg-white text-slate-900 rounded-lg p-6">
       <h3 className="text-xl font-bold mb-2">Talk to Us</h3>
       <p className="text-sm text-gray-600 mb-4">
-        Have questions? Send us a message and we'll get back to you soon.
+        Have questions? Send us a message and we&apos;ll get back to you soon.
       </p>
 
       <Form {...form}>
