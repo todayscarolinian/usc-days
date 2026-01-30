@@ -93,7 +93,7 @@ export default function Standings() {
       setChampionsData(champions);
 
       // Transform games to standings statistics
-      const gameStandings = transformGamesToSchoolRank(games);
+      const gameStandings = transformGamesToSchoolRank(games, selectedSport);
 
       // Create comprehensive standings list
       const allStandings: StandingWithRank[] = [];
