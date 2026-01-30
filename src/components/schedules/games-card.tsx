@@ -10,29 +10,11 @@ import { schoolLogos } from "@/src/constants/schoolLogos";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Schedules } from "@/src/types/types";
+import { getIconFor, getLogoForSchool } from "@/src/lib/utils";
 
 type ScheduleCardProps = {
   game: Schedules;
   onOpen?: (g: Schedules) => void;
-};
-
-const swimmingAliases = [
-  "Freestyle",
-  "Backstroke",
-  "Butterfly",
-  "Breaststroke",
-  "Medley",
-  "Relay",
-];
-
-const getIconFor = (name: string) => {
-  if (swimmingAliases.some((alias) => name.includes(alias))) {
-    return sportIcons["Swimming"];
-  }
-
-  const key = Object.keys(sportIcons).find((k) => name.includes(k));
-
-  return key ? sportIcons[key] : sportIcons["Default"];
 };
 
 export function GameCard({ game, onOpen }: ScheduleCardProps) {
@@ -70,7 +52,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             <div className="flex justify-end gap-3 md:gap-4 items-center text-sm md:text-base col-span-2 md:col-span-2">
               {game.teamA.teamName}
               <Image
-                src={schoolLogos["Default"].src}
+                src={getLogoForSchool(game.teamA.teamName).src}
                 alt={`${game.teamA.teamName} logo`}
                 width={24}
                 height={24}
@@ -105,7 +87,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             )}
             <div className="flex justify-start gap-1 md:gap-2 items-center text-sm md:text-base col-span-2 md:col-span-2">
               <Image
-                src={schoolLogos["Default"].src}
+                src={getLogoForSchool(game.teamB.teamName).src}
                 alt={`${game.teamB.teamName} logo`}
                 width={24}
                 height={24}
