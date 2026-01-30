@@ -23,7 +23,7 @@ export function SchedulesCard({ date, games, onOpenGame }: ScheduleCardProps) {
     <Card className="w-full py-4">
       <CardHeader className="flex flex-row md:flex-col">
         <CardTitle className="flex-1 text-lg md:text-2xl">
-          {format(parsedDate, "MMM d, yyyy").toUpperCase()}
+          {isToday ? "TODAY" : format(parsedDate, "MMM d, yyyy").toUpperCase()}
         </CardTitle>
         <p className="flex-1 text-right text-xs text-gray-500">
           {format(parsedDate, "EEEE").toUpperCase()}

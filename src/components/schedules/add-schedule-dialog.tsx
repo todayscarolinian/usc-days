@@ -21,7 +21,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
-import { SearchableSelect, SelectOption } from "./searchable-select";
+import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
 interface ScheduleInputs {
@@ -49,22 +49,23 @@ interface SportTeam {
 }
 
 const defaultInputs: ScheduleInputs = {
-    teamAId: -1,
-    teamBId: -1,
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
-    startTime: new Date().toISOString().split("T")[1].substring(0, 5),
-    endTime: new Date(new Date().getTime() + 60 * 60 * 1000) // +1 hour
-        .toISOString()
-        .split("T")[1]
-        .substring(0, 5),
-    location: undefined,
+  teamAId: -1,
+  teamBId: -1,
+  startDate: new Date().toISOString().split("T")[0],
+  endDate: new Date().toISOString().split("T")[0],
+  startTime: new Date().toISOString().split("T")[1].substring(0, 5),
+  endTime: new Date(new Date().getTime() + 60 * 60 * 1000) // +1 hour
+    .toISOString()
+    .split("T")[1]
+    .substring(0, 5),
+  location: undefined,
 };
 
 export default function AddScheduleDialog() {
-    const [selectedSport, setSelectedSport] = useState<number | null>(null);
-    const [open, setOpen] = useState(false);
-  const [scheduleInputs, setScheduleInputs] = useState<ScheduleInputs>(defaultInputs);
+  const [selectedSport, setSelectedSport] = useState<number | null>(null);
+  const [open, setOpen] = useState(false);
+  const [scheduleInputs, setScheduleInputs] =
+    useState<ScheduleInputs>(defaultInputs);
 
   useInitializeUserStore();
   const user = useUserStore();
@@ -114,12 +115,12 @@ export default function AddScheduleDialog() {
       createdById: userId,
     };
 
-      add.mutate(data, {
-        onSuccess: () => {
-            setSelectedSport(null);
-              setScheduleInputs(defaultInputs);
-              setOpen(false);
-        }
+    add.mutate(data, {
+      onSuccess: () => {
+        setSelectedSport(null);
+        setScheduleInputs(defaultInputs);
+        setOpen(false);
+      },
     });
   }
 
@@ -127,9 +128,10 @@ export default function AddScheduleDialog() {
   const error = sportsError || teamSportsError || userError || add.error;
 
   return (
-      <Dialog
-        open={open}
+    <Dialog
+      open={open}
       onOpenChange={(open) => {
+        setOpen(open);
         if (!open) {
           setSelectedSport(null);
           setScheduleInputs(defaultInputs);
@@ -224,11 +226,12 @@ export default function AddScheduleDialog() {
               emptyMessage="No sports found."
               options={sportsOptions}
               value={selectedSport?.toString() || ""}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 setSelectedSport(value ? Number(value) : null)
               }
               disabled={loading}
-              width="w-full"
+              loading={sportsLoading}
+              className="w-full"
             />
           </div>
           <div className="w-full flex justify-between items-center gap-4">
@@ -246,13 +249,14 @@ export default function AddScheduleDialog() {
                     ? scheduleInputs.teamAId.toString()
                     : ""
                 }
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs({
                     ...scheduleInputs,
                     teamAId: value ? Number(value) : -1,
                   })
                 }
                 disabled={!selectedSport || loading}
+                loading={teamLoading}
               />
             </div>
             <span className="font-bold opacity-50">vs</span>
@@ -270,13 +274,14 @@ export default function AddScheduleDialog() {
                     ? scheduleInputs.teamBId.toString()
                     : ""
                 }
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs({
                     ...scheduleInputs,
                     teamBId: value ? Number(value) : -1,
                   })
                 }
                 disabled={!selectedSport || loading}
+                loading={teamLoading}
               />
             </div>
           </div>

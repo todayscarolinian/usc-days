@@ -35,7 +35,7 @@ import {
 import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { getSportsTeamData } from "@/src/lib/actions";
-import { SearchableSelect, SelectOption } from "./searchable-select";
+import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
 interface ScheduleInputs {
   teamAId: number;
@@ -92,10 +92,10 @@ export default function EditScheduleDialog({
       timeZone: "Asia/Manila",
     }),
     location: schedule.location ? schedule.location : undefined,
-    };
-    
+  };
+
   const [selectedSport, setSelectedSport] = useState<number>(
-    schedule.gameType.id
+    schedule.gameType.id,
   );
   const [scheduleInputs, setScheduleInputs] =
     useState<ScheduleInputs>(defaultInputs);
@@ -135,8 +135,9 @@ export default function EditScheduleDialog({
       startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
       endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
       location: scheduleInputs.location ? scheduleInputs.location : undefined,
-      teamAScore: schedule.teamAScore,
-      teamBScore: schedule.teamBScore,
+      teamAScore: Number(schedule.teamAScore),
+      teamBScore: Number(schedule.teamBScore),
+      winnerId: schedule.winnerId ? Number(schedule.winnerId) : undefined,
     };
 
     edit.mutate(data, {
@@ -154,7 +155,7 @@ export default function EditScheduleDialog({
         onSuccess: () => {
           onOpenChange(false);
         },
-      }
+      },
     );
   };
 
@@ -175,7 +176,7 @@ export default function EditScheduleDialog({
               "en-CA",
               {
                 timeZone: "Asia/Manila",
-              }
+              },
             ),
             endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
               timeZone: "Asia/Manila",
@@ -187,7 +188,7 @@ export default function EditScheduleDialog({
                 minute: "2-digit",
                 hour12: false,
                 timeZone: "Asia/Manila",
-              }
+              },
             ),
             endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
               hour: "2-digit",
@@ -295,9 +296,10 @@ export default function EditScheduleDialog({
               emptyMessage="No sports found."
               options={sportsOptions}
               value={selectedSport.toString()}
-              onChange={(value) => setSelectedSport(Number(value))}
-              disabled={sportsOptions.length <= 0 || sportsLoading}
-              width="w-full"
+              onValueChange={(value) => setSelectedSport(Number(value))}
+              disabled={sportsOptions.length <= 0}
+              loading={sportsLoading}
+              className="w-full"
             />
           </div>
 
@@ -312,13 +314,14 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={scheduleInputs.teamAId.toString()}
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs((s) => ({
                     ...s,
                     teamAId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0 || teamLoading}
+                disabled={teamOptions.length <= 0}
+                loading={teamLoading}
               />
             </div>
 
@@ -334,13 +337,14 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={scheduleInputs.teamBId.toString()}
-                onChange={(value) =>
+                onValueChange={(value) =>
                   setScheduleInputs((s) => ({
                     ...s,
                     teamBId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0 || teamLoading}
+                disabled={teamOptions.length <= 0}
+                loading={teamLoading}
               />
             </div>
           </div>

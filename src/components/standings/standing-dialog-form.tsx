@@ -23,7 +23,7 @@ import {
   EditChampionPayload,
   EditChampionSchema,
 } from "@/src/types/champions.types";
-import { SearchableSelect } from "../schedules/searchable-select";
+import { SearchableSelect } from "../ui/searchable-select";
 import { Team } from "@/src/lib/prisma/generated/client";
 import {
   Select,
@@ -120,7 +120,7 @@ export default function StandingFormDialog({
         toast.success(
           mode === "add"
             ? "Standing added successfully"
-            : "Standing updated successfully"
+            : "Standing updated successfully",
         );
         onCloseAction(true);
       },
@@ -158,7 +158,7 @@ export default function StandingFormDialog({
             "Failed to delete standing. Please try again.";
           toast.error(errorMessage);
         },
-      }
+      },
     );
   };
 
@@ -193,7 +193,7 @@ export default function StandingFormDialog({
                       value={field.value ? new Date(field.value) : new Date()}
                       onChange={(date) =>
                         field.onChange(
-                          date ? date.toISOString().split("T")[0] : ""
+                          date ? date.toISOString().split("T")[0] : "",
                         )
                       }
                       disabled={isSubmitting}
@@ -221,13 +221,11 @@ export default function StandingFormDialog({
                         label: team.teamName,
                       }))}
                       value={field.value !== -1 ? field.value.toString() : ""}
-                      onChange={(value) =>
+                      onValueChange={(value) =>
                         field.onChange(value ? Number(value) : -1)
                       }
-                      disabled={
-                        // teams.length === 0 ||
-                        isSubmitting
-                      }
+                      disabled={isSubmitting}
+                      loading={isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />

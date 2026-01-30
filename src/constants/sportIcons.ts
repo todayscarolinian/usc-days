@@ -22,7 +22,7 @@ export const sportIcons: Record<string, StaticImageData> = {
   Basketball,
   "Cheer Dance": Cheerdance,
   Chess,
-  "E-Sports": Esports,
+  "ESports": Esports,
   "Flag Football": FlagFootball,
   Football,
   Frisbee,

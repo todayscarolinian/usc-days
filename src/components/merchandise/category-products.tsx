@@ -24,7 +24,7 @@ export default function CategoryProductsClient({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data = [], error, isLoading } = getProductsQuery();
+    const { data = [], error, isLoading } = getProductsQuery();
 
   const filteredProducts = (data as unknown as Product[]).filter(
     (product) => product.categoryId === categoryId,
@@ -34,6 +34,64 @@ export default function CategoryProductsClient({
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <section className="py-12 px-6 pt-20">
+        <Breadcrumb categoryName={categoryName} />
+        <h2 className="text-3xl font-bold mb-8">{categoryName}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full">
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col animate-pulse"
+            >
+              <div className="w-full h-32 bg-gray-200" />
+              <div className="p-3">
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+                <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+                <div className="h-3 bg-gray-100 rounded w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="py-12 px-6 pt-20">
+        <Breadcrumb categoryName={categoryName} />
+        <h2 className="text-3xl font-bold mb-8">{categoryName}sadasds</h2>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-600 font-semibold mb-2">
+            Failed to load products
+          </p>
+          <p className="text-red-500 text-sm">
+            {error instanceof Error
+              ? error.message
+              : "An unexpected error occurred."}
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty state
+  if (!filteredProducts || filteredProducts.length === 0) {
+    return (
+      <section className="py-12 px-6 pt-20">
+        <Breadcrumb categoryName={categoryName} />
+        <h2 className="text-3xl font-bold mb-8">{categoryName}</h2>
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+          <p className="text-gray-600">No products found in this category.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -79,9 +137,9 @@ export default function CategoryProductsClient({
           product={selectedProduct}
           isOpen={isModalOpen}
           onClose={() => {
-            setIsModalOpen(false)
-            setSelectedProduct(null)
-        }}
+            setIsModalOpen(false);
+            setSelectedProduct(null);
+          }}
         />
       )}
     </>

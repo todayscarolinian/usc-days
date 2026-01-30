@@ -57,7 +57,7 @@ export default function SchedulesList({ filters }: SchedulesListProps) {
     }
     
     return games;
-  }, [data?.pages]);
+  }, [data]);
 
   const { grouped, orderedDates } = useMemo(() => {
     const groupedByDay = allGames.reduce<Record<string, Schedules[]>>(

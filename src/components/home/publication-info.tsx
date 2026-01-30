@@ -2,12 +2,13 @@ import Image from "next/image";
 import { Facebook, Instagram, Youtube, Mail } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { PUBLICATION } from "@/src/constants/publication";
+import Link from "next/link";
 
 export default function PublicationInfo() {
   return (
     <div className="flex flex-col justify-between">
-      <Image 
-        src="/tc-print-logo.png" 
+      <Image
+        src="/tc-print-logo.png"
         alt="Today's Carolinian Logo"
         width={300}
         height={300}
@@ -18,12 +19,12 @@ export default function PublicationInfo() {
       {/* Email with icon */}
       <div className="flex items-center gap-2 mb-5">
         <Mail size={20} className="text-white" />
-        <a 
-          href={`mailto:${PUBLICATION.email}`} 
+        <a
+          href={`mailto:${PUBLICATION.email}`}
           className="text-sm text-white hover:underline"
         >
           {PUBLICATION.email}
-        </a> 
+        </a>
       </div>
 
       {/* Social Icons */}
@@ -61,10 +62,13 @@ export default function PublicationInfo() {
       <div className="bg-white text-slate-900 rounded-lg p-6">
         <h3 className="text-xl font-bold mb-2">Feedback Form</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Help us improve! Share your experience using the USC Days app. Your feedback is valuable.
+          Help us improve! Share your experience using the USC Days app. Your
+          feedback is valuable.
         </p>
-        <Button disabled className="w-full opacity-50 cursor-not-allowed">
-          Share Your Feedback
+        <Button asChild className="w-full bg-primary">
+          <Link href={"https://forms.gle/7qTRkni7CAG13H1g8"} target="_blank">
+            Share Your Feedback
+          </Link>
         </Button>
       </div>
     </div>

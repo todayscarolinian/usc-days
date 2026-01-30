@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
-import SportLogo from "@/src/assets/tc-logo-red.png";
 import Image from "next/image";
 import { StandingData } from "@/src/types/types";
+import { getLogoForSchool } from "@/src/lib/utils";
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
   meta?: {
@@ -16,7 +16,7 @@ export const columns: ColumnDef<StandingData>[] = [
     meta: { className: "w-100" },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <Image src={SportLogo} alt="Sport Logo" className="size-6" />
+        <Image src={getLogoForSchool(row.getValue("team")).src} alt="Sport Logo" className="size-6" width={24} height={24} />
         <span>{row.getValue("team")}</span>
       </div>
     ),

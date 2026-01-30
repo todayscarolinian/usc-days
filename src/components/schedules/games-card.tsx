@@ -10,6 +10,7 @@ import { schoolLogos } from "@/src/constants/schoolLogos";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Schedules } from "@/src/types/types";
+import { getIconFor, getLogoForSchool } from "@/src/lib/utils";
 
 type ScheduleCardProps = {
   game: Schedules;
@@ -32,9 +33,12 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
         }
       }}
     >
-      <div className="grid grid-cols-[1fr_auto_auto] md:grid-cols-[1fr_auto_1fr] p-4 mt-4">
-        <CardHeader className="col-span-1 flex items-center p-0">
-          <CardTitle>
+      <div
+        id="card-content"
+        className="flex flex-col p-4 mt-4 gap-2 md:grid md:grid-cols-4 md:gap-0"
+      >
+        <CardHeader className="p-0 md:col-span-1 mb-2 md:mb-0 flex flex-row md:flex-col justify-center">
+          <CardTitle className="flex items-center gap-1">
             <span className="text-lg md:text-2xl font-semibold">
               {format(start, "h:mm")}
             </span>
@@ -43,47 +47,47 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="col-span-1 flex justify-center items-center p-0">
-          <div className="flex justify-center gap-2 sm:gap-6 items-center text-center">
-            <div className="flex justify-center gap-3 md:gap-4 items-center text-sm md:text-base">
+        <CardContent className="col-span-2 w-full flex-1 flex justify-center items-center p-0">
+          <div className="gap-2 md:gap-6 justify-center items-center text-center w-full grid grid-cols-5 md:grid-cols-5">
+            <div className="flex justify-end gap-3 md:gap-4 items-center text-sm md:text-base col-span-2 md:col-span-2">
               {game.teamA.teamName}
               <Image
-                src={schoolLogos["Default"].src}
+                src={getLogoForSchool(game.teamA.teamName).src}
                 alt={`${game.teamA.teamName} logo`}
                 width={24}
                 height={24}
               />
             </div>
-            {game.teamAScore && game.teamBScore ? (
-              <div className="flex gap-2">
+            {Number(game.teamAScore) && Number(game.teamBScore) ? (
+              <div className="flex gap-2 justify-center">
                 <span
                   className={
-                    game.teamAScore > game.teamBScore
+                    game.winnerId === game.teamA.id
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {game.teamAScore}
+                  {Number(game.teamAScore)}
                 </span>
                 <span>
                   <b>/</b>
                 </span>
                 <span
                   className={
-                    game.teamBScore > game.teamAScore
+                    game.winnerId === game.teamB.id
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {game.teamBScore}
+                  {Number(game.teamBScore)}
                 </span>
               </div>
             ) : (
               <p className="text-xs md:text-sm text-gray-500">No score yet</p>
             )}
-            <div className="flex justify-center gap-1 md:gap-2 items-center text-sm md:text-base">
+            <div className="flex justify-start gap-1 md:gap-2 items-center text-sm md:text-base col-span-2 md:col-span-2">
               <Image
-                src={schoolLogos["Default"].src}
+                src={getLogoForSchool(game.teamB.teamName).src}
                 alt={`${game.teamB.teamName} logo`}
                 width={24}
                 height={24}
@@ -96,15 +100,11 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
       <CardFooter className="grid grid-cols-[auto_auto_1fr] md:grid-cols-[1fr_auto_1fr] bg-[#C02D2D] text-xs text-white py-2 px-2">
         <div className="col-span-1 flex items-center">
           <Image
-            src={
-              (sportIcons[game.gameType.gameName] || sportIcons["Default"]).src
-            }
+            src={getIconFor(game.gameType.gameName)}
             alt={`${game.gameType.gameName} icon`}
             width={20}
             height={20}
-            className={`mr-1 size-6 ${
-              sportIcons[game.gameType.gameName] ? "invert" : ""
-            }`}
+            className={`mr-1 invert size-6`}
           />
           <span>{game.gameType.gameName.toUpperCase()}</span>
         </div>

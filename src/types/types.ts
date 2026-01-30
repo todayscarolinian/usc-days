@@ -1,3 +1,5 @@
+import { Game } from "../lib/prisma/generated/client";
+
 /*
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
 */
@@ -40,10 +42,7 @@ export type StandingData = {
     sport: string;
 };
 
-export type Schedules = {
-    id: number;
-    startDate: string;
-    endDate: string;
+export type Schedules = Game & {
     gameType: {
         id: number;
         gameName: string;
@@ -56,9 +55,10 @@ export type Schedules = {
         id: number;
         teamName: string;
     };
-    teamAScore: number | null;
-    teamBScore: number | null;
-    location?: string | undefined;
+    winner: {
+        id: number;
+        teamName: string;
+    } | null;
 };
 
 export type filterType = {

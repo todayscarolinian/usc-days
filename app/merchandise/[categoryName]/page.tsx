@@ -1,25 +1,49 @@
 import { Metadata } from "next";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import CategoryProductsClient from "@/src/components/merchandise/category-products";
-import CATEGORIES from "@/src/constants/categories.json";
+import CategoryService from "@/src/services/category.service";
+
+const categoryService = new CategoryService();
 
 export const metadata: Metadata = generateMeta({
   title: "Merchandise Category - USC Days 2025",
-    description:
+  description:
     "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
   url: "/merchandise/[categoryName]",
   image: "/tc-logo-red.png",
 });
 
-export default async function CategoryPage({ 
-  params 
-}: { 
-  params: Promise<{ categoryName: string }> 
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ categoryName: string }>;
 }) {
   const { categoryName } = await params;
-  
-  const category = CATEGORIES.find(
-    (c) => c.name.toLowerCase() === categoryName.toLowerCase()
+
+  let categories;
+  let error;
+
+  try {
+    categories = await categoryService.getCategories();
+  } catch (err) {
+    error = err;
+  }
+
+  if (error) {
+    return (
+      <div className="p-12">
+        <h2 className="text-3xl font-bold mb-4">Error loading category</h2>
+        <p className="text-red-600">
+          {error instanceof Error
+            ? error.message
+            : "Failed to load merchandise category"}
+        </p>
+      </div>
+    );
+  }
+
+  const category = categories?.find(
+    (c) => c.categoryName.toLowerCase() === categoryName.toLowerCase(),
   );
 
   if (!category) {
@@ -32,7 +56,10 @@ export default async function CategoryPage({
 
   return (
     <div>
-      <CategoryProductsClient categoryId={category.id} categoryName={category.name} />
+      <CategoryProductsClient
+        categoryId={category.id}
+        categoryName={category.categoryName}
+      />
     </div>
   );
 }

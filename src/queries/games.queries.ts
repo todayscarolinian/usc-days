@@ -4,13 +4,14 @@ import { AddGamePayload, EditGamePayload } from "@/src/types/games.types";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Game } from "../lib/prisma/generated/client";
 import axios from "axios";
+import { Schedules } from "../types/types";
 const STALE_TIME = 1000 * 60 * 5;
 
 export const getGamesQuery = (params?: {
   startDate?: string;
   endDate?: string;
 }) =>
-  useQuery<Game[]>({
+  useQuery<Schedules[]>({
     queryKey: ["games", params],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
