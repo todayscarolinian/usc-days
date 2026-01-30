@@ -51,9 +51,12 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
         }
       }}
     >
-      <div className="flex flex-col md:flex-row md:items-center p-4 mt-4 gap-2 md:gap-0">
-        <CardHeader className="p-0 mb-2 md:mb-0 md:pl-12 flex flex-row md:flex-col items-center justify-center">
-          <CardTitle className="flex items-center md:gap-1">
+      <div
+        id="card-content"
+        className="flex flex-col p-4 mt-4 gap-2 md:grid md:grid-cols-4 md:gap-0"
+      >
+        <CardHeader className="p-0 md:col-span-1 mb-2 md:mb-0 flex flex-row md:flex-col justify-center">
+          <CardTitle className="flex items-center gap-1">
             <span className="text-lg md:text-2xl font-semibold">
               {format(start, "h:mm")}
             </span>
@@ -62,9 +65,9 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex justify-center items-center p-0">
-          <div className="flex justify-center gap-2 sm:gap-6 items-center text-center w-full">
-            <div className="flex justify-center gap-3 md:gap-4 items-center text-sm md:text-base">
+        <CardContent className="col-span-2 w-full flex-1 flex justify-center items-center p-0">
+          <div className="gap-2 md:gap-6 justify-center items-center text-center w-full grid grid-cols-5 md:grid-cols-5">
+            <div className="flex justify-end gap-3 md:gap-4 items-center text-sm md:text-base col-span-2 md:col-span-2">
               {game.teamA.teamName}
               <Image
                 src={schoolLogos["Default"].src}
@@ -74,7 +77,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
               />
             </div>
             {Number(game.teamAScore) && Number(game.teamBScore) ? (
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-center">
                 <span
                   className={
                     game.winnerId === game.teamA.id
@@ -100,7 +103,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             ) : (
               <p className="text-xs md:text-sm text-gray-500">No score yet</p>
             )}
-            <div className="flex justify-center gap-1 md:gap-2 items-center text-sm md:text-base">
+            <div className="flex justify-start gap-1 md:gap-2 items-center text-sm md:text-base col-span-2 md:col-span-2">
               <Image
                 src={schoolLogos["Default"].src}
                 alt={`${game.teamB.teamName} logo`}
