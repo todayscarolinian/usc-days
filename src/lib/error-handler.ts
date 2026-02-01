@@ -19,13 +19,19 @@ export function parseApiError(error: unknown): string {
     const errorMessage = response?.message || response?.error || response?.details || "";
     const lowerMessage = errorMessage.toLowerCase();
     
+    // Preserve specific location conflict messages
+    if (lowerMessage.includes("already booked")) {
+      return errorMessage;
+    }
+    
+    // Return generic message for other duplicate scenarios
     if (
       lowerMessage.includes("duplicate") ||
       lowerMessage.includes("already exists") ||
       lowerMessage.includes("conflict") ||
       error.response?.status === 409
     ) {
-      return "A schedule already exists for these teams at this time.";
+      return errorMessage || "A schedule already exists for these teams at this time.";
     }
 
     // Return API message if available

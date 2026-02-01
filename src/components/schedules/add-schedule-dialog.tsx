@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
@@ -65,22 +65,27 @@ export default function AddScheduleDialog() {
 
   const add = useAddGamesQuery();
 
-  // Handle query errors
+  // Handle query errors - using refs to track which errors have been shown
+  const shownErrorsRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
-    if (sportsError) {
+    if (sportsError && !shownErrorsRef.current.has('sports')) {
       showToast("error", "Failed to load sports", parseApiError(sportsError));
+      shownErrorsRef.current.add('sports');
     }
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError) {
+    if (teamSportsError && !shownErrorsRef.current.has('teams')) {
       showToast("error", "Failed to load teams", parseApiError(teamSportsError));
+      shownErrorsRef.current.add('teams');
     }
   }, [teamSportsError, showToast]);
 
   useEffect(() => {
-    if (userError) {
+    if (userError && !shownErrorsRef.current.has('user')) {
       showToast("error", "Authentication error", parseApiError(userError));
+      shownErrorsRef.current.add('user');
     }
   }, [userError, showToast]);
 
@@ -90,6 +95,7 @@ export default function AddScheduleDialog() {
       reset();
       setSelectedSport(null);
       dismissAll();
+      shownErrorsRef.current.clear();
     }
   }, [open, reset, dismissAll]);
 
@@ -112,6 +118,12 @@ export default function AddScheduleDialog() {
       return;
     }
 
+    // Validate userId is available
+    if (!userId) {
+      showToast("error", "Authentication required", "Please wait for authentication to complete");
+      return;
+    }
+
     // Validate form inputs using existing AddGameSchema
     if (!validate(selectedSport, userId)) {
       showToast("error", "Validation Error", firstError || "Please check your inputs");
@@ -122,6 +134,8 @@ export default function AddScheduleDialog() {
       gameTypeId: selectedSport,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
+      // Note: Timezone is hardcoded to +08:00 (Philippine Time/UTC+8)
+      // This assumes all users are in the same timezone
       startDate: `${inputs.startDate}T${inputs.startTime}:00+08:00`,
       endDate: `${inputs.endDate}T${inputs.endTime}:00+08:00`,
       location: inputs.location || undefined,
@@ -212,17 +226,7 @@ export default function AddScheduleDialog() {
                 type="time"
                 value={inputs.startTime}
                 onChange={(e) => updateInput("startTime", e.target.value)}
-                className={
-                  validationErrors.startTime
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
               />
-              {validationErrors.startTime && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.startTime}
-                </span>
-              )}
             </div>
             <div className="flex flex-col gap-1">
               <Label htmlFor="endTime" className="font-bold opacity-50">
@@ -232,17 +236,7 @@ export default function AddScheduleDialog() {
                 type="time"
                 value={inputs.endTime}
                 onChange={(e) => updateInput("endTime", e.target.value)}
-                className={
-                  validationErrors.endTime
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
               />
-              {validationErrors.endTime && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.endTime}
-                </span>
-              )}
             </div>
           </div>
           <div className="w-full">

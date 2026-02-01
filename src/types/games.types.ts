@@ -53,7 +53,7 @@ export const AddGameSchema = z
         message: 'Please select two different teams.',
         path: ['teamBId'],
     })
-    .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
+    .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
         message: 'End date must be after start date.',
         path: ['endDate'],
     });

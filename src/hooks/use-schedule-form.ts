@@ -45,6 +45,8 @@ export function useScheduleForm() {
   const validate = useCallback((gameTypeId: number, createdById: number): boolean => {
     try {
       // Transform inputs to match AddGameSchema format
+      // Note: Timezone is hardcoded to +08:00 (Philippine Time/UTC+8)
+      // This assumes all users are in the same timezone
       const dataToValidate = {
         gameTypeId,
         teamAId: inputs.teamAId,
@@ -63,7 +65,7 @@ export function useScheduleForm() {
       setValidationErrors(errors);
       return false;
     }
-  }, [inputs]);
+  }, [inputs.teamAId, inputs.teamBId, inputs.startDate, inputs.endDate, inputs.startTime, inputs.endTime, inputs.location]);
 
   const reset = useCallback(() => {
     setInputs(getDefaultInputs());
