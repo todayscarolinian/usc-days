@@ -19,13 +19,20 @@ export function parseApiError(error: unknown): string {
     const errorMessage = response?.message || response?.error || response?.details || "";
     const lowerMessage = errorMessage.toLowerCase();
     
-    if (
+    // Preserve specific location conflict messages (they contain the location name)
+    if (lowerMessage.includes("already booked")) {
+      return errorMessage;
+    }
+    
+    // Check for conflict patterns in message or 409 status
+    const hasConflictMessage = 
       lowerMessage.includes("duplicate") ||
       lowerMessage.includes("already exists") ||
-      lowerMessage.includes("conflict") ||
-      error.response?.status === 409
-    ) {
-      return "A schedule already exists for these teams at this time.";
+      lowerMessage.includes("conflict");
+    
+    if (hasConflictMessage || error.response?.status === 409) {
+      // Return original message if it has conflict keywords, otherwise use generic
+      return hasConflictMessage ? errorMessage : "A schedule already exists for these teams at this time.";
     }
 
     // Return API message if available

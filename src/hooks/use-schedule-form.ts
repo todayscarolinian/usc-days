@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { AddGameSchema } from "@/src/types/games.types";
 import { getValidationErrors } from "@/src/lib/error-handler";
+import { getTimezoneOffset } from "@/src/lib/utils";
 
 interface ScheduleInputs {
   teamAId: number;
@@ -49,8 +50,8 @@ export function useScheduleForm() {
         gameTypeId,
         teamAId: inputs.teamAId,
         teamBId: inputs.teamBId,
-        startDate: `${inputs.startDate}T${inputs.startTime}:00+08:00`,
-        endDate: `${inputs.endDate}T${inputs.endTime}:00+08:00`,
+        startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
+        endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
         location: inputs.location,
         createdById,
       };

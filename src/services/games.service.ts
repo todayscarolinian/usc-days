@@ -202,9 +202,10 @@ class GameService {
 
       // Check for location conflict (same venue can't host two games)
       if (location && location.trim() !== "") {
+        const normalizedLocation = location.trim().toLowerCase();
         const locationConflict = conflicts.find(
           (game) =>
-            game.location?.toLowerCase() === location.toLowerCase()
+            game.location?.trim().toLowerCase() === normalizedLocation
         );
         if (locationConflict) {
           throw new Error(
