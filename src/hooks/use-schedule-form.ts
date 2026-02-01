@@ -65,7 +65,7 @@ export function useScheduleForm() {
       setValidationErrors(errors);
       return false;
     }
-  }, [inputs.teamAId, inputs.teamBId, inputs.startDate, inputs.endDate, inputs.startTime, inputs.endTime, inputs.location]);
+  }, [inputs]);
 
   const reset = useCallback(() => {
     setInputs(getDefaultInputs());
