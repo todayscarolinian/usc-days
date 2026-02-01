@@ -110,7 +110,7 @@ export default function AddScheduleDialog() {
       teamAId: scheduleInputs.teamAId,
       teamBId: scheduleInputs.teamBId,
       startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-      endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
+      endDate: `${scheduleInputs.startDate}T${scheduleInputs.endTime}:00+08:00`,
       location: scheduleInputs.location ? scheduleInputs.location : undefined,
       createdById: userId,
     };
@@ -151,10 +151,10 @@ export default function AddScheduleDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
-          <div className="w-full grid grid-cols-2 gap-4">
+          <div className="w-full grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+                Date
               </Label>
               <Input
                 type="date"
@@ -164,22 +164,6 @@ export default function AddScheduleDialog() {
                   setScheduleInputs({
                     ...scheduleInputs,
                     startDate: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="endDate" className="font-bold opacity-50">
-                End Date
-              </Label>
-              <Input
-                type="date"
-                placeholder="End Date"
-                value={scheduleInputs.endDate}
-                onChange={(e) =>
-                  setScheduleInputs({
-                    ...scheduleInputs,
-                    endDate: e.target.value,
                   })
                 }
               />
