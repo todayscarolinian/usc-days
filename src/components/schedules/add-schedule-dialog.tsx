@@ -112,6 +112,12 @@ export default function AddScheduleDialog() {
       return;
     }
 
+    // Validate userId is available
+    if (!userId) {
+      showToast("error", "Authentication required", "Please wait for authentication to complete");
+      return;
+    }
+
     // Validate form inputs using existing AddGameSchema
     if (!validate(selectedSport, userId)) {
       showToast("error", "Validation Error", firstError || "Please check your inputs");
@@ -330,7 +336,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={selectedSport === null || loading}
+            disabled={selectedSport === null || loading || !userId}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>
