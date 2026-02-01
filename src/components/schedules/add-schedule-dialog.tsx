@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
@@ -26,6 +26,15 @@ import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 
+// Helper to get the current timezone offset in ISO 8601 format (e.g., "+08:00" or "-05:00")
+function getTimezoneOffset(): string {
+  const offset = -new Date().getTimezoneOffset();
+  const hours = Math.floor(Math.abs(offset) / 60);
+  const minutes = Math.abs(offset) % 60;
+  const sign = offset >= 0 ? "+" : "-";
+  return `${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
 export default function AddScheduleDialog() {
   const [selectedSport, setSelectedSport] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
@@ -41,6 +50,9 @@ export default function AddScheduleDialog() {
   } = useScheduleForm();
 
   const { showToast, dismissAll } = useToastManager();
+
+  // Track which errors have already been shown
+  const shownErrorsRef = useRef<Set<string>>(new Set());
 
   useInitializeUserStore();
   const user = useUserStore();
@@ -65,22 +77,25 @@ export default function AddScheduleDialog() {
 
   const add = useAddGamesQuery();
 
-  // Handle query errors
+  // Handle query errors - only show toast once per error
   useEffect(() => {
-    if (sportsError) {
+    if (sportsError && !shownErrorsRef.current.has('sportsError')) {
       showToast("error", "Failed to load sports", parseApiError(sportsError));
+      shownErrorsRef.current.add('sportsError');
     }
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError) {
+    if (teamSportsError && !shownErrorsRef.current.has('teamSportsError')) {
       showToast("error", "Failed to load teams", parseApiError(teamSportsError));
+      shownErrorsRef.current.add('teamSportsError');
     }
   }, [teamSportsError, showToast]);
 
   useEffect(() => {
-    if (userError) {
+    if (userError && !shownErrorsRef.current.has('userError')) {
       showToast("error", "Authentication error", parseApiError(userError));
+      shownErrorsRef.current.add('userError');
     }
   }, [userError, showToast]);
 
@@ -90,6 +105,7 @@ export default function AddScheduleDialog() {
       reset();
       setSelectedSport(null);
       dismissAll();
+      shownErrorsRef.current.clear();
     }
   }, [open, reset, dismissAll]);
 
@@ -106,6 +122,12 @@ export default function AddScheduleDialog() {
   }));
 
   async function createSchedule() {
+    // Validate user authentication
+    if (!userId) {
+      showToast("error", "Authentication required", "Please wait for authentication to complete");
+      return;
+    }
+
     // Validate sport selection
     if (!selectedSport) {
       showToast("error", "Please select a sport");
@@ -122,8 +144,8 @@ export default function AddScheduleDialog() {
       gameTypeId: selectedSport,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00+08:00`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00+08:00`,
+      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
+      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location || undefined,
       createdById: userId,
     };
@@ -212,17 +234,7 @@ export default function AddScheduleDialog() {
                 type="time"
                 value={inputs.startTime}
                 onChange={(e) => updateInput("startTime", e.target.value)}
-                className={
-                  validationErrors.startTime
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
               />
-              {validationErrors.startTime && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.startTime}
-                </span>
-              )}
             </div>
             <div className="flex flex-col gap-1">
               <Label htmlFor="endTime" className="font-bold opacity-50">
@@ -232,17 +244,7 @@ export default function AddScheduleDialog() {
                 type="time"
                 value={inputs.endTime}
                 onChange={(e) => updateInput("endTime", e.target.value)}
-                className={
-                  validationErrors.endTime
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
               />
-              {validationErrors.endTime && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.endTime}
-                </span>
-              )}
             </div>
           </div>
           <div className="w-full">
@@ -330,7 +332,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={selectedSport === null || loading}
+            disabled={!userId || selectedSport === null || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>
