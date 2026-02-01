@@ -147,7 +147,7 @@ class GameService {
       throw new Error("Could not fetch games");
     }
   }
-    async addGame({
+  async addGame({
     gameTypeId,
     teamAId,
     teamBId,
