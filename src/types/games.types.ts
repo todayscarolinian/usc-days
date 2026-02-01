@@ -84,6 +84,35 @@ export const EditGameSchema = z
                     ? 'teamBId is required.'
                     : 'teamBId must be a number.',
         }),
+        teamAScore: z
+            .number({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? 'teamAScore is required.'
+                        : 'teamAScore must be a number.',
+            })
+            .min(-1, 'teamAScore cannot be negative.')
+            .nullable()
+            .optional(),
+        teamBScore: z
+            .number({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? 'teamBScore is required.'
+                        : 'teamBScore must be a number.',
+            })
+            .min(-1, 'teamBScore cannot be negative.')
+            .nullable()
+            .optional(),
+        winnerId: z
+            .number({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? 'winnerId is required.'
+                        : 'winnerId must be a number.',
+            })
+            .nullable()
+            .optional(),
         startDate: z
             .string({
                 error: (issue) =>
@@ -107,8 +136,17 @@ export const EditGameSchema = z
         location: z.string().optional(),
     })
     .refine((data) => data.teamAId !== data.teamBId, {
-        message: 'Team A and Team B cannot be the same.',
+        message: 'teamAId and teamBId cannot be the same.',
         path: ['teamBId'],
+    })
+    .refine((data) => {
+        if (data.winnerId !== null && data.winnerId !== undefined) {
+            return data.winnerId === data.teamAId || data.winnerId === data.teamBId;
+        }
+        return true;
+    }, {
+        message: 'winnerId must be either teamAId, teamBId, or null for unfinished games.',
+        path: ['winnerId'],
     });
 
 // Schema for DeleteGame
