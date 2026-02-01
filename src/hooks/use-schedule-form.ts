@@ -1,15 +1,7 @@
 import { useState, useCallback } from "react";
 import { AddGameSchema } from "@/src/types/games.types";
 import { getValidationErrors } from "@/src/lib/error-handler";
-
-// Helper to get the current timezone offset in ISO 8601 format (e.g., "+08:00" or "-05:00")
-function getTimezoneOffset(): string {
-  const offset = -new Date().getTimezoneOffset();
-  const hours = Math.floor(Math.abs(offset) / 60);
-  const minutes = Math.abs(offset) % 60;
-  const sign = offset >= 0 ? "+" : "-";
-  return `${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-}
+import { getTimezoneOffset } from "@/src/lib/utils";
 
 interface ScheduleInputs {
   teamAId: number;
