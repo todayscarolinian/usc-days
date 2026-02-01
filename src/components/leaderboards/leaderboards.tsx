@@ -11,7 +11,6 @@ import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboard
 import { StandingData } from "@/src/types/types";
 
 export default function Leaderboards() {
-  const [rankingsData, setRankingsData] = useState<StandingData[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectedSport = searchParams.get("sport")
@@ -23,10 +22,6 @@ export default function Leaderboards() {
   const transformed = useMemo(() => {
     return transformGamesToSchoolRank(games, selectedSport || undefined);
   }, [games, selectedSport]);
-
-  useEffect(() => {
-    setRankingsData(transformed);
-  }, [transformed]);
 
   const handleSportSelect = (sportId: number | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -41,15 +36,15 @@ export default function Leaderboards() {
   return (
     <div className="p-4 sm:py-10">
       <div className="mx-auto max-w-[96%] space-y-6">
-          <SportSelector
-            value={selectedSport}
-            onValueChangeAction={handleSportSelect}
-            className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
-          />
+        <SportSelector
+          value={selectedSport}
+          onValueChangeAction={handleSportSelect}
+          className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
+        />
         {error || loading ? (
           <LeaderboardsTableSkeleton error={error?.message} />
         ) : (
-          <DataTable columns={columns} data={rankingsData} title="USC DAYS" />
+          <DataTable columns={columns} data={transformed} title="USC DAYS" />
         )}
       </div>
     </div>
