@@ -51,7 +51,7 @@ export const AddGameSchema = z
             }),
     })
     .refine((data) => data.teamAId !== data.teamBId, {
-        message: 'teamAId and teamBId cannot be the same.',
+        message: 'Team A and Team B cannot be the same.',
         path: ['teamBId'],
     });
 

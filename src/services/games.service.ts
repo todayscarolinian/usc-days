@@ -147,7 +147,7 @@ class GameService {
       throw new Error("Could not fetch games");
     }
   }
-  async addGame({
+    async addGame({
     gameTypeId,
     teamAId,
     teamBId,
@@ -157,6 +157,63 @@ class GameService {
     createdById,
   }: AddGamePayload) {
     try {
+      const proposedStart = new Date(startDate);
+      const proposedEnd = new Date(endDate);
+
+      // Single query to check all conflicts
+      const conflicts = await prisma.game.findMany({
+        where: {
+          AND: [
+            { startDate: { lt: proposedEnd } },
+            { endDate: { gt: proposedStart } },
+          ],
+          OR: [
+            // Exact duplicate (same teams, same sport, overlapping time)
+            {
+              gameTypeId,
+              OR: [
+                { AND: [{ teamAId }, { teamBId }] },
+                { AND: [{ teamAId: teamBId }, { teamBId: teamAId }] },
+              ],
+            },
+            // Location conflict (if provided)
+            ...(location && location.trim() !== ""
+              ? [{ location: { equals: location, mode: "insensitive" as const } }]
+              : []),
+          ],
+        },
+        include: {
+          teamA: true,
+          teamB: true,
+          gameType: true,
+        },
+      });
+
+      // Check for exact duplicate (same teams, same sport)
+      const duplicate = conflicts.find(
+        (game) =>
+          game.gameTypeId === gameTypeId &&
+          ((game.teamAId === teamAId && game.teamBId === teamBId) ||
+            (game.teamAId === teamBId && game.teamBId === teamAId))
+      );
+      if (duplicate) {
+        throw new Error("A schedule already exists for these teams at this time.");
+      }
+
+      // Check for location conflict (same venue can't host two games)
+      if (location && location.trim() !== "") {
+        const locationConflict = conflicts.find(
+          (game) =>
+            game.location?.toLowerCase() === location.toLowerCase()
+        );
+        if (locationConflict) {
+          throw new Error(
+            `The location "${location}" is already booked for another game during this time.`
+          );
+        }
+      }
+
+      // All validations passed, create the game
       const newGame = await prisma.game.create({
         data: {
           gameTypeId,
@@ -171,6 +228,13 @@ class GameService {
       return newGame;
     } catch (error) {
       console.error("Error adding game:", error);
+
+      if (error instanceof Error && 
+          (error.message.includes("already exists") || 
+           error.message.includes("already booked"))) {
+        throw error;
+      }
+      
       throw new Error("An unexpected error occurred while adding the game.");
     }
   }

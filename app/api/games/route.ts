@@ -123,7 +123,18 @@ export async function POST(req: Request) {
         return NextResponse.json({ newGame }, { status: 201 });
     } catch (error) {
         console.error("Error adding game:", error);
-        return NextResponse.json({ error: `${error}` }, { status: 500 });
+        // Check if it's our duplicate schedule error
+        if (error instanceof Error && error.message.includes("already exists")) {
+            return NextResponse.json(
+                { message: error.message },
+                { status: 409 }
+            );
+        }
+
+        return NextResponse.json(
+            { error: "Could not add game" },
+            { status: 500 }
+        );
     }
 }
 
