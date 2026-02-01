@@ -154,7 +154,7 @@ export default function AddScheduleDialog() {
           <div className="w-full grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+                Date
               </Label>
               <Input
                 type="date"
