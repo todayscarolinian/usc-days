@@ -24,14 +24,15 @@ export function parseApiError(error: unknown): string {
       return errorMessage;
     }
     
-    if (
+    // Check for conflict patterns in message or 409 status
+    const hasConflictMessage = 
       lowerMessage.includes("duplicate") ||
       lowerMessage.includes("already exists") ||
-      lowerMessage.includes("conflict") ||
-      error.response?.status === 409
-    ) {
-      // Return the original message if it exists, otherwise use generic
-      return errorMessage || "A schedule already exists for these teams at this time.";
+      lowerMessage.includes("conflict");
+    
+    if (hasConflictMessage || error.response?.status === 409) {
+      // Return original message if it has conflict keywords, otherwise use generic
+      return hasConflictMessage ? errorMessage : "A schedule already exists for these teams at this time.";
     }
 
     // Return API message if available
