@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/src/components/leaderboards/data-table";
 import { columns } from "@/src/components/leaderboards/columns";
@@ -8,7 +8,6 @@ import { transformGamesToSchoolRank } from "@/src/components/leaderboards/transf
 import { getGamesQuery } from "@/src/queries/games.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
 import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboards-table-skeleton";
-import { StandingData } from "@/src/types/types";
 
 export default function Leaderboards() {
   const searchParams = useSearchParams();
