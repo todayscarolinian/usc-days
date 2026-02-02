@@ -24,16 +24,15 @@ export default function ContactForm() {
     },
   });
 
-  function handleContactClick() {
-    const { firstName, lastName, email, message } = form.getValues();
-    const fullName = `${firstName} ${lastName}`.trim();
-
+  const onSubmit = (values: ContactFormValues) => {
+    const fullName = `${values.firstName} ${values.lastName}`.trim();
+    
     const mailtoLink = `mailto:todayscarolinianusc.dev@gmail.com?subject=${encodeURIComponent(
       "USC Days Inquiry"
-    )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${email}\n\n${message}`)}`;
+    )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${values.email}\n\n${values.message}`)}`;
 
     window.location.href = mailtoLink;
-  }
+  };
 
   return (
     <div className="bg-white text-slate-900 rounded-lg p-6">
@@ -43,7 +42,7 @@ export default function ContactForm() {
       </p>
 
       <Form {...form}>
-        <div className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -104,19 +103,18 @@ export default function ContactForm() {
           />
 
           <Button
-            type="button"
-            onClick={handleContactClick}
+            type="submit"
             className="w-full bg-tc_primary text-white"
           >
             Send Message
           </Button>
-          
+
           <p className="text-xs text-gray-500">
             If your email client doesn’t open, email us directly at
             {" "}todayscarolinianusc.dev@gmail.com.
           </p>
 
-        </div>
+        </form>
       </Form>
     </div>
   );
