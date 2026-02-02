@@ -18,7 +18,7 @@ export function useToastManager() {
       setActiveToasts((prev) => new Set(prev).add(id));
       return id;
     },
-    []
+    [setActiveToasts]
   );
 
   const dismissToast = useCallback((id: string | number) => {
