@@ -4,6 +4,7 @@ import { getValidationErrors } from "@/src/lib/error-handler";
 import { getTimezoneOffset } from "@/src/lib/utils";
 
 interface ScheduleInputs {
+  gameTypeId: number;
   teamAId: number;
   teamBId: number;
   startDate: string;
@@ -14,6 +15,7 @@ interface ScheduleInputs {
 }
 
 const getDefaultInputs = (): ScheduleInputs => ({
+  gameTypeId: -1,
   teamAId: -1,
   teamBId: -1,
   startDate: new Date().toISOString().split("T")[0],
@@ -43,11 +45,11 @@ export function useScheduleForm() {
     []
   );
 
-  const validate = useCallback((gameTypeId: number, createdById: number): boolean => {
+  const validate = useCallback((createdById: number): boolean => {
     try {
       // Transform inputs to match AddGameSchema format
       const dataToValidate = {
-        gameTypeId,
+        gameTypeId: inputs.gameTypeId,
         teamAId: inputs.teamAId,
         teamBId: inputs.teamBId,
         startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,

@@ -28,7 +28,6 @@ import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { getTimezoneOffset } from "@/src/lib/utils";
 
 export default function AddScheduleDialog() {
-  const [selectedSport, setSelectedSport] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
 
   const {
@@ -59,7 +58,7 @@ export default function AddScheduleDialog() {
     data: fetchedTeamSportsData = [],
     error: teamSportsError,
     isLoading: teamLoading,
-  } = getTeamGameTypesQuery(Number(selectedSport));
+  } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
 
   const {
     data: userId,
@@ -95,7 +94,6 @@ export default function AddScheduleDialog() {
   useEffect(() => {
     if (!open) {
       reset();
-      setSelectedSport(null);
       dismissAll();
       shownErrorsRef.current.clear();
     }
@@ -121,19 +119,19 @@ export default function AddScheduleDialog() {
     }
 
     // Validate sport selection
-    if (!selectedSport) {
+    if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
       return;
     }
 
     // Validate form inputs using existing AddGameSchema
-    if (!validate(selectedSport, userId)) {
+    if (!validate(userId)) {
       showToast("error", "Validation Error", firstError || "Please check your inputs");
       return;
     }
 
     const data: AddGamePayload = {
-      gameTypeId: selectedSport,
+      gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
@@ -245,9 +243,9 @@ export default function AddScheduleDialog() {
               searchPlaceholder="Search sports..."
               emptyMessage="No sports found."
               options={sportsOptions}
-              value={selectedSport?.toString() || ""}
+              value={inputs.gameTypeId > 0 ? inputs.gameTypeId.toString() : ""}
               onValueChange={(value) =>
-                setSelectedSport(value ? Number(value) : null)
+                updateInput("gameTypeId", value ? Number(value) : -1)
               }
               disabled={loading}
               loading={sportsLoading}
@@ -268,7 +266,7 @@ export default function AddScheduleDialog() {
                 onValueChange={(value) =>
                   updateInput("teamAId", value ? Number(value) : -1)
                 }
-                disabled={!selectedSport || loading}
+                disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
                 className={validationErrors.teamAId ? "border-red-500" : ""}
               />
@@ -292,7 +290,7 @@ export default function AddScheduleDialog() {
                 onValueChange={(value) =>
                   updateInput("teamBId", value ? Number(value) : -1)
                 }
-                disabled={!selectedSport || loading}
+                disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
                 className={validationErrors.teamBId ? "border-red-500" : ""}
               />
@@ -324,7 +322,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={!userId || selectedSport === null || loading}
+            disabled={!userId || inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>
