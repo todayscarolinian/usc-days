@@ -30,3 +30,15 @@ export const getLogoForSchool = (schoolName: string) => {
     const key = Object.keys(schoolLogos).find((k) => schoolName.includes(k));
     return key ? schoolLogos[key] : schoolLogos["Default"];
 }
+
+/**
+ * Get the current timezone offset in ISO 8601 format (e.g., "+08:00" or "-05:00")
+ * This ensures dates are stored in the user's local timezone
+ */
+export function getTimezoneOffset(): string {
+  const offset = -new Date().getTimezoneOffset();
+  const hours = Math.floor(Math.abs(offset) / 60);
+  const minutes = Math.abs(offset) % 60;
+  const sign = offset >= 0 ? "+" : "-";
+  return `${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
