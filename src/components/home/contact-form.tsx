@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -16,8 +14,6 @@ import { Button } from "@/src/components/ui/button";
 import { contactFormSchema, type ContactFormValues } from "@/src/types/contact.types";
 
 export default function ContactForm() {
-  const [status, setStatus] = React.useState<null | "sending" | "sent" | "error">(null);
-
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -28,32 +24,15 @@ export default function ContactForm() {
     },
   });
 
-  useEffect(() => {
-    if (status === "sent") {
-      const timer = setTimeout(() => setStatus(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
+  function handleContactClick() {
+    const { firstName, lastName, email, message } = form.getValues();
+    const fullName = `${firstName} ${lastName}`.trim();
 
-  async function onSubmit(values: ContactFormValues) {
-    setStatus("sending");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
+    const mailtoLink = `mailto:todayscarolinianusc.dev@gmail.com?subject=${encodeURIComponent(
+      "USC Days Inquiry"
+    )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${email}\n\n${message}`)}`;
 
-      if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
-      }
-
-      setStatus("sent");
-      form.reset();
-    } catch (err) {
-      console.error("Contact form error:", err);
-      setStatus("error");
-    }
+    window.location.href = mailtoLink;
   }
 
   return (
@@ -64,7 +43,7 @@ export default function ContactForm() {
       </p>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -119,33 +98,19 @@ export default function ContactForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription className="text-slate-500">
-                  {field.value.length}/500 characters
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
           <Button
-            type="submit"
+            type="button"
+            onClick={handleContactClick}
             className="w-full bg-tc_primary text-white"
-            disabled={status === "sending"}
           >
-            {status === "sending" ? "Sending…" : "Submit"}
+            Send Message
           </Button>
-
-          {status === "sent" && (
-            <div role="alert" className="text-sm text-green-600 p-2 bg-green-50 rounded">
-              Message sent — thank you!
-            </div>
-          )}
-          {status === "error" && (
-            <div role="alert" className="text-sm text-red-600 p-2 bg-red-50 rounded">
-              Error sending — please try again.
-            </div>
-          )}
-        </form>
+        </div>
       </Form>
     </div>
   );
