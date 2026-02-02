@@ -27,8 +27,7 @@ import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 interface ScheduleInputs {
   teamAId: number;
   teamBId: number;
-  startDate: string;
-  endDate: string;
+  date: string;
   startTime: string;
   endTime: string;
   location?: string | undefined;
@@ -51,8 +50,7 @@ interface SportTeam {
 const defaultInputs: ScheduleInputs = {
   teamAId: -1,
   teamBId: -1,
-  startDate: new Date().toISOString().split("T")[0],
-  endDate: new Date().toISOString().split("T")[0],
+  date: new Date().toISOString().split("T")[0],
   startTime: new Date().toISOString().split("T")[1].substring(0, 5),
   endTime: new Date(new Date().getTime() + 60 * 60 * 1000) // +1 hour
     .toISOString()
@@ -105,15 +103,19 @@ export default function AddScheduleDialog() {
   async function createSchedule() {
     if (!selectedSport) return;
 
+    let endDate = new Date(`${scheduleInputs.date}T${scheduleInputs.endTime}:00+08:00`)
+    endDate.setDate(endDate.getDate() + 1)  // Plus One Day
+
     const data: AddGamePayload = {
       gameTypeId: selectedSport,
       teamAId: scheduleInputs.teamAId,
       teamBId: scheduleInputs.teamBId,
-      startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
-      endDate: `${scheduleInputs.startDate}T${scheduleInputs.endTime}:00+08:00`,
+      startDate: `${scheduleInputs.date}T${scheduleInputs.startTime}:00+08:00`,
+      endDate: `${endDate.toISOString().split('T')[0]}T${scheduleInputs.endTime}:00+08:00`,
       location: scheduleInputs.location ? scheduleInputs.location : undefined,
       createdById: userId,
     };
+
 
     add.mutate(data, {
       onSuccess: () => {
@@ -153,17 +155,17 @@ export default function AddScheduleDialog() {
         <div className="grid gap-8 py-4">
           <div className="w-full grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
-              <Label htmlFor="startDate" className="font-bold opacity-50">
+              <Label htmlFor="date" className="font-bold opacity-50">
                 Date
               </Label>
               <Input
                 type="date"
-                placeholder="Start Date"
-                value={scheduleInputs.startDate}
+                placeholder="Date"
+                value={scheduleInputs.date}
                 onChange={(e) =>
                   setScheduleInputs({
                     ...scheduleInputs,
-                    startDate: e.target.value,
+                    date: e.target.value,
                   })
                 }
               />
