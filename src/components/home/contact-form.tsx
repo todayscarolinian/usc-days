@@ -110,6 +110,12 @@ export default function ContactForm() {
           >
             Send Message
           </Button>
+          
+          <p className="text-xs text-gray-500">
+            If your email client doesn’t open, email us directly at
+            {" "}todayscarolinianusc.dev@gmail.com.
+          </p>
+
         </div>
       </Form>
     </div>
