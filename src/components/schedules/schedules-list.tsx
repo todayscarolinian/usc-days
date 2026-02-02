@@ -13,9 +13,10 @@ import SchedulesListSkeleton from "./schedules-list-skeleton";
 
 type SchedulesListProps = {
   filters?: filterType;
+  selectedDate?: Date;
 };
 
-export default function SchedulesList({ filters }: SchedulesListProps) {
+export default function SchedulesList({ filters, selectedDate }: SchedulesListProps) {
   const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
   const [open, setOpen] = useState(false);
   const [editGame, setEditGame] = useState<Schedules | null>(null);
@@ -77,6 +78,14 @@ export default function SchedulesList({ filters }: SchedulesListProps) {
       );
     });
 
+    // If a specific date is selected, only show that date
+    if (selectedDate) {
+      const selectedDateKey = format(selectedDate, "yyyy-MM-dd");
+      const filteredGrouped = { [selectedDateKey]: groupedByDay[selectedDateKey] ?? [] };
+      return { grouped: filteredGrouped, orderedDates: [selectedDateKey] };
+    }
+
+    // Otherwise, show all dates with today first
     const todayKey = format(new Date(), "yyyy-MM-dd");
     if (!groupedByDay[todayKey]) {
       groupedByDay[todayKey] = [];
@@ -92,7 +101,7 @@ export default function SchedulesList({ filters }: SchedulesListProps) {
     ];
 
     return { grouped: groupedByDay, orderedDates: ordered };
-  }, [allGames]);
+  }, [allGames, selectedDate]);
 
   useEffect(() => {
     const node = loadMoreRef.current;
@@ -134,29 +143,42 @@ export default function SchedulesList({ filters }: SchedulesListProps) {
   }
 
   const hasGames = allGames.length > 0;
+  const hasFilteredGames = orderedDates.some((date) => grouped[date] && grouped[date].length > 0);
 
   return (
     <div className="flex flex-col items-center gap-15 w-full">
-      {!hasGames && !isFetching && (
+      {!hasFilteredGames && !isFetching && (
         <div className="py-12 text-center">
-          <p className="text-muted-foreground">No games scheduled</p>
+          <p className="text-muted-foreground">
+            {selectedDate 
+              ? `No games scheduled for ${format(selectedDate, "MMMM d, yyyy")}` 
+              : "No games scheduled"
+            }
+          </p>
+          {selectedDate && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Try selecting a different date or clearing the filter
+            </p>
+          )}
         </div>
       )}
 
-      {orderedDates.map((date) => (
-        <SchedulesCard
-          key={date}
-          date={date}
-          games={grouped[date] ?? []}
-          onOpenGame={(g) => {
-            setSelectedGame(g);
-            setOpen(true);
-          }}
-        />
-      ))}
+      {orderedDates
+        .filter((date) => grouped[date] && grouped[date].length > 0)
+        .map((date) => (
+          <SchedulesCard
+            key={date}
+            date={date}
+            games={grouped[date]}
+            onOpenGame={(g) => {
+              setSelectedGame(g);
+              setOpen(true);
+            }}
+          />
+        ))}
 
       {/* Loading sentinel for infinite scroll */}
-      {hasNextPage && (
+      {hasNextPage && hasFilteredGames && (
         <div
           ref={loadMoreRef}
           className="h-20 w-full flex items-center justify-center"
@@ -172,7 +194,7 @@ export default function SchedulesList({ filters }: SchedulesListProps) {
         </div>
       )}
 
-      {!hasNextPage && hasGames && (
+      {!hasNextPage && hasFilteredGames && !selectedDate && (
         <div className="py-4 text-center">
           <p className="text-xs text-muted-foreground">
             You&apos;ve reached the end
