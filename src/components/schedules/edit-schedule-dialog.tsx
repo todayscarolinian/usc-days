@@ -230,23 +230,7 @@ export default function EditScheduleDialog({
                   setScheduleInputs((s) => ({
                     ...s,
                     startDate: e.target.value,
-                  }))
-                }
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="endDate" className="font-bold opacity-50">
-                End Date
-              </Label>
-              <Input
-                type="date"
-                placeholder="End Date"
-                value={scheduleInputs.endDate ?? ""}
-                onChange={(e) =>
-                  setScheduleInputs((s) => ({
-                    ...s,
-                    endDate: e.target.value,
+                    endDate: e.target.value
                   }))
                 }
               />

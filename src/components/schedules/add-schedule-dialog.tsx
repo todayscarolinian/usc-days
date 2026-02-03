@@ -135,7 +135,7 @@ export default function AddScheduleDialog() {
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.startDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location || undefined,
       createdById: userId,
     };
