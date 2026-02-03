@@ -30,7 +30,7 @@ export default function ContactForm() {
     
     const mailtoLink = `mailto:${PUBLICATION.email}?subject=${encodeURIComponent(
       "USC Days Inquiry"
-    )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${values.email}\n\n${values.message}`)}`;
+    )}&body=${encodeURIComponent(`Hello,\n\n${values.message}`)}`;
 
     window.location.href = mailtoLink;
     form.reset();
