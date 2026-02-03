@@ -11,6 +11,7 @@ import {
 } from "@/src/components/ui/form";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
+import { PUBLICATION } from "@/src/constants/publication";
 import { contactFormSchema, type ContactFormValues } from "@/src/types/contact.types";
 
 export default function ContactForm() {
@@ -27,7 +28,7 @@ export default function ContactForm() {
   const onSubmit = (values: ContactFormValues) => {
     const fullName = `${values.firstName} ${values.lastName}`.trim();
     
-    const mailtoLink = `mailto:todayscarolinianusc.dev@gmail.com?subject=${encodeURIComponent(
+    const mailtoLink = `mailto:${PUBLICATION.email}?subject=${encodeURIComponent(
       "USC Days Inquiry"
     )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${values.email}\n\n${values.message}`)}`;
 
@@ -108,11 +109,6 @@ export default function ContactForm() {
           >
             Send Message
           </Button>
-
-          <p className="text-xs text-gray-500">
-            If your email client doesn’t open, email us directly at
-            {" "}todayscarolinianusc.dev@gmail.com.
-          </p>
 
         </form>
       </Form>
