@@ -220,11 +220,11 @@ export default function EditScheduleDialog({
           <div className="grid w-full grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+                Date
               </Label>
               <Input
                 type="date"
-                placeholder="Start Date"
+                placeholder="Date"
                 value={scheduleInputs.startDate ?? ""}
                 onChange={(e) =>
                   setScheduleInputs((s) => ({
