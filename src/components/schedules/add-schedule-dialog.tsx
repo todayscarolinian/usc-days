@@ -130,15 +130,12 @@ export default function AddScheduleDialog() {
       return;
     }
 
-    const end = new Date(`${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`);
-    end.setDate(end.getDate() + 1)
-
     const data: AddGamePayload = {
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2,"0")}-${String(end.getDate()).padStart(2,"0")}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      endDate: `${inputs.startDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location || undefined,
       createdById: userId,
     };
