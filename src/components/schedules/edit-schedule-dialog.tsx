@@ -217,7 +217,7 @@ export default function EditScheduleDialog({
         </DialogHeader>
 
         <div className="grid gap-8 py-4">
-          <div className="grid w-full grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
                 Date
