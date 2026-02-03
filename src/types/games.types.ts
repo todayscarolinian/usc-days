@@ -6,53 +6,56 @@ export const AddGameSchema = z
         gameTypeId: z.number({
             error: (issue) =>
                 issue.input === undefined
-                    ? 'gameTypeId is required.'
-                    : 'gameTypeId must be a number.',
+                    ? 'Please select a sport.'
+                    : 'Sport selection is invalid.',
         }),
         teamAId: z.number({
             error: (issue) =>
                 issue.input === undefined
-                    ? 'teamAId is required.'
-                    : 'teamAId must be a number.',
+                    ? 'Please select the first team.'
+                    : 'First team selection is invalid.',
         }),
         teamBId: z.number({
             error: (issue) =>
                 issue.input === undefined
-                    ? 'teamBId is required.'
-                    : 'teamBId must be a number.',
+                    ? 'Please select the second team.'
+                    : 'Second team selection is invalid.',
         }),
         startDate: z
             .string({
                 error: (issue) =>
                     issue.input === undefined
-                        ? 'startDate is required.'
-                        : 'startDate must be a valid ISO date string.',
+                        ? 'Start date is required.'
+                        : 'Start date must be a valid date.',
             })
             .refine((val) => !isNaN(Date.parse(val)), {
-                message: 'Invalid date format for startDate. Use ISO format.',
+                message: 'Please enter a valid start date.',
             }),
         endDate: z
             .string({
                 error: (issue) =>
                     issue.input === undefined
-                        ? 'endDate is required.'
-                        : 'endDate must be a valid ISO date string.',
+                        ? 'End date is required.'
+                        : 'End date must be a valid date.',
             })
             .refine((val) => !isNaN(Date.parse(val)), {
-                message: 'Invalid date format for endDate. Use ISO format.',
+                message: 'Please enter a valid end date.',
             }),
         location: z.string().optional(),
-        createdById: z
-            .number({
-                error: (issue) =>
-                    issue.input === undefined
-                        ? 'createdById is required.'
-                        : 'createdById must be a number.',
-            }),
+        createdById: z.number({
+            error: (issue) =>
+                issue.input === undefined
+                    ? 'User authentication is required.'
+                    : 'User authentication is invalid.',
+        }),
     })
     .refine((data) => data.teamAId !== data.teamBId, {
-        message: 'teamAId and teamBId cannot be the same.',
+        message: 'Please select two different teams.',
         path: ['teamBId'],
+    })
+    .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
+        message: 'End date must be on or after start date.',
+        path: ['endDate'],
     });
 
 export const EditGameSchema = z
@@ -163,15 +166,15 @@ export type DeleteGamePayload = z.infer<typeof DeleteGameSchema>;
 
 // Pagination types
 export interface PaginationParams {
-  cursor?: string;
-  limit?: number;
-  offset?: number;
+    cursor?: string;
+    limit?: number;
+    offset?: number;
 }
 
 export interface PaginatedGamesResponse {
-  games: Schedules[];
-  hasMore: boolean;
-  nextCursor: string | null;
-  count: number;
-  total?: number;
+    games: Schedules[];
+    hasMore: boolean;
+    nextCursor: string | null;
+    count: number;
+    total?: number;
 }
