@@ -130,12 +130,15 @@ export default function AddScheduleDialog() {
       return;
     }
 
+    const end = new Date(`${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`);
+    end.setDate(end.getDate() + 1)
+
     const data: AddGamePayload = {
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      endDate: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2,"0")}-${String(end.getDate()).padStart(2,"0")}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location || undefined,
       createdById: userId,
     };
@@ -173,10 +176,10 @@ export default function AddScheduleDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
-          <div className="w-full grid grid-cols-2 gap-4">
+          <div className="w-full grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
-              <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+              <Label htmlFor="date" className="font-bold opacity-50">
+                Date
               </Label>
               <Input
                 type="date"
@@ -191,26 +194,6 @@ export default function AddScheduleDialog() {
               {validationErrors.startDate && (
                 <span className="text-xs text-red-500">
                   {validationErrors.startDate}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="endDate" className="font-bold opacity-50">
-                End Date
-              </Label>
-              <Input
-                type="date"
-                value={inputs.endDate}
-                onChange={(e) => updateInput("endDate", e.target.value)}
-                className={
-                  validationErrors.endDate
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
-              />
-              {validationErrors.endDate && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.endDate}
                 </span>
               )}
             </div>
