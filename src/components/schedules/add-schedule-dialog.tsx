@@ -173,15 +173,16 @@ export default function AddScheduleDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
-          <div className="w-full grid grid-cols-2 gap-4">
+          <div className="w-full grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+                Date
               </Label>
               <Input
                 type="date"
                 value={inputs.startDate}
-                onChange={(e) => updateInput("startDate", e.target.value)}
+                onChange={(e) => { updateInput("startDate", e.target.value)
+                    updateInput("endDate", e.target.value) }}
                 className={
                   validationErrors.startDate
                     ? "border-red-500 focus-visible:ring-red-500"
@@ -191,26 +192,6 @@ export default function AddScheduleDialog() {
               {validationErrors.startDate && (
                 <span className="text-xs text-red-500">
                   {validationErrors.startDate}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="endDate" className="font-bold opacity-50">
-                End Date
-              </Label>
-              <Input
-                type="date"
-                value={inputs.endDate}
-                onChange={(e) => updateInput("endDate", e.target.value)}
-                className={
-                  validationErrors.endDate
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
-              />
-              {validationErrors.endDate && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.endDate}
                 </span>
               )}
             </div>
