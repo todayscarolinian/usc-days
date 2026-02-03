@@ -1,23 +1,20 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormMessage,
 } from "@/src/components/ui/form";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
+import { PUBLICATION } from "@/src/constants/publication";
 import { contactFormSchema, type ContactFormValues } from "@/src/types/contact.types";
 
 export default function ContactForm() {
-  const [status, setStatus] = React.useState<null | "sending" | "sent" | "error">(null);
-
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -28,33 +25,14 @@ export default function ContactForm() {
     },
   });
 
-  useEffect(() => {
-    if (status === "sent") {
-      const timer = setTimeout(() => setStatus(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
+  const onSubmit = (values: ContactFormValues) => {    
+    const mailtoLink = `mailto:${PUBLICATION.email}?subject=${encodeURIComponent(
+      "USC Days Inquiry"
+    )}&body=${encodeURIComponent(`Hello,\n\n${values.message}`)}`;
 
-  async function onSubmit(values: ContactFormValues) {
-    setStatus("sending");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
-      }
-
-      setStatus("sent");
-      form.reset();
-    } catch (err) {
-      console.error("Contact form error:", err);
-      setStatus("error");
-    }
-  }
+    window.location.assign(mailtoLink);
+    form.reset();
+  };
 
   return (
     <div className="bg-white text-slate-900 rounded-lg p-6">
@@ -119,9 +97,6 @@ export default function ContactForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription className="text-slate-500">
-                  {field.value.length}/500 characters
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -129,22 +104,11 @@ export default function ContactForm() {
 
           <Button
             type="submit"
-            className="w-full bg-tc_primary text-white cursor-pointer"
-            disabled={status === "sending"}
+            className="w-full bg-tc_primary text-white"
           >
-            {status === "sending" ? "Sending…" : "Submit"}
+            Send Message
           </Button>
 
-          {status === "sent" && (
-            <div role="alert" className="text-sm text-green-600 p-2 bg-green-50 rounded">
-              Message sent — thank you!
-            </div>
-          )}
-          {status === "error" && (
-            <div role="alert" className="text-sm text-red-600 p-2 bg-red-50 rounded">
-              Error sending — please try again.
-            </div>
-          )}
         </form>
       </Form>
     </div>
