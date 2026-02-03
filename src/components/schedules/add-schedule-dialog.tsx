@@ -181,7 +181,8 @@ export default function AddScheduleDialog() {
               <Input
                 type="date"
                 value={inputs.startDate}
-                onChange={(e) => updateInput("startDate", e.target.value)}
+                onChange={(e) => { updateInput("startDate", e.target.value)
+                    updateInput("endDate", e.target.value) }}
                 className={
                   validationErrors.startDate
                     ? "border-red-500 focus-visible:ring-red-500"
