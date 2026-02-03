@@ -33,6 +33,7 @@ export default function ContactForm() {
     )}&body=${encodeURIComponent(`Hello,\n\n${fullName}\n${values.email}\n\n${values.message}`)}`;
 
     window.location.href = mailtoLink;
+    form.reset();
   };
 
   return (
