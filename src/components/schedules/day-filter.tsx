@@ -49,12 +49,6 @@ export function DateFilter({ selectedDate, onDateSelect, className }: DateFilter
               {format(selectedDate, "MMM d")}
             </span>
           )}
-          {selectedDate && (
-            <X 
-              className="h-3 w-3 hover:bg-neutral-100 rounded-full p-0.5 ml-1" 
-              onClick={handleClearDate}
-            />
-          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
