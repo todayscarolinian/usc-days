@@ -15,9 +15,9 @@ import DataTable from "@/src/components/standings/standings-table";
 import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import standingColumns from "@/src/components/standings/columns";
 import { Button } from "@/src/components/ui/button";
-import { Champion, GameType, Team } from "@/src/lib/prisma/generated/client";
+import { GameType } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
-import { Champions, StandingData } from "@/src/types/types";
+import { Champions, Schedules, StandingData } from "@/src/types/types";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
@@ -48,12 +48,7 @@ export default function Standings() {
   const { data: gameTypes = [], error: gameTypesError } = getGameTypesQuery();
   const { data: teams = [], error: teamsError } = getTeamsQuery();
 
-  // Dynamic data (changes per sport selection)
-  const [championsData, setChampionsData] = useState<Champions[]>([]);
-  const [standingsData, setStandingsData] = useState<StandingWithRank[]>([]);
-
   // UI state
-  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [formData, setFormData] = useState<EditChampionPayload | null>(null);
 
@@ -62,35 +57,44 @@ export default function Standings() {
   const isAdmin = !!email;
 
   // Fetch dynamic data using TanStack Query
-  const { data: championsQueryData = [], error: championsError } =
-    getChampionsQuery();
-  const { data: gamesQueryData = [], error: gamesError } = getGamesQuery();
+  const {
+    data: championsQueryData = [],
+    error: championsError,
+    isLoading: championsLoading,
+  } = getChampionsQuery();
+  const {
+    data: gamesQueryData = [],
+    error: gamesError,
+    isLoading: gamesLoading,
+  } = getGamesQuery();
 
-  // Process data when sport selection or query data changes
-  const fetchStandingsData = useCallback(() => {
-    if (!selectedSport) {
-      setStandingsData([]);
-      setChampionsData([]);
-      return;
-    }
-
+  // Show error toast when errors occur
+  useEffect(() => {
     if (gameTypesError || teamsError || championsError || gamesError) {
       toast.error("Failed to load standings data");
-      return;
     }
+  }, [gameTypesError, teamsError, championsError, gamesError]);
+
+  // Compute loading state
+  const loading = championsLoading || gamesLoading;
+
+  // Process champions data reactively
+  const championsData = useMemo(() => {
+    if (!selectedSport) return [];
+    return championsQueryData.filter(
+      (c: Champions) => c.gameType.id === selectedSport,
+    );
+  }, [selectedSport, championsQueryData]);
+
+  // Process standings data reactively
+  const standingsData = useMemo(() => {
+    if (!selectedSport) return [];
 
     try {
-      setLoading(true);
-
-      // Filter data by selected sport
-      const champions: Champions[] = championsQueryData.filter(
-        (c: any) => c.gameType.id === selectedSport,
-      );
+      // Filter games by selected sport
       const games = gamesQueryData.filter(
-        (g: any) => g.gameType?.id === selectedSport,
+        (g: Schedules) => g.gameType?.id === selectedSport,
       );
-
-      setChampionsData(champions);
 
       // Transform games to standings statistics
       const gameStandings = transformGamesToSchoolRank(games, selectedSport);
@@ -100,7 +104,7 @@ export default function Standings() {
 
       // Add teams with game statistics
       gameStandings.forEach((standing) => {
-        const champion = champions.find(
+        const champion = championsData.find(
           (c) => c.team.teamName === standing.team,
         );
         allStandings.push({
@@ -110,7 +114,7 @@ export default function Standings() {
       });
 
       // Add champions without game history
-      champions.forEach((champion) => {
+      championsData.forEach((champion) => {
         const existingStanding = allStandings.find(
           (s) => s.team === champion.team.teamName,
         );
@@ -128,28 +132,13 @@ export default function Standings() {
         }
       });
 
-      setStandingsData(allStandings);
+      return allStandings;
     } catch (err) {
       console.error("Error processing standings data:", err);
       toast.error("Failed to process standings data");
-      setStandingsData([]);
-      setChampionsData([]);
-    } finally {
-      setLoading(false);
+      return [];
     }
-  }, [
-    selectedSport,
-    championsQueryData,
-    gamesQueryData,
-    gameTypesError,
-    teamsError,
-    championsError,
-    gamesError,
-  ]);
-
-  useEffect(() => {
-    fetchStandingsData();
-  }, [fetchStandingsData]);
+  }, [selectedSport, gamesQueryData, championsData]);
 
   // Memoized computed values
   const sportName = useMemo(
@@ -222,7 +211,7 @@ export default function Standings() {
       });
       setShowDialog(true);
     },
-    [championsData, selectedSport],
+    [championsData, selectedSport, isAdmin],
   );
 
   const handleAddStanding = useCallback(() => {
@@ -239,17 +228,10 @@ export default function Standings() {
     setShowDialog(true);
   }, [selectedSport]);
 
-  const handleCloseDialog = useCallback(
-    (dataChanged?: boolean) => {
-      setFormData(null);
-      setShowDialog(false);
-      // Only refetch data if changes were made
-      if (dataChanged) {
-        fetchStandingsData();
-      }
-    },
-    [fetchStandingsData],
-  );
+  const handleCloseDialog = useCallback(() => {
+    setFormData(null);
+    setShowDialog(false);
+  }, []);
 
   const handleSportSelect = (sportId: number | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -268,7 +250,7 @@ export default function Standings() {
           <SportSelector
             value={selectedSport}
             onValueChangeAction={handleSportSelect}
-            className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
+            className="flex items-center justify-between px-5.5! py-1.75! h-13.5! max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
           {isAdmin && (
             <Button
