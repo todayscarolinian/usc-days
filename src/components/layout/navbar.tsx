@@ -58,7 +58,7 @@ function UserAvatar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-muted-foreground">My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
             Logout
