@@ -87,8 +87,8 @@ export default function Standings() {
   }, [selectedSport, championsQueryData]);
 
   // Process standings data reactively
-  const standingsData = useMemo(() => {
-    if (!selectedSport) return [];
+  const { data: standingsData, error: standingsError } = useMemo(() => {
+    if (!selectedSport) return { data: [], error: false };
 
     try {
       // Filter games by selected sport
@@ -132,13 +132,19 @@ export default function Standings() {
         }
       });
 
-      return allStandings;
+      return { data: allStandings, error: false };
     } catch (err) {
       console.error("Error processing standings data:", err);
-      toast.error("Failed to process standings data");
-      return [];
+      return { data: [], error: true };
     }
   }, [selectedSport, gamesQueryData, championsData]);
+
+  // Show error toast when standings processing fails
+  useEffect(() => {
+    if (standingsError) {
+      toast.error("Failed to process standings data");
+    }
+  }, [standingsError]);
 
   // Memoized computed values
   const sportName = useMemo(
