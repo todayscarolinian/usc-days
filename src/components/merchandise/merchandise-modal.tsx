@@ -184,7 +184,8 @@ export default function MerchandiseModal({
           {/* Order Form Button */}
           <div className="flex justify-end">
             <Button
-              className="bg-tc_primary text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity"
+              className={`bg-tc_primary text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity ${!product.isAvailable ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={!product.isAvailable}
               onClick={() => {
                 const formUrl = new URL(
                   "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform",
@@ -203,7 +204,7 @@ export default function MerchandiseModal({
                 onClose();
               }}
             >
-              Order Form
+              {product.isAvailable ? "Order Form" : "Sold Out"}
             </Button>
           </div>
         </DialogContent>
