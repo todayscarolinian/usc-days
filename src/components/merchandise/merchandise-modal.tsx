@@ -76,7 +76,7 @@ export default function MerchandiseModal({
         <DialogOverlay />
         <DialogContent
           showCloseButton={true}
-          className="sm:max-w-[560px] pt-12 pb-8 bg-white rounded-lg"
+          className="sm:max-w-140 pt-12 pb-8 bg-white rounded-lg"
         >
           <DialogTitle className="sr-only">{product.productTitle}</DialogTitle>
           <div className="flex gap-6">
@@ -84,7 +84,7 @@ export default function MerchandiseModal({
               {product.productTitle}
             </DialogTitle>
             {/* Left: Image */}
-            <div className="flex-shrink-0 flex flex-col gap-3">
+            <div className="shrink-0 flex flex-col gap-3">
               {/* Main Image */}
               <div className="relative w-[225px] aspect-square bg-gray-100 rounded-lg overflow-hidden">
                 <Image

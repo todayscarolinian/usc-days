@@ -32,6 +32,7 @@ export function DataTable<TValue>({
   const [sorting, setSorting] = useState<SortingState>([
     { id: "wins", desc: true },
   ]);
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

@@ -142,7 +142,6 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
     );
   }
 
-  const hasGames = allGames.length > 0;
   const hasFilteredGames = orderedDates.some((date) => grouped[date] && grouped[date].length > 0);
 
   return (

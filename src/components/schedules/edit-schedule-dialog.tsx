@@ -32,9 +32,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
+import { EditGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
-import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
 interface ScheduleInputs {
@@ -45,20 +44,6 @@ interface ScheduleInputs {
   startTime: string;
   endTime: string;
   location?: string | undefined;
-}
-
-interface Sport {
-  id: number;
-  gameName: string;
-}
-
-interface SportTeam {
-  id: number;
-  gameTypeId: number;
-  teamId: number;
-  team: {
-    teamName: string;
-  };
 }
 
 export default function EditScheduleDialog({
@@ -208,7 +193,7 @@ export default function EditScheduleDialog({
         <FaRegEdit />
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>
           <DialogDescription>

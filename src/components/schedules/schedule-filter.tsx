@@ -56,7 +56,7 @@ export default function ScheduleFilter({
             <SportSelector
               onValueChangeAction={onSportSelect}
               value={selectedSport}
-              className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] w-full md:max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
+              className="flex items-center justify-between px-5.5! py-1.75! h-13.5! w-full md:max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
             />
           </div>
           <DateFilter

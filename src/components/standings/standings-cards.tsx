@@ -206,13 +206,13 @@ export default function Cards({ data, onSelect }: CardsProps) {
   const rankInfo = getRankInfo(data.rank);
   return (
     <Card
-      className="h-[191px] overflow-hidden flex flex-col cursor-pointer hover:scale-[1.01] transition"
+      className="h-47.75 overflow-hidden flex flex-col cursor-pointer hover:scale-[1.01] transition"
       onClick={onSelect}
     >
       <CardContent
         className={cn(
           "flex-1 flex items-center justify-between",
-          "!p-6 !pb-0 !pt-0 !mb-0",
+          "p-6! pb-0! pt-0! mb-0!",
         )}
       >
         <div className="flex-1">
@@ -287,8 +287,8 @@ export default function Cards({ data, onSelect }: CardsProps) {
 
       <CardFooter
         className={cn(
-          "flex items-center justify-between flex-shrink-0",
-          "!h-[40px] !px-6 !py-4 !mt-0 !mb-0",
+          "flex items-center justify-between shrink-0",
+          "h-10! px-6! py-4! mt-0! mb-0!",
         )}
         style={{
           backgroundColor: rankInfo.bgColor,
@@ -315,7 +315,7 @@ export default function Cards({ data, onSelect }: CardsProps) {
           )}
         </div>
         <span
-          className="text-white uppercase flex-shrink-0 ml-2"
+          className="text-white uppercase shrink-0 ml-2"
           style={{
             fontFamily: roboto.style.fontFamily,
             fontSize: "14px",

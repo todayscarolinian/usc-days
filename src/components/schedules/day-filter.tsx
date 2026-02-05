@@ -23,7 +23,6 @@ export function DateFilter({
   selectedDate,
   onDateSelect,
   className,
-  showClear,
 }: DateFilterProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -44,12 +43,12 @@ export function DateFilter({
         <Button
           variant="outline"
           className={cn(
-            "relative flex items-center justify-start gap-2 w-full !px-[16px] !py-[7px] !h-[54px] bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none overflow-hidden",
+            "relative flex items-center justify-start gap-2 w-full px-4! py-1.75! h-13.5! bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none overflow-hidden",
             selectedDate && "border-l-tc_primary-500 pr-10", // Reduced padding when date is selected
             className,
           )}
         >
-          <CalendarIcon className="h-4 w-4 flex-shrink-0" />
+          <CalendarIcon className="h-4 w-4 shrink-0" />
           {selectedDate ? (
             <span className="text-sm font-medium truncate">
               {format(selectedDate, "MMM d")}

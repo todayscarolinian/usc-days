@@ -8,11 +8,11 @@ export default function StandingsCardsSkeleton() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full">
       {Array.from({ length: 3 }).map((_, index) => (
-        <Card key={index} className="h-[191px] overflow-hidden flex flex-col">
+        <Card key={index} className="h-47.75 overflow-hidden flex flex-col">
           <CardContent
             className={cn(
               "flex-1 flex items-center justify-between",
-              "!p-6 !pb-0 !pt-0 !mb-0"
+              "p-6! pb-0! pt-0! mb-0!"
             )}
           >
             <div className="flex-1">
@@ -43,8 +43,8 @@ export default function StandingsCardsSkeleton() {
 
           <CardFooter
             className={cn(
-              "flex items-center justify-between flex-shrink-0",
-              "!h-[40px] !px-6 !py-4 !mt-4 !mb-0"
+              "flex items-center justify-between shrink-0",
+              "h-10! px-6! py-4! mt-4! mb-0!"
             )}
             style={{
               backgroundColor: "#C4C4C4",
@@ -59,7 +59,7 @@ export default function StandingsCardsSkeleton() {
               <Skeleton className="h-4 w-20 bg-white/20" />
             </div>
             {/* Rank title */}
-            <Skeleton className="h-4 w-24 bg-white/20 flex-shrink-0 ml-2" />
+            <Skeleton className="h-4 w-24 bg-white/20 shrink-0 ml-2" />
           </CardFooter>
         </Card>
       ))}
