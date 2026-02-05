@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getChampionsQuery } from "@/src/queries/champions.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
@@ -60,6 +60,10 @@ export default function Standings() {
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [formData, setFormData] = useState<EditChampionPayload | null>(null);
 
+  // Track shown errors to prevent duplicate toasts
+  const shownLoadErrorRef = useRef(false);
+  const shownProcessErrorRef = useRef(false);
+
   useInitializeUserStore();
   const { email } = useUserStore();
   const isAdmin = !!email;
@@ -78,8 +82,15 @@ export default function Standings() {
 
   // Show error toast when errors occur
   useEffect(() => {
-    if (gameTypesError || teamsError || championsError || gamesError) {
+    const hasError =
+      gameTypesError || teamsError || championsError || gamesError;
+
+    if (hasError && !shownLoadErrorRef.current) {
       toast.error("Failed to load standings data");
+      shownLoadErrorRef.current = true;
+    } else if (!hasError) {
+      // Reset when errors are cleared
+      shownLoadErrorRef.current = false;
     }
   }, [gameTypesError, teamsError, championsError, gamesError]);
 
@@ -150,8 +161,12 @@ export default function Standings() {
 
   // Show error toast when standings processing fails
   useEffect(() => {
-    if (standingsError) {
+    if (standingsError && !shownProcessErrorRef.current) {
       toast.error("Failed to process standings data");
+      shownProcessErrorRef.current = true;
+    } else if (!standingsError) {
+      // Reset when error is cleared
+      shownProcessErrorRef.current = false;
     }
   }, [standingsError]);
 
