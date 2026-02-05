@@ -45,8 +45,16 @@ export default function Standings() {
     : null;
 
   // Static data (fetched once using TanStack Query)
-  const { data: gameTypes = [], error: gameTypesError } = getGameTypesQuery();
-  const { data: teams = [], error: teamsError } = getTeamsQuery();
+  const {
+    data: gameTypes = [],
+    error: gameTypesError,
+    isLoading: gameTypesLoading,
+  } = getGameTypesQuery();
+  const {
+    data: teams = [],
+    error: teamsError,
+    isLoading: teamsLoading,
+  } = getTeamsQuery();
 
   // UI state
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -76,7 +84,8 @@ export default function Standings() {
   }, [gameTypesError, teamsError, championsError, gamesError]);
 
   // Compute loading state
-  const loading = championsLoading || gamesLoading;
+  const loading =
+    gameTypesLoading || teamsLoading || championsLoading || gamesLoading;
 
   // Process champions data reactively
   const championsData = useMemo(() => {
