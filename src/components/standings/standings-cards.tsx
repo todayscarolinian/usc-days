@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card";
-import { cn } from "@/src/lib/utils";
+import { cn, getLogoForSchool } from "@/src/lib/utils";
 import Image from "next/image";
 import { Roboto } from "next/font/google";
 
@@ -181,16 +181,20 @@ const getRankInfo = (rank: number) => {
   }
 };
 
-// const getTeamLogo = (teamName: string): React.JSX.Element => {
-//     // Placeholder logo - replace when team logos are ready
-//     return (
-//         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-//             <span className="text-2xl font-bold text-gray-600">
-//                 {teamName.charAt(0).toUpperCase()}
-//             </span>
-//         </div>
-//     );
-// };
+const getTeamLogo = (teamName: string): React.JSX.Element => {
+  const logo = getLogoForSchool(teamName);
+
+  // test placeholder icon
+  return (
+    <>
+      <Image
+        src={logo}
+        alt="Fallback Team Logo"
+        className="inline size-20 mr-2"
+      />
+    </>
+  );
+};
 
 interface CardsProps {
   data: StandingWithRank;
@@ -198,7 +202,7 @@ interface CardsProps {
 }
 
 export default function Cards({ data, onSelect }: CardsProps) {
-  const isEmpty = data.rank === 0;
+  const isEmpty = data.team === "TBD";
   const rankInfo = getRankInfo(data.rank);
   return (
     <Card
@@ -208,7 +212,7 @@ export default function Cards({ data, onSelect }: CardsProps) {
       <CardContent
         className={cn(
           "flex-1 flex items-center justify-between",
-          "!p-6 !pb-0 !pt-0 !mb-0"
+          "!p-6 !pb-0 !pt-0 !mb-0",
         )}
       >
         <div className="flex-1">
@@ -219,9 +223,9 @@ export default function Cards({ data, onSelect }: CardsProps) {
               fontSize: "32px",
               fontWeight: "700",
             }}
-            title={isEmpty ? "TBD" : data.team}
+            title={data.team}
           >
-            {isEmpty ? "TBD" : data.team}
+            {data.team}
           </h3>
 
           <div className="flex gap-6">
@@ -264,27 +268,27 @@ export default function Cards({ data, onSelect }: CardsProps) {
                   fontWeight: "700",
                 }}
               >
-                {isEmpty ? "-" : data.winPercentage.toFixed(2)}%
+                {isEmpty ? "-" : `${data.winPercentage.toFixed(2)}%`}
               </p>
             </div>
           </div>
         </div>
 
-        {/* <div className="ml-4">
-                    {isEmpty ? (
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
-                            <span className="text-gray-400 text-sm">?</span>
-                        </div>
-                    ) : (
-                        getTeamLogo(data.team)
-                    )}
-                </div> */}
+        <div className="ml-4">
+          {isEmpty ? (
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+              <span className="text-gray-400 text-sm">?</span>
+            </div>
+          ) : (
+              getTeamLogo(data.team)
+          )}
+        </div>
       </CardContent>
 
       <CardFooter
         className={cn(
           "flex items-center justify-between flex-shrink-0",
-          "!h-[40px] !px-6 !py-4 !mt-0 !mb-0"
+          "!h-[40px] !px-6 !py-4 !mt-0 !mb-0",
         )}
         style={{
           backgroundColor: rankInfo.bgColor,
