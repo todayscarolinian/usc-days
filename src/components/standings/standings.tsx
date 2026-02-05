@@ -229,7 +229,6 @@ export default function Standings() {
   // Handler functions
   const handleCardClick = useCallback(
     (rank: number) => {
-      if (!isAdmin) return;
       const champion = championsData.find((c) => c.rank === rank);
 
       setFormData({
@@ -246,7 +245,7 @@ export default function Standings() {
       });
       setShowDialog(true);
     },
-    [championsData, selectedSport, isAdmin],
+    [championsData, selectedSport],
   );
 
   const handleAddStanding = useCallback(() => {
@@ -313,7 +312,7 @@ export default function Standings() {
                 <Cards
                   key={`rank-${index + 1}`}
                   data={card}
-                  onSelect={() => handleCardClick(index + 1)}
+                  onSelect={() => isAdmin ? handleCardClick(index + 1) : undefined}
                 />
               ))}
             </div>
