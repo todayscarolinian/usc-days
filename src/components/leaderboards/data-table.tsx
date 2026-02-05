@@ -29,7 +29,9 @@ export function DataTable<TValue>({
   data,
   title = "USC DAYS",
 }: DataTableProps<TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "wins", desc: true },
+  ]);
   const table = useReactTable({
     data,
     columns,
