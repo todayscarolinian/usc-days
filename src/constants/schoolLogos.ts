@@ -20,3 +20,11 @@ export const schoolLogos: Record<string, StaticImageData> = {
   SOE,
   Default: TCRedLogo,
 };
+
+export const schools = Object.entries(schoolLogos)
+  .filter(([key]) => key !== "Default")
+  .map(([key, icon]) => ({
+    id: key.toLowerCase().replace(/\s+/g, "-"),
+    name: key,
+    icon,
+  }));
