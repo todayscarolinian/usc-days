@@ -111,6 +111,11 @@ export default function Standings() {
     if (!selectedSport) return { data: [], error: false };
 
     try {
+      // Filter champions by selected sport (inline instead of depending on championsData memo)
+      const filteredChampions = championsQueryData.filter(
+        (c: Champions) => c.gameType.id === selectedSport,
+      );
+
       // Filter games by selected sport
       const games = gamesQueryData.filter(
         (g: Schedules) => g.gameType?.id === selectedSport,
@@ -124,7 +129,7 @@ export default function Standings() {
 
       // Add teams with game statistics
       gameStandings.forEach((standing) => {
-        const champion = championsData.find(
+        const champion = filteredChampions.find(
           (c) => c.team.teamName === standing.team,
         );
         allStandings.push({
@@ -134,7 +139,7 @@ export default function Standings() {
       });
 
       // Add champions without game history
-      championsData.forEach((champion) => {
+      filteredChampions.forEach((champion) => {
         const existingStanding = allStandings.find(
           (s) => s.team === champion.team.teamName,
         );
@@ -157,7 +162,7 @@ export default function Standings() {
       console.error("Error processing standings data:", err);
       return { data: [], error: true };
     }
-  }, [selectedSport, gamesQueryData, championsData]);
+  }, [selectedSport, gamesQueryData, championsQueryData]);
 
   // Show error toast when standings processing fails
   useEffect(() => {
