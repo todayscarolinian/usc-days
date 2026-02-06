@@ -14,7 +14,6 @@ import StandingsCardsSkeleton from "@/src/components/standings/standings-cards-s
 import DataTable from "@/src/components/standings/standings-table";
 import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import standingColumns from "@/src/components/standings/columns";
-import { Button } from "@/src/components/ui/button";
 import { GameType } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
 import { Champions, Schedules, StandingData } from "@/src/types/types";
