@@ -1,81 +1,13 @@
 "use client";
 
-import React, { useMemo } from "react";
-import Image from "next/image";
+import { useMemo } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import {
   SearchableSelect,
   SelectOption,
 } from "@/src/components/ui/searchable-select";
-
-import Badminton from "@/src/assets/icons/Diamond/Badminton.svg";
-import Basketball from "@/src/assets/icons/Diamond/Basketball.svg";
-import Cheerdance from "@/src/assets/icons/Diamond/Cheerdance.svg";
-import Chess from "@/src/assets/icons/Diamond/Chess.svg";
-import Esports from "@/src/assets/icons/Diamond/Esports.svg";
-import FlagFootball from "@/src/assets/icons/Diamond/Flag Football.svg";
-import Football from "@/src/assets/icons/Diamond/Football.svg";
-import Frisbee from "@/src/assets/icons/Diamond/Frisbee.svg";
-import Futsal from "@/src/assets/icons/Diamond/Futsal.svg";
-import LawnTennis from "@/src/assets/icons/Diamond/Lawn Tennis.svg";
-import MrIntrams from "@/src/assets/icons/Diamond/Mr Intrams.svg";
-import MsIntrams from "@/src/assets/icons/Diamond/Ms Intrams.svg";
-import Swimming from "@/src/assets/icons/Diamond/Swimming.svg";
-import TableTennis from "@/src/assets/icons/Diamond/Table Tennis.svg";
-import ThreeByThreeBasketball from "@/src/assets/icons/Diamond/ThreeByThreeBasketball.svg";
-import Volleyball from "@/src/assets/icons/Diamond/Volleyball.svg";
-import Default from "@/src/assets/tc-logo-red.png";
-
-// Sport icon mapping configuration
-import type { StaticImageData } from "next/image";
-
-const SPORT_ICON_MAP: Record<string, StaticImageData> = {
-  Badminton,
-  Basketball,
-  "Cheer Dance": Cheerdance,
-  Chess,
-  "E-Sports": Esports,
-  "Flag Football": FlagFootball,
-  Football,
-  Frisbee,
-  Futsal,
-  "Lawn Tennis": LawnTennis,
-  "Mr. USC Days": MrIntrams,
-  "Ms. USC Days": MsIntrams,
-  Swimming,
-  "Table Tennis": TableTennis,
-  "3x3 Basketball": ThreeByThreeBasketball,
-  Volleyball,
-};
-
-// Swimming event aliases
-const SWIMMING_ALIASES = [
-  "Freestyle",
-  "Backstroke",
-  "Butterfly",
-  "Breaststroke",
-  "Medley",
-  "Relay",
-];
-
-/**
- * Get the appropriate sport icon based on sport name
- * Handles special cases like swimming events and partial matches
- */
-const getSportIcon = (sportName: string): React.ReactNode => {
-  // Check swimming aliases first
-  if (SWIMMING_ALIASES.some((alias) => sportName.includes(alias))) {
-    return <Image src={Swimming} alt="Swimming" className="size-6" />;
-  }
-
-  // Find exact or partial match
-  const iconKey = Object.keys(SPORT_ICON_MAP).find((key) =>
-    sportName.includes(key),
-  );
-
-  const iconSrc = iconKey ? SPORT_ICON_MAP[iconKey] : Default;
-  return <Image src={iconSrc} alt={sportName} className="size-6" />;
-};
+import { getIconFor } from "@/src/lib/utils";
+import Image from "next/image";
 
 type SportSelectorProps = {
   // State
@@ -128,7 +60,7 @@ export default function SportSelector({
       value: sport.id.toString(),
       label: sport.gameName,
       id: sport.id,
-      icon: getSportIcon(sport.gameName),
+      icon: <Image src={getIconFor(sport.gameName)} alt={sport.gameName} className="size-6" />,
     }));
 
     // Add "All Sports" option if enabled
@@ -138,7 +70,7 @@ export default function SportSelector({
           value: "",
           label: allOptionLabel,
           id: 0,
-          icon: getSportIcon(allOptionLabel),
+          icon: <Image src={getIconFor(allOptionLabel)} alt={allOptionLabel} className="size-6" />,
         },
         ...sportOptions,
       ];
