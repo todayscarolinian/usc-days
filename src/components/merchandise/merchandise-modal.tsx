@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -10,7 +10,6 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/src/components/ui/dialog";
-import { Button } from "@/src/components/ui/button";
 import { MerchandiseProduct } from "@/src/lib/prisma/generated/client";
 
 interface Product extends Omit<MerchandiseProduct, "imgUrls, designers"> {
@@ -31,8 +30,16 @@ export default function MerchandiseModal({
 }: MerchandiseModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+  const [displayedProductId, setDisplayedProductId] = useState(product.id);
   const images = product.imgUrls;
   const THUMBNAIL_COUNT = 3;
+
+  // Reset indices when product changes (adjust state during render)
+  if (product.id !== displayedProductId) {
+    setCurrentImageIndex(0);
+    setThumbnailStartIndex(0);
+    setDisplayedProductId(product.id);
+  }
 
   const nextImage = () => {
     const newIndex = (currentImageIndex + 1) % images.length;
@@ -64,11 +71,6 @@ export default function MerchandiseModal({
   const currentDesigner = product.designers
     ? product.designers.join("\n")
     : null;
-
-  useEffect(() => {
-    setCurrentImageIndex(0);
-    setThumbnailStartIndex(0);
-  }, [product.id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -181,32 +183,65 @@ export default function MerchandiseModal({
             </div>
           </div>
 
-          {/* Order Form Button */}
-          <div className="flex justify-end">
-            <Button
-              className={`bg-tc_primary text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity ${!product.isAvailable ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={!product.isAvailable}
-              onClick={() => {
-                const formUrl = new URL(
-                  "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform",
-                ); // fields depend on form
-                formUrl.searchParams.append(
-                  "entry.FIELD_ID_1",
-                  product.productTitle,
-                );
-                formUrl.searchParams.append(
-                  "entry.FIELD_ID_2",
-                  `PHP ${Number(product.productPrice).toFixed(2)}`,
-                );
-                // Add more fields as needed
-
-                window.open(formUrl.toString(), "_blank");
-                onClose();
-              }}
-            >
-              {product.isAvailable ? "Order Form" : "Sold Out"}
-            </Button>
-          </div>
+          {/* Purchase Information */}
+          {product.isAvailable && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                How to Purchase
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <svg
+                    className="w-5 h-5 text-tc_primary mt-0.5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      TC Booth, USC Museum (Downtown Campus)
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg
+                    className="w-5 h-5 text-tc_primary mt-0.5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Monday - Friday
+                    </p>
+                    <p className="text-sm text-gray-600">9:00 AM - 5:00 PM</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </DialogPortal>
     </Dialog>
