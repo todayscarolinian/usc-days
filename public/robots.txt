@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /auth
-Disallow: /auth/
-
-Sitemap: https://uscdays.todayscarolinian.com/sitemap.xml

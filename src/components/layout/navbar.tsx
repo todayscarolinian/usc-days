@@ -1,192 +1,174 @@
 "use client";
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet";
-import { Button } from "@/src/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
-import { useSignOut } from "@/src/queries/auth.queries";
-import { useEffect, useState, useMemo } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useInitializeUserStore, useUserStore } from "@/stores/user-store";
+import axios from "axios";
 
 const nav_items = [
-  {
-    href: "/",
-    name: "Home",
-    protected: false,
-  },
-  {
-    href: "/schedules",
-    name: "Schedules",
-    protected: false,
-  },
-  {
-    href: "/leaderboards",
-    name: "Leaderboards",
-    protected: false,
-  },
-  {
-    href: "/standings",
-    name: "Standings",
-    protected: false,
-  },
+    {
+        href: "/",
+        name: "Scores",
+        protected: false,
+    },
+    {
+        href: "/schedules",
+        name: "Schedules",
+        protected: false,
+    },
+    // {
+    //     href: "/rankings",
+    //     name: "Rankings",
+    //     protected: false,
+    // },
+    {
+        href: "/champions",
+        name: "Champions",
+        protected: false,
+    },
+    {
+        href: "/management",
+        name: "Management",
+        protected: false,
+    },
 ];
 
-function UserAvatar({
-  handleLogout,
-  isPending,
-}: {
-  handleLogout: () => void;
-  isPending: boolean;
-}) {
-  return (
-    <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-      <div className="ml-auto flex-1 sm:flex-initial"></div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="text-muted-foreground">My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-}
-
 export default function Navbar() {
-  useInitializeUserStore();
-  const { email, resetUser } = useUserStore();
-  const { mutate: signOut, isPending } = useSignOut();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const pathName = usePathname();
-  const searchParams = useSearchParams();
+    useInitializeUserStore();
+    const { email, resetUser } = useUserStore();
 
-  // Preserve sport parameter across navigation
-  const sportParam = searchParams.get("sport");
-  const queryString = useMemo(() => {
-    return sportParam ? `?sport=${sportParam}` : "";
-  }, [sportParam]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 150) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+    const signOut = async () => {
+        try {
+            const response = await axios.get("/api/user/logout");
+            const { status } = response.data;
+            localStorage.removeItem("user");
+            return status;
+        } catch (error) {
+            console.error("Error during login", error);
+        }
     };
 
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [pathName]);
-
-  const handleLogout = () => {
-    signOut(undefined, {
-      onSuccess: () => {
-        resetUser();
-      },
-    });
-  };
-
-  return (
-    <header
-      className={`w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary sticky" : "fixed bg-tc_primary md:bg-transparent"}`}
-    >
-      {/* Desktop Nav */}
-      <nav className="hidden text-lg font-medium md:flex md:flex-row md:items-center md:justify-between w-full">
-        <Link href="/">
-          <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
-        </Link>
-        <div className="flex items-center lg:gap-6">
-          {nav_items.map((n) =>
-            n.protected ? (
-              email && (
-                <Button
-                  key={n.name}
-                  className={`${isScrolled || pathName !== "/" ? "bg-tc_primary shadow-none" : "bg-transparent shadow-none"}`}
-                  asChild
-                >
-                  <Link
-                    href={`${n.href}${n.href === "/" ? "" : queryString}`}
-                    className="text-white transition-colors hover:text-white"
-                  >
-                    {n.name}
-                  </Link>
-                </Button>
-              )
-            ) : (
-              <Button
-                key={n.name}
-                className={`${pathName === "/" ? "bg-transparent shadow-none" : "bg-tc_primary shadow-none"}`}
-                asChild
-              >
-                <Link
-                  href={`${n.href}${n.href === "/" ? "" : queryString}`}
-                  className="text-white transition-colors hover:text-white"
-                >
-                  {n.name}
-                </Link>
-              </Button>
-            ),
-          )}
-          {email && (
-            <UserAvatar handleLogout={handleLogout} isPending={isPending} />
-          )}
+    return (
+        <div>
+            <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-tc_primary">
+                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+                    <Image
+                        src="/tc-logo-red.png"
+                        alt="tc-logo"
+                        width={50}
+                        height={50}
+                    />
+                    {nav_items.map((n) =>
+                        n.protected ? (
+                            email && (
+                                <Button
+                                    key={n.name}
+                                    className="bg-tc_primary shadow-none"
+                                    asChild
+                                >
+                                    <Link
+                                        href={n.href}
+                                        className="text-white transition-colors hover:text-white"
+                                    >
+                                        {n.name}
+                                    </Link>
+                                </Button>
+                            )
+                        ) : (
+                            <Button
+                                key={n.name}
+                                className="bg-tc_primary shadow-none"
+                                asChild
+                            >
+                                <Link
+                                    href={n.href}
+                                    className="text-white transition-colors hover:text-white"
+                                >
+                                    {n.name}
+                                </Link>
+                            </Button>
+                        )
+                    )}
+                </nav>
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button
+                            size="icon"
+                            className="shrink-0 bg-tc_primary-600 md:hidden"
+                        >
+                            <Menu />
+                            <span className="sr-only">
+                                Toggle navigation menu
+                            </span>
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="bg-tc_primary">
+                        <nav className="grid gap-6 text-lg font-medium">
+                            <Image
+                                src="/tc-logo-white.png"
+                                alt="tc-logo"
+                                width={50}
+                                height={50}
+                            />
+                            {nav_items.map((i) => (
+                                <Link
+                                    key={i.href}
+                                    href={i.href}
+                                    className="text-white"
+                                >
+                                    {i.name}
+                                </Link>
+                            ))}
+                        </nav>
+                    </SheetContent>
+                </Sheet>
+                {email ? (
+                    <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                        <div className="ml-auto flex-1 sm:flex-initial"></div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    size="icon"
+                                    className="rounded-full"
+                                >
+                                    <CircleUser className="h-5 w-5" />
+                                    <span className="sr-only">
+                                        Toggle user menu
+                                    </span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>
+                                    My Account
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>Settings</DropdownMenuItem>
+                                <DropdownMenuItem>Support</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        const status = await signOut();
+                                        if (status == 200) resetUser();
+                                    }}
+                                >
+                                    Logout
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                ) : null}
+            </header>
         </div>
-      </nav>
-
-      {/* Mobile Nav */}
-      <div className="md:hidden flex w-full items-center justify-between">
-        <Sheet defaultOpen={false}>
-          <SheetTrigger asChild>
-            <Button size="icon" className="shrink-0 bg-tc_primary-600">
-              <Menu />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="bg-tc_primary p-4">
-            <nav className="grid gap-6 text-lg font-medium">
-              <Image
-                src="/tc-logo-white.png"
-                alt="tc-logo"
-                width={50}
-                height={50}
-              />
-              {nav_items.map((i) => (
-                <Link
-                  key={i.href}
-                  href={`${i.href}${i.href === "/" ? "" : queryString}`}
-                  className="text-white"
-                >
-                  {i.name}
-                </Link>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
-        {email && (
-          <UserAvatar handleLogout={handleLogout} isPending={isPending} />
-        )}
-      </div>
-    </header>
-  );
+    );
 }
