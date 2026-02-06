@@ -35,7 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload, EditGameSchema } from "@/src/types/games.types";
+import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
@@ -113,6 +113,7 @@ export default function EditScheduleDialog({
     if (!open) {
       reset();
       shownErrorsRef.current.clear();
+      dismissAll();
     }
   }, [open, reset]);
 
