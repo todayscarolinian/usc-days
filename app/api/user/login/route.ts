@@ -23,8 +23,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  console.log("data:" + data);
-
   // Return the Google OAuth URL to redirect the user
   return NextResponse.json({ url: data.url }, { status: 200 });
 }

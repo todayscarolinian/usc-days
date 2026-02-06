@@ -84,7 +84,6 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   React.useEffect(() => {
     if (open && game) {
       const { a, b } = getDbScores(game);
-      console.log("Initializing scores:", a, b);
       setAScore(a ?? 0);
       setBScore(b ?? 0);
       setWinnerId(game.winnerId ?? null);

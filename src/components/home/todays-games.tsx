@@ -32,8 +32,6 @@ function GamesContent({
     endDate: nextDay,
   });
 
-  console.log("Today's Games: ", todaysGames);
-
   const sortedGames = useMemo(() => {
     return [...todaysGames].sort(
       (a: Schedules, b: Schedules) =>

@@ -61,8 +61,6 @@ export default function MerchSection() {
       </section>
     );
     }
-    
-    console.log("Merchandise Categories:", categories);
 
   return (
     <section className="py-12">
