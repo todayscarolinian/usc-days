@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -31,8 +31,16 @@ export default function MerchandiseModal({
 }: MerchandiseModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+  const [displayedProductId, setDisplayedProductId] = useState(product.id);
   const images = product.imgUrls;
   const THUMBNAIL_COUNT = 3;
+
+  // Reset indices when product changes (adjust state during render)
+  if (product.id !== displayedProductId) {
+    setCurrentImageIndex(0);
+    setThumbnailStartIndex(0);
+    setDisplayedProductId(product.id);
+  }
 
   const nextImage = () => {
     const newIndex = (currentImageIndex + 1) % images.length;
@@ -64,11 +72,6 @@ export default function MerchandiseModal({
   const currentDesigner = product.designers
     ? product.designers.join("\n")
     : null;
-
-  useEffect(() => {
-    setCurrentImageIndex(0);
-    setThumbnailStartIndex(0);
-  }, [product.id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
