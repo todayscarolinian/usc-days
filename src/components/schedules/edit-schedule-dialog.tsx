@@ -124,6 +124,7 @@ export default function EditScheduleDialog({
   useEffect(() => {
     if (!open) {
       shownErrorsRef.current.clear();
+      dismissAll();
     }
   }, [open, dismissAll]);
 
