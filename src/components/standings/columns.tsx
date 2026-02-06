@@ -2,31 +2,18 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-import Default from "@/src/assets/tc-logo-red.png"; //temporary for testing
 import { StandingData } from "@/src/types/types";
-
-// Team icons mapping - add team logos here when available
-const teamIcons: Record<string, React.JSX.Element> = {
-  // Add team mappings like:
-  // "Team A": <Image src={TeamALogo} className="inline mr-2 size-6" alt="Team A" />,
-  // "Team B": <Image src={TeamBLogo} className="inline mr-2 size-6" alt="Team B" />,
-};
+import { getLogoForSchool } from "@/src/lib/utils";
 
 // Fallback function to get team icon or placeholder
-const getTeamIcon = (teamName: string): React.JSX.Element => {
-  const matchingTeamKey = Object.keys(teamIcons).find((key) =>
-    teamName.includes(key)
-  );
-
-  if (matchingTeamKey) {
-    return teamIcons[matchingTeamKey];
-  }
+const getTeamLogo = (teamName: string): React.JSX.Element => {
+  const logo = getLogoForSchool(teamName);
 
   // test placeholder icon
   return (
     <>
       <Image
-        src={Default}
+        src={logo}
         alt="Fallback Team Logo"
         className="inline size-6 mr-2"
       />
@@ -42,7 +29,7 @@ const standingColumns: ColumnDef<StandingData>[] = [
       const teamName = info.getValue() as string;
       return (
         <>
-          {getTeamIcon(teamName)}
+          {getTeamLogo(teamName)}
           {teamName}
         </>
       );

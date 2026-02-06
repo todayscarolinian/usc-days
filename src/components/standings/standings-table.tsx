@@ -28,6 +28,7 @@ interface DataTableProps {
 }
 
 export default function DataTable({ columns, data }: DataTableProps) {
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -37,25 +38,25 @@ export default function DataTable({ columns, data }: DataTableProps) {
   return (
     <div className={`border overflow-x-auto ${roboto.className}`}>
       <Table
-        className="w-full border-collapse text-sm [&_th]:!border-0 [&_td]:!border-0 [&_tr]:!border-0 [&_thead]:!border-0 [&_tbody]:!border-0"
+        className="w-full border-collapse text-sm [&_th]:border-0! [&_td]:border-0! [&_tr]:border-0! [&_thead]:border-0! [&_tbody]:border-0!"
         style={{ borderCollapse: "collapse" }}
       >
         <TableHeader
-          className="bg-[#FAFAFA] text-[#080808] [&_tr]:!border-0 [&_th]:!border-0"
+          className="bg-[#FAFAFA] text-[#080808] [&_tr]:border-0! [&_th]:border-0!"
           style={{ border: "none" }}
         >
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="h-[60px] !border-0"
+              className="h-15 border-0!"
               style={{ border: "none" }}
             >
               {headerGroup.headers.map((header, i) => (
                 <TableHead
                   key={header.id}
-                  className={`h-[60px] px-4 font-bold uppercase ${
-                    i === 0 ? "w-[942px] text-left" : "w-[142px] text-center"
-                  } !border-0`}
+                  className={`h-15 px-4 font-bold uppercase ${
+                    i === 0 ? "w-235.5 text-left" : "w-35.5 text-center"
+                  } border-0!`}
                   style={{ border: "none" }}
                 >
                   {header.isPlaceholder
@@ -71,22 +72,22 @@ export default function DataTable({ columns, data }: DataTableProps) {
         </TableHeader>
 
         <TableBody
-          className="text-[#3A3A3A] [&_tr]:!border-0 [&_td]:!border-0"
+          className="text-[#3A3A3A] [&_tr]:border-0! [&_td]:border-0!"
           style={{ border: "none" }}
         >
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                className="h-[60px] !border-0"
+                className="h-15 border-0!"
                 style={{ border: "none" }}
               >
                 {row.getVisibleCells().map((cell, i) => (
                   <TableCell
                     key={cell.id}
-                    className={`h-[60px] px-4 ${
-                      i === 0 ? "w-[942px] text-left" : "w-[142px] text-center"
-                    } !border-0`}
+                    className={`h-15 px-4 ${
+                      i === 0 ? "w-235.5 text-left" : "w-35.5 text-center"
+                    } border-0!`}
                     style={{ border: "none" }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -95,10 +96,10 @@ export default function DataTable({ columns, data }: DataTableProps) {
               </TableRow>
             ))
           ) : (
-            <TableRow className="h-[60px] !border-0" style={{ border: "none" }}>
+            <TableRow className="h-15 border-0!" style={{ border: "none" }}>
               <TableCell
                 colSpan={columns.length}
-                className="h-[60px] text-center !border-0"
+                className="h-15 text-center border-0!"
                 style={{ border: "none" }}
               >
                 No results.

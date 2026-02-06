@@ -4,6 +4,8 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -14,6 +16,7 @@ import {
   TableRow,
 } from "@/src/components/ui/table";
 import { CustomColumnDef } from "./columns";
+import { useState } from "react";
 
 interface DataTableProps<TData> {
   columns: CustomColumnDef<TData>[];
@@ -26,11 +29,20 @@ export function DataTable<TValue>({
   data,
   title = "USC DAYS",
 }: DataTableProps<TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "wins", desc: true },
+  ]);
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   });
 
   return (
@@ -59,7 +71,7 @@ export function DataTable<TValue>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}

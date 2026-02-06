@@ -18,7 +18,7 @@ export default function MerchSection() {
               key={index}
               className="bg-tc_primary border border-gray-300 rounded-lg overflow-hidden flex flex-col animate-pulse"
             >
-              <div className="w-full h-48 bg-gray-300 flex-shrink-0" />
+              <div className="w-full h-48 bg-gray-300 shrink-0" />
               <div className="p-3">
                 <div className="h-6 bg-gray-300 rounded mx-auto w-3/4" />
               </div>
@@ -61,8 +61,6 @@ export default function MerchSection() {
       </section>
     );
     }
-    
-    console.log("Merchandise Categories:", categories);
 
   return (
     <section className="py-12">
@@ -74,7 +72,7 @@ export default function MerchSection() {
             href={`/merchandise/${category.categoryName.toLowerCase()}`}
             className="text-left bg-tc_primary border border-gray-300 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col"
           >
-            <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
+            <div className="relative w-full h-48 bg-gray-100 shrink-0">
               <Image
                 src={category.imgUrl}
                 alt={category.categoryName}

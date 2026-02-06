@@ -22,14 +22,17 @@ export interface GetGamesParams {
   createdById?: number;
 }
 
-export interface GetGamesWithPaginationParams extends GetGamesParams, PaginationParams {}
+export interface GetGamesWithPaginationParams
+  extends GetGamesParams, PaginationParams {}
 
 class GameService {
   /**
    * Fetch games with optional cursor-based pagination.
    * If no pagination params provided, returns all matching games (legacy behavior).
    */
-  async getGames(params?: GetGamesWithPaginationParams): Promise<Schedules[] | PaginatedGamesResponse> {
+  async getGames(
+    params?: GetGamesWithPaginationParams,
+  ): Promise<Schedules[] | PaginatedGamesResponse> {
     try {
       const where: Prisma.GameWhereInput = {};
       const cursor = params?.cursor;
@@ -99,7 +102,7 @@ class GameService {
         if (cursorDate) {
           where.AND = where.AND || [];
           (where.AND as Prisma.GameWhereInput[]).push({
-            startDate: { lt: cursorDate },
+            startDate: { gt: cursorDate },
           });
         }
 
@@ -112,13 +115,15 @@ class GameService {
             winner: true,
             createdBy: true,
           },
-          orderBy: [{ startDate: "desc" }, { createdAt: "desc" }],
+          orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
           take: pageSize + 1,
         });
 
         const hasMore = games.length > pageSize;
         const paginatedGames = games.slice(0, pageSize);
-        const nextCursor = hasMore ? paginatedGames[paginatedGames.length - 1]?.startDate.toISOString() : null;
+        const nextCursor = hasMore
+          ? paginatedGames[paginatedGames.length - 1]?.startDate.toISOString()
+          : null;
 
         return {
           games: paginatedGames,
@@ -138,7 +143,7 @@ class GameService {
           winner: true,
           createdBy: true,
         },
-        orderBy: [{ startDate: "desc" }, { createdAt: "desc" }],
+        orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
       });
 
       return games;
@@ -157,6 +162,72 @@ class GameService {
     createdById,
   }: AddGamePayload) {
     try {
+      const proposedStart = new Date(startDate);
+      const proposedEnd = new Date(endDate);
+
+      // Single query to check all conflicts
+      const conflicts = await prisma.game.findMany({
+        where: {
+          AND: [
+            { startDate: { lt: proposedEnd } },
+            { endDate: { gt: proposedStart } },
+          ],
+          OR: [
+            // Exact duplicate (same teams, same sport, overlapping time)
+            {
+              gameTypeId,
+              OR: [
+                { AND: [{ teamAId }, { teamBId }] },
+                { AND: [{ teamAId: teamBId }, { teamBId: teamAId }] },
+              ],
+            },
+            // Location conflict (if provided)
+            ...(location && location.trim() !== ""
+              ? [
+                  {
+                    location: {
+                      equals: location,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                ]
+              : []),
+          ],
+        },
+        include: {
+          teamA: true,
+          teamB: true,
+          gameType: true,
+        },
+      });
+
+      // Check for exact duplicate (same teams, same sport)
+      const duplicate = conflicts.find(
+        (game) =>
+          game.gameTypeId === gameTypeId &&
+          ((game.teamAId === teamAId && game.teamBId === teamBId) ||
+            (game.teamAId === teamBId && game.teamBId === teamAId)),
+      );
+      if (duplicate) {
+        throw new Error(
+          "A schedule already exists for these teams at this time.",
+        );
+      }
+
+      // Check for location conflict (same venue can't host two games)
+      if (location && location.trim() !== "") {
+        const normalizedLocation = location.trim().toLowerCase();
+        const locationConflict = conflicts.find(
+          (game) => game.location?.trim().toLowerCase() === normalizedLocation,
+        );
+        if (locationConflict) {
+          throw new Error(
+            `The location "${location}" is already booked for another game during this time.`,
+          );
+        }
+      }
+
+      // All validations passed, create the game
       const newGame = await prisma.game.create({
         data: {
           gameTypeId,
@@ -171,6 +242,15 @@ class GameService {
       return newGame;
     } catch (error) {
       console.error("Error adding game:", error);
+
+      if (
+        error instanceof Error &&
+        (error.message.includes("already exists") ||
+          error.message.includes("already booked"))
+      ) {
+        throw error;
+      }
+
       throw new Error("An unexpected error occurred while adding the game.");
     }
   }
@@ -194,13 +274,13 @@ class GameService {
 
         if (!validTeam) {
           throw new Error(
-            "winnerId must be either teamAId, teamBId, or null for unfinished games."
+            "winnerId must be either teamAId, teamBId, or null for unfinished games.",
           );
         }
 
         if (winnerId !== teamAId && winnerId !== teamBId) {
           throw new Error(
-            "winnerId must be either teamAId, teamBId, or null for unfinished games."
+            "winnerId must be either teamAId, teamBId, or null for unfinished games.",
           );
         }
       }

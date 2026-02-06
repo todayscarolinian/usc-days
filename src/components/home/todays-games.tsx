@@ -14,25 +14,14 @@ function GamesContent({
   dateLabel: string;
   onOpenGame: (g: Schedules) => void;
 }) {
-  const nextDay = useMemo(() => {
-    const [year, month, day] = dateLabel.split("-").map(Number);
-    const date = new Date(year, month - 1, day + 1);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }, [dateLabel]);
-
   const {
     data: todaysGames = [],
     error,
     isLoading: loading,
   } = getGamesQuery({
     startDate: dateLabel,
-    endDate: nextDay,
+    endDate: dateLabel,
   });
-
-  console.log("Today's Games: ", todaysGames);
 
   const sortedGames = useMemo(() => {
     return [...todaysGames].sort(

@@ -74,14 +74,14 @@ export default function MerchandiseModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogContent showCloseButton={true} className="sm:max-w-[560px] pt-12 pb-8 bg-white rounded-lg">
+        <DialogContent showCloseButton={true} className="sm:max-w-140 pt-12 pb-8 bg-white rounded-lg">
           <DialogTitle className="sr-only">{product.title}</DialogTitle>
           <div className="flex gap-6">
             <DialogTitle className="sr-only">{product.title}</DialogTitle>
             {/* Left: Image */}
-            <div className="flex-shrink-0 flex flex-col gap-3">
+            <div className="shrink-0 flex flex-col gap-3">
               {/* Main Image */}
-              <div className="relative w-[225px] aspect-square bg-gray-100 rounded-lg overflow-hidden"> 
+              <div className="relative w-56.25 aspect-square bg-gray-100 rounded-lg overflow-hidden"> 
                 <Image
                   src={images[currentImageIndex]}
                   alt={product.title}
@@ -108,7 +108,7 @@ export default function MerchandiseModal({
                       <button
                         key={thumbnailStartIndex + idx}
                         onClick={() => setCurrentImageIndex(thumbnailStartIndex + idx)}
-                        className={`relative flex-shrink-0 w-12 h-12 rounded border-2 overflow-hidden ${
+                        className={`relative shrink-0 w-12 h-12 rounded border-2 overflow-hidden ${
                           currentImageIndex === thumbnailStartIndex + idx
                             ? "border-blue-500"
                             : "border-gray-300"

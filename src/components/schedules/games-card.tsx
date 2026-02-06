@@ -5,8 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { sportIcons } from "@/src/constants/sportIcons";
-import { schoolLogos } from "@/src/constants/schoolLogos";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Schedules } from "@/src/types/types";

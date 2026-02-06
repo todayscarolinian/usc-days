@@ -77,7 +77,7 @@ export default function GameDetailsDialog({
         onOpenChange(v);
       }}
     >
-      <DialogContent className="sm:max-w-[560px]">
+      <DialogContent className="sm:max-w-140">
         <DialogHeader>
           <DialogTitle className="text-xl">Game Details</DialogTitle>
           <DialogDescription>Quick view & actions</DialogDescription>

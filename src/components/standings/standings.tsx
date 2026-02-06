@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getChampionsQuery } from "@/src/queries/champions.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
@@ -14,10 +14,9 @@ import StandingsCardsSkeleton from "@/src/components/standings/standings-cards-s
 import DataTable from "@/src/components/standings/standings-table";
 import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import standingColumns from "@/src/components/standings/columns";
-import { Button } from "@/src/components/ui/button";
-import { Champion, GameType, Team } from "@/src/lib/prisma/generated/client";
+import { GameType } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
-import { Champions, StandingData } from "@/src/types/types";
+import { Champions, Schedules, StandingData } from "@/src/types/types";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
@@ -45,52 +44,81 @@ export default function Standings() {
     : null;
 
   // Static data (fetched once using TanStack Query)
-  const { data: gameTypes = [], error: gameTypesError } = getGameTypesQuery();
-  const { data: teams = [], error: teamsError } = getTeamsQuery();
-
-  // Dynamic data (changes per sport selection)
-  const [championsData, setChampionsData] = useState<Champions[]>([]);
-  const [standingsData, setStandingsData] = useState<StandingWithRank[]>([]);
+  const {
+    data: gameTypes = [],
+    error: gameTypesError,
+    isLoading: gameTypesLoading,
+  } = getGameTypesQuery();
+  const {
+    data: teams = [],
+    error: teamsError,
+    isLoading: teamsLoading,
+  } = getTeamsQuery();
 
   // UI state
-  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [formData, setFormData] = useState<EditChampionPayload | null>(null);
+
+  // Track shown errors to prevent duplicate toasts
+  const shownLoadErrorRef = useRef(false);
+  const shownProcessErrorRef = useRef(false);
 
   useInitializeUserStore();
   const { email } = useUserStore();
   const isAdmin = !!email;
 
   // Fetch dynamic data using TanStack Query
-  const { data: championsQueryData = [], error: championsError } =
-    getChampionsQuery();
-  const { data: gamesQueryData = [], error: gamesError } = getGamesQuery();
+  const {
+    data: championsQueryData = [],
+    error: championsError,
+    isLoading: championsLoading,
+  } = getChampionsQuery();
+  const {
+    data: gamesQueryData = [],
+    error: gamesError,
+    isLoading: gamesLoading,
+  } = getGamesQuery();
 
-  // Process data when sport selection or query data changes
-  const fetchStandingsData = useCallback(() => {
-    if (!selectedSport) {
-      setStandingsData([]);
-      setChampionsData([]);
-      return;
-    }
+  // Show error toast when errors occur
+  useEffect(() => {
+    const hasError =
+      gameTypesError || teamsError || championsError || gamesError;
 
-    if (gameTypesError || teamsError || championsError || gamesError) {
+    if (hasError && !shownLoadErrorRef.current) {
       toast.error("Failed to load standings data");
-      return;
+      shownLoadErrorRef.current = true;
+    } else if (!hasError) {
+      // Reset when errors are cleared
+      shownLoadErrorRef.current = false;
     }
+  }, [gameTypesError, teamsError, championsError, gamesError]);
+
+  // Compute loading state
+  const loading =
+    gameTypesLoading || teamsLoading || championsLoading || gamesLoading;
+
+  // Process champions data reactively
+  const championsData = useMemo(() => {
+    if (!selectedSport) return [];
+    return championsQueryData.filter(
+      (c: Champions) => c.gameType.id === selectedSport,
+    );
+  }, [selectedSport, championsQueryData]);
+
+  // Process standings data reactively
+  const { data: standingsData, error: standingsError } = useMemo(() => {
+    if (!selectedSport) return { data: [], error: false };
 
     try {
-      setLoading(true);
-
-      // Filter data by selected sport
-      const champions: Champions[] = championsQueryData.filter(
-        (c: any) => c.gameType.id === selectedSport,
+      // Filter champions by selected sport (inline instead of depending on championsData memo)
+      const filteredChampions = championsQueryData.filter(
+        (c: Champions) => c.gameType.id === selectedSport,
       );
+
+      // Filter games by selected sport
       const games = gamesQueryData.filter(
-        (g: any) => g.gameType?.id === selectedSport,
+        (g: Schedules) => g.gameType?.id === selectedSport,
       );
-
-      setChampionsData(champions);
 
       // Transform games to standings statistics
       const gameStandings = transformGamesToSchoolRank(games, selectedSport);
@@ -100,7 +128,7 @@ export default function Standings() {
 
       // Add teams with game statistics
       gameStandings.forEach((standing) => {
-        const champion = champions.find(
+        const champion = filteredChampions.find(
           (c) => c.team.teamName === standing.team,
         );
         allStandings.push({
@@ -110,7 +138,7 @@ export default function Standings() {
       });
 
       // Add champions without game history
-      champions.forEach((champion) => {
+      filteredChampions.forEach((champion) => {
         const existingStanding = allStandings.find(
           (s) => s.team === champion.team.teamName,
         );
@@ -128,28 +156,23 @@ export default function Standings() {
         }
       });
 
-      setStandingsData(allStandings);
+      return { data: allStandings, error: false };
     } catch (err) {
       console.error("Error processing standings data:", err);
-      toast.error("Failed to process standings data");
-      setStandingsData([]);
-      setChampionsData([]);
-    } finally {
-      setLoading(false);
+      return { data: [], error: true };
     }
-  }, [
-    selectedSport,
-    championsQueryData,
-    gamesQueryData,
-    gameTypesError,
-    teamsError,
-    championsError,
-    gamesError,
-  ]);
+  }, [selectedSport, gamesQueryData, championsQueryData]);
 
+  // Show error toast when standings processing fails
   useEffect(() => {
-    fetchStandingsData();
-  }, [fetchStandingsData]);
+    if (standingsError && !shownProcessErrorRef.current) {
+      toast.error("Failed to process standings data");
+      shownProcessErrorRef.current = true;
+    } else if (!standingsError) {
+      // Reset when error is cleared
+      shownProcessErrorRef.current = false;
+    }
+  }, [standingsError]);
 
   // Memoized computed values
   const sportName = useMemo(
@@ -205,7 +228,6 @@ export default function Standings() {
   // Handler functions
   const handleCardClick = useCallback(
     (rank: number) => {
-      if (!isAdmin) return;
       const champion = championsData.find((c) => c.rank === rank);
 
       setFormData({
@@ -225,31 +247,12 @@ export default function Standings() {
     [championsData, selectedSport],
   );
 
-  const handleAddStanding = useCallback(() => {
-    if (!selectedSport) return;
+  
 
-    setFormData({
-      id: -1,
-      gameTypeId: selectedSport,
-      rank: 1, // Default to first place
-      teamId: -1,
-      endDate: new Date().toISOString().split("T")[0],
-      startDate: new Date().toISOString().split("T")[0],
-    });
-    setShowDialog(true);
-  }, [selectedSport]);
-
-  const handleCloseDialog = useCallback(
-    (dataChanged?: boolean) => {
-      setFormData(null);
-      setShowDialog(false);
-      // Only refetch data if changes were made
-      if (dataChanged) {
-        fetchStandingsData();
-      }
-    },
-    [fetchStandingsData],
-  );
+  const handleCloseDialog = useCallback(() => {
+    setFormData(null);
+    setShowDialog(false);
+  }, []);
 
   const handleSportSelect = (sportId: number | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -268,17 +271,9 @@ export default function Standings() {
           <SportSelector
             value={selectedSport}
             onValueChangeAction={handleSportSelect}
-            className="flex items-center justify-between !px-[22px] !py-[7px] !h-[54px] max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-[2px] transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
+            className="flex items-center justify-between px-5.5! py-1.75! h-13.5! max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
-          {isAdmin && (
-            <Button
-              variant="default"
-              disabled={!selectedSport}
-              onClick={handleAddStanding}
-            >
-              + Add Standing
-            </Button>
-          )}
+          
         </div>
 
         {loading && selectedSport && (
@@ -296,7 +291,7 @@ export default function Standings() {
                 <Cards
                   key={`rank-${index + 1}`}
                   data={card}
-                  onSelect={() => handleCardClick(index + 1)}
+                  onSelect={() => isAdmin ? handleCardClick(index + 1) : undefined}
                 />
               ))}
             </div>

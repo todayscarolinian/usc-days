@@ -84,7 +84,6 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   React.useEffect(() => {
     if (open && game) {
       const { a, b } = getDbScores(game);
-      console.log("Initializing scores:", a, b);
       setAScore(a ?? 0);
       setBScore(b ?? 0);
       setWinnerId(game.winnerId ?? null);
@@ -139,7 +138,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
+      <DialogContent className="sm:max-w-130">
         <DialogHeader>
           <DialogTitle>Add / Edit Score</DialogTitle>
           <DialogDescription>
