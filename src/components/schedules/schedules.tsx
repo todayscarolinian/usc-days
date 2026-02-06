@@ -1,53 +1,87 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { scheduleColumns } from "@/components/schedules/columns";
-import { DataTable } from "@/components/schedules/schedules-table";
-import axios from "axios";
-import { Schedules } from "@/types/types";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
+import SchedulesList from "@/src/components/schedules/schedules-list";
+import { filterType } from "@/src/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
+import ScheduleFilter from "./schedule-filter";
+import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
+import { format, parse } from "date-fns";
 
 export default function SchedulesPage() {
-    const [gamesData, setGamesData] = useState<Schedules[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const selectedSport = searchParams.get("sport")
+    ? Number(searchParams.get("sport"))
+    : null;
 
-    useEffect(() => {
-        const fetchGamesData = async () => {
-            try {
-                const {
-                    data: { games: fetchedGamesData },
-                } = await axios.get("/api/games");
-
-                setGamesData(fetchedGamesData);
-            } catch (err) {
-                console.error("Error fetching games data:", err);
-                setError("Failed to load games data");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGamesData();
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
+  const selectedDate = useMemo(() => {
+    const dateParam = searchParams.get("date");
+    if (!dateParam) return undefined;
+    try {
+      return parse(dateParam, "yyyy-MM-dd", new Date());
+    } catch {
+      return undefined;
     }
+  }, [searchParams]);
 
-    if (error) {
-        return <div>Error: {error}</div>;
+  useInitializeUserStore();
+  const { email } = useUserStore();
+
+  const currentFilters: filterType | undefined = useMemo(() => {
+    const filters: filterType = {};
+    
+    if (selectedSport && selectedSport !== 0) {
+      filters.game = String(selectedSport);
     }
+    
+    if (selectedDate) {
+      filters.date = format(selectedDate, "yyyy-MM-dd");
+    }
+    
+    return Object.keys(filters).length > 0 ? filters : undefined;
+  }, [selectedSport, selectedDate]);
 
-    return (
-        <div className="p-4 sm:py-10">
-            <div className="mx-auto sm:max-w-360">
-                <DataTable
-                    columns={scheduleColumns}
-                    data={gamesData}
-                    actionButton={<AddScheduleDialog />}
-                />
+  const handleSportSelect = (sportId: number | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (sportId) {
+      params.set("sport", sportId.toString());
+    } else {
+      params.delete("sport");
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (date) {
+      params.set("date", format(date, "yyyy-MM-dd"));
+    } else {
+      params.delete("date");
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  return (
+    <>
+      <ScheduleFilter 
+        onSportSelect={handleSportSelect} 
+        selectedSport={selectedSport}
+        onDateSelect={handleDateSelect}
+        selectedDate={selectedDate}
+      />
+      <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
+        <div className="flex flex-col gap-4">
+          {email && (
+            <div className="flex justify-end">
+              <AddScheduleDialog />
             </div>
+          )}
+          <SchedulesList filters={currentFilters} selectedDate={selectedDate} />
         </div>
-    );
+      </div>
+    </>
+  );
 }
