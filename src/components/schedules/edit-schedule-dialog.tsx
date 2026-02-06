@@ -35,7 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
+import { EditGamePayload, EditGameSchema } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
@@ -73,7 +73,6 @@ export default function EditScheduleDialog({
       }),
       location: schedule.location ? schedule.location : undefined,
     },
-    schema: EditGameSchema,
   });
 
   const { showToast, dismissAll } = useToastManager();
