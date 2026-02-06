@@ -92,7 +92,7 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
     }
 
     const sortedDates = Object.keys(groupedByDay).sort(
-      (a, b) => new Date(b).getTime() - new Date(a).getTime()
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
     const ordered = [
