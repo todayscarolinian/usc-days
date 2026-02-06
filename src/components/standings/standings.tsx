@@ -14,7 +14,6 @@ import StandingsCardsSkeleton from "@/src/components/standings/standings-cards-s
 import DataTable from "@/src/components/standings/standings-table";
 import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import standingColumns from "@/src/components/standings/columns";
-import { Button } from "@/src/components/ui/button";
 import { GameType } from "@/src/lib/prisma/generated/client";
 import { transformGamesToSchoolRank } from "../leaderboards/transformData";
 import { Champions, Schedules, StandingData } from "@/src/types/types";
@@ -248,19 +247,7 @@ export default function Standings() {
     [championsData, selectedSport],
   );
 
-  const handleAddStanding = useCallback(() => {
-    if (!selectedSport) return;
-
-    setFormData({
-      id: -1,
-      gameTypeId: selectedSport,
-      rank: 1, // Default to first place
-      teamId: -1,
-      endDate: new Date().toISOString().split("T")[0],
-      startDate: new Date().toISOString().split("T")[0],
-    });
-    setShowDialog(true);
-  }, [selectedSport]);
+  
 
   const handleCloseDialog = useCallback(() => {
     setFormData(null);
@@ -286,15 +273,7 @@ export default function Standings() {
             onValueChangeAction={handleSportSelect}
             className="flex items-center justify-between px-5.5! py-1.75! h-13.5! max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
-          {isAdmin && (
-            <Button
-              variant="default"
-              disabled={!selectedSport}
-              onClick={handleAddStanding}
-            >
-              + Add Standing
-            </Button>
-          )}
+          
         </div>
 
         {loading && selectedSport && (
