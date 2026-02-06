@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useEditGamesQuery,
   useDeleteGamesQuery,
 } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { parseApiError } from "@/src/lib/error-handler";
+import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/src/components/ui/button";
@@ -32,8 +34,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload } from "@/src/types/games.types";
+import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
+import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
 interface ScheduleInputs {
@@ -85,6 +88,11 @@ export default function EditScheduleDialog({
   const [scheduleInputs, setScheduleInputs] =
     useState<ScheduleInputs>(defaultInputs);
 
+  const { showToast, dismissAll } = useToastManager();
+
+  // Track which errors have already been shown
+  const shownErrorsRef = useRef<Set<string>>(new Set());
+
   const {
     data: fetchedSportsData = [],
     error: sportsError,
@@ -96,6 +104,28 @@ export default function EditScheduleDialog({
     error: teamSportsError,
     isLoading: teamLoading,
   } = getTeamGameTypesQuery(Number(selectedSport));
+
+  // Handle query errors - only show toast once per error
+  useEffect(() => {
+    if (sportsError && !shownErrorsRef.current.has('sportsError')) {
+      showToast("error", "Failed to load sports", parseApiError(sportsError));
+      shownErrorsRef.current.add('sportsError');
+    }
+  }, [sportsError, showToast]);
+
+  useEffect(() => {
+    if (teamSportsError && !shownErrorsRef.current.has('teamSportsError')) {
+      showToast("error", "Failed to load teams", parseApiError(teamSportsError));
+      shownErrorsRef.current.add('teamSportsError');
+    }
+  }, [teamSportsError, showToast]);
+
+  // Reset form and dismiss toasts when dialog closes
+  useEffect(() => {
+    if (!open) {
+      shownErrorsRef.current.clear();
+    }
+  }, [open, dismissAll]);
 
   const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
@@ -111,7 +141,11 @@ export default function EditScheduleDialog({
 
   const edit = useEditGamesQuery();
   const editSchedule = () => {
-    if (!selectedSport) return;
+    if (!selectedSport) {
+      showToast("error", "Please select a sport");
+      return;
+    }
+
     const data: EditGamePayload = {
       id: schedule.id,
       gameTypeId: selectedSport,
@@ -120,14 +154,23 @@ export default function EditScheduleDialog({
       startDate: `${scheduleInputs.startDate}T${scheduleInputs.startTime}:00+08:00`,
       endDate: `${scheduleInputs.endDate}T${scheduleInputs.endTime}:00+08:00`,
       location: scheduleInputs.location ? scheduleInputs.location : undefined,
-      teamAScore: Number(schedule.teamAScore),
-      teamBScore: Number(schedule.teamBScore),
-      winnerId: schedule.winnerId ? Number(schedule.winnerId) : undefined,
+      teamAScore: schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
+      teamBScore: schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
+      winnerId: schedule.winnerId ? Number(schedule.winnerId) : null,
     };
 
     edit.mutate(data, {
       onSuccess: () => {
+        showToast(
+          "success",
+          "Schedule updated!",
+          "The game schedule has been updated successfully."
+        );
         onOpenChange(false);
+      },
+      onError: (error) => {
+        const errorMessage = parseApiError(error);
+        showToast("error", "Failed to update schedule", errorMessage);
       },
     });
   };
@@ -138,7 +181,16 @@ export default function EditScheduleDialog({
       { scheduleId: schedule.id },
       {
         onSuccess: () => {
+          showToast(
+            "success",
+            "Schedule deleted!",
+            "The game schedule has been removed successfully."
+          );
           onOpenChange(false);
+        },
+        onError: (error) => {
+          const errorMessage = parseApiError(error);
+          showToast("error", "Failed to delete schedule", errorMessage);
         },
       },
     );
@@ -146,7 +198,6 @@ export default function EditScheduleDialog({
 
   const loading =
     sportsLoading || teamLoading || edit.isPending || del.isPending;
-  const error = sportsError || teamSportsError || edit.error || del.error;
 
   return (
     <Dialog
@@ -193,7 +244,7 @@ export default function EditScheduleDialog({
         <FaRegEdit />
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-150">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>
           <DialogDescription>
@@ -202,20 +253,36 @@ export default function EditScheduleDialog({
         </DialogHeader>
 
         <div className="grid gap-8 py-4">
-          <div className="grid w-full grid-cols-1 gap-4">
+          <div className="grid w-full grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Date
+                Start Date
               </Label>
               <Input
                 type="date"
-                placeholder="Date"
+                placeholder="Start Date"
                 value={scheduleInputs.startDate ?? ""}
                 onChange={(e) =>
                   setScheduleInputs((s) => ({
                     ...s,
                     startDate: e.target.value,
-                    endDate: e.target.value
+                  }))
+                }
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="endDate" className="font-bold opacity-50">
+                End Date
+              </Label>
+              <Input
+                type="date"
+                placeholder="End Date"
+                value={scheduleInputs.endDate ?? ""}
+                onChange={(e) =>
+                  setScheduleInputs((s) => ({
+                    ...s,
+                    endDate: e.target.value,
                   }))
                 }
               />
@@ -266,7 +333,7 @@ export default function EditScheduleDialog({
               options={sportsOptions}
               value={selectedSport.toString()}
               onValueChange={(value) => setSelectedSport(Number(value))}
-              disabled={sportsOptions.length <= 0}
+              disabled={sportsOptions.length <= 0 || loading}
               loading={sportsLoading}
               className="w-full"
             />
@@ -289,7 +356,7 @@ export default function EditScheduleDialog({
                     teamAId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0}
+                disabled={teamOptions.length <= 0 || loading}
                 loading={teamLoading}
               />
             </div>
@@ -312,7 +379,7 @@ export default function EditScheduleDialog({
                     teamBId: Number(value),
                   }))
                 }
-                disabled={teamOptions.length <= 0}
+                disabled={teamOptions.length <= 0 || loading}
                 loading={teamLoading}
               />
             </div>
@@ -337,8 +404,6 @@ export default function EditScheduleDialog({
         </div>
 
         <DialogFooter className="flex items-center">
-          {error && <span className="text-red-500">{error?.message}</span>}
-
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -372,11 +437,9 @@ export default function EditScheduleDialog({
             type="submit"
             className="px-8"
             onClick={editSchedule}
-            disabled={
-              loading || teamOptions.length <= 0 || sportsOptions.length <= 0
-            }
+            disabled={loading || teamOptions.length <= 0 || sportsOptions.length <= 0}
           >
-            Save
+            {edit.isPending ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>
