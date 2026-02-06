@@ -34,9 +34,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload, DeleteGamePayload } from "@/src/types/games.types";
+import { EditGamePayload } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
-import { getSportsTeamData } from "@/src/lib/actions";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 
 interface ScheduleInputs {
