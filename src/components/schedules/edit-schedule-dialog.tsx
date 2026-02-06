@@ -10,6 +10,7 @@ import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
+import { getTimezoneOffset } from "@/src/lib/utils";
 import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/src/components/ui/button";
@@ -48,7 +49,7 @@ export default function EditScheduleDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const { inputs, updateInput, reset } = useScheduleForm({
+  const { inputs, updateInput, validate, firstError, reset } = useScheduleForm({
     initialValues: {
       gameTypeId: schedule.gameType.id,
       teamAId: schedule.teamA.id,
@@ -73,6 +74,19 @@ export default function EditScheduleDialog({
       }),
       location: schedule.location ? schedule.location : undefined,
     },
+    schema: EditGameSchema,
+    transformData: (inputs) => ({
+      id: schedule.id,
+      gameTypeId: inputs.gameTypeId,
+      teamAId: inputs.teamAId,
+      teamBId: inputs.teamBId,
+      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
+      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      location: inputs.location,
+      teamAScore: schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
+      teamBScore: schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
+      winnerId: schedule.winnerId ? Number(schedule.winnerId) : null,
+    }),
   });
 
   const { showToast, dismissAll } = useToastManager();
@@ -114,7 +128,7 @@ export default function EditScheduleDialog({
       shownErrorsRef.current.clear();
       dismissAll();
     }
-  }, [open, reset]);
+  }, [open, reset, dismissAll]);
 
   const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
@@ -130,8 +144,15 @@ export default function EditScheduleDialog({
 
   const edit = useEditGamesQuery();
   const editSchedule = () => {
+    // Validate sport selection
     if (!inputs.gameTypeId || inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
+      return;
+    }
+
+    // Validate form inputs using EditGameSchema
+    if (!validate()) {
+      showToast("error", "Validation Error", firstError || "Please check your inputs");
       return;
     }
 
@@ -140,8 +161,8 @@ export default function EditScheduleDialog({
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00+08:00`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00+08:00`,
+      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
+      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location ? inputs.location : undefined,
       teamAScore: schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
       teamBScore: schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
