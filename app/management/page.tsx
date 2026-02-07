@@ -6,7 +6,7 @@ export const metadata: Metadata = generateMeta({
   description:
     "Administrative dashboard for managing USC Days 2025 teams, sports, and competition data.",
   url: "/management",
-  image: "/tc-logo-red.png",
+  image: "/og_image.jpg",
 });
 
 const ManagementPage = () => {

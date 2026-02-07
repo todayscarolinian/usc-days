@@ -8,7 +8,7 @@ export const metadata: Metadata = generateMeta({
   description:
     "View the latest standings for USC Days 2025 intramural competitions.",
   url: "/standings",
-  image: "/tc-logo-red.png",
+  image: "/og_image.jpg",
 });
 
 const StandingsPage = () => {

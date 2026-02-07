@@ -10,7 +10,7 @@ export const metadata: Metadata = generateMeta({
   description:
     "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
   url: "/merchandise/[categoryName]",
-  image: "/tc-logo-red.png",
+  image: "/og_image.jpg",
 });
 
 export default async function CategoryPage({

@@ -7,7 +7,7 @@ export const metadata: Metadata = generateMeta({
   description:
     "USC Days 2025 official website. Browse merchandise, view today's games, explore sports, and stay connected with intramural competitions.",
   url: "/",
-  image: "/tc-logo-red.png",
+  image: "/og_image.jpg",
 });
 
 export default function Home() {
