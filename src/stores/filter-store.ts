@@ -1,4 +1,4 @@
-import { filterType } from "@/types/types";
+import { filterType } from "@/src/types/types";
 import { create } from "zustand";
 
 interface FilterState {
@@ -26,11 +26,12 @@ export const useFilterStore = create<FilterState>((set) => ({
       isFilterActive: true,
     });
   },
-  clearFilter: () => set({
-    date: "", 
-    game: "", 
-    teams: { home: "", away: "" }, 
-    isFilterActive: false, 
-    finishedGames: false 
-  }),
+  clearFilter: () =>
+    set({
+      date: "",
+      game: "",
+      teams: { home: "", away: "" },
+      isFilterActive: false,
+      finishedGames: false,
+    }),
 }));
