@@ -26,6 +26,7 @@ import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { getTimezoneOffset } from "@/src/lib/utils";
+import { Plus } from "lucide-react";
 
 export default function AddScheduleDialog() {
   const [open, setOpen] = useState(false);
