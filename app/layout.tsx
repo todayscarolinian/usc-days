@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description:
       "Scoreboard of the different school teams per game for USC Days 2025",
     url: "/",
-    image: "/tc-logo-red.png",
+    image: "/og_image.jpg",
   }),
   keywords: [
     "USC Days",
