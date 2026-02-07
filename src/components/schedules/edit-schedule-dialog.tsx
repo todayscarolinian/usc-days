@@ -229,10 +229,6 @@ export default function EditScheduleDialog({
         }
       }}
     >
-      <DialogTrigger className="text-primary-foreground bg-[#9B2626] hover:bg-[#771D1D] h-9 rounded-md px-3">
-        <FaRegEdit />
-      </DialogTrigger>
-
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>

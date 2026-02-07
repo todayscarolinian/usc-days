@@ -16,7 +16,10 @@ type SchedulesListProps = {
   selectedDate?: Date;
 };
 
-export default function SchedulesList({ filters, selectedDate }: SchedulesListProps) {
+export default function SchedulesList({
+  filters,
+  selectedDate,
+}: SchedulesListProps) {
   const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
   const [open, setOpen] = useState(false);
   const [editGame, setEditGame] = useState<Schedules | null>(null);
@@ -44,10 +47,10 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
 
   const allGames: Schedules[] = useMemo(() => {
     if (!data?.pages) return [];
-    
+
     const seen = new Set<number>();
     const games: Schedules[] = [];
-    
+
     for (const page of data.pages) {
       for (const game of page.games) {
         if (!seen.has(game.id)) {
@@ -56,7 +59,7 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
         }
       }
     }
-    
+
     return games;
   }, [data]);
 
@@ -68,40 +71,59 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
         acc[dayKey].push(game);
         return acc;
       },
-      {}
+      {},
     );
 
     Object.keys(groupedByDay).forEach((date) => {
       groupedByDay[date].sort(
         (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
       );
     });
 
     // If a specific date is selected, only show that date
     if (selectedDate) {
       const selectedDateKey = format(selectedDate, "yyyy-MM-dd");
-      const filteredGrouped = { [selectedDateKey]: groupedByDay[selectedDateKey] ?? [] };
+      const filteredGrouped = {
+        [selectedDateKey]: groupedByDay[selectedDateKey] ?? [],
+      };
       return { grouped: filteredGrouped, orderedDates: [selectedDateKey] };
     }
 
-    // Otherwise, show all dates with today first
+    // Otherwise, show all dates with today first, then future, then past
     const todayKey = format(new Date(), "yyyy-MM-dd");
     if (!groupedByDay[todayKey]) {
       groupedByDay[todayKey] = [];
     }
 
-    const sortedDates = Object.keys(groupedByDay).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
+    const allDates = Object.keys(groupedByDay);
+    const futureDates = allDates
+      .filter((d) => d > todayKey)
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
-    const ordered = [
-      todayKey,
-      ...sortedDates.filter((d) => d !== todayKey),
-    ];
+    const pastDates = allDates
+      .filter((d) => d < todayKey)
+      .sort((a, b) => (a > b ? -1 : a < b ? 1 : 0));
+
+    const ordered = [todayKey, ...futureDates, ...pastDates];
 
     return { grouped: groupedByDay, orderedDates: ordered };
   }, [allGames, selectedDate]);
+
+  // Filter out past dates until all pages are loaded
+  const visibleDates = useMemo(() => {
+      if (!selectedDate) {
+          const todayKey = format(new Date(), "yyyy-MM-dd");
+
+          // If there are more pages to load, hide past dates
+          if (hasNextPage) {
+              return orderedDates.filter((date) => date >= todayKey);
+          }
+      }
+
+    // Otherwise, show all dates
+    return orderedDates;
+  }, [orderedDates, hasNextPage, selectedDate]);
 
   useEffect(() => {
     const node = loadMoreRef.current;
@@ -114,7 +136,7 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
           fetchNextPage();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 },
     );
 
     observer.observe(node);
@@ -130,7 +152,9 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
       <div className="flex flex-col items-center gap-4 py-12">
         <p className="text-red-500 font-medium">Failed to load schedules</p>
         <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : "An unexpected error occurred"}
+          {error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"}
         </p>
         <button
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
@@ -142,17 +166,18 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
     );
   }
 
-  const hasFilteredGames = orderedDates.some((date) => grouped[date] && grouped[date].length > 0);
+  const hasFilteredGames = visibleDates.some(
+    (date) => grouped[date] && grouped[date].length > 0,
+  );
 
   return (
     <div className="flex flex-col items-center gap-15 w-full">
       {!hasFilteredGames && !isFetching && (
         <div className="py-12 text-center">
           <p className="text-muted-foreground">
-            {selectedDate 
-              ? `No games scheduled for ${format(selectedDate, "MMMM d, yyyy")}` 
-              : "No games scheduled"
-            }
+            {selectedDate
+              ? `No games scheduled for ${format(selectedDate, "MMMM d, yyyy")}`
+              : "No games scheduled"}
           </p>
           {selectedDate && (
             <p className="text-sm text-muted-foreground mt-2">
@@ -162,7 +187,7 @@ export default function SchedulesList({ filters, selectedDate }: SchedulesListPr
         </div>
       )}
 
-      {orderedDates
+      {visibleDates
         .filter((date) => grouped[date] && grouped[date].length > 0)
         .map((date) => (
           <SchedulesCard

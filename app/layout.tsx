@@ -6,6 +6,8 @@ import Navbar from "@/src/components/layout/navbar";
 import { Toaster } from "@/src/components/ui/sonner";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import QueryProvider from "@/src/components/provider";
+import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const robotoCondensed = Roboto_Condensed({
   subsets: ["latin"],
@@ -62,7 +64,9 @@ export default function RootLayout({
           </Suspense>
           <main className="relative z-0">{children}</main>
           <Toaster />
-        </QueryProvider>
+              </QueryProvider>
+              <GoogleAnalytics gaId="G-ZF7QYY6WNC" />
+        <Analytics />
       </body>
     </html>
   );

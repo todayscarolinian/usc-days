@@ -58,7 +58,9 @@ function UserAvatar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="text-muted-foreground">My Account</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-muted-foreground">
+            My Account
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
             Logout
@@ -74,6 +76,7 @@ export default function Navbar() {
   const { email, resetUser } = useUserStore();
   const { mutate: signOut, isPending } = useSignOut();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathName = usePathname();
   const searchParams = useSearchParams();
 
@@ -156,7 +159,7 @@ export default function Navbar() {
 
       {/* Mobile Nav */}
       <div className="md:hidden flex w-full items-center justify-between">
-        <Sheet defaultOpen={false}>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button size="icon" className="shrink-0 bg-tc_primary-600">
               <Menu />
@@ -176,6 +179,7 @@ export default function Navbar() {
                   key={i.href}
                   href={`${i.href}${i.href === "/" ? "" : queryString}`}
                   className="text-white"
+                  onClick={() => setIsSheetOpen(false)}
                 >
                   {i.name}
                 </Link>
