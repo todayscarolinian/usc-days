@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { ZodSchema } from "zod";
 import { AddGameSchema } from "@/src/types/games.types";
 import { getValidationErrors } from "@/src/lib/error-handler";
 import { getTimezoneOffset } from "@/src/lib/utils";
@@ -12,6 +13,12 @@ interface ScheduleInputs {
   startTime: string;
   endTime: string;
   location?: string;
+}
+
+interface UseScheduleFormOptions<T = any> {
+  initialValues?: Partial<ScheduleInputs>;
+  schema?: ZodSchema<T>;
+  transformData?: (inputs: ScheduleInputs, additionalData?: any) => T;
 }
 
 const getDefaultInputs = (): ScheduleInputs => ({
@@ -28,8 +35,17 @@ const getDefaultInputs = (): ScheduleInputs => ({
   location: undefined,
 });
 
-export function useScheduleForm() {
-  const [inputs, setInputs] = useState<ScheduleInputs>(getDefaultInputs());
+export function useScheduleForm<T = any>(options: UseScheduleFormOptions<T> = {}) {
+  const {
+    initialValues,
+    schema = AddGameSchema,
+    transformData,
+  } = options;
+
+  const [inputs, setInputs] = useState<ScheduleInputs>({
+    ...getDefaultInputs(),
+    ...initialValues,
+  });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const updateInput = useCallback(
@@ -45,20 +61,22 @@ export function useScheduleForm() {
     []
   );
 
-  const validate = useCallback((createdById: number): boolean => {
+  const validate = useCallback((additionalData?: any): boolean => {
     try {
-      // Transform inputs to match AddGameSchema format
-      const dataToValidate = {
-        gameTypeId: inputs.gameTypeId,
-        teamAId: inputs.teamAId,
-        teamBId: inputs.teamBId,
-        startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-        endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
-        location: inputs.location,
-        createdById,
-      };
+      // Use custom transform if provided, otherwise use default for AddGameSchema
+      const dataToValidate = transformData
+        ? transformData(inputs, additionalData)
+        : {
+            gameTypeId: inputs.gameTypeId,
+            teamAId: inputs.teamAId,
+            teamBId: inputs.teamBId,
+            startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
+            endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+            location: inputs.location,
+            createdById: additionalData,
+          };
 
-      AddGameSchema.parse(dataToValidate);
+      schema.parse(dataToValidate);
       setValidationErrors({});
       return true;
     } catch (error) {
@@ -66,12 +84,15 @@ export function useScheduleForm() {
       setValidationErrors(errors);
       return false;
     }
-  }, [inputs]);
+  }, [inputs, schema, transformData]);
 
   const reset = useCallback(() => {
-    setInputs(getDefaultInputs());
+    setInputs({
+      ...getDefaultInputs(),
+      ...initialValues,
+    });
     setValidationErrors({});
-  }, []);
+  }, [initialValues]);
 
   const clearErrors = useCallback(() => {
     setValidationErrors({});

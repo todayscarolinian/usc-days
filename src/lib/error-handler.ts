@@ -17,11 +17,14 @@ export function parseApiError(error: unknown): string {
 
     // Check for duplicate/conflict messages
     const errorMessage = response?.message || response?.error || response?.details || "";
-    const lowerMessage = errorMessage.toLowerCase();
+    
+    // Ensure errorMessage is a string before using string methods
+    const messageStr = typeof errorMessage === 'string' ? errorMessage : String(errorMessage);
+    const lowerMessage = messageStr.toLowerCase();
     
     // Preserve specific location conflict messages (they contain the location name)
     if (lowerMessage.includes("already booked")) {
-      return errorMessage;
+      return messageStr;
     }
     
     // Check for conflict patterns in message or 409 status
@@ -32,12 +35,12 @@ export function parseApiError(error: unknown): string {
     
     if (hasConflictMessage || error.response?.status === 409) {
       // Return original message if it has conflict keywords, otherwise use generic
-      return hasConflictMessage ? errorMessage : "A schedule already exists for these teams at this time.";
+      return hasConflictMessage ? messageStr : "A schedule already exists for these teams at this time.";
     }
 
     // Return API message if available
-    if (errorMessage) {
-      return errorMessage;
+    if (messageStr && messageStr !== '[object Object]') {
+      return messageStr;
     }
 
     // Handle different HTTP status codes
