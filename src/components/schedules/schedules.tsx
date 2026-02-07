@@ -12,7 +12,7 @@ import { format, parse } from "date-fns";
 export default function SchedulesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const selectedSport = searchParams.get("sport")
     ? Number(searchParams.get("sport"))
     : null;
@@ -27,22 +27,30 @@ export default function SchedulesPage() {
     }
   }, [searchParams]);
 
+  const selectedTeam = searchParams.get("team")
+    ? Number(searchParams.get("team"))
+    : null;
+
   useInitializeUserStore();
   const { email } = useUserStore();
 
   const currentFilters: filterType | undefined = useMemo(() => {
     const filters: filterType = {};
-    
+
     if (selectedSport && selectedSport !== 0) {
       filters.game = String(selectedSport);
     }
-    
+
     if (selectedDate) {
       filters.date = format(selectedDate, "yyyy-MM-dd");
     }
-    
+
+    if (selectedTeam && selectedTeam !== 0) {
+      filters.teams = { home: String(selectedTeam) };
+    }
+
     return Object.keys(filters).length > 0 ? filters : undefined;
-  }, [selectedSport, selectedDate]);
+  }, [selectedSport, selectedDate, selectedTeam]);
 
   const handleSportSelect = (sportId: number | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -50,6 +58,16 @@ export default function SchedulesPage() {
       params.set("sport", sportId.toString());
     } else {
       params.delete("sport");
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleTeamSelect = (teamId: number | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (teamId) {
+      params.set("team", teamId.toString());
+    } else {
+      params.delete("team");
     }
     router.push(`?${params.toString()}`);
   };
@@ -66,15 +84,17 @@ export default function SchedulesPage() {
 
   return (
     <>
-      <ScheduleFilter 
-        onSportSelect={handleSportSelect} 
+      <ScheduleFilter
+        onSportSelect={handleSportSelect}
         selectedSport={selectedSport}
         onDateSelect={handleDateSelect}
-        selectedDate={selectedDate}
+              selectedDate={selectedDate}
+              onTeamSelect={handleTeamSelect}
+              selectedTeam={selectedTeam}
       />
       <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
         <div className="flex flex-col gap-4">
-          {email && (
+          {!email && (
             <div className="flex justify-end">
               <AddScheduleDialog />
             </div>

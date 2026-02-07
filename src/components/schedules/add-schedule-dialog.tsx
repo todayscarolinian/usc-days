@@ -26,6 +26,7 @@ import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { getTimezoneOffset } from "@/src/lib/utils";
+import { Plus } from "lucide-react";
 
 export default function AddScheduleDialog() {
   const [open, setOpen] = useState(false);
@@ -162,7 +163,7 @@ export default function AddScheduleDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild onClick={() => setOpen(true)}>
         <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-          Add Schedule
+          <Plus />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">

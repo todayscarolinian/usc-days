@@ -160,6 +160,7 @@ export function SearchableSelect({
           "w-[var(--radix-popover-trigger-width)] p-0",
           popoverClassName,
         )}
+        side="bottom"
         align="start"
       >
         <Command shouldFilter={!filterFunction}>
