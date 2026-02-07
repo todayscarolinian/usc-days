@@ -8,7 +8,7 @@ export const metadata: Metadata = generateMeta({
   description:
     "Check upcoming game schedules for USC Days 2025. Never miss a match with our comprehensive schedule overview.",
   url: "/schedules",
-  image: "/tc-logo-red.png",
+  image: "/og_image.jpg",
 });
 
 export default function SchedulesPage() {
