@@ -95,7 +95,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
           </div>
         </CardContent>
       </div>
-      <CardFooter className="grid grid-cols-[auto_auto_1fr] md:grid-cols-[1fr_auto_1fr] bg-[#C02D2D] text-xs text-white py-2 px-2">
+      <CardFooter className="grid grid-cols-1 place-items-center space-y-2 md:grid-cols-[1fr_auto_1fr] md:space-y-0 md:place-items-stretch bg-[#C02D2D] text-xs text-white py-2 px-2">
         <div className="col-span-1 flex items-center">
           <Image
             src={getIconFor(game.gameType.gameName)}
@@ -106,7 +106,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
           />
           <span>{game.gameType.gameName.toUpperCase()}</span>
         </div>
-        <p className="col-span-2 text-right md:col-span-1 md:text-center">
+        <p className="col-span-2 flex items-center text-right md:col-span-1 md:text-center">
           {(game.location ?? "TBA").toUpperCase()}
         </p>
       </CardFooter>
