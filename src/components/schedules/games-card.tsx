@@ -56,7 +56,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
                 height={24}
               />
             </div>
-            {Number(game.teamAScore) && Number(game.teamBScore) ? (
+            {game.winnerId ? (
               <div className="flex gap-2 justify-center">
                 <span
                   className={
