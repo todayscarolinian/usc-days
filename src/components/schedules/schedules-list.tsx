@@ -112,14 +112,14 @@ export default function SchedulesList({
 
   // Filter out past dates until all pages are loaded
   const visibleDates = useMemo(() => {
-      if (!selectedDate) {
-          const todayKey = format(new Date(), "yyyy-MM-dd");
+    if (!selectedDate) {
+      const todayKey = format(new Date(), "yyyy-MM-dd");
 
-          // If there are more pages to load, hide past dates
-          if (hasNextPage) {
-              return orderedDates.filter((date) => date >= todayKey);
-          }
+      // If there are more pages to load, hide past dates
+      if (hasNextPage) {
+        return orderedDates.filter((date) => date >= todayKey);
       }
+    }
 
     // Otherwise, show all dates
     return orderedDates;
@@ -202,7 +202,7 @@ export default function SchedulesList({
         ))}
 
       {/* Loading sentinel for infinite scroll */}
-      {hasNextPage && hasFilteredGames && (
+      {hasNextPage && (
         <div
           ref={loadMoreRef}
           className="h-20 w-full flex items-center justify-center"

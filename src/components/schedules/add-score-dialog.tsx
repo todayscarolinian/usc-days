@@ -99,7 +99,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   const { a: dbA, b: dbB } = getDbScores(game);
   const dbWinnerId = game.winnerId ?? null;
   const editingChanged =
-    (aScore && bScore && (dbA !== aScore || dbB !== bScore)) ||
+    (aScore !== "" && bScore !== "" && (dbA !== aScore || dbB !== bScore)) ||
     winnerId !== dbWinnerId;
 
   async function save() {
@@ -138,7 +138,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-130">
+      <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle>Add / Edit Score</DialogTitle>
           <DialogDescription>
