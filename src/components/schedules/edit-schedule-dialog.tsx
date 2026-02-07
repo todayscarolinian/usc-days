@@ -49,7 +49,15 @@ export default function EditScheduleDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const { inputs, updateInput, validate, firstError, reset } = useScheduleForm({
+  const {
+    inputs,
+    updateInput,
+    validationErrors,
+    hasErrors,
+    firstError,
+    validate,
+    reset,
+  } = useScheduleForm({
     initialValues: {
       gameTypeId: schedule.gameType.id,
       teamAId: schedule.teamA.id,
@@ -145,7 +153,7 @@ export default function EditScheduleDialog({
   const edit = useEditGamesQuery();
   const editSchedule = () => {
     // Validate sport selection
-    if (!inputs.gameTypeId || inputs.gameTypeId <= 0) {
+    if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
       return;
     }
@@ -234,29 +242,29 @@ export default function EditScheduleDialog({
         </DialogHeader>
 
         <div className="grid gap-8 py-4">
-          <div className="grid w-full grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-1 gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
-                Start Date
+                Date
               </Label>
               <Input
                 type="date"
-                placeholder="Start Date"
                 value={inputs.startDate ?? ""}
-                onChange={(e) => updateInput("startDate", e.target.value)}
+                onChange={(e) => {
+                  updateInput("startDate", e.target.value);
+                  updateInput("endDate", e.target.value);
+                }}
+                className={
+                  validationErrors.startDate
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
+                }
               />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="endDate" className="font-bold opacity-50">
-                End Date
-              </Label>
-              <Input
-                type="date"
-                placeholder="End Date"
-                value={inputs.endDate ?? ""}
-                onChange={(e) => updateInput("endDate", e.target.value)}
-              />
+              {validationErrors.startDate && (
+                <span className="text-xs text-red-500">
+                  {validationErrors.startDate}
+                </span>
+              )}
             </div>
           </div>
 
@@ -311,14 +319,20 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={inputs.teamAId !== -1 ? inputs.teamAId.toString() : ""}
-                onValueChange={(value) => updateInput("teamAId", Number(value))}
-                disabled={teamOptions.length <= 0 || loading}
+                onValueChange={(value) =>
+                  updateInput("teamAId", value ? Number(value) : -1)
+                }
+                disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
+                className={validationErrors.teamAId ? "border-red-500" : ""}
               />
+              {validationErrors.teamAId && (
+                <span className="text-xs text-red-500">
+                  {validationErrors.teamAId}
+                </span>
+              )}
             </div>
-
             <span className="font-bold opacity-50">vs</span>
-
             <div className="flex w-full flex-col gap-1">
               <Label htmlFor="teamB" className="font-bold opacity-50">
                 Team
@@ -329,10 +343,18 @@ export default function EditScheduleDialog({
                 emptyMessage="No teams found."
                 options={teamOptions}
                 value={inputs.teamBId !== -1 ? inputs.teamBId.toString() : ""}
-                onValueChange={(value) => updateInput("teamBId", Number(value))}
-                disabled={teamOptions.length <= 0 || loading}
+                onValueChange={(value) =>
+                  updateInput("teamBId", value ? Number(value) : -1)
+                }
+                disabled={loading || inputs.gameTypeId <= 0}
                 loading={teamLoading}
+                className={validationErrors.teamBId ? "border-red-500" : ""}
               />
+              {validationErrors.teamBId && (
+                <span className="text-xs text-red-500">
+                  {validationErrors.teamBId}
+                </span>
+              )}
             </div>
           </div>
 
@@ -343,7 +365,7 @@ export default function EditScheduleDialog({
             <Input
               type="text"
               placeholder="Location"
-              value={inputs.location ?? ""}
+              value={inputs.location || ""}
               onChange={(e) => updateInput("location", e.target.value)}
             />
           </div>
@@ -379,11 +401,16 @@ export default function EditScheduleDialog({
             </AlertDialogContent>
           </AlertDialog>
 
+          {hasErrors && (
+            <span className="text-sm text-red-500 mr-auto">
+              Please ensure data is correct.
+            </span>
+          )}
           <Button
             type="submit"
             className="px-8"
             onClick={editSchedule}
-            disabled={loading || teamOptions.length <= 0 || sportsOptions.length <= 0}
+            disabled={loading || inputs.gameTypeId <= 0 || sportsOptions.length <= 0}
           >
             {edit.isPending ? "Saving..." : "Save"}
           </Button>
