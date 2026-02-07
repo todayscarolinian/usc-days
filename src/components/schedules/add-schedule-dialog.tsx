@@ -163,7 +163,7 @@ export default function AddScheduleDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild onClick={() => setOpen(true)}>
         <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-          <Plus />
+          Add Schedule
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">

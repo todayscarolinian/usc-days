@@ -94,7 +94,7 @@ export default function SchedulesPage() {
       />
       <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
         <div className="flex flex-col gap-4">
-          {!email && (
+          {email && (
             <div className="flex justify-end">
               <AddScheduleDialog />
             </div>
