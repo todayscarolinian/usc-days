@@ -97,7 +97,7 @@ export default function ScheduleFilter({
           </div>
           {/* Filters Section */}
           {isFilterOpen && (
-            <div className="bg-neutral-50/50 border-b border-neutral-100 animate-in slide-in-from-top-2 duration-200">
+            <div className="animate-in slide-in-from-top-2 duration-200">
               <div className="w-full px-4 py-6 sm:max-w-5xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <DateFilter
