@@ -20,17 +20,9 @@ export async function fetchGamesPage(
   if (filters?.date) params.append("startDate", filters.date);
   if (filters?.game) params.append("gameTypeId", filters.game);
 
-  if (filters?.teams?.home && filters?.teams?.away) {
-    if (filters.teams.home === filters.teams.away) {
-      params.append("teamId", filters.teams.home);
-    } else {
-      params.append("teamAId", filters.teams.home);
-      params.append("teamBId", filters.teams.away);
-    }
-  } else if (filters?.teams?.home) {
-    params.append("teamAId", filters.teams.home);
-  } else if (filters?.teams?.away) {
-    params.append("teamBId", filters.teams.away);
+  const teamId = filters?.teams?.home ?? filters?.teams?.away;
+  if (teamId) {
+    params.append("teamId", teamId);
   }
 
   if (filters?.finishedGames !== undefined) {
