@@ -5,6 +5,7 @@ import { getGamesQuery } from "@/src/queries/games.queries";
 import { Schedules } from "@/src/types/types";
 import { SchedulesCard } from "@/src/components/schedules/schedules-card";
 import GameDetailsDialog from "@/src/components/schedules/game-details-dialog";
+import AddScoreDialog from "@/src/components/schedules/add-score-dialog";
 import SchedulesCardSkeleton from "@/src/components/schedules/schedules-card-skeleton";
 
 function GamesContent({
@@ -63,6 +64,9 @@ export default function TodaysGames() {
   const [open, setOpen] = useState(false);
   const [inView, setInView] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const [scoreOpen, setScoreOpen] = useState(false);
+  const [scoreGame, setScoreGame] = useState<Schedules | null>(null);
+
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -110,6 +114,15 @@ export default function TodaysGames() {
         open={open}
         onOpenChange={setOpen}
         game={selectedGame}
+        onAddScore={(g) => {
+          setScoreGame(g);
+          setScoreOpen(true);
+        }}
+      />
+      <AddScoreDialog
+        open={scoreOpen}
+        onOpenChange={setScoreOpen}
+        game={scoreGame}
       />
     </div>
   );
