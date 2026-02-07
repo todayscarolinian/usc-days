@@ -20,8 +20,9 @@ export async function fetchGamesPage(
   if (filters?.date) params.append("startDate", filters.date);
   if (filters?.game) params.append("gameTypeId", filters.game);
 
-  if (filters?.teams?.home) {
-    params.append("teamId", filters.teams.home);
+  const teamId = filters?.teams?.home ?? filters?.teams?.away;
+  if (teamId) {
+    params.append("teamId", teamId);
   }
 
   if (filters?.finishedGames !== undefined) {
