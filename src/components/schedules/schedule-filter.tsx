@@ -69,24 +69,26 @@ export default function ScheduleFilter({
                   {formattedDay}
                 </span>
               </div>
+            </div>
+            
+              <p className="text-sm text-muted-foreground md:text-center hidden sm:block">
+                Click on a game card to view its details
+              </p>
+
+            <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground md:text-center block sm:hidden">
                 Click on a game card to view its details
               </p>
-            </div>
-
-            <p className="text-sm text-muted-foreground md:text-center hidden sm:block">
-              Click on a game card to view its details
-            </p>
-
-            <div className="flex items-center gap-4">
               <Button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 px-4 py-2 bg-tc_primary-500 hover:bg-tc_primary-600 text-white rounded-md transition-colors shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-tc_primary-500 hover:bg-tc_primary-600 text-white rounded-md transition-colors shadow-sm sm:w-auto justify-between"
                 aria-expanded={isFilterOpen}
                 aria-label="Toggle filters"
               >
-                <Filter className="w-4 h-4" />
-                <span className="font-medium">Filters</span>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  <span className="font-medium">Filters</span>
+                </div>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${
                     isFilterOpen ? "rotate-180" : ""
@@ -98,7 +100,7 @@ export default function ScheduleFilter({
           {/* Filters Section */}
           {isFilterOpen && (
             <div className="animate-in slide-in-from-top-2 duration-200">
-              <div className="w-full px-4 py-6 sm:max-w-5xl mx-auto">
+              <div className="w-full px-4 pt-6 sm:max-w-5xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <DateFilter
                     selectedDate={selectedDate}
