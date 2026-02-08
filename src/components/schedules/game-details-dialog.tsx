@@ -28,6 +28,29 @@ function getDbScores(g: Schedules) {
   return { a, b };
 }
 
+function getGameStatus(game: Schedules): string {
+  const now = new Date();
+  const start = new Date(game.startDate);
+  const end = new Date(game.endDate);
+  const hasScores = game.teamAScore != null && game.teamBScore != null;
+
+  // If no scores and no forfeits, determine status based on time
+  if (!hasScores && !(game.teamAForfeited || game.teamBForfeited)) {
+    // Game hasn't started yet
+    if (start > now) {
+      return "Scheduled";
+    }
+
+    // Game is currently in progress
+    if (end > now) {
+      return "Ongoing";
+    }
+  }
+
+  // Otherwise, if scores exist or forfeits occurred, the game is finished
+  return "Finished";
+}
+
 export default function GameDetailsDialog({
   open,
   onOpenChange,
@@ -50,16 +73,7 @@ export default function GameDetailsDialog({
   const location = game.location ?? "TBA";
 
   const { a: dbA, b: dbB } = getDbScores(game);
-
-  const now = new Date();
-  const status =
-    dbA && dbB
-      ? "Finished"
-      : start > now
-        ? "Scheduled"
-        : end > now
-          ? "Ongoing"
-          : "Finished";
+  const status = getGameStatus(game);
 
   function goEditSchedule() {
     try {
@@ -120,8 +134,8 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Score</span>
             <span className="col-span-2">
-              {game.teamAForfeited ? "X" : (dbA == null ? "-" : Number(dbA))} /{" "}
-              {game.teamBForfeited ? "X" : (dbB == null ? "-" : Number(dbB))}
+              {game.teamAForfeited ? "X" : dbA == null ? "-" : Number(dbA)} /{" "}
+              {game.teamBForfeited ? "X" : dbB == null ? "-" : Number(dbB)}
             </span>
           </div>
         </div>
