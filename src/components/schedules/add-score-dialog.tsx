@@ -22,8 +22,8 @@ import type { Schedules } from "@/src/types/types";
 import { useEditGamesQuery } from "@/src/queries/games.queries";
 
 function getDbScores(g: Schedules) {
-  const a = Number(g.teamAScore) ?? null;
-  const b = Number(g.teamBScore) ?? null;
+  const a = g.teamAScore ? Number(g.teamAScore) : null;
+  const b = g.teamBScore ? Number(g.teamBScore) : null;
   return { a, b };
 }
 
@@ -95,8 +95,9 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
     // When dialog opens, initialize state with current game data
     if (open && game) {
       const { a, b } = getDbScores(game);
-      setAScore(a ?? 0);
-      setBScore(b ?? 0);
+      console.log("A/B from DB:", a, b);
+      setAScore(a ?? "");
+      setBScore(b ?? "");
       setWinnerId(game.winnerId ?? null);
       setTeamAForfeited(game.teamAForfeited ?? false);
       setTeamBForfeited(game.teamBForfeited ?? false);
@@ -258,6 +259,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
               <Input
                 inputMode="numeric"
                 type="number"
+                placeholder="Enter score"
                 min={0}
                 step={1}
                 value={aScore}
@@ -276,6 +278,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
               <Input
                 inputMode="numeric"
                 type="number"
+                placeholder="Enter score"
                 min={0}
                 step={1}
                 value={bScore}
@@ -336,7 +339,8 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                 New score (not saved)
               </div>
               <div className="text-lg font-semibold">
-                {teamAForfeited ? "X" : aScore} – {teamBForfeited ? "X" : bScore}
+                {teamAForfeited ? "X" : aScore} –{" "}
+                {teamBForfeited ? "X" : bScore}
               </div>
               <div className="text-sm text-muted-foreground mt-1">
                 {isDraw
