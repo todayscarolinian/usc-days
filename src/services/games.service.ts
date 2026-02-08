@@ -319,7 +319,7 @@ class GameService {
           teamBId,
           teamAScore,
           teamBScore,
-          winnerId: winnerId || null,
+          ...(winnerId !== undefined ? { winnerId } : {}),
           startDate,
           endDate,
           location,
