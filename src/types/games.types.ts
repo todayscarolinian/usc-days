@@ -196,18 +196,12 @@ export const EditGameSchema = z
         return data.winnerId === null || data.winnerId === undefined;
       }
 
-      // If only one team forfeited, winnerId must be the other team
+      // If only one team forfeited, winnerId must be the other team (and must be set)
       if (oneForfeited && !bothForfeited) {
         const expectedWinner = data.teamAForfeited
           ? data.teamBId
           : data.teamAId;
-        if (
-          data.winnerId !== null &&
-          data.winnerId !== undefined &&
-          data.winnerId !== expectedWinner
-        ) {
-          return false;
-        }
+        return data.winnerId === expectedWinner;
       }
 
       // For normal games (no forfeits), winnerId must be one of the teams or null
