@@ -323,9 +323,9 @@ class GameService {
           startDate,
           endDate,
           location,
-          teamAForfeited: teamAForfeited ?? false,
-          teamBForfeited: teamBForfeited ?? false,
-          isDraw: isDraw ?? false,
+          ...(teamAForfeited !== undefined ? { teamAForfeited } : {}),
+          ...(teamBForfeited !== undefined ? { teamBForfeited } : {}),
+          ...(isDraw !== undefined ? { isDraw } : {}),
         },
       });
       return updatedGame;
