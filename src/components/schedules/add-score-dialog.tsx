@@ -22,8 +22,8 @@ import type { Schedules } from "@/src/types/types";
 import { useEditGamesQuery } from "@/src/queries/games.queries";
 
 function getDbScores(g: Schedules) {
-  const a = g.teamAScore ? Number(g.teamAScore) : null;
-  const b = g.teamBScore ? Number(g.teamBScore) : null;
+  const a = g.teamAScore != null ? Number(g.teamAScore) : null;
+  const b = g.teamBScore != null ? Number(g.teamBScore) : null;
   return { a, b };
 }
 
