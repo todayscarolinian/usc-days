@@ -496,10 +496,6 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type MerchandiseProductCreateWithoutMerchandiseCategoryInput = {
   productTitle: string
   productSize?: string | null

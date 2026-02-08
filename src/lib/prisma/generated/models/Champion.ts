@@ -236,8 +236,8 @@ export type ChampionWhereInput = {
   rank?: Prisma.IntFilter<"Champion"> | number
   startDate?: Prisma.DateTimeFilter<"Champion"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Champion"> | Date | string
-  team?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
   gameType?: Prisma.XOR<Prisma.GameTypeScalarRelationFilter, Prisma.GameTypeWhereInput>
+  team?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
 }
 
 export type ChampionOrderByWithRelationInput = {
@@ -247,8 +247,8 @@ export type ChampionOrderByWithRelationInput = {
   rank?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
-  team?: Prisma.TeamOrderByWithRelationInput
   gameType?: Prisma.GameTypeOrderByWithRelationInput
+  team?: Prisma.TeamOrderByWithRelationInput
 }
 
 export type ChampionWhereUniqueInput = Prisma.AtLeast<{
@@ -261,8 +261,8 @@ export type ChampionWhereUniqueInput = Prisma.AtLeast<{
   rank?: Prisma.IntFilter<"Champion"> | number
   startDate?: Prisma.DateTimeFilter<"Champion"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Champion"> | Date | string
-  team?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
   gameType?: Prisma.XOR<Prisma.GameTypeScalarRelationFilter, Prisma.GameTypeWhereInput>
+  team?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
 }, "id">
 
 export type ChampionOrderByWithAggregationInput = {
@@ -295,8 +295,8 @@ export type ChampionCreateInput = {
   rank: number
   startDate?: Date | string
   endDate?: Date | string
-  team: Prisma.TeamCreateNestedOneWithoutChampionInput
   gameType: Prisma.GameTypeCreateNestedOneWithoutChampionInput
+  team: Prisma.TeamCreateNestedOneWithoutChampionInput
 }
 
 export type ChampionUncheckedCreateInput = {
@@ -312,8 +312,8 @@ export type ChampionUpdateInput = {
   rank?: Prisma.IntFieldUpdateOperationsInput | number
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  team?: Prisma.TeamUpdateOneRequiredWithoutChampionNestedInput
   gameType?: Prisma.GameTypeUpdateOneRequiredWithoutChampionNestedInput
+  team?: Prisma.TeamUpdateOneRequiredWithoutChampionNestedInput
 }
 
 export type ChampionUncheckedUpdateInput = {
@@ -649,8 +649,8 @@ export type ChampionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   rank?: boolean
   startDate?: boolean
   endDate?: boolean
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["champion"]>
 
 export type ChampionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -660,8 +660,8 @@ export type ChampionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   rank?: boolean
   startDate?: boolean
   endDate?: boolean
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["champion"]>
 
 export type ChampionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -671,8 +671,8 @@ export type ChampionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   rank?: boolean
   startDate?: boolean
   endDate?: boolean
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["champion"]>
 
 export type ChampionSelectScalar = {
@@ -686,23 +686,23 @@ export type ChampionSelectScalar = {
 
 export type ChampionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teamId" | "gameTypeId" | "rank" | "startDate" | "endDate", ExtArgs["result"]["champion"]>
 export type ChampionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }
 export type ChampionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }
 export type ChampionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
+  team?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
 }
 
 export type $ChampionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Champion"
   objects: {
-    team: Prisma.$TeamPayload<ExtArgs>
     gameType: Prisma.$GameTypePayload<ExtArgs>
+    team: Prisma.$TeamPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1105,8 +1105,8 @@ readonly fields: ChampionFieldRefs;
  */
 export interface Prisma__ChampionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  team<T extends Prisma.TeamDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   gameType<T extends Prisma.GameTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GameTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__GameTypeClient<runtime.Types.Result.GetResult<Prisma.$GameTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  team<T extends Prisma.TeamDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

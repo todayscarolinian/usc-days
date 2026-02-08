@@ -21,17 +21,8 @@ export function transformGamesToSchoolRank(
     const teamA = g.teamA.teamName;
     const teamB = g.teamB.teamName;
 
-    // Skip if team names are missing or no winner is declared
-    if (!teamA || !teamB || !g.winnerId) continue;
-
-    const winnerTeam =
-      g.winnerId === g.teamA.id
-        ? teamA
-        : g.winnerId === g.teamB.id
-          ? teamB
-          : null;
-
-    if (!winnerTeam) continue;
+    // Skip if team names are missing
+    if (!teamA || !teamB) continue;
 
     // Initialize Team A entry if it doesn't exist
     if (!leaderboard[teamA]) {
@@ -52,6 +43,30 @@ export function transformGamesToSchoolRank(
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
+
+    // Handle both teams forfeiting - both get a loss
+    if (g.teamAForfeited && g.teamBForfeited) {
+      leaderboard[teamA].losses++;
+      leaderboard[teamB].losses++;
+      continue;
+    }
+
+    // Skip draws - no wins or losses for either team
+    if (g.isDraw) {
+      continue;
+    }
+
+    // Skip if no winner is declared and no forfeits
+    if (!g.winnerId) continue;
+
+    const winnerTeam =
+      g.winnerId === g.teamA.id
+        ? teamA
+        : g.winnerId === g.teamB.id
+          ? teamB
+          : null;
+
+    if (!winnerTeam) continue;
 
     // Update wins/losses
     if (winnerTeam === teamA) {

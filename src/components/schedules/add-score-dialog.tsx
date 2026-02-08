@@ -10,6 +10,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import { Checkbox } from "@/src/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -21,8 +22,8 @@ import type { Schedules } from "@/src/types/types";
 import { useEditGamesQuery } from "@/src/queries/games.queries";
 
 function getDbScores(g: Schedules) {
-  const a = Number(g.teamAScore) ?? null;
-  const b = Number(g.teamBScore) ?? null;
+  const a = g.teamAScore != null ? Number(g.teamAScore) : null;
+  const b = g.teamBScore != null ? Number(g.teamBScore) : null;
   return { a, b };
 }
 
@@ -31,6 +32,9 @@ function toEditPayload(
   a: number,
   b: number,
   winnerId: number | null,
+  teamAForfeited: boolean,
+  teamBForfeited: boolean,
+  isDraw: boolean,
 ) {
   const gameTypeId = game.gameType.id;
   const teamAId = game.teamA.id;
@@ -64,6 +68,9 @@ function toEditPayload(
     teamAScore: a,
     teamBScore: b,
     winnerId,
+    teamAForfeited,
+    teamBForfeited,
+    isDraw,
   };
 }
 
@@ -77,16 +84,23 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   const [aScore, setAScore] = React.useState<number | "">("");
   const [bScore, setBScore] = React.useState<number | "">("");
   const [winnerId, setWinnerId] = React.useState<number | null>(null);
+  const [teamAForfeited, setTeamAForfeited] = React.useState(false);
+  const [teamBForfeited, setTeamBForfeited] = React.useState(false);
+  const [isDraw, setIsDraw] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const editGameMutation = useEditGamesQuery();
 
   React.useEffect(() => {
+    // When dialog opens, initialize state with current game data
     if (open && game) {
       const { a, b } = getDbScores(game);
-      setAScore(a ?? 0);
-      setBScore(b ?? 0);
+      setAScore(a ?? "");
+      setBScore(b ?? "");
       setWinnerId(game.winnerId ?? null);
+      setTeamAForfeited(game.teamAForfeited ?? false);
+      setTeamBForfeited(game.teamBForfeited ?? false);
+      setIsDraw(game.isDraw ?? false);
       setError(null);
     }
   }, [open, game]);
@@ -98,9 +112,19 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
   const { a: dbA, b: dbB } = getDbScores(game);
   const dbWinnerId = game.winnerId ?? null;
+  const dbTeamAForfeited = game.teamAForfeited ?? false;
+  const dbTeamBForfeited = game.teamBForfeited ?? false;
+  const dbIsDraw = game.isDraw ?? false;
+  const bothForfeited = teamAForfeited && teamBForfeited;
+  const oneForfeited = teamAForfeited || teamBForfeited;
+
+  // Editing is considered changed if scores differ from DB or winner/forfeit/draw status changed
   const editingChanged =
     (aScore !== "" && bScore !== "" && (dbA !== aScore || dbB !== bScore)) ||
-    winnerId !== dbWinnerId;
+    winnerId !== dbWinnerId ||
+    teamAForfeited !== dbTeamAForfeited ||
+    teamBForfeited !== dbTeamBForfeited ||
+    isDraw !== dbIsDraw;
 
   async function save() {
     setError(null);
@@ -120,13 +144,30 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
       return;
     }
 
-    if (winnerId === null) {
-      setError("Please select a winning team.");
+    // Validate draw condition
+    if (isDraw && a !== b) {
+      setError("For a draw, both teams must have equal scores.");
+      return;
+    }
+
+    // Both forfeited: winnerId must be null, skip winnerId check
+    // Draw: winnerId must be null
+    // One or no forfeits and not draw: winnerId is required
+    if (!bothForfeited && !isDraw && winnerId === null) {
+      setError("Please select a winning team or mark as draw.");
       return;
     }
 
     try {
-      const payload = toEditPayload(game as Schedules, a, b, winnerId);
+      const payload = toEditPayload(
+        game as Schedules,
+        a,
+        b,
+        winnerId,
+        teamAForfeited,
+        teamBForfeited,
+        isDraw,
+      );
       await editGameMutation.mutateAsync(payload);
       onOpenChange(false);
     } catch (e: unknown) {
@@ -147,12 +188,77 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
         </DialogHeader>
 
         <div className="grid gap-3">
+          {/* Forfeit Checkboxes */}
+          <div className="grid grid-cols-2 gap-4 pb-2 border-b">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="teamAForfeit"
+                checked={teamAForfeited}
+                onCheckedChange={(checked) => {
+                  const isChecked = checked === true;
+                  setTeamAForfeited(isChecked);
+                  if (isChecked) {
+                    setAScore(0);
+                    setBScore(0);
+                    setIsDraw(false); // Clear draw if forfeit is set
+                    // If B also forfeited, clear winner; otherwise B wins
+                    setWinnerId(teamBForfeited ? null : game.teamB.id);
+                  } else if (!teamBForfeited) {
+                    // Neither forfeited now, clear winner
+                    setWinnerId(null);
+                  } else {
+                    // Only B forfeited now, so A wins
+                    setWinnerId(game.teamA.id);
+                  }
+                }}
+                disabled={editGameMutation.isPending}
+              />
+              <label
+                htmlFor="teamAForfeit"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {home} forfeited
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="teamBForfeit"
+                checked={teamBForfeited}
+                onCheckedChange={(checked) => {
+                  const isChecked = checked === true;
+                  setTeamBForfeited(isChecked);
+                  if (isChecked) {
+                    setAScore(0);
+                    setBScore(0);
+                    setIsDraw(false); // Clear draw if forfeit is set
+                    // If A also forfeited, clear winner; otherwise A wins
+                    setWinnerId(teamAForfeited ? null : game.teamA.id);
+                  } else if (!teamAForfeited) {
+                    // Neither forfeited now, clear winner
+                    setWinnerId(null);
+                  } else {
+                    // Only A forfeited now, so B wins
+                    setWinnerId(game.teamB.id);
+                  }
+                }}
+                disabled={editGameMutation.isPending}
+              />
+              <label
+                htmlFor="teamBForfeit"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {away} forfeited
+              </label>
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 items-center gap-2">
             <span className="text-muted-foreground">{home} score</span>
             <div className="col-span-2">
               <Input
                 inputMode="numeric"
                 type="number"
+                placeholder="Enter score"
                 min={0}
                 step={1}
                 value={aScore}
@@ -160,7 +266,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   const v = e.currentTarget.value;
                   setAScore(v === "" ? "" : Number(v));
                 }}
-                disabled={editGameMutation.isPending}
+                disabled={editGameMutation.isPending || oneForfeited}
               />
             </div>
           </div>
@@ -171,6 +277,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
               <Input
                 inputMode="numeric"
                 type="number"
+                placeholder="Enter score"
                 min={0}
                 step={1}
                 value={bScore}
@@ -178,48 +285,72 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   const v = e.currentTarget.value;
                   setBScore(v === "" ? "" : Number(v));
                 }}
-                disabled={editGameMutation.isPending}
+                disabled={editGameMutation.isPending || oneForfeited}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-3 items-center gap-2">
-            <span className="text-muted-foreground">Winner</span>
-            <div className="col-span-2">
-              <Select
-                value={winnerId?.toString()}
-                onValueChange={(value) => {
-                  setWinnerId(Number(value));
-                }}
-                disabled={editGameMutation.isPending}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select winning team" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={game.teamA.id.toString()}>
-                    {home}
-                  </SelectItem>
-                  <SelectItem value={game.teamB.id.toString()}>
-                    {away}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+          {!bothForfeited ? (
+            <div className="grid grid-cols-3 items-center gap-2">
+              <span className="text-muted-foreground">Winner</span>
+              <div className="col-span-2">
+                <Select
+                  value={isDraw ? "draw" : (winnerId?.toString() ?? "")}
+                  onValueChange={(value) => {
+                    if (value === "draw") {
+                      setIsDraw(true);
+                      setWinnerId(null);
+                    } else {
+                      setIsDraw(false);
+                      setWinnerId(Number(value));
+                    }
+                  }}
+                  disabled={editGameMutation.isPending || oneForfeited}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select winning team or draw" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={game.teamA.id.toString()}>
+                      {home}
+                    </SelectItem>
+                    <SelectItem value={game.teamB.id.toString()}>
+                      {away}
+                    </SelectItem>
+                    <SelectItem value="draw">Draw</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-md bg-muted p-3 text-center">
+              <p className="text-sm text-muted-foreground">
+                No winner (both teams forfeited)
+              </p>
+            </div>
+          )}
 
           {error && <p className="text-xs text-red-600">{error}</p>}
 
-          {editingChanged ? (
+          {editingChanged && !bothForfeited ? (
             <div className="mt-1 rounded-md border p-3 text-center">
               <div className="text-xs text-muted-foreground">
                 New score (not saved)
               </div>
               <div className="text-lg font-semibold">
-                {aScore} – {bScore}
+                {teamAForfeited ? "X" : aScore} –{" "}
+                {teamBForfeited ? "X" : bScore}
               </div>
               <div className="text-sm text-muted-foreground mt-1">
-                Winner: {winnerId === game.teamA.id ? home : away}
+                {isDraw
+                  ? "Result: Draw"
+                  : `Winner: ${
+                      winnerId === game.teamA.id
+                        ? home
+                        : winnerId === game.teamB.id
+                          ? away
+                          : "TBD"
+                    }${oneForfeited ? " (forfeit)" : ""}`}
               </div>
             </div>
           ) : null}

@@ -265,9 +265,35 @@ class GameService {
     startDate,
     endDate,
     location,
+    teamAForfeited,
+    teamBForfeited,
+    isDraw,
   }: EditGamePayload) {
     try {
-      if (winnerId !== null && winnerId !== undefined) {
+      const bothForfeited = teamAForfeited && teamBForfeited;
+
+      // Validate: Cannot be draw and forfeit
+      if (isDraw && (teamAForfeited || teamBForfeited)) {
+        throw new Error("A game cannot be both a draw and have forfeits.");
+      }
+
+      // Validate: Draw requires equal scores
+      if (isDraw && teamAScore !== teamBScore) {
+        throw new Error("For a draw, both teams must have equal scores.");
+      }
+
+      // Validate: Draw requires winnerId to be null
+      if (isDraw && winnerId !== null && winnerId !== undefined) {
+        throw new Error("For a draw, winnerId must be null.");
+      }
+
+      // Only validate winnerId for non-forfeit, non-draw games
+      if (
+        winnerId !== null &&
+        winnerId !== undefined &&
+        !bothForfeited &&
+        !isDraw
+      ) {
         const validTeam = await prisma.team.findUnique({
           where: { id: winnerId },
         });
@@ -293,10 +319,13 @@ class GameService {
           teamBId,
           teamAScore,
           teamBScore,
-          winnerId: winnerId || null,
+          ...(winnerId !== undefined ? { winnerId } : {}),
           startDate,
           endDate,
           location,
+          ...(teamAForfeited !== undefined ? { teamAForfeited } : {}),
+          ...(teamBForfeited !== undefined ? { teamBForfeited } : {}),
+          ...(isDraw !== undefined ? { isDraw } : {}),
         },
       });
       return updatedGame;

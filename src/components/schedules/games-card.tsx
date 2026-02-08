@@ -9,11 +9,43 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { Schedules } from "@/src/types/types";
 import { getIconFor, getLogoForSchool } from "@/src/lib/utils";
+import type { Decimal } from "@prisma/client/runtime/client";
 
 type ScheduleCardProps = {
   game: Schedules;
   onOpen?: (g: Schedules) => void;
 };
+
+function formatScore(
+  score: Decimal | null | undefined,
+  forfeited: boolean,
+): string | number {
+  if (forfeited) return "X";
+  if (score == null) return "-";
+  return Number(score);
+}
+
+function getScoreClassName(game: Schedules, teamId: number): string {
+  const bothForfeited = game.teamAForfeited && game.teamBForfeited;
+
+  // Show as winner (bold) if this team won or it's a draw
+  const isWinner = game.winnerId === teamId || game.isDraw;
+
+  if (isWinner && !bothForfeited) {
+    return "font-bold";
+  }
+
+  return "text-gray-400";
+}
+
+function hasGameResult(game: Schedules): boolean {
+  return !!(
+    game.winnerId ||
+    game.teamAForfeited ||
+    game.teamBForfeited ||
+    game.isDraw
+  );
+}
 
 export function GameCard({ game, onOpen }: ScheduleCardProps) {
   const start = new Date(game.startDate);
@@ -56,28 +88,16 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
                 height={24}
               />
             </div>
-            {game.winnerId ? (
+            {hasGameResult(game) ? (
               <div className="flex gap-2 justify-center">
-                <span
-                  className={
-                    game.winnerId === game.teamA.id
-                      ? "font-bold"
-                      : "text-gray-400"
-                  }
-                >
-                  {Number(game.teamAScore)}
+                <span className={getScoreClassName(game, game.teamAId)}>
+                  {formatScore(game.teamAScore, game.teamAForfeited)}
                 </span>
                 <span>
                   <b>/</b>
                 </span>
-                <span
-                  className={
-                    game.winnerId === game.teamB.id
-                      ? "font-bold"
-                      : "text-gray-400"
-                  }
-                >
-                  {Number(game.teamBScore)}
+                <span className={getScoreClassName(game, game.teamBId)}>
+                  {formatScore(game.teamBScore, game.teamBForfeited)}
                 </span>
               </div>
             ) : (
