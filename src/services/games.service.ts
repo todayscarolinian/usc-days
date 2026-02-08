@@ -265,9 +265,14 @@ class GameService {
     startDate,
     endDate,
     location,
+    teamAForfeited,
+    teamBForfeited,
   }: EditGamePayload) {
     try {
-      if (winnerId !== null && winnerId !== undefined) {
+      const bothForfeited = teamAForfeited && teamBForfeited;
+
+      // Only validate winnerId for non-forfeit games or single forfeit games
+      if (winnerId !== null && winnerId !== undefined && !bothForfeited) {
         const validTeam = await prisma.team.findUnique({
           where: { id: winnerId },
         });
@@ -297,6 +302,8 @@ class GameService {
           startDate,
           endDate,
           location,
+          teamAForfeited: teamAForfeited ?? false,
+          teamBForfeited: teamBForfeited ?? false,
         },
       });
       return updatedGame;

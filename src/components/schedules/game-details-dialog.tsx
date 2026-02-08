@@ -56,10 +56,10 @@ export default function GameDetailsDialog({
     dbA && dbB
       ? "Finished"
       : start > now
-      ? "Scheduled"
-      : end > now
-      ? "Ongoing"
-      : "Finished";
+        ? "Scheduled"
+        : end > now
+          ? "Ongoing"
+          : "Finished";
 
   function goEditSchedule() {
     try {
@@ -120,7 +120,8 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Score</span>
             <span className="col-span-2">
-              {dbA && dbB ? ` ${dbA} - ${dbB} ` : ""}
+              {game.teamAForfeited ? "X" : (Number(dbA) ?? "-")} /{" "}
+              {game.teamBForfeited ? "X" : (Number(dbB) ?? "-")}
             </span>
           </div>
         </div>

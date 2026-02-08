@@ -56,28 +56,32 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
                 height={24}
               />
             </div>
-            {game.winnerId ? (
+            {/* show X for forfeited teams */}
+            {game.winnerId || game.teamAForfeited || game.teamBForfeited ? (
               <div className="flex gap-2 justify-center">
                 <span
                   className={
-                    game.winnerId === game.teamA.id
+                    // exclude if both teams forfeited (neither is the winner)
+                    game.winnerId === game.teamA.id ||
+                    !(game.teamAForfeited || game.teamBForfeited)
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {Number(game.teamAScore)}
+                  {game.teamAForfeited ? "X" : Number(game.teamAScore)}
                 </span>
                 <span>
                   <b>/</b>
                 </span>
                 <span
                   className={
-                    game.winnerId === game.teamB.id
+                    game.winnerId === game.teamB.id ||
+                    !(game.teamAForfeited || game.teamBForfeited)
                       ? "font-bold"
                       : "text-gray-400"
                   }
                 >
-                  {Number(game.teamBScore)}
+                  {game.teamBForfeited ? "X" : Number(game.teamBScore)}
                 </span>
               </div>
             ) : (
