@@ -120,8 +120,8 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Score</span>
             <span className="col-span-2">
-              {game.teamAForfeited ? "X" : (Number(dbA) ?? "-")} /{" "}
-              {game.teamBForfeited ? "X" : (Number(dbB) ?? "-")}
+              {game.teamAForfeited ? "X" : (dbA == null ? "-" : Number(dbA))} /{" "}
+              {game.teamBForfeited ? "X" : (dbB == null ? "-" : Number(dbB))}
             </span>
           </div>
         </div>
