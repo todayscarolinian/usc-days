@@ -81,6 +81,7 @@ model Game {
     winnerId       Int?     @map("winner_id")
     teamAForfeited Boolean  @default(false) @map("team_a_forfeited")
     teamBForfeited Boolean  @default(false) @map("team_b_forfeited")
+    isDraw         Boolean  @default(false) @map("is_draw")
     createdBy      User     @relation(fields: [createdById], references: [id])
     gameType       GameType @relation(fields: [gameTypeId], references: [id])
     teamA          Team     @relation("TeamAGames", fields: [teamAId], references: [id])

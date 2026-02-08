@@ -51,6 +51,11 @@ export function transformGamesToSchoolRank(
       continue;
     }
 
+    // Skip draws - no wins or losses for either team
+    if (g.isDraw) {
+      continue;
+    }
+
     // Skip if no winner is declared and no forfeits
     if (!g.winnerId) continue;
 

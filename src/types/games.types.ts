@@ -134,6 +134,7 @@ export const EditGameSchema = z
     location: z.string().optional(),
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
+    isDraw: z.boolean().optional(),
   })
   .refine((data) => data.teamAId !== data.teamBId, {
     message: "teamAId and teamBId cannot be the same.",
@@ -141,16 +142,58 @@ export const EditGameSchema = z
   })
   .refine(
     (data) => {
+      // If isDraw is true, scores must be equal
+      if (data.isDraw) {
+        if (
+          data.teamAScore !== null &&
+          data.teamAScore !== undefined &&
+          data.teamBScore !== null &&
+          data.teamBScore !== undefined &&
+          data.teamAScore !== data.teamBScore
+        ) {
+          return false;
+        }
+        // winnerId must be null for draws
+        if (data.winnerId !== null && data.winnerId !== undefined) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message: "For draws, scores must be equal and no winner can be selected.",
+      path: ["isDraw"],
+    },
+  )
+  .refine(
+    (data) => {
+      // Cannot have draw and forfeit simultaneously
+      if (data.isDraw && (data.teamAForfeited || data.teamBForfeited)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "A game cannot be both a draw and have forfeits.",
+      path: ["isDraw"],
+    },
+  )
+  .refine(
+    (data) => {
       const bothForfeited = data.teamAForfeited && data.teamBForfeited;
       const oneForfeited = data.teamAForfeited || data.teamBForfeited;
+      const isDraw = data.isDraw;
 
-      // If both teams forfeited, winnerId must be null
-      if (
-        bothForfeited &&
-        data.winnerId !== null &&
-        data.winnerId !== undefined
-      ) {
-        return false;
+      // If both teams forfeited, winnerId must be null and not a draw
+      if (bothForfeited) {
+        return (
+          (data.winnerId === null || data.winnerId === undefined) && !isDraw
+        );
+      }
+
+      // If draw, winnerId must be null
+      if (isDraw) {
+        return data.winnerId === null || data.winnerId === undefined;
       }
 
       // If only one team forfeited, winnerId must be the other team

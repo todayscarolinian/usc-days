@@ -57,7 +57,7 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
               />
             </div>
             {/* show X for forfeited teams */}
-            {game.winnerId || game.teamAForfeited || game.teamBForfeited ? (
+            {game.winnerId || game.teamAForfeited || game.teamBForfeited || game.isDraw ? (
               <div className="flex gap-2 justify-center">
                 <span
                   className={

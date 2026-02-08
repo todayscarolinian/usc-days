@@ -143,7 +143,8 @@ export const GameScalarFieldEnum = {
   teamBScore: 'teamBScore',
   winnerId: 'winnerId',
   teamAForfeited: 'teamAForfeited',
-  teamBForfeited: 'teamBForfeited'
+  teamBForfeited: 'teamBForfeited',
+  isDraw: 'isDraw'
 } as const
 
 export type GameScalarFieldEnum = (typeof GameScalarFieldEnum)[keyof typeof GameScalarFieldEnum]
