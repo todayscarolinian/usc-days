@@ -95,7 +95,6 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
     // When dialog opens, initialize state with current game data
     if (open && game) {
       const { a, b } = getDbScores(game);
-      console.log("A/B from DB:", a, b);
       setAScore(a ?? "");
       setBScore(b ?? "");
       setWinnerId(game.winnerId ?? null);
