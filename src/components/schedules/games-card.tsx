@@ -57,13 +57,16 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
               />
             </div>
             {/* show X for forfeited teams */}
-            {game.winnerId || game.teamAForfeited || game.teamBForfeited || game.isDraw ? (
+            {game.winnerId ||
+            game.teamAForfeited ||
+            game.teamBForfeited ||
+            game.isDraw ? (
               <div className="flex gap-2 justify-center">
                 <span
                   className={
-                    // exclude if both teams forfeited (neither is the winner)
-                    game.winnerId === game.teamA.id ||
-                    !(game.teamAForfeited || game.teamBForfeited)
+                    // bolden if winner or draw, but not if both teams forfeited
+                    (game.winnerId === game.teamA.id || game.isDraw) &&
+                    !(game.teamAForfeited && game.teamBForfeited)
                       ? "font-bold"
                       : "text-gray-400"
                   }
@@ -75,8 +78,8 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
                 </span>
                 <span
                   className={
-                    game.winnerId === game.teamB.id ||
-                    !(game.teamAForfeited || game.teamBForfeited)
+                    (game.winnerId === game.teamB.id || game.isDraw) &&
+                      !(game.teamAForfeited && game.teamBForfeited)
                       ? "font-bold"
                       : "text-gray-400"
                   }

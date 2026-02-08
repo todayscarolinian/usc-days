@@ -336,7 +336,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                 New score (not saved)
               </div>
               <div className="text-lg font-semibold">
-                {aScore} – {bScore}
+                {teamAForfeited ? "X" : aScore} – {teamBForfeited ? "X" : bScore}
               </div>
               <div className="text-sm text-muted-foreground mt-1">
                 {isDraw
