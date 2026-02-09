@@ -182,7 +182,10 @@ export default function EditScheduleDialog({
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
       endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       //revert the location to default "TBA" display if undefined
-      location: inputs.location ? inputs.location : "TBA",
+      location:
+        inputs.location && inputs.location.trim() !== ""
+          ? inputs.location
+          : null,
       teamAScore:
         schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
       teamBScore:
