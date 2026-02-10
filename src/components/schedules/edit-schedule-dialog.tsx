@@ -91,8 +91,10 @@ export default function EditScheduleDialog({
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
       endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location,
-      teamAScore: schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
-      teamBScore: schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
+      teamAScore:
+        schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
+      teamBScore:
+        schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
       winnerId: schedule.winnerId ? Number(schedule.winnerId) : null,
     }),
   });
@@ -116,16 +118,20 @@ export default function EditScheduleDialog({
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
-    if (sportsError && !shownErrorsRef.current.has('sportsError')) {
+    if (sportsError && !shownErrorsRef.current.has("sportsError")) {
       showToast("error", "Failed to load sports", parseApiError(sportsError));
-      shownErrorsRef.current.add('sportsError');
+      shownErrorsRef.current.add("sportsError");
     }
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError && !shownErrorsRef.current.has('teamSportsError')) {
-      showToast("error", "Failed to load teams", parseApiError(teamSportsError));
-      shownErrorsRef.current.add('teamSportsError');
+    if (teamSportsError && !shownErrorsRef.current.has("teamSportsError")) {
+      showToast(
+        "error",
+        "Failed to load teams",
+        parseApiError(teamSportsError),
+      );
+      shownErrorsRef.current.add("teamSportsError");
     }
   }, [teamSportsError, showToast]);
 
@@ -160,7 +166,11 @@ export default function EditScheduleDialog({
 
     // Validate form inputs using EditGameSchema
     if (!validate()) {
-      showToast("error", "Validation Error", firstError || "Please check your inputs");
+      showToast(
+        "error",
+        "Validation Error",
+        firstError || "Please check your inputs",
+      );
       return;
     }
 
@@ -171,9 +181,15 @@ export default function EditScheduleDialog({
       teamBId: inputs.teamBId,
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
       endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
-      location: inputs.location ? inputs.location : undefined,
-      teamAScore: schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
-      teamBScore: schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
+      //revert the location to default "TBA" display if undefined
+      location:
+        inputs.location && inputs.location.trim() !== ""
+          ? inputs.location
+          : null,
+      teamAScore:
+        schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
+      teamBScore:
+        schedule.teamBScore !== null ? Number(schedule.teamBScore) : null,
       winnerId: schedule.winnerId ? Number(schedule.winnerId) : null,
     };
 
@@ -182,7 +198,7 @@ export default function EditScheduleDialog({
         showToast(
           "success",
           "Schedule updated!",
-          "The game schedule has been updated successfully."
+          "The game schedule has been updated successfully.",
         );
         onOpenChange(false);
       },
@@ -202,7 +218,7 @@ export default function EditScheduleDialog({
           showToast(
             "success",
             "Schedule deleted!",
-            "The game schedule has been removed successfully."
+            "The game schedule has been removed successfully.",
           );
           onOpenChange(false);
         },
@@ -297,7 +313,9 @@ export default function EditScheduleDialog({
               emptyMessage="No sports found."
               options={sportsOptions}
               value={inputs.gameTypeId > 0 ? inputs.gameTypeId.toString() : ""}
-              onValueChange={(value) => updateInput("gameTypeId", Number(value))}
+              onValueChange={(value) =>
+                updateInput("gameTypeId", Number(value))
+              }
               disabled={sportsOptions.length <= 0 || loading}
               loading={sportsLoading}
               className="w-full"
@@ -406,7 +424,9 @@ export default function EditScheduleDialog({
             type="submit"
             className="px-8"
             onClick={editSchedule}
-            disabled={loading || inputs.gameTypeId <= 0 || sportsOptions.length <= 0}
+            disabled={
+              loading || inputs.gameTypeId <= 0 || sportsOptions.length <= 0
+            }
           >
             {edit.isPending ? "Saving..." : "Save"}
           </Button>

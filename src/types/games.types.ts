@@ -131,7 +131,7 @@ export const EditGameSchema = z
       .refine((val) => !isNaN(Date.parse(val)), {
         message: "Invalid date format for endDate. Use ISO format.",
       }),
-    location: z.string().optional(),
+    location: z.string().nullable().optional(),
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),
