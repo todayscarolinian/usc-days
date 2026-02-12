@@ -15,12 +15,12 @@ import DataTable from "@/src/components/standings/standings-table";
 import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import standingColumns from "@/src/components/standings/columns";
 import { GameType } from "@/src/lib/prisma/generated/client";
-import { transformGamesToSchoolRank } from "../leaderboards/transformData";
 import { Champions, Schedules, StandingData } from "@/src/types/types";
 import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
 import { toast } from "sonner";
+import { transformTeamsData } from "./transformTeamsData";
 
 export type StandingWithRank = StandingData & {
   rank: number;
@@ -121,7 +121,7 @@ export default function Standings() {
       );
 
       // Transform games to standings statistics
-      const gameStandings = transformGamesToSchoolRank(games, selectedSport);
+      const gameStandings = transformTeamsData(games, selectedSport);
 
       // Create comprehensive standings list
       const allStandings: StandingWithRank[] = [];
@@ -138,23 +138,23 @@ export default function Standings() {
       });
 
       // Add champions without game history
-      filteredChampions.forEach((champion) => {
-        const existingStanding = allStandings.find(
-          (s) => s.team === champion.team.teamName,
-        );
+      //   filteredChampions.forEach((champion) => {
+      //     const existingStanding = allStandings.find(
+      //       (s) => s.team === champion.team.teamName,
+      //     );
 
-        if (!existingStanding) {
-          allStandings.push({
-            id: champion.team.id,
-            team: champion.team.teamName,
-            wins: 0,
-            losses: 0,
-            winPercentage: 0,
-            sport: champion.gameType.gameName,
-            rank: champion.rank,
-          });
-        }
-      });
+      //     if (!existingStanding) {
+      //       allStandings.push({
+      //         id: champion.team.id,
+      //         team: champion.team.teamName,
+      //         wins: 0,
+      //         losses: 0,
+      //         winPercentage: 0,
+      //         sport: champion.gameType.gameName,
+      //         rank: champion.rank,
+      //       });
+      //     }
+      //   });
 
       return { data: allStandings, error: false };
     } catch (err) {
@@ -247,8 +247,6 @@ export default function Standings() {
     [championsData, selectedSport],
   );
 
-  
-
   const handleCloseDialog = useCallback(() => {
     setFormData(null);
     setShowDialog(false);
@@ -273,7 +271,6 @@ export default function Standings() {
             onValueChangeAction={handleSportSelect}
             className="flex items-center justify-between px-5.5! py-1.75! h-13.5! max-w-xs bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none [&>svg.size-4.opacity-50]:hidden"
           />
-          
         </div>
 
         {loading && selectedSport && (
@@ -291,7 +288,9 @@ export default function Standings() {
                 <Cards
                   key={`rank-${index + 1}`}
                   data={card}
-                  onSelect={() => isAdmin ? handleCardClick(index + 1) : undefined}
+                  onSelect={() =>
+                    isAdmin ? handleCardClick(index + 1) : undefined
+                  }
                 />
               ))}
             </div>
