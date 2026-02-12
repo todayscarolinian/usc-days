@@ -1,13 +1,26 @@
 import { Schedules } from "@/src/types/types";
 import { StandingData } from "@/src/types/types";
+import { schoolLogos } from "@/src/constants/schoolLogos";
 
-export function transformGamesToSchoolRank(
+export function transformSchoolsData(
   games: Schedules[],
   sportId?: number,
 ): StandingData[] {
+  // Get school keys (e.g., SOE, SAFAD, etc.)
+  const schoolKeys = Object.keys(schoolLogos).filter((k) => k !== "Default");
+
+  // Helper to get school from team name
+  function getSchoolFromTeam(teamName: string): string | null {
+    if (!teamName) return null;
+    const match = schoolKeys.find((school) =>
+      teamName.toLowerCase().startsWith(school.toLowerCase()),
+    );
+    return match || null;
+  }
+
   const leaderboard: Record<
     string,
-    { team: string; wins: number; losses: number; sport: string }
+    { school: string; wins: number; losses: number; sport: string }
   > = {};
 
   // Filter by sport if specified
@@ -21,23 +34,27 @@ export function transformGamesToSchoolRank(
     const teamA = g.teamA.teamName;
     const teamB = g.teamB.teamName;
 
-    // Skip if team names are missing
-    if (!teamA || !teamB) continue;
+    // Map team names to schools
+    const schoolA = getSchoolFromTeam(teamA);
+    const schoolB = getSchoolFromTeam(teamB);
 
-    // Initialize Team A entry if it doesn't exist
-    if (!leaderboard[teamA]) {
-      leaderboard[teamA] = {
-        team: teamA,
+    // Omit if either team does not match a school
+    if (!schoolA || !schoolB) continue;
+
+    // Initialize School A entry if it doesn't exist
+    if (!leaderboard[schoolA]) {
+      leaderboard[schoolA] = {
+        school: schoolA,
         wins: 0,
         losses: 0,
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
 
-    // Initialize Team B entry if it doesn't exist
-    if (!leaderboard[teamB]) {
-      leaderboard[teamB] = {
-        team: teamB,
+    // Initialize School B entry if it doesn't exist
+    if (!leaderboard[schoolB]) {
+      leaderboard[schoolB] = {
+        school: schoolB,
         wins: 0,
         losses: 0,
         sport: sportId !== undefined ? sport : "Overall",
@@ -46,8 +63,8 @@ export function transformGamesToSchoolRank(
 
     // Handle both teams forfeiting - both get a loss
     if (g.teamAForfeited && g.teamBForfeited) {
-      leaderboard[teamA].losses++;
-      leaderboard[teamB].losses++;
+      leaderboard[schoolA].losses++;
+      leaderboard[schoolB].losses++;
       continue;
     }
 
@@ -59,22 +76,22 @@ export function transformGamesToSchoolRank(
     // Skip if no winner is declared and no forfeits
     if (!g.winnerId) continue;
 
-    const winnerTeam =
+    const winnerSchool =
       g.winnerId === g.teamA.id
-        ? teamA
+        ? schoolA
         : g.winnerId === g.teamB.id
-          ? teamB
+          ? schoolB
           : null;
 
-    if (!winnerTeam) continue;
+    if (!winnerSchool) continue;
 
     // Update wins/losses
-    if (winnerTeam === teamA) {
-      leaderboard[teamA].wins++;
-      leaderboard[teamB].losses++;
+    if (winnerSchool === schoolA) {
+      leaderboard[schoolA].wins++;
+      leaderboard[schoolB].losses++;
     } else {
-      leaderboard[teamB].wins++;
-      leaderboard[teamA].losses++;
+      leaderboard[schoolB].wins++;
+      leaderboard[schoolA].losses++;
     }
   }
 
@@ -83,7 +100,7 @@ export function transformGamesToSchoolRank(
       const totalGames = entry.wins + entry.losses;
       return {
         id: idx + 1,
-        team: entry.team,
+        team: entry.school, // 'team' field now holds the school name
         wins: entry.wins,
         losses: entry.losses,
         winPercentage: totalGames > 0 ? (entry.wins / totalGames) * 100 : 0,
