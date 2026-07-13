@@ -4,7 +4,15 @@ import {
     EditGameSchema,
     DeleteGameSchema,
 } from "@/src/types/games.types";
+import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
 import { NextRequest, NextResponse } from "next/server";
+
+function accessErrorResponse(error: "UNAUTHENTICATED" | "FORBIDDEN" | "SERVICE_ERROR", message: string) {
+    return NextResponse.json(
+        { error: message },
+        { status: error === "UNAUTHENTICATED" ? 401 : error === "FORBIDDEN" ? 403 : 502 }
+    );
+}
 
 const gameService = new GameService();
 export async function GET(req: NextRequest) {
@@ -109,7 +117,12 @@ export async function GET(req: NextRequest) {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = AddGameSchema.safeParse(body);
@@ -138,7 +151,12 @@ export async function POST(req: Request) {
     }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = EditGameSchema.safeParse(body);
@@ -157,7 +175,12 @@ export async function PUT(req: Request) {
     }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = DeleteGameSchema.safeParse(body);

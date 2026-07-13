@@ -16,7 +16,7 @@ import StandingsTableSkeleton from "@/src/components/standings/standings-table-s
 import standingColumns from "@/src/components/standings/columns";
 import { GameType } from "@/src/lib/prisma/generated/client";
 import { Champions, Schedules, StandingData } from "@/src/types/types";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
+import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { EditChampionPayload } from "@/src/types/champions.types";
 import StandingFormDialog from "./standing-dialog-form";
 import { toast } from "sonner";
@@ -63,9 +63,7 @@ export default function Standings() {
   const shownLoadErrorRef = useRef(false);
   const shownProcessErrorRef = useRef(false);
 
-  useInitializeUserStore();
-  const { email } = useUserStore();
-  const isAdmin = !!email;
+  const { hasAccess: isAdmin } = useHasHeraldDomainAccess();
 
   // Fetch dynamic data using TanStack Query
   const {

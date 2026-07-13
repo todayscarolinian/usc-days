@@ -60,8 +60,7 @@ The app follows a **modular, feature-driven architecture**, with clear separatio
 - Ensures type safety across layers
 ### **Utilities Layer**
 - Located in `/utils`
-- Small, generic functions with no business logic (Supabase and Prisma utilities for auth)
-- Example: Supabase middleware, server and browser clients
+- Small, generic functions with no business logic
 
 ---
 
@@ -93,8 +92,10 @@ The app follows a **modular, feature-driven architecture**, with clear separatio
 
 ## Security
 
--   Authentication stored in Zustand store.
--   Sensitive tokens/keys never exposed in client-side code.
+-   Identity is provided by Herald, TC's centralized auth service (`src/lib/herald/`), via a session cookie shared across every `*.todayscarolinian.com` subdomain — this app does not maintain its own accounts.
+-   Client-side session reads (`useHasHeraldDomainAccess`) only control UI visibility; they are never a security boundary.
+-   Every Server Action / Route Handler that performs a sensitive mutation independently re-verifies the session against Herald server-to-server (`requireHeraldAccess`) before acting.
+-   Sensitive tokens/keys (`HERALD_INTERNAL_API_KEY`) never exposed in client-side code.
 -   Environment variables managed via `.env.local` and Vercel dashboard.
 -   All API requests routed through services layer for consistent security handling.
 

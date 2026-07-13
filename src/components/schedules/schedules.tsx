@@ -6,7 +6,7 @@ import SchedulesList from "@/src/components/schedules/schedules-list";
 import { filterType } from "@/src/types/types";
 import AddScheduleDialog from "./add-schedule-dialog";
 import ScheduleFilter from "./schedule-filter";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
+import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { format, parse } from "date-fns";
 
 export default function SchedulesPage() {
@@ -31,8 +31,8 @@ export default function SchedulesPage() {
     ? Number(searchParams.get("team"))
     : null;
 
-  useInitializeUserStore();
-  const { email } = useUserStore();
+  const { hasAccess } = useHasHeraldDomainAccess();
+  console.log("hasAccess", hasAccess);
 
   const currentFilters: filterType | undefined = useMemo(() => {
     const filters: filterType = {};
@@ -94,7 +94,7 @@ export default function SchedulesPage() {
       />
       <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
         <div className="flex flex-col gap-4">
-          {email && (
+          {hasAccess && (
             <div className="flex justify-end">
               <AddScheduleDialog />
             </div>

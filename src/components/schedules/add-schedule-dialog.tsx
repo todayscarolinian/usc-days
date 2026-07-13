@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
-import { getUserId } from "@/src/queries/auth.queries";
+import { useResolveUserId } from "@/src/queries/user.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
@@ -24,7 +24,6 @@ import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
 import { getTimezoneOffset } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 
@@ -46,9 +45,6 @@ export default function AddScheduleDialog() {
   // Track which errors have already been shown
   const shownErrorsRef = useRef<Set<string>>(new Set());
 
-  useInitializeUserStore();
-  const user = useUserStore();
-
   const {
     data: fetchedSportsData = [],
     error: sportsError,
@@ -65,7 +61,7 @@ export default function AddScheduleDialog() {
     data: userId,
     error: userError,
     isLoading: userLoading,
-  } = getUserId(user.email);
+  } = useResolveUserId();
 
   const add = useAddGamesQuery();
 

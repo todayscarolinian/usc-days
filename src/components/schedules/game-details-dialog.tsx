@@ -11,7 +11,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import type { Schedules } from "@/src/types/types";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
+import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 
 type Props = {
   open: boolean;
@@ -60,8 +60,7 @@ export default function GameDetailsDialog({
 }: Props) {
   const [busyEdit, setBusyEdit] = React.useState(false);
 
-  useInitializeUserStore();
-  const { email } = useUserStore();
+  const { hasAccess } = useHasHeraldDomainAccess();
 
   if (!game) return null;
   const s = game;
@@ -149,7 +148,7 @@ export default function GameDetailsDialog({
             Close
           </Button>
 
-          {email && (
+          {hasAccess && (
             <>
               <Button
                 onClick={goEditSchedule}

@@ -12,8 +12,8 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { CircleUser, Menu } from "lucide-react";
 import Image from "next/image";
-import { useInitializeUserStore, useUserStore } from "@/src/stores/user-store";
-import { useSignOut } from "@/src/queries/auth.queries";
+import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
+import { signOutFromHerald } from "@/src/lib/herald/auth-client";
 import { useEffect, useState, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -37,6 +37,11 @@ const nav_items = [
     href: "/standings",
     name: "Standings",
     protected: false,
+  },
+  {
+    href: "/management",
+    name: "Management",
+    protected: true,
   },
 ];
 
@@ -72,9 +77,8 @@ function UserAvatar({
 }
 
 export default function Navbar() {
-  useInitializeUserStore();
-  const { email, resetUser } = useUserStore();
-  const { mutate: signOut, isPending } = useSignOut();
+  const { isAuthenticated, hasAccess } = useHasHeraldDomainAccess();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathName = usePathname();
@@ -102,12 +106,10 @@ export default function Navbar() {
     };
   }, [pathName]);
 
-  const handleLogout = () => {
-    signOut(undefined, {
-      onSuccess: () => {
-        resetUser();
-      },
-    });
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await signOutFromHerald();
+    window.location.reload();
   };
 
   return (
@@ -122,7 +124,7 @@ export default function Navbar() {
         <div className="flex items-center lg:gap-6">
           {nav_items.map((n) =>
             n.protected ? (
-              email && (
+              hasAccess && (
                 <Button
                   key={n.name}
                   className={`${isScrolled || pathName !== "/" ? "bg-tc_primary shadow-none" : "bg-transparent shadow-none"}`}
@@ -151,8 +153,8 @@ export default function Navbar() {
               </Button>
             ),
           )}
-          {email && (
-            <UserAvatar handleLogout={handleLogout} isPending={isPending} />
+          {isAuthenticated && (
+            <UserAvatar handleLogout={handleLogout} isPending={isLoggingOut} />
           )}
         </div>
       </nav>
@@ -174,21 +176,23 @@ export default function Navbar() {
                 width={50}
                 height={50}
               />
-              {nav_items.map((i) => (
-                <Link
-                  key={i.href}
-                  href={`${i.href}${i.href === "/" ? "" : queryString}`}
-                  className="text-white"
-                  onClick={() => setIsSheetOpen(false)}
-                >
-                  {i.name}
-                </Link>
-              ))}
+              {nav_items
+                .filter((i) => !i.protected || hasAccess)
+                .map((i) => (
+                  <Link
+                    key={i.href}
+                    href={`${i.href}${i.href === "/" ? "" : queryString}`}
+                    className="text-white"
+                    onClick={() => setIsSheetOpen(false)}
+                  >
+                    {i.name}
+                  </Link>
+                ))}
             </nav>
           </SheetContent>
         </Sheet>
-        {email && (
-          <UserAvatar handleLogout={handleLogout} isPending={isPending} />
+        {isAuthenticated && (
+          <UserAvatar handleLogout={handleLogout} isPending={isLoggingOut} />
         )}
       </div>
     </header>

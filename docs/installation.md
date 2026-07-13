@@ -14,7 +14,7 @@
     ```
 
 3. **Configure environment variables:**
-    - Copy `.env.example` to `.env` and fill in required values (Supabase, database, etc).
+    - Copy `.env.example` to `.env` and fill in required values (database, Herald SSO, etc).
 4. **Set up the database:**
 
     ```bash
