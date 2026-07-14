@@ -12,7 +12,6 @@ export async function verifySessionFromCookie(
 ): Promise<VerifySessionResult> {
   const authUrl = process.env.HERALD_AUTH_URL;
   const internalKey = process.env.HERALD_INTERNAL_API_KEY;
-  console.log("Internal Key", internalKey);
 
   if (!authUrl || !internalKey) {
     return {
@@ -60,8 +59,6 @@ export async function verifySessionFromCookie(
       message: "Herald verify-session returned an unparseable response",
     };
   }
-
-  console.log("verifySessionFromCookie response body:", body);
 
   if (!body.success || !body.data?.valid || !body.data.user) {
     return { status: "unauthenticated" };
