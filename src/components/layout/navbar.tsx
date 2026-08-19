@@ -38,11 +38,11 @@ const nav_items = [
     name: "Standings",
     protected: false,
   },
-  {
-    href: "/management",
-    name: "Management",
-    protected: true,
-  },
+  // {
+  //   href: "/management",
+  //   name: "Management",
+  //   protected: true,
+  // },
 ];
 
 function UserAvatar({

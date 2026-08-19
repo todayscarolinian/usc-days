@@ -6,8 +6,16 @@ import {
   EditMerchProductSchema,
 } from "@/src/types/merchProducts.types";
 import { GetProductsParams } from "@/src/services/product.service";
+import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
 
 const productService = new ProductService();
+
+function accessErrorResponse(error: "UNAUTHENTICATED" | "FORBIDDEN" | "SERVICE_ERROR", message: string) {
+  return NextResponse.json(
+    { error: message },
+    { status: error === "UNAUTHENTICATED" ? 401 : error === "FORBIDDEN" ? 403 : 502 }
+  );
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -60,7 +68,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const access = await requireHeraldAccess(req.headers.get("cookie"));
+  if (isAccessError(access)) {
+    return accessErrorResponse(access.error, access.message);
+  }
+
   try {
     const body = await req.json();
     const result = AddMerchProductSchema.safeParse(body);
@@ -86,7 +99,12 @@ export async function POST(req: Request) {
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
+  const access = await requireHeraldAccess(req.headers.get("cookie"));
+  if (isAccessError(access)) {
+    return accessErrorResponse(access.error, access.message);
+  }
+
   try {
     const body = await req.json();
     const result = EditMerchProductSchema.safeParse(body);
@@ -118,7 +136,12 @@ export async function PUT(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
+  const access = await requireHeraldAccess(req.headers.get("cookie"));
+  if (isAccessError(access)) {
+    return accessErrorResponse(access.error, access.message);
+  }
+
   try {
     const body = await req.json();
     const result = DeleteMerchProductSchema.safeParse(body);

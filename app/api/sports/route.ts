@@ -1,8 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import GameTypeService from "@/src/services/gametypes.service";
 import { AddGameTypeSchema, DeleteGameTypeSchema, EditGameTypeSchema } from "@/src/types/gametypes.types";
+import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
 
 const gameTypeService = new GameTypeService()
+
+function accessErrorResponse(error: "UNAUTHENTICATED" | "FORBIDDEN" | "SERVICE_ERROR", message: string) {
+    return NextResponse.json(
+        { error: message },
+        { status: error === "UNAUTHENTICATED" ? 401 : error === "FORBIDDEN" ? 403 : 502 }
+    );
+}
 
 export async function GET() {
     try {
@@ -15,7 +23,12 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = AddGameTypeSchema.safeParse(body);
@@ -34,7 +47,12 @@ export async function POST(req: Request) {
     }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = EditGameTypeSchema.safeParse(body);
@@ -52,7 +70,12 @@ export async function PUT(req: Request) {
     }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
+    const access = await requireHeraldAccess(req.headers.get("cookie"));
+    if (isAccessError(access)) {
+        return accessErrorResponse(access.error, access.message);
+    }
+
     try {
         const body = await req.json();
         const result = DeleteGameTypeSchema.safeParse(body);
