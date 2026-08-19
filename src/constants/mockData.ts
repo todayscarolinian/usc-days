@@ -5,7 +5,6 @@ import {
   Team,
   TeamGameType,
   TeamSchool,
-  User,
 } from "@/src/lib/prisma/generated/client";
 
 export type Game = {
@@ -27,49 +26,6 @@ type ChampionMock = Omit<Champion, "startDate" | "endDate"> & {
   startDate: string;
   endDate: string;
 };
-
-const users: User[] = [
-  {
-    id: 1,
-    email: "alice.johnson@example.com",
-  },
-  {
-    id: 2,
-    email: "bob.smith@example.com",
-  },
-  {
-    id: 3,
-    email: "charlie.brown@example.com",
-  },
-  {
-    id: 4,
-    email: "david.wilson@example.com",
-  },
-  {
-    id: 5,
-    email: "eve.adams@example.com",
-  },
-  {
-    id: 6,
-    email: "frank.miller@example.com",
-  },
-  {
-    id: 7,
-    email: "george.james@example.com",
-  },
-  {
-    id: 8,
-    email: "harry.james@example.com",
-  },
-  {
-    id: 9,
-    email: "ian.thomas@example.com",
-  },
-  {
-    id: 10,
-    email: "james.bond@example.com",
-  },
-];
 
 const teams: Team[] = [
   {
@@ -8105,7 +8061,6 @@ const champions: ChampionMock[] = [
 ];
 
 export {
-  users,
   teams,
   schools,
   teamSchools,

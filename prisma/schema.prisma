@@ -1,131 +1,122 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../src/lib/prisma/generated/"
+  provider = "prisma-client"
+  output   = "../src/lib/prisma/generated/"
 }
 
 datasource db {
-    provider = "postgresql"
-}
-
-model User {
-    email String @unique @db.VarChar(100)
-    id    Int    @id @default(autoincrement())
-    Game  Game[]
-
-    @@map("users")
+  provider = "postgresql"
 }
 
 model Team {
-    teamName    String         @map("team_name") @db.VarChar(100)
-    id          Int            @id @default(autoincrement())
-    Champion    Champion[]
-    teamAGames  Game[]         @relation("TeamAGames")
-    teamBGames  Game[]         @relation("TeamBGames")
-    gameWinner  Game[]         @relation("GameWinner")
-    gameTypes   TeamGameType[]
-    teamSchools TeamSchool[]
+  teamName    String         @map("team_name") @db.VarChar(100)
+  id          Int            @id @default(autoincrement())
+  Champion    Champion[]
+  teamAGames  Game[]         @relation("TeamAGames")
+  teamBGames  Game[]         @relation("TeamBGames")
+  gameWinner  Game[]         @relation("GameWinner")
+  gameTypes   TeamGameType[]
+  teamSchools TeamSchool[]
 
-    @@map("teams")
+  @@map("teams")
 }
 
 model School {
-    schoolName String       @unique @map("school_name") @db.VarChar(100)
-    id         Int          @id @default(autoincrement())
-    teams      TeamSchool[]
+  schoolName String       @unique @map("school_name") @db.VarChar(100)
+  id         Int          @id @default(autoincrement())
+  teams      TeamSchool[]
 
-    @@map("schools")
+  @@map("schools")
 }
 
 model TeamSchool {
-    id       Int    @id @default(autoincrement())
-    teamId   Int    @map("team_id")
-    schoolId Int    @map("school_id")
-    school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-    team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  teamId   Int    @map("team_id")
+  schoolId Int    @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    @@map("team_schools")
+  @@map("team_schools")
 }
 
 model GameType {
-    gameName String         @map("game_name") @db.VarChar(100)
-    id       Int            @id @default(autoincrement())
-    Champion Champion[]
-    games    Game[]
-    teams    TeamGameType[]
+  gameName String         @map("game_name") @db.VarChar(100)
+  id       Int            @id @default(autoincrement())
+  Champion Champion[]
+  games    Game[]
+  teams    TeamGameType[]
 
-    @@map("game_types")
+  @@map("game_types")
 }
 
 model TeamGameType {
-    id         Int      @id @default(autoincrement())
-    gameTypeId Int      @map("game_type_id")
-    teamId     Int      @map("team_id")
-    gameType   GameType @relation(fields: [gameTypeId], references: [id])
-    team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  gameTypeId Int      @map("game_type_id")
+  teamId     Int      @map("team_id")
+  gameType   GameType @relation(fields: [gameTypeId], references: [id])
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    @@map("team_game_types")
+  @@map("team_game_types")
 }
 
 model Game {
-    gameTypeId     Int      @map("game_type_id")
-    teamAId        Int      @map("team_a_id")
-    teamBId        Int      @map("team_b_id")
-    location       String?  @db.VarChar(255)
-    id             Int      @id @default(autoincrement())
-    endDate        DateTime @default(now()) @map("end_date")
-    startDate      DateTime @default(now()) @map("start_date")
-    createdAt      DateTime @default(now()) @map("created_at")
-    createdById    Int      @map("created_by")
-    teamAScore     Decimal? @map("team_a_score") @db.Decimal(10, 2)
-    teamBScore     Decimal? @map("team_b_score") @db.Decimal(10, 2)
-    winnerId       Int?     @map("winner_id")
-    teamAForfeited Boolean  @default(false) @map("team_a_forfeited")
-    teamBForfeited Boolean  @default(false) @map("team_b_forfeited")
-    isDraw         Boolean  @default(false) @map("is_draw")
-    createdBy      User     @relation(fields: [createdById], references: [id])
-    gameType       GameType @relation(fields: [gameTypeId], references: [id])
-    teamA          Team     @relation("TeamAGames", fields: [teamAId], references: [id])
-    teamB          Team     @relation("TeamBGames", fields: [teamBId], references: [id])
-    winner         Team?    @relation("GameWinner", fields: [winnerId], references: [id])
+  gameTypeId        Int      @map("game_type_id")
+  teamAId           Int      @map("team_a_id")
+  teamBId           Int      @map("team_b_id")
+  location          String?  @db.VarChar(255)
+  id                Int      @id @default(autoincrement())
+  endDate           DateTime @default(now()) @map("end_date")
+  startDate         DateTime @default(now()) @map("start_date")
+  createdAt         DateTime @default(now()) @map("created_at")
+  createdByHeraldId String?  @map("created_by_herald_id") @db.VarChar(255)
+  teamAScore        Decimal? @map("team_a_score") @db.Decimal(10, 2)
+  teamBScore        Decimal? @map("team_b_score") @db.Decimal(10, 2)
+  winnerId          Int?     @map("winner_id")
+  teamAForfeited    Boolean  @default(false) @map("team_a_forfeited")
+  teamBForfeited    Boolean  @default(false) @map("team_b_forfeited")
+  isDraw            Boolean  @default(false) @map("is_draw")
+  gameType          GameType @relation(fields: [gameTypeId], references: [id])
+  teamA             Team     @relation("TeamAGames", fields: [teamAId], references: [id])
+  teamB             Team     @relation("TeamBGames", fields: [teamBId], references: [id])
+  winner            Team?    @relation("GameWinner", fields: [winnerId], references: [id])
 
-    @@map("games")
+  @@map("games")
 }
 
 model Champion {
-    id         Int      @id @default(autoincrement())
-    teamId     Int      @map("team_id")
-    gameTypeId Int      @map("game_type_id")
-    rank       Int
-    startDate  DateTime @default(now()) @map("start_date")
-    endDate    DateTime @default(now()) @map("end_date")
-    gameType   GameType @relation(fields: [gameTypeId], references: [id])
-    team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  teamId     Int      @map("team_id")
+  gameTypeId Int      @map("game_type_id")
+  rank       Int
+  startDate  DateTime @default(now()) @map("start_date")
+  endDate    DateTime @default(now()) @map("end_date")
+  gameType   GameType @relation(fields: [gameTypeId], references: [id])
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    @@map("champions")
+  @@map("champions")
 }
 
 model MerchandiseCategory {
-    id                  Int                  @id @default(autoincrement())
-    categoryName        String               @map("category_name") @db.VarChar(100)
-    imgUrl              String               @map("img_url") @db.VarChar(255)
-    createdAt           DateTime             @default(now()) @map("created_at")
-    merchandiseProducts MerchandiseProduct[]
+  id                  Int                  @id @default(autoincrement())
+  categoryName        String               @map("category_name") @db.VarChar(100)
+  imgUrl              String               @map("img_url") @db.VarChar(255)
+  createdAt           DateTime             @default(now()) @map("created_at")
+  merchandiseProducts MerchandiseProduct[]
 
-    @@map("merchandise_categories")
+  @@map("merchandise_categories")
 }
 
 model MerchandiseProduct {
-    id                  Int                 @id @default(autoincrement())
-    categoryId          Int                 @map("category_id")
-    productTitle        String              @map("product_title") @db.VarChar(255)
-    productSize         String?             @map("product_size") @db.VarChar(50)
-    productPrice        Decimal             @map("product_price") @db.Decimal(10, 2)
-    isAvailable         Boolean             @default(true) @map("is_available")
-    imgUrls             Json                @map("img_urls")
-    designers           Json?               @map("designers")
-    createdAt           DateTime            @default(now()) @map("created_at")
-    merchandiseCategory MerchandiseCategory @relation(fields: [categoryId], references: [id])
+  id                  Int                 @id @default(autoincrement())
+  categoryId          Int                 @map("category_id")
+  productTitle        String              @map("product_title") @db.VarChar(255)
+  productSize         String?             @map("product_size") @db.VarChar(50)
+  productPrice        Decimal             @map("product_price") @db.Decimal(10, 2)
+  isAvailable         Boolean             @default(true) @map("is_available")
+  imgUrls             Json                @map("img_urls")
+  designers           Json?               @map("designers")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  merchandiseCategory MerchandiseCategory @relation(fields: [categoryId], references: [id])
 
-    @@index([categoryId])
-    @@map("merchandise_products")
+  @@index([categoryId])
+  @@map("merchandise_products")
 }

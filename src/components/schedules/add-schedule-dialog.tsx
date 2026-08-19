@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
-import { useResolveUserId } from "@/src/queries/user.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
@@ -57,12 +56,6 @@ export default function AddScheduleDialog() {
     isLoading: teamLoading,
   } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
 
-  const {
-    data: userId,
-    error: userError,
-    isLoading: userLoading,
-  } = useResolveUserId();
-
   const add = useAddGamesQuery();
 
   // Handle query errors - only show toast once per error
@@ -79,13 +72,6 @@ export default function AddScheduleDialog() {
       shownErrorsRef.current.add('teamSportsError');
     }
   }, [teamSportsError, showToast]);
-
-  useEffect(() => {
-    if (userError && !shownErrorsRef.current.has('userError')) {
-      showToast("error", "Authentication error", parseApiError(userError));
-      shownErrorsRef.current.add('userError');
-    }
-  }, [userError, showToast]);
 
   // Reset form and dismiss toasts when dialog closes
   useEffect(() => {
@@ -109,12 +95,6 @@ export default function AddScheduleDialog() {
   }));
 
   async function createSchedule() {
-    // Validate user authentication
-    if (!userId) {
-      showToast("error", "Authentication required", "Please wait for authentication to complete");
-      return;
-    }
-
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -122,7 +102,7 @@ export default function AddScheduleDialog() {
     }
 
     // Validate form inputs using existing AddGameSchema
-    if (!validate(userId)) {
+    if (!validate()) {
       showToast("error", "Validation Error", firstError || "Please check your inputs");
       return;
     }
@@ -134,7 +114,6 @@ export default function AddScheduleDialog() {
       startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
       endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
       location: inputs.location || undefined,
-      createdById: userId,
     };
 
     add.mutate(data, {
@@ -153,7 +132,7 @@ export default function AddScheduleDialog() {
     });
   }
 
-  const loading = sportsLoading || teamLoading || userLoading || add.isPending;
+  const loading = sportsLoading || teamLoading || add.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -300,7 +279,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={!userId || inputs.gameTypeId <= 0 || loading}
+            disabled={inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>

@@ -332,6 +332,18 @@ export type TeamNullableScalarRelationFilter = {
   isNot?: Prisma.TeamWhereInput | null
 }
 
+export type StringFieldUpdateOperationsInput = {
+  set?: string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type TeamCreateNestedOneWithoutTeamSchoolsInput = {
   create?: Prisma.XOR<Prisma.TeamCreateWithoutTeamSchoolsInput, Prisma.TeamUncheckedCreateWithoutTeamSchoolsInput>
   connectOrCreate?: Prisma.TeamCreateOrConnectWithoutTeamSchoolsInput

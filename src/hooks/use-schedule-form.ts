@@ -73,7 +73,6 @@ export function useScheduleForm<T = any>(options: UseScheduleFormOptions<T> = {}
             startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
             endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
             location: inputs.location,
-            createdById: additionalData,
           };
 
       schema.parse(dataToValidate);

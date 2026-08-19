@@ -19,7 +19,7 @@ export interface GetGamesParams {
   startDate?: Date;
   endDate?: Date;
   hasWinner?: boolean;
-  createdById?: number;
+  createdByHeraldId?: string;
 }
 
 export interface GetGamesWithPaginationParams
@@ -66,8 +66,8 @@ class GameService {
         };
       }
 
-      if (params?.createdById) {
-        where.createdById = params.createdById;
+      if (params?.createdByHeraldId) {
+        where.createdByHeraldId = params.createdByHeraldId;
       }
 
       if (params?.hasWinner !== undefined) {
@@ -113,7 +113,6 @@ class GameService {
             teamA: true,
             teamB: true,
             winner: true,
-            createdBy: true,
           },
           orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
           take: pageSize + 1,
@@ -141,7 +140,6 @@ class GameService {
           teamA: true,
           teamB: true,
           winner: true,
-          createdBy: true,
         },
         orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
       });
@@ -152,15 +150,17 @@ class GameService {
       throw new Error("Could not fetch games");
     }
   }
-  async addGame({
-    gameTypeId,
-    teamAId,
-    teamBId,
-    startDate,
-    endDate,
-    location,
-    createdById,
-  }: AddGamePayload) {
+  async addGame(
+    {
+      gameTypeId,
+      teamAId,
+      teamBId,
+      startDate,
+      endDate,
+      location,
+    }: AddGamePayload,
+    createdByHeraldId: string,
+  ) {
     try {
       const proposedStart = new Date(startDate);
       const proposedEnd = new Date(endDate);
@@ -236,7 +236,7 @@ class GameService {
           startDate,
           endDate,
           location,
-          createdById,
+          createdByHeraldId,
         },
       });
       return newGame;

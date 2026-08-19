@@ -42,12 +42,6 @@ export const AddGameSchema = z
         message: "Please enter a valid end date.",
       }),
     location: z.string().optional(),
-    createdById: z.number({
-      error: (issue) =>
-        issue.input === undefined
-          ? "User authentication is required."
-          : "User authentication is invalid.",
-    }),
   })
   .refine((data) => data.teamAId !== data.teamBId, {
     message: "Please select two different teams.",

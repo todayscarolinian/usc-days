@@ -51,10 +51,9 @@ export async function GET(req: NextRequest) {
             if (!isNaN(parsed)) params.winnerId = parsed;
         }
 
-        const createdById = searchParams.get("createdById");
-        if (createdById) {
-            const parsed = parseInt(createdById, 10);
-            if (!isNaN(parsed)) params.createdById = parsed;
+        const createdByHeraldId = searchParams.get("createdByHeraldId");
+        if (createdByHeraldId) {
+            params.createdByHeraldId = createdByHeraldId;
         }
 
         const location = searchParams.get("location");
@@ -132,7 +131,7 @@ export async function POST(req: NextRequest) {
         }
 
         const validatedBody = result.data;
-        const newGame = await gameService.addGame(validatedBody);
+        const newGame = await gameService.addGame(validatedBody, access.user.id);
         return NextResponse.json({ newGame }, { status: 201 });
     } catch (error) {
         console.error("Error adding game:", error);
