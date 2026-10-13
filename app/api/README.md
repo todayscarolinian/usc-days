@@ -5,7 +5,7 @@ Shared helpers live in `src/lib/api` (import from `@/src/lib/api`). Use them ins
 ## URLs
 
 - Collection: `app/api/<resource>/route.ts` → `GET` (list), `POST` (create).
-- Item: `app/api/<resource>/[id]/route.ts` → `GET`, `PATCH` (partial update), `DELETE`.
+- Item: `app/api/<resource>/[id]/route.ts` → `GET`, `PUT` (full replacement), `DELETE`.
 - IDs go in the path, never in the request body. `DELETE` has no body.
 - Related collections are nested: `/api/sports/{id}/teams`, not `/api/teamgametypes?sportId=`.
 - Plural, lowercase resource names.
@@ -35,7 +35,7 @@ Shared helpers live in `src/lib/api` (import from `@/src/lib/api`). Use them ins
 
 ```ts
 // app/api/teams/[id]/route.ts
-export async function PATCH(
+export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
