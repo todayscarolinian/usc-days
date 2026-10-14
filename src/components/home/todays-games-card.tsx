@@ -22,8 +22,8 @@ export function TodaysGamesCard({
   const status = getMatchdayGameStatus(game, now);
   const ongoing = status === "ONGOING";
   const location = game.location?.trim() || "TBA";
-  const teamA = game.teamA.teamName;
-  const teamB = game.teamB.teamName;
+  const teamA = game.teamA?.teamName ?? "TBD";
+  const teamB = game.teamB?.teamName ?? "TBD";
   const sport = game.gameType.gameName;
 
   return (
