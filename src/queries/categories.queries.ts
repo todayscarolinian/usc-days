@@ -15,7 +15,7 @@ export const getCategoriesQuery = () => {
   return useQuery<MerchandiseCategory[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await axios.get("/api/categories");
+      const response = await axios.get("/api/merchandise/categories");
       return response.data.categories;
     },
     staleTime: STALE_TIME,
@@ -26,7 +26,7 @@ export const getCategoryQuery = (categoryId?: number) => {
   return useQuery<MerchandiseCategory>({
     queryKey: ["categories", categoryId],
     queryFn: async () => {
-      const response = await axios.get(`/api/categories?categoryId`, {
+      const response = await axios.get(`/api/merchandise/categories?categoryId`, {
         params: { categoryId },
       });
       return response.data.category;
@@ -45,7 +45,7 @@ export const useAddCategoriesQuery = () => {
     { prevCategories?: MerchandiseCategory[] }
   >({
     mutationFn: async (data) => {
-      const response = await axios.post("/api/categories", data);
+      const response = await axios.post("/api/merchandise/categories", data);
       return response.data;
     },
     onSuccess: () => {
@@ -64,7 +64,7 @@ export const useEditCategoriesQuery = () => {
   return useMutation<MerchandiseCategory, Error, EditMerchCategoryPayload>({
     mutationFn: async (catData) => {
       const { id, ...rest } = catData;
-      const { data } = await axios.put("/api/categories", { id, ...rest });
+      const { data } = await axios.put(`/api/merchandise/categories/${id}`, rest);
       return data;
     },
     onSuccess: () => {
@@ -80,10 +80,9 @@ export const useEditCategoriesQuery = () => {
 
 export const useDeleteCategoriesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<MerchandiseCategory, Error, DeleteMerchCategoryPayload>({
+  return useMutation<void, Error, DeleteMerchCategoryPayload>({
     mutationFn: async (catData) => {
-      const { data } = await axios.delete("/api/categories", { data: catData });
-      return data;
+      await axios.delete(`/api/merchandise/categories/${catData.id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
