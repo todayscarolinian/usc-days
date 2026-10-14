@@ -8,7 +8,7 @@ import { getGamesQuery } from "@/src/queries/games.queries";
 import type { Schedules } from "@/src/types/types";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { selectTodaysGames } from "@/src/lib/todays-games";
+import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
 import { TodaysGamesCard } from "./todays-games-card";
 
 const GameDetailsDialog = dynamic(
@@ -183,6 +183,7 @@ export default function TodaysGames() {
   }, []);
 
   const todayString = now ? format(now, "yyyy-MM-dd") : null;
+  const eventDay = now ? getEventDay(now) : 0;
 
   function openGame(game: Schedules) {
     setSelectedGame(game);
@@ -232,12 +233,12 @@ export default function TodaysGames() {
             </p>
           </div>
           <div
-            aria-label="Event day 0"
+            aria-label={`Event day ${eventDay}`}
             className="flex shrink-0 flex-col items-end gap-1 font-bold text-tc_primary-400"
           >
             <span className="text-base leading-6">DAY</span>
             <span className="text-[64px] leading-[68px] md:text-[96px] md:leading-[100px]">
-              00
+              {String(eventDay).padStart(2, "0")}
             </span>
           </div>
         </div>
