@@ -10,7 +10,7 @@ import type {
 
 const GRAPH_URL = "https://graph.facebook.com/v26.0";
 const POST_FIELDS = "id,message,created_time,permalink_url,full_picture";
-const REVALIDATE_SECONDS = 600;
+const REVALIDATE_SECONDS = 1800;
 const PAGE_SIZE = 100;
 // Safety cap so a wide date range can't page through the Page's entire history.
 const MAX_PAGES = 20;
@@ -31,7 +31,10 @@ class FacebookService {
     const appSecret = process.env.FB_APP_SECRET;
 
     if (!pageId || !accessToken) {
-      throw new ApiError("INTERNAL_ERROR", "Facebook integration is not configured.");
+      throw new ApiError(
+        "INTERNAL_ERROR",
+        "Facebook integration is not configured.",
+      );
     }
 
     return {
@@ -69,9 +72,9 @@ class FacebookService {
 
     if (!res.ok) {
       if (notFoundMessage) {
-        const body = (await res.json().catch(() => null)) as
-          | { error?: { code?: number } }
-          | null;
+        const body = (await res.json().catch(() => null)) as {
+          error?: { code?: number };
+        } | null;
         if (body?.error?.code === GRAPH_NOT_FOUND_CODE) {
           throw new ApiError("NOT_FOUND", notFoundMessage);
         }
@@ -82,7 +85,10 @@ class FacebookService {
     try {
       return (await res.json()) as T;
     } catch {
-      throw new ApiError("SERVICE_ERROR", "Facebook returned an unreadable response.");
+      throw new ApiError(
+        "SERVICE_ERROR",
+        "Facebook returned an unreadable response.",
+      );
     }
   }
 
@@ -97,7 +103,11 @@ class FacebookService {
   }
 
   /** All Page posts created within [since, until], newest first. */
-  async getPosts({ since, until, limit }: GetFacebookPostsParams): Promise<FacebookPost[]> {
+  async getPosts({
+    since,
+    until,
+    limit,
+  }: GetFacebookPostsParams): Promise<FacebookPost[]> {
     const config = this.config();
 
     let url: URL | undefined = new URL(`${GRAPH_URL}/${config.pageId}/posts`);
@@ -140,13 +150,18 @@ class FacebookService {
     const url = new URL(`${GRAPH_URL}/${id}`);
     url.searchParams.set("fields", POST_FIELDS);
 
-    const raw = await this.graphFetch<GraphPost>(url, config, "Facebook post not found.");
+    const raw = await this.graphFetch<GraphPost>(
+      url,
+      config,
+      "Facebook post not found.",
+    );
     return this.toFacebookPost(raw);
   }
 
   private sortNewestFirst(posts: FacebookPost[]) {
     return posts.sort(
-      (a, b) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
+      (a, b) =>
+        new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
     );
   }
 }

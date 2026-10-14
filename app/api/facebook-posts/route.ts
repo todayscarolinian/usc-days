@@ -29,14 +29,7 @@ export async function GET(req: NextRequest) {
       limit,
     });
 
-    return NextResponse.json(
-      { data: posts },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
-        },
-      },
-    );
+    return NextResponse.json({ data: posts });
   } catch (error) {
     return handleRouteError(error, "Could not fetch Facebook posts.");
   }
