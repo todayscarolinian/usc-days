@@ -10,7 +10,6 @@ import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
-import { getTimezoneOffset } from "@/src/lib/utils";
 import {
   getEventDayKey,
   getEventTimeOfDay,
