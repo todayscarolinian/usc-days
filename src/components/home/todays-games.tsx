@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { format } from "date-fns";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { getGamesQuery } from "@/src/queries/games.queries";
+import { useGamesQuery } from "@/src/queries/games.queries";
 import type { Schedules } from "@/src/types/types";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
@@ -74,7 +74,7 @@ function GamesContent({
     isLoading: loading,
     isFetching,
     refetch,
-  } = getGamesQuery({
+  } = useGamesQuery({
     startDate: dateLabel,
     endDate: dateLabel,
   });

@@ -126,7 +126,6 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
       endDate: "2035-05-01T02:00:00.000Z",
     });
     const base = {
-      id: open.id,
       gameTypeId,
       teamAId: null,
       teamBId: teamBId,
@@ -142,7 +141,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
       { teamAForfeited: true, teamBForfeited: true, winnerId: null },
     ];
     for (const attempt of attempts) {
-      await assert.rejects(() => games.editGame({ ...base, ...attempt }), {
+      await assert.rejects(() => games.editGame(open.id, { ...base, ...attempt }), {
         message: SCORES_REQUIRE_TEAMS_MESSAGE,
       });
     }
@@ -157,7 +156,6 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
     });
 
     const base = {
-      id: open.id,
       gameTypeId,
       startDate: "2035-04-01T01:00:00.000Z",
       endDate: "2035-04-01T02:00:00.000Z",
@@ -166,7 +164,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
 
     await assert.rejects(
       () =>
-        games.editGame({
+        games.editGame(open.id, {
           ...base,
           teamAId: null,
           teamBId,
@@ -177,7 +175,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
       { message: SCORES_REQUIRE_TEAMS_MESSAGE },
     );
 
-    const scored = await games.editGame({
+    const scored = await games.editGame(open.id, {
       ...base,
       teamAId,
       teamBId,
@@ -193,7 +191,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
 
     await assert.rejects(
       () =>
-        games.editGame({
+        games.editGame(open.id, {
           ...base,
           teamAId: null,
           teamBId,

@@ -7,7 +7,7 @@ import axios from "axios";
 import { Schedules } from "../types/types";
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getGamesQuery = (params?: {
+export const useGamesQuery = (params?: {
   startDate?: string;
   endDate?: string;
 }) =>
@@ -20,14 +20,14 @@ export const getGamesQuery = (params?: {
 
       const url = `/api/games${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
       const response = await axios.get(url);
-      return response.data.games;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });
 
 export const useAddGamesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<Game, Error, AddGamePayload, { prevGames?: any[] }>({
+  return useMutation<Game, Error, AddGamePayload, { prevGames?: Schedules[] }>({
     mutationFn: async (data) => {
       const response = await axios.post(`/api/games`, data);
       return response.data;
@@ -35,7 +35,7 @@ export const useAddGamesQuery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] });
     },
-    onError: (err, g, context: any) => {
+    onError: (err, g, context) => {
       if (context?.prevGames) {
         queryClient.setQueryData(["games"], context.prevGames);
       }
@@ -45,10 +45,9 @@ export const useAddGamesQuery = () => {
 
 export const useEditGamesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<Game, Error, EditGamePayload>({
-    mutationFn: async (gameData) => {
-      const { id, ...rest } = gameData;
-      const { data } = await axios.put("/api/games", { id, ...rest });
+  return useMutation<Game, Error, EditGamePayload & { id: number }>({
+    mutationFn: async ({ id, ...body }) => {
+      const { data } = await axios.put(`/api/games/${id}`, body);
       return data;
     },
 
@@ -65,12 +64,9 @@ export const useEditGamesQuery = () => {
 export const useDeleteGamesQuery = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Game, Error, { scheduleId: number }>({
+  return useMutation<void, Error, { scheduleId: number }>({
     mutationFn: async ({ scheduleId }) => {
-      const { data } = await axios.delete(`/api/games`, {
-        data: { id: scheduleId },
-      });
-      return data;
+      await axios.delete(`/api/games/${scheduleId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] });

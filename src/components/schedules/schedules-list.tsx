@@ -52,7 +52,7 @@ export default function SchedulesList({
     const games: Schedules[] = [];
 
     for (const page of data.pages) {
-      for (const game of page.games) {
+      for (const game of page.data) {
         if (!seen.has(game.id)) {
           seen.add(game.id);
           games.push(game);
