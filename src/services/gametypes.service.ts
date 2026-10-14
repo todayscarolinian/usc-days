@@ -1,65 +1,40 @@
 import { prisma } from "@/src/lib/prisma";
+import { ApiError } from "@/src/lib/api";
 import {
   AddGameTypePayload,
-  DeleteGameTypePayload,
   EditGameTypePayload,
 } from "@/src/types/gametypes.types";
 
 class GameTypeService {
   async getGameTypes() {
-    try {
-      const gametypes = await prisma.gameType.findMany();
-      return gametypes;
-    } catch (error) {
-      console.error("Error fetching gametypes:", error);
-      throw new Error("Could not fetch gametypes.");
+    return prisma.gameType.findMany();
+  }
+
+  async getGameTypeById(id: number) {
+    const gameType = await prisma.gameType.findUnique({where: { id } });
+    if(!gameType) {
+      throw new ApiError("NOT_FOUND", "Sport not found.");
     }
+    return gameType;
   }
 
   async addGameType({ gameName }: AddGameTypePayload) {
-    try {
-      const newGameType = await prisma.gameType.create({
-        data: {
-          gameName,
-        },
-      });
-
-      return newGameType;
-    } catch (error) {
-      console.log("Error adding gametype: ", error);
-      throw new Error("An unexpected error occured while adding the gametype.");
-    }
+    return prisma.gameType.create({
+      data: { gameName },
+    })
   }
 
-  async editGameType({ id, gameName }: EditGameTypePayload) {
-    try {
-      const updatedGameType = await prisma.gameType.update({
-        where: { id },
-        data: {
-          gameName,
-        },
-      });
-      return updatedGameType;
-    } catch (error) {
-      console.error("Error updating gametype:", error);
-      throw new Error(
-        "An unexpected error occurred while updating the gametype."
-      );
-    }
+  async editGameType( id: number, { gameName }: EditGameTypePayload) {
+    return prisma.gameType.update({
+      where: { id },
+      data: { gameName },
+    });
   }
 
-  async deleteGameType({ id }: DeleteGameTypePayload) {
-    try {
-      const deletedGame = await prisma.gameType.delete({
+  async deleteGameType(id: number) {
+    return prisma.gameType.delete({
         where: { id },
       });
-      return deletedGame;
-    } catch (error) {
-      console.error("Error deleting gametype:", error);
-      throw new Error(
-        "An unexpected error occurred while deleting the gametype."
-      );
-    }
   }
 }
 
