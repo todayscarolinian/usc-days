@@ -1,10 +1,7 @@
 import { prisma } from "@/src/lib/prisma";
-import {
-  AddChampionPayload,
-  DeleteChampionPayload,
-  EditChampionPayload,
-} from "@/src/types/champions.types";
 import { Prisma } from "@/src/lib/prisma/generated/client";
+import { ApiError } from "@/src/lib/api";
+import type { AddChampionPayload } from "@/src/types/champions.types";
 
 export interface GetChampionsParams {
   teamId?: number;
@@ -14,119 +11,74 @@ export interface GetChampionsParams {
   endDate?: Date;
 }
 
+const championInclude = {
+  gameType: true,
+  team: true,
+} satisfies Prisma.ChampionInclude;
+
 class ChampionService {
   async getChampions(params?: GetChampionsParams) {
-    try {
-      const where: Prisma.ChampionWhereInput = {};
+    const where: Prisma.ChampionWhereInput = {};
 
-      if (params?.teamId) {
-        where.teamId = params.teamId;
-      }
+    if (params?.teamId) where.teamId = params.teamId;
+    if (params?.gameTypeId) where.gameTypeId = params.gameTypeId;
+    if (params?.rank) where.rank = params.rank;
 
-      if (params?.gameTypeId) {
-        where.gameTypeId = params.gameTypeId;
-      }
-
-      if (params?.rank) {
-        where.rank = params.rank;
-      }
-
-      if (params?.startDate || params?.endDate) {
-        where.OR = [];
-
-        if (params.startDate && params.endDate) {
-          where.OR.push({
-            AND: [
-              { startDate: { lte: params.endDate } },
-              { endDate: { gte: params.startDate } },
-            ],
-          });
-        } else if (params.startDate) {
-          where.OR.push({ endDate: { gte: params.startDate } });
-        } else if (params.endDate) {
-          where.OR.push({ startDate: { lte: params.endDate } });
-        }
-      }
-
-      const champions = await prisma.champion.findMany({
-        where,
-        include: {
-          gameType: true,
-          team: true,
-        },
-        orderBy: [{ rank: "asc" }, { startDate: "desc" }],
-      });
-
-      return champions;
-    } catch (error) {
-      console.error("Error fetching champions:", error);
-      throw new Error("Could not fetch champions");
+    // Overlap semantics: champion period intersects [startDate, endDate]
+    if (params?.startDate && params?.endDate) {
+      where.AND = [
+        { startDate: { lte: params.endDate } },
+        { endDate: { gte: params.startDate } },
+      ];
+    } else if (params?.startDate) {
+      where.endDate = { gte: params.startDate };
+    } else if (params?.endDate) {
+      where.startDate = { lte: params.endDate };
     }
+
+    return prisma.champion.findMany({
+      where,
+      include: championInclude,
+      orderBy: [{ rank: "asc" }, { startDate: "desc" }],
+    });
   }
-  async addChampion({
-    gameTypeId,
-    teamId,
-    startDate,
-    endDate,
-    rank,
-  }: AddChampionPayload) {
-    try {
-      const newChampion = await prisma.champion.create({
-        data: {
-          gameTypeId,
-          teamId,
-          startDate,
-          endDate,
-          rank,
-        },
-      });
-      return newChampion;
-    } catch (error) {
-      console.error("Error adding champion:", error);
-      throw new Error(
-        "An unexpected error occurred while adding the champion."
-      );
+
+  async getChampionById(id: number) {
+    const champion = await prisma.champion.findUnique({
+      where: { id },
+      include: championInclude,
+    });
+
+    if (!champion) {
+      throw new ApiError(404, "Champion not found.");
     }
+
+    return champion;
   }
-  async editChampion({
-    id,
-    gameTypeId,
-    teamId,
-    startDate,
-    endDate,
-    rank,
-  }: EditChampionPayload) {
-    try {
-      const updatedChampion = await prisma.champion.update({
-        where: { id },
-        data: {
-          gameTypeId,
-          teamId,
-          startDate,
-          endDate,
-          rank,
-        },
-      });
-      return updatedChampion;
-    } catch (error) {
-      console.error("Error updating champion:", error);
-      throw new Error(
-        "An unexpected error occurred while updating the champion."
-      );
-    }
+
+  async addChampion(payload: AddChampionPayload) {
+    const { gameTypeId, teamId, startDate, endDate, rank } = payload;
+
+    return prisma.champion.create({
+      data: { gameTypeId, teamId, startDate, endDate, rank },
+      include: championInclude,
+    });
   }
-  async deleteChampion({ id }: DeleteChampionPayload) {
-    try {
-      const deletedChampion = await prisma.champion.delete({
-        where: { id },
-      });
-      return deletedChampion;
-    } catch (error) {
-      console.error("Error deleting champion:", error);
-      throw new Error(
-        "An unexpected error occurred while deleting the champion."
-      );
-    }
+
+  // Full replacement. Throws Prisma P2025 if the id doesn't exist.
+  async editChampion(id: number, payload: AddChampionPayload) {
+    const { gameTypeId, teamId, startDate, endDate, rank } = payload;
+
+    return prisma.champion.update({
+      where: { id },
+      data: { gameTypeId, teamId, startDate, endDate, rank },
+      include: championInclude,
+    });
+  }
+
+  // Hard delete (unchanged behaviour). Throws Prisma P2025 if missing.
+  async deleteChampion(id: number) {
+    return prisma.champion.delete({ where: { id } });
   }
 }
 
