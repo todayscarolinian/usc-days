@@ -7,7 +7,7 @@ const facebookService = new FacebookService();
 
 /**
  * GET /api/facebook-posts: Page posts matching a hashtag within an inclusive
- * YYYY-MM-DD date range, newest first. Returns `{ data: FacebookPost[] }`.
+ * YYYY-MM-DD date range in Asia/Manila, newest first. Returns `{ data: FacebookPost[] }`.
  * Invalid query params return 400; service failures use the shared error format.
  */
 export async function GET(req: NextRequest) {
