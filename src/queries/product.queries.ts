@@ -1,15 +1,12 @@
 "use client";
 
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import {
-  AddMerchProductPayload,
-  DeleteMerchProductPayload,
-  EditMerchProductPayload,
-} from "../types/merchProducts.types";
+import { AddMerchProductPayload, EditMerchProductPayload } from "../types/merchProducts.types";
 import axios from "axios";
 import { MerchandiseProduct } from "../lib/prisma/generated/client";
 
 const STALE_TIME = 1000 * 60 * 5;
+const PRODUCTS_URL = "/api/merchandise/products";
 
 interface GetProductsParams {
   categoryId?: number;
@@ -20,7 +17,16 @@ interface GetProductsParams {
   search?: string;
 }
 
-export const getProductsQuery = (params?: GetProductsParams) => {
+interface EditProductVariables {
+  id: number;
+  data: EditMerchProductPayload;
+}
+
+interface ProductsMutationContext {
+  prevProducts?: MerchandiseProduct[];
+}
+
+export const useGetProductsQuery = (params?: GetProductsParams) => {
   return useQuery<MerchandiseProduct[]>({
     queryKey: ["products", params],
     queryFn: async () => {
@@ -36,9 +42,9 @@ export const getProductsQuery = (params?: GetProductsParams) => {
       if (params?.size) queryParams.append("size", params.size);
       if (params?.search) queryParams.append("search", params.search);
 
-      const url = `/api/products${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+      const url = `${PRODUCTS_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
       const response = await axios.get(url);
-      return response.data.products;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });
@@ -50,16 +56,16 @@ export const useAddProductsQuery = () => {
     MerchandiseProduct,
     Error,
     AddMerchProductPayload,
-    { prevProducts?: any[] }
+    ProductsMutationContext
   >({
     mutationFn: async (data) => {
-      const response = await axios.post("/api/products", data);
+      const response = await axios.post(PRODUCTS_URL, data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: (err, g, context: any) => {
+    onError: (err, g, context) => {
       if (context?.prevProducts) {
         queryClient.setQueryData(["products"], context.prevProducts);
       }
@@ -69,16 +75,20 @@ export const useAddProductsQuery = () => {
 
 export const useEditProductsQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<MerchandiseProduct, Error, EditMerchProductPayload>({
-    mutationFn: async (prodData) => {
-      const { id, ...rest } = prodData;
-      const { data } = await axios.put("/api/products", { id, ...rest });
-      return data;
+  return useMutation<
+    MerchandiseProduct,
+    Error,
+    EditProductVariables,
+    ProductsMutationContext
+  >({
+    mutationFn: async ({ id, data }) => {
+      const response = await axios.put(`${PRODUCTS_URL}/${id}`, data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: (err, g, context: any) => {
+    onError: (err, g, context) => {
       if (context?.prevProducts) {
         queryClient.setQueryData(["products"], context.prevProducts);
       }
@@ -88,17 +98,14 @@ export const useEditProductsQuery = () => {
 
 export const useDeleteProductsQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<MerchandiseProduct, Error, DeleteMerchProductPayload>({
-    mutationFn: async (prodData) => {
-      const { data } = await axios.delete("/api/products", {
-        data: prodData,
-      });
-      return data;
+  return useMutation<void, Error, number, ProductsMutationContext>({
+    mutationFn: async (id) => {
+      await axios.delete(`${PRODUCTS_URL}/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: (err, g, context: any) => {
+    onError: (err, g, context) => {
       if (context?.prevProducts) {
         queryClient.setQueryData(["products"], context.prevProducts);
       }
