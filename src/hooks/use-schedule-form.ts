@@ -11,8 +11,8 @@ import { addHours } from "date-fns";
 
 interface ScheduleInputs {
   gameTypeId: number;
-  teamAId: number;
-  teamBId: number;
+  teamAId: number | null;
+  teamBId: number | null;
   startDate: string;
   endDate: string;
   startTime: string;

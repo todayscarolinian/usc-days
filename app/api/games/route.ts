@@ -4,6 +4,7 @@ import {
     EditGameSchema,
     DeleteGameSchema,
 } from "@/src/types/games.types";
+import { handleRouteError } from "@/src/lib/api";
 import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
 import { NextRequest, NextResponse } from "next/server";
 import { getEventDayRange, isEventDayKey } from "@/src/lib/time";
@@ -164,8 +165,7 @@ export async function PUT(req: NextRequest) {
         const updatedGame = await gameService.editGame(validatedBody);
         return NextResponse.json({ updatedGame }, { status: 200 });
     } catch (error) {
-        console.error("Error updating game:", error);
-        return NextResponse.json({ error: `${error}` }, { status: 500 });
+        return handleRouteError(error, "Could not update game");
     }
 }
 
