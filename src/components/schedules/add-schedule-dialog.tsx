@@ -219,9 +219,10 @@ export default function AddScheduleDialog() {
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamAId !== -1 ? inputs.teamAId.toString() : ""}
+                clearable
+                value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamAId", value ? Number(value) : -1)
+                  updateInput("teamAId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
@@ -243,9 +244,10 @@ export default function AddScheduleDialog() {
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamBId !== -1 ? inputs.teamBId.toString() : ""}
+                clearable
+                value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamBId", value ? Number(value) : -1)
+                  updateInput("teamBId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}

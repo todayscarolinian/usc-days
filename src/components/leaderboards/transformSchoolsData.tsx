@@ -30,6 +30,8 @@ export function transformSchoolsData(
       : games;
 
   for (const g of filteredGames) {
+    if (!g.teamA || !g.teamB) continue;
+
     const sport = g.gameType.gameName;
     const teamA = g.teamA.teamName;
     const teamB = g.teamB.teamName;

@@ -265,8 +265,8 @@ export type GameGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type GameGroupByOutputType = {
   gameTypeId: number
-  teamAId: number
-  teamBId: number
+  teamAId: number | null
+  teamBId: number | null
   location: string | null
   id: number
   endDate: Date
@@ -306,8 +306,8 @@ export type GameWhereInput = {
   OR?: Prisma.GameWhereInput[]
   NOT?: Prisma.GameWhereInput | Prisma.GameWhereInput[]
   gameTypeId?: Prisma.IntFilter<"Game"> | number
-  teamAId?: Prisma.IntFilter<"Game"> | number
-  teamBId?: Prisma.IntFilter<"Game"> | number
+  teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
+  teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
   id?: Prisma.IntFilter<"Game"> | number
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -321,15 +321,15 @@ export type GameWhereInput = {
   teamBForfeited?: Prisma.BoolFilter<"Game"> | boolean
   isDraw?: Prisma.BoolFilter<"Game"> | boolean
   gameType?: Prisma.XOR<Prisma.GameTypeScalarRelationFilter, Prisma.GameTypeWhereInput>
-  teamA?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
-  teamB?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
+  teamA?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
+  teamB?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
   winner?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
 }
 
 export type GameOrderByWithRelationInput = {
   gameTypeId?: Prisma.SortOrder
-  teamAId?: Prisma.SortOrder
-  teamBId?: Prisma.SortOrder
+  teamAId?: Prisma.SortOrderInput | Prisma.SortOrder
+  teamBId?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -354,8 +354,8 @@ export type GameWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.GameWhereInput[]
   NOT?: Prisma.GameWhereInput | Prisma.GameWhereInput[]
   gameTypeId?: Prisma.IntFilter<"Game"> | number
-  teamAId?: Prisma.IntFilter<"Game"> | number
-  teamBId?: Prisma.IntFilter<"Game"> | number
+  teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
+  teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
   startDate?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -368,15 +368,15 @@ export type GameWhereUniqueInput = Prisma.AtLeast<{
   teamBForfeited?: Prisma.BoolFilter<"Game"> | boolean
   isDraw?: Prisma.BoolFilter<"Game"> | boolean
   gameType?: Prisma.XOR<Prisma.GameTypeScalarRelationFilter, Prisma.GameTypeWhereInput>
-  teamA?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
-  teamB?: Prisma.XOR<Prisma.TeamScalarRelationFilter, Prisma.TeamWhereInput>
+  teamA?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
+  teamB?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
   winner?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
 }, "id">
 
 export type GameOrderByWithAggregationInput = {
   gameTypeId?: Prisma.SortOrder
-  teamAId?: Prisma.SortOrder
-  teamBId?: Prisma.SortOrder
+  teamAId?: Prisma.SortOrderInput | Prisma.SortOrder
+  teamBId?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -401,8 +401,8 @@ export type GameScalarWhereWithAggregatesInput = {
   OR?: Prisma.GameScalarWhereWithAggregatesInput[]
   NOT?: Prisma.GameScalarWhereWithAggregatesInput | Prisma.GameScalarWhereWithAggregatesInput[]
   gameTypeId?: Prisma.IntWithAggregatesFilter<"Game"> | number
-  teamAId?: Prisma.IntWithAggregatesFilter<"Game"> | number
-  teamBId?: Prisma.IntWithAggregatesFilter<"Game"> | number
+  teamAId?: Prisma.IntNullableWithAggregatesFilter<"Game"> | number | null
+  teamBId?: Prisma.IntNullableWithAggregatesFilter<"Game"> | number | null
   location?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   id?: Prisma.IntWithAggregatesFilter<"Game"> | number
   endDate?: Prisma.DateTimeWithAggregatesFilter<"Game"> | Date | string
@@ -429,15 +429,15 @@ export type GameCreateInput = {
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType: Prisma.GameTypeCreateNestedOneWithoutGamesInput
-  teamA: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
-  teamB: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
+  teamA?: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
+  teamB?: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
   winner?: Prisma.TeamCreateNestedOneWithoutGameWinnerInput
 }
 
 export type GameUncheckedCreateInput = {
   gameTypeId: number
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -464,15 +464,15 @@ export type GameUpdateInput = {
   teamBForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDraw?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gameType?: Prisma.GameTypeUpdateOneRequiredWithoutGamesNestedInput
-  teamA?: Prisma.TeamUpdateOneRequiredWithoutTeamAGamesNestedInput
-  teamB?: Prisma.TeamUpdateOneRequiredWithoutTeamBGamesNestedInput
+  teamA?: Prisma.TeamUpdateOneWithoutTeamAGamesNestedInput
+  teamB?: Prisma.TeamUpdateOneWithoutTeamBGamesNestedInput
   winner?: Prisma.TeamUpdateOneWithoutGameWinnerNestedInput
 }
 
 export type GameUncheckedUpdateInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -489,8 +489,8 @@ export type GameUncheckedUpdateInput = {
 
 export type GameCreateManyInput = {
   gameTypeId: number
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -520,8 +520,8 @@ export type GameUpdateManyMutationInput = {
 
 export type GameUncheckedUpdateManyInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -828,13 +828,13 @@ export type GameCreateWithoutTeamAInput = {
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType: Prisma.GameTypeCreateNestedOneWithoutGamesInput
-  teamB: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
+  teamB?: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
   winner?: Prisma.TeamCreateNestedOneWithoutGameWinnerInput
 }
 
 export type GameUncheckedCreateWithoutTeamAInput = {
   gameTypeId: number
-  teamBId: number
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -871,13 +871,13 @@ export type GameCreateWithoutTeamBInput = {
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType: Prisma.GameTypeCreateNestedOneWithoutGamesInput
-  teamA: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
+  teamA?: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
   winner?: Prisma.TeamCreateNestedOneWithoutGameWinnerInput
 }
 
 export type GameUncheckedCreateWithoutTeamBInput = {
   gameTypeId: number
-  teamAId: number
+  teamAId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -914,14 +914,14 @@ export type GameCreateWithoutWinnerInput = {
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType: Prisma.GameTypeCreateNestedOneWithoutGamesInput
-  teamA: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
-  teamB: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
+  teamA?: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
+  teamB?: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
 }
 
 export type GameUncheckedCreateWithoutWinnerInput = {
   gameTypeId: number
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -966,8 +966,8 @@ export type GameScalarWhereInput = {
   OR?: Prisma.GameScalarWhereInput[]
   NOT?: Prisma.GameScalarWhereInput | Prisma.GameScalarWhereInput[]
   gameTypeId?: Prisma.IntFilter<"Game"> | number
-  teamAId?: Prisma.IntFilter<"Game"> | number
-  teamBId?: Prisma.IntFilter<"Game"> | number
+  teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
+  teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
   id?: Prisma.IntFilter<"Game"> | number
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -1025,14 +1025,14 @@ export type GameCreateWithoutGameTypeInput = {
   teamAForfeited?: boolean
   teamBForfeited?: boolean
   isDraw?: boolean
-  teamA: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
-  teamB: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
+  teamA?: Prisma.TeamCreateNestedOneWithoutTeamAGamesInput
+  teamB?: Prisma.TeamCreateNestedOneWithoutTeamBGamesInput
   winner?: Prisma.TeamCreateNestedOneWithoutGameWinnerInput
 }
 
 export type GameUncheckedCreateWithoutGameTypeInput = {
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -1075,7 +1075,7 @@ export type GameUpdateManyWithWhereWithoutGameTypeInput = {
 
 export type GameCreateManyTeamAInput = {
   gameTypeId: number
-  teamBId: number
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -1092,7 +1092,7 @@ export type GameCreateManyTeamAInput = {
 
 export type GameCreateManyTeamBInput = {
   gameTypeId: number
-  teamAId: number
+  teamAId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -1109,8 +1109,8 @@ export type GameCreateManyTeamBInput = {
 
 export type GameCreateManyWinnerInput = {
   gameTypeId: number
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -1136,13 +1136,13 @@ export type GameUpdateWithoutTeamAInput = {
   teamBForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDraw?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gameType?: Prisma.GameTypeUpdateOneRequiredWithoutGamesNestedInput
-  teamB?: Prisma.TeamUpdateOneRequiredWithoutTeamBGamesNestedInput
+  teamB?: Prisma.TeamUpdateOneWithoutTeamBGamesNestedInput
   winner?: Prisma.TeamUpdateOneWithoutGameWinnerNestedInput
 }
 
 export type GameUncheckedUpdateWithoutTeamAInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1159,7 +1159,7 @@ export type GameUncheckedUpdateWithoutTeamAInput = {
 
 export type GameUncheckedUpdateManyWithoutTeamAInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1186,13 +1186,13 @@ export type GameUpdateWithoutTeamBInput = {
   teamBForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDraw?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gameType?: Prisma.GameTypeUpdateOneRequiredWithoutGamesNestedInput
-  teamA?: Prisma.TeamUpdateOneRequiredWithoutTeamAGamesNestedInput
+  teamA?: Prisma.TeamUpdateOneWithoutTeamAGamesNestedInput
   winner?: Prisma.TeamUpdateOneWithoutGameWinnerNestedInput
 }
 
 export type GameUncheckedUpdateWithoutTeamBInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1209,7 +1209,7 @@ export type GameUncheckedUpdateWithoutTeamBInput = {
 
 export type GameUncheckedUpdateManyWithoutTeamBInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1236,14 +1236,14 @@ export type GameUpdateWithoutWinnerInput = {
   teamBForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDraw?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gameType?: Prisma.GameTypeUpdateOneRequiredWithoutGamesNestedInput
-  teamA?: Prisma.TeamUpdateOneRequiredWithoutTeamAGamesNestedInput
-  teamB?: Prisma.TeamUpdateOneRequiredWithoutTeamBGamesNestedInput
+  teamA?: Prisma.TeamUpdateOneWithoutTeamAGamesNestedInput
+  teamB?: Prisma.TeamUpdateOneWithoutTeamBGamesNestedInput
 }
 
 export type GameUncheckedUpdateWithoutWinnerInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1259,8 +1259,8 @@ export type GameUncheckedUpdateWithoutWinnerInput = {
 
 export type GameUncheckedUpdateManyWithoutWinnerInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1275,8 +1275,8 @@ export type GameUncheckedUpdateManyWithoutWinnerInput = {
 }
 
 export type GameCreateManyGameTypeInput = {
-  teamAId: number
-  teamBId: number
+  teamAId?: number | null
+  teamBId?: number | null
   location?: string | null
   id?: number
   endDate?: Date | string
@@ -1302,14 +1302,14 @@ export type GameUpdateWithoutGameTypeInput = {
   teamAForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   teamBForfeited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDraw?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  teamA?: Prisma.TeamUpdateOneRequiredWithoutTeamAGamesNestedInput
-  teamB?: Prisma.TeamUpdateOneRequiredWithoutTeamBGamesNestedInput
+  teamA?: Prisma.TeamUpdateOneWithoutTeamAGamesNestedInput
+  teamB?: Prisma.TeamUpdateOneWithoutTeamBGamesNestedInput
   winner?: Prisma.TeamUpdateOneWithoutGameWinnerNestedInput
 }
 
 export type GameUncheckedUpdateWithoutGameTypeInput = {
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1325,8 +1325,8 @@ export type GameUncheckedUpdateWithoutGameTypeInput = {
 }
 
 export type GameUncheckedUpdateManyWithoutGameTypeInput = {
-  teamAId?: Prisma.IntFieldUpdateOperationsInput | number
-  teamBId?: Prisma.IntFieldUpdateOperationsInput | number
+  teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1360,8 +1360,8 @@ export type GameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }, ExtArgs["result"]["game"]>
 
@@ -1382,8 +1382,8 @@ export type GameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }, ExtArgs["result"]["game"]>
 
@@ -1404,8 +1404,8 @@ export type GameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   teamBForfeited?: boolean
   isDraw?: boolean
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }, ExtArgs["result"]["game"]>
 
@@ -1430,20 +1430,20 @@ export type GameSelectScalar = {
 export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"gameTypeId" | "teamAId" | "teamBId" | "location" | "id" | "endDate" | "startDate" | "createdAt" | "createdByHeraldId" | "teamAScore" | "teamBScore" | "winnerId" | "teamAForfeited" | "teamBForfeited" | "isDraw", ExtArgs["result"]["game"]>
 export type GameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }
 export type GameIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }
 export type GameIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
-  teamA?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
-  teamB?: boolean | Prisma.TeamDefaultArgs<ExtArgs>
+  teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
+  teamB?: boolean | Prisma.Game$teamBArgs<ExtArgs>
   winner?: boolean | Prisma.Game$winnerArgs<ExtArgs>
 }
 
@@ -1451,14 +1451,14 @@ export type $GamePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "Game"
   objects: {
     gameType: Prisma.$GameTypePayload<ExtArgs>
-    teamA: Prisma.$TeamPayload<ExtArgs>
-    teamB: Prisma.$TeamPayload<ExtArgs>
+    teamA: Prisma.$TeamPayload<ExtArgs> | null
+    teamB: Prisma.$TeamPayload<ExtArgs> | null
     winner: Prisma.$TeamPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     gameTypeId: number
-    teamAId: number
-    teamBId: number
+    teamAId: number | null
+    teamBId: number | null
     location: string | null
     id: number
     endDate: Date
@@ -1866,8 +1866,8 @@ readonly fields: GameFieldRefs;
 export interface Prisma__GameClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   gameType<T extends Prisma.GameTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GameTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__GameTypeClient<runtime.Types.Result.GetResult<Prisma.$GameTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  teamA<T extends Prisma.TeamDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  teamB<T extends Prisma.TeamDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  teamA<T extends Prisma.Game$teamAArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Game$teamAArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  teamB<T extends Prisma.Game$teamBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Game$teamBArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   winner<T extends Prisma.Game$winnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Game$winnerArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2306,6 +2306,44 @@ export type GameDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Games to delete.
    */
   limit?: number
+}
+
+/**
+ * Game.teamA
+ */
+export type Game$teamAArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Team
+   */
+  select?: Prisma.TeamSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Team
+   */
+  omit?: Prisma.TeamOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamInclude<ExtArgs> | null
+  where?: Prisma.TeamWhereInput
+}
+
+/**
+ * Game.teamB
+ */
+export type Game$teamBArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Team
+   */
+  select?: Prisma.TeamSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Team
+   */
+  omit?: Prisma.TeamOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamInclude<ExtArgs> | null
+  where?: Prisma.TeamWhereInput
 }
 
 /**

@@ -5,9 +5,85 @@ import {
   EditGamePayload,
   PaginationParams,
   PaginatedGamesResponse,
+  SCORES_REQUIRE_TEAMS_MESSAGE,
+  hasSavedResult,
 } from "@/src/types/games.types";
+import { ApiError } from "@/src/lib/api";
 import { Prisma } from "@/src/lib/prisma/generated/client";
 import { Schedules } from "../types/types";
+
+export type StoredGameTeams = {
+  teamAId: number | null;
+  teamBId: number | null;
+  teamAScore: unknown;
+  teamBScore: unknown;
+  winnerId: number | null;
+  teamAForfeited: boolean;
+  teamBForfeited: boolean;
+  isDraw: boolean;
+};
+
+export type GameTeamEdit = {
+  teamAId: number | null;
+  teamBId: number | null;
+  teamAScore?: unknown;
+  teamBScore?: unknown;
+  winnerId?: number | null;
+  teamAForfeited?: boolean;
+  teamBForfeited?: boolean;
+  isDraw?: boolean;
+};
+
+/** Team ids come from the edit. Omitted result fields keep the stored value. */
+export function resolveEditedGame(
+  existing: StoredGameTeams,
+  edit: GameTeamEdit,
+): StoredGameTeams {
+  return {
+    teamAId: edit.teamAId,
+    teamBId: edit.teamBId,
+    teamAScore:
+      edit.teamAScore !== undefined ? edit.teamAScore : existing.teamAScore,
+    teamBScore:
+      edit.teamBScore !== undefined ? edit.teamBScore : existing.teamBScore,
+    winnerId: edit.winnerId !== undefined ? edit.winnerId : existing.winnerId,
+    teamAForfeited:
+      edit.teamAForfeited !== undefined
+        ? edit.teamAForfeited
+        : existing.teamAForfeited,
+    teamBForfeited:
+      edit.teamBForfeited !== undefined
+        ? edit.teamBForfeited
+        : existing.teamBForfeited,
+    isDraw: edit.isDraw !== undefined ? edit.isDraw : existing.isDraw,
+  };
+}
+
+export function assertTeamsSetForResults(state: StoredGameTeams) {
+  if (
+    hasSavedResult(state) &&
+    (state.teamAId == null || state.teamBId == null)
+  ) {
+    throw new ApiError("VALIDATION_ERROR", SCORES_REQUIRE_TEAMS_MESSAGE);
+  }
+}
+
+/** Duplicate-matchup lookup applies only when both teams are already known. */
+export function duplicateTeamMatchupFilter(
+  gameTypeId: number,
+  teamAId: number | null | undefined,
+  teamBId: number | null | undefined,
+): Prisma.GameWhereInput | null {
+  if (teamAId == null || teamBId == null) return null;
+
+  return {
+    gameTypeId,
+    OR: [
+      { AND: [{ teamAId }, { teamBId }] },
+      { AND: [{ teamAId: teamBId }, { teamBId: teamAId }] },
+    ],
+  };
+}
 
 export interface GetGamesParams {
   gameTypeId?: number;
@@ -164,54 +240,50 @@ class GameService {
     try {
       const proposedStart = new Date(startDate);
       const proposedEnd = new Date(endDate);
-
-      // Single query to check all conflicts
-      const conflicts = await prisma.game.findMany({
-        where: {
-          AND: [
-            { startDate: { lt: proposedEnd } },
-            { endDate: { gt: proposedStart } },
-          ],
-          OR: [
-            // Exact duplicate (same teams, same sport, overlapping time)
-            {
-              gameTypeId,
-              OR: [
-                { AND: [{ teamAId }, { teamBId }] },
-                { AND: [{ teamAId: teamBId }, { teamBId: teamAId }] },
-              ],
-            },
-            // Location conflict (if provided)
-            ...(location && location.trim() !== ""
-              ? [
-                  {
-                    location: {
-                      equals: location,
-                      mode: "insensitive" as const,
-                    },
-                  },
-                ]
-              : []),
-          ],
-        },
-        include: {
-          teamA: true,
-          teamB: true,
-          gameType: true,
-        },
-      });
-
-      // Check for exact duplicate (same teams, same sport)
-      const duplicate = conflicts.find(
-        (game) =>
-          game.gameTypeId === gameTypeId &&
-          ((game.teamAId === teamAId && game.teamBId === teamBId) ||
-            (game.teamAId === teamBId && game.teamBId === teamAId)),
+      const duplicateFilter = duplicateTeamMatchupFilter(
+        gameTypeId,
+        teamAId,
+        teamBId,
       );
-      if (duplicate) {
-        throw new Error(
-          "A schedule already exists for these teams at this time.",
+      const hasLocation = Boolean(location && location.trim() !== "");
+      const conflictFilters: Prisma.GameWhereInput[] = [];
+
+      if (duplicateFilter) conflictFilters.push(duplicateFilter);
+      if (hasLocation && location) {
+        conflictFilters.push({
+          location: {
+            equals: location,
+            mode: "insensitive",
+          },
+        });
+      }
+
+      const conflicts =
+        conflictFilters.length > 0
+          ? await prisma.game.findMany({
+              where: {
+                AND: [
+                  { startDate: { lt: proposedEnd } },
+                  { endDate: { gt: proposedStart } },
+                ],
+                OR: conflictFilters,
+              },
+            })
+          : [];
+
+      // Same teams and sport, in either order. Skipped when either team is TBD.
+      if (teamAId != null && teamBId != null) {
+        const duplicate = conflicts.find(
+          (game) =>
+            game.gameTypeId === gameTypeId &&
+            ((game.teamAId === teamAId && game.teamBId === teamBId) ||
+              (game.teamAId === teamBId && game.teamBId === teamAId)),
         );
+        if (duplicate) {
+          throw new Error(
+            "A schedule already exists for these teams at this time.",
+          );
+        }
       }
 
       // Check for location conflict (same venue can't host two games)
@@ -231,8 +303,8 @@ class GameService {
       const newGame = await prisma.game.create({
         data: {
           gameTypeId,
-          teamAId,
-          teamBId,
+          teamAId: teamAId ?? null,
+          teamBId: teamBId ?? null,
           startDate,
           endDate,
           location,
@@ -270,6 +342,24 @@ class GameService {
     isDraw,
   }: EditGamePayload) {
     try {
+      const existing = await prisma.game.findUnique({ where: { id } });
+      if (!existing) {
+        throw new ApiError("NOT_FOUND", "Game not found.");
+      }
+
+      assertTeamsSetForResults(
+        resolveEditedGame(existing, {
+          teamAId,
+          teamBId,
+          teamAScore,
+          teamBScore,
+          winnerId,
+          teamAForfeited,
+          teamBForfeited,
+          isDraw,
+        }),
+      );
+
       const bothForfeited = teamAForfeited && teamBForfeited;
 
       // Validate: Cannot be draw and forfeit
@@ -296,6 +386,7 @@ class GameService {
       ) {
         const validTeam = await prisma.team.findUnique({
           where: { id: winnerId },
+          select: { id: true },
         });
 
         if (!validTeam) {
@@ -331,6 +422,7 @@ class GameService {
       return updatedGame;
     } catch (error) {
       console.error("Error updating game:", error);
+      if (error instanceof ApiError) throw error;
       throw new Error("An unexpected error occurred while updating the game.");
     }
   }
