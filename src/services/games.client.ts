@@ -1,16 +1,13 @@
 import axios from "axios";
-import { Schedules, filterType } from "@/src/types/types";
+import { filterType } from "@/src/types/types";
+import { PaginatedGamesResponse } from "@/src/types/games.types";
 
 export async function fetchGamesPage(
   cursor?: string | null,
   limit = 20,
   filters?: filterType,
   signal?: AbortSignal
-): Promise<{
-  games: Schedules[];
-  nextCursor: string | null;
-  hasMore: boolean;
-}> {
+): Promise<PaginatedGamesResponse> {
   const params = new URLSearchParams();
   
   if (cursor) params.append("cursor", cursor);
@@ -29,17 +26,9 @@ export async function fetchGamesPage(
     params.append("hasWinner", String(filters.finishedGames));
   }
 
-  const { data } = await axios.get(`/api/games?${params.toString()}`, {
+  const { data } = await axios.get<PaginatedGamesResponse>(`/api/games?${params.toString()}`, {
     signal
   });
-
-  if (Array.isArray(data.games) && !data.nextCursor) {
-    return {
-      games: data.games,
-      nextCursor: null,
-      hasMore: false,
-    };
-  }
 
   return data;
 }
