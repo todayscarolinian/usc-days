@@ -11,6 +11,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import type { Schedules } from "@/src/types/types";
+import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 
 type Props = {
@@ -67,8 +68,9 @@ export default function GameDetailsDialog({
   const start = new Date(game.startDate);
   const end = new Date(game.endDate);
   const sport = game.gameType?.gameName ?? "-";
-  const home = game.teamA.teamName ?? "-";
-  const away = game.teamB.teamName ?? "-";
+  const home = game.teamA?.teamName ?? "TBD";
+  const away = game.teamB?.teamName ?? "TBD";
+  const teamsAreSet = game.teamA != null && game.teamB != null;
   const location = game.location ?? "TBA";
 
   const { a: dbA, b: dbB } = getDbScores(game);
@@ -139,6 +141,12 @@ export default function GameDetailsDialog({
           </div>
         </div>
 
+        {hasAccess && !teamsAreSet && (
+          <p className="text-sm text-muted-foreground">
+            {SCORES_REQUIRE_TEAMS_MESSAGE}
+          </p>
+        )}
+
         <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
@@ -160,6 +168,7 @@ export default function GameDetailsDialog({
 
               <Button
                 onClick={() => onAddScore?.(game)}
+                disabled={!teamsAreSet}
                 className="w-full sm:w-auto"
               >
                 Add Score

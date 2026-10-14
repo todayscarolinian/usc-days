@@ -53,7 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Team: 'Team',
   School: 'School',
-  TeamSchool: 'TeamSchool',
   GameType: 'GameType',
   TeamGameType: 'TeamGameType',
   Game: 'Game',
@@ -80,7 +79,8 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const TeamScalarFieldEnum = {
   teamName: 'teamName',
-  id: 'id'
+  id: 'id',
+  schoolId: 'schoolId'
 } as const
 
 export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
@@ -92,15 +92,6 @@ export const SchoolScalarFieldEnum = {
 } as const
 
 export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
-
-
-export const TeamSchoolScalarFieldEnum = {
-  id: 'id',
-  teamId: 'teamId',
-  schoolId: 'schoolId'
-} as const
-
-export type TeamSchoolScalarFieldEnum = (typeof TeamSchoolScalarFieldEnum)[keyof typeof TeamSchoolScalarFieldEnum]
 
 
 export const GameTypeScalarFieldEnum = {

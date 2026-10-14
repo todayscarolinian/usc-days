@@ -25,11 +25,11 @@ function formatScore(
   return Number(score);
 }
 
-function getScoreClassName(game: Schedules, teamId: number): string {
+function getScoreClassName(game: Schedules, teamId: number | null): string {
   const bothForfeited = game.teamAForfeited && game.teamBForfeited;
 
   // Show as winner (bold) if this team won or it's a draw
-  const isWinner = game.winnerId === teamId || game.isDraw;
+  const isWinner = (teamId != null && game.winnerId === teamId) || game.isDraw;
 
   if (isWinner && !bothForfeited) {
     return "font-bold";
@@ -49,6 +49,8 @@ function hasGameResult(game: Schedules): boolean {
 
 export function GameCard({ game, onOpen }: ScheduleCardProps) {
   const start = new Date(game.startDate);
+  const teamAName = game.teamA?.teamName ?? "TBD";
+  const teamBName = game.teamB?.teamName ?? "TBD";
 
   return (
     <Card
@@ -80,10 +82,10 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
         <CardContent className="col-span-2 w-full flex-1 flex justify-center items-center p-0">
           <div className="gap-2 md:gap-6 justify-center items-center text-center w-full grid grid-cols-5 md:grid-cols-5">
             <div className="flex justify-end gap-3 md:gap-4 items-center text-sm md:text-base col-span-2 md:col-span-2">
-              {game.teamA.teamName}
+              {teamAName}
               <Image
-                src={getLogoForSchool(game.teamA.teamName).src}
-                alt={`${game.teamA.teamName} logo`}
+                src={getLogoForSchool(teamAName).src}
+                alt={`${teamAName} logo`}
                 width={24}
                 height={24}
               />
@@ -105,12 +107,12 @@ export function GameCard({ game, onOpen }: ScheduleCardProps) {
             )}
             <div className="flex justify-start gap-1 md:gap-2 items-center text-sm md:text-base col-span-2 md:col-span-2">
               <Image
-                src={getLogoForSchool(game.teamB.teamName).src}
-                alt={`${game.teamB.teamName} logo`}
+                src={getLogoForSchool(teamBName).src}
+                alt={`${teamBName} logo`}
                 width={24}
                 height={24}
               />
-              {game.teamB.teamName}
+              {teamBName}
             </div>
           </div>
         </CardContent>

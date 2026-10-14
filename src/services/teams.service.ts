@@ -11,11 +11,7 @@ class TeamService {
             gameType: true,
           },
         },
-        teamSchools: {
-          include: {
-            school: true,
-          },
-        },
+        school: true,
       },
     });
   }
@@ -29,11 +25,7 @@ class TeamService {
             gameType: true,
           },
         },
-        teamSchools: {
-          include: {
-            school: true,
-          },
-        },
+        school: true,
       },
     });
     if (!team) {
@@ -42,39 +34,30 @@ class TeamService {
     return team;
   }
 
-  async addTeam({ teamName, schoolIds, gameTypeIds }: AddTeamPayload) {
+  async addTeam({ teamName, schoolId, gameTypeIds }: AddTeamPayload) {
     return prisma.team.create({
       data: {
         teamName,
+        schoolId,
         gameTypes: {
           create: gameTypeIds.map((gameTypeId) => ({
             gameTypeId,
-          })),
-        },
-        teamSchools: {
-          create: schoolIds.map((schoolId) => ({
-            schoolId,
           })),
         },
       },
     });
   }
 
-  async editTeam(id: number, { schoolIds, teamName, gameTypeIds }: EditTeamPayload) {
+  async editTeam(id: number, { schoolId, teamName, gameTypeIds }: EditTeamPayload) {
     return prisma.team.update({
       where: { id },
       data: {
         teamName,
+        schoolId,
         gameTypes: {
           deleteMany: {},
           create: gameTypeIds.map((gameTypeId) => ({
             gameTypeId,
-          })),
-        },
-        teamSchools: {
-          deleteMany: {},
-          create: schoolIds.map((schoolId) => ({
-            schoolId,
           })),
         },
       },
