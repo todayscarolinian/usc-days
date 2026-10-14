@@ -5,12 +5,13 @@ import {
   useEditGamesQuery,
   useDeleteGamesQuery,
 } from "@/src/queries/games.queries";
-import { useGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { useTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
 import { getTimezoneOffset } from "@/src/lib/utils";
+import { FaRegEdit } from "react-icons/fa";
 
 import { Button } from "@/src/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/src/components/ui/dialog";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -106,13 +108,13 @@ export default function EditScheduleDialog({
     data: fetchedSportsData = [],
     error: sportsError,
     isLoading: sportsLoading,
-  } = useGameTypesQuery();
+  } = getGameTypesQuery();
 
   const {
     data: fetchedTeamSportsData = [],
     error: teamSportsError,
     isLoading: teamLoading,
-  } = useTeamGameTypesQuery(Number(inputs.gameTypeId));
+  } = getTeamGameTypesQuery(Number(inputs.gameTypeId));
 
   // Handle query errors - only show toast once per error
   useEffect(() => {

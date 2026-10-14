@@ -11,7 +11,7 @@ import {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const useChampionsQuery = () =>
+export const getChampionsQuery = () =>
   useQuery<Champions[]>({
     queryKey: ["champions"],
     queryFn: async () => {
@@ -30,6 +30,11 @@ export const useAddChampionsQuery = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["champions"] });
+    },
+    onError: (err, c, context: any) => {
+      if (context?.prevChampions) {
+        queryClient.setQueryData(["champions"], context.prevChampions);
+      }
     },
   });
 };

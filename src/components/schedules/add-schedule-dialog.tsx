@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { useTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
@@ -24,6 +24,7 @@ import { Label } from "@/src/components/ui/label";
 import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { getTimezoneOffset } from "@/src/lib/utils";
+import { Plus } from "lucide-react";
 
 export default function AddScheduleDialog() {
   const [open, setOpen] = useState(false);
@@ -47,13 +48,13 @@ export default function AddScheduleDialog() {
     data: fetchedSportsData = [],
     error: sportsError,
     isLoading: sportsLoading,
-  } = useGameTypesQuery();
+  } = getGameTypesQuery();
 
   const {
     data: fetchedTeamSportsData = [],
     error: teamSportsError,
     isLoading: teamLoading,
-  } = useTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
+  } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
 
   const add = useAddGamesQuery();
 

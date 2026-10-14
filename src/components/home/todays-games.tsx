@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useGamesQuery } from "@/src/queries/games.queries";
+import { getGamesQuery } from "@/src/queries/games.queries";
 import { Schedules } from "@/src/types/types";
 import { SchedulesCard } from "@/src/components/schedules/schedules-card";
 import GameDetailsDialog from "@/src/components/schedules/game-details-dialog";
@@ -19,7 +19,7 @@ function GamesContent({
     data: todaysGames = [],
     error,
     isLoading: loading,
-  } = useGamesQuery({
+  } = getGamesQuery({
     startDate: dateLabel,
     endDate: dateLabel,
   });

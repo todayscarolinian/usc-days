@@ -9,7 +9,7 @@ type Team = {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const useTeamsQuery = () =>
+export const getTeamsQuery = () =>
   useQuery<Team[]>({
     queryKey: ["teams"],
     queryFn: async () => {
@@ -19,14 +19,9 @@ export const useTeamsQuery = () =>
     staleTime: STALE_TIME,
   });
 
-export const useAddTeamsQuery = () => {
+export const addTeamsQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    Team,
-    Error,
-    AddTeamPayload,
-    { prevTeams?: Team[] }
-  >({
+  return useMutation<Team, Error, AddTeamPayload>({
     mutationFn: async (data) => {
       const response = await axios.post(`/api/teams`, data);
       return response.data;
@@ -36,14 +31,14 @@ export const useAddTeamsQuery = () => {
     },
     onMutate: async (t) => {
       await queryClient.cancelQueries({ queryKey: ["teams"] });
-      const prevTeams = queryClient.getQueryData<Team[]>(["teams"]);
+      const prevTeams = queryClient.getQueryData<any[]>(["teams"]);
       if (prevTeams) {
         queryClient.setQueryData(["teams"], [...prevTeams, t]);
       }
 
       return { prevTeams };
     },
-    onError: (err, t, context) => {
+    onError: (err, t, context: any) => {
       if (context?.prevTeams) {
         queryClient.setQueryData(["teams"], context.prevTeams);
       }

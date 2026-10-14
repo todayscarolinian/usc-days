@@ -4,10 +4,10 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useChampionsQuery } from "@/src/queries/champions.queries";
-import { useGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { useGamesQuery } from "@/src/queries/games.queries";
-import { useTeamsQuery } from "@/src/queries/teams.queries";
+import { getChampionsQuery } from "@/src/queries/champions.queries";
+import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { getGamesQuery } from "@/src/queries/games.queries";
+import { getTeamsQuery } from "@/src/queries/teams.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
 import Cards from "@/src/components/standings/standings-cards";
 import StandingsCardsSkeleton from "@/src/components/standings/standings-cards-skeleton";
@@ -48,12 +48,12 @@ export default function Standings() {
     data: gameTypes = [],
     error: gameTypesError,
     isLoading: gameTypesLoading,
-  } = useGameTypesQuery();
+  } = getGameTypesQuery();
   const {
     data: teams = [],
     error: teamsError,
     isLoading: teamsLoading,
-  } = useTeamsQuery();
+  } = getTeamsQuery();
 
   // UI state
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -70,12 +70,12 @@ export default function Standings() {
     data: championsQueryData = [],
     error: championsError,
     isLoading: championsLoading,
-  } = useChampionsQuery();
+  } = getChampionsQuery();
   const {
     data: gamesQueryData = [],
     error: gamesError,
     isLoading: gamesLoading,
-  } = useGamesQuery();
+  } = getGamesQuery();
 
   // Show error toast when errors occur
   useEffect(() => {
