@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Team: 'Team',
   School: 'School',
+  TeamSchool: 'TeamSchool',
   GameType: 'GameType',
   TeamGameType: 'TeamGameType',
   Game: 'Game',
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "team" | "school" | "gameType" | "teamGameType" | "game" | "champion" | "merchandiseCategory" | "merchandiseProduct"
+    modelProps: "team" | "school" | "teamSchool" | "gameType" | "teamGameType" | "game" | "champion" | "merchandiseCategory" | "merchandiseProduct"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -556,6 +557,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SchoolCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SchoolCountAggregateOutputType> | number
+        }
+      }
+    }
+    TeamSchool: {
+      payload: Prisma.$TeamSchoolPayload<ExtArgs>
+      fields: Prisma.TeamSchoolFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TeamSchoolFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TeamSchoolFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        findFirst: {
+          args: Prisma.TeamSchoolFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TeamSchoolFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        findMany: {
+          args: Prisma.TeamSchoolFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>[]
+        }
+        create: {
+          args: Prisma.TeamSchoolCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        createMany: {
+          args: Prisma.TeamSchoolCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TeamSchoolCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>[]
+        }
+        delete: {
+          args: Prisma.TeamSchoolDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        update: {
+          args: Prisma.TeamSchoolUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        deleteMany: {
+          args: Prisma.TeamSchoolDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TeamSchoolUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TeamSchoolUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>[]
+        }
+        upsert: {
+          args: Prisma.TeamSchoolUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamSchoolPayload>
+        }
+        aggregate: {
+          args: Prisma.TeamSchoolAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeamSchool>
+        }
+        groupBy: {
+          args: Prisma.TeamSchoolGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamSchoolGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TeamSchoolCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamSchoolCountAggregateOutputType> | number
         }
       }
     }
@@ -1044,8 +1119,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const TeamScalarFieldEnum = {
   teamName: 'teamName',
-  id: 'id',
-  schoolId: 'schoolId'
+  id: 'id'
 } as const
 
 export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
@@ -1057,6 +1131,15 @@ export const SchoolScalarFieldEnum = {
 } as const
 
 export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
+
+
+export const TeamSchoolScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  schoolId: 'schoolId'
+} as const
+
+export type TeamSchoolScalarFieldEnum = (typeof TeamSchoolScalarFieldEnum)[keyof typeof TeamSchoolScalarFieldEnum]
 
 
 export const GameTypeScalarFieldEnum = {
@@ -1375,6 +1458,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   team?: Prisma.TeamOmit
   school?: Prisma.SchoolOmit
+  teamSchool?: Prisma.TeamSchoolOmit
   gameType?: Prisma.GameTypeOmit
   teamGameType?: Prisma.TeamGameTypeOmit
   game?: Prisma.GameOmit

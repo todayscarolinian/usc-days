@@ -4,6 +4,7 @@ import {
   School,
   Team,
   TeamGameType,
+  TeamSchool,
 } from "@/src/lib/prisma/generated/client";
 
 export type Game = {
@@ -30,97 +31,78 @@ const teams: Team[] = [
   {
     id: 8,
     teamName: "SOE Alpha",
-    schoolId: 1,
   },
   {
     id: 9,
     teamName: "SOE Gamma",
-    schoolId: 1,
   },
   {
     id: 10,
     teamName: "SBE Amigos",
-    schoolId: 6,
   },
   {
     id: 11,
     teamName: "SAS Delta",
-    schoolId: 7,
   },
   {
     id: 12,
     teamName: "SAS SIGMA",
-    schoolId: 7,
   },
   {
     id: 13,
     teamName: "SBE Spartans",
-    schoolId: 6,
   },
   {
     id: 14,
     teamName: "SLG",
-    schoolId: 3,
   },
   {
     id: 15,
     teamName: "SAFAD",
-    schoolId: 2,
   },
   {
     id: 16,
     teamName: "SED",
-    schoolId: 4,
   },
   {
     id: 17,
     teamName: "SHCP",
-    schoolId: 5,
   },
   {
     id: 18,
     teamName: "SBE",
-    schoolId: 6,
   },
   {
     id: 19,
     teamName: "SOE",
-    schoolId: 1,
   },
   {
     id: 20,
     teamName: "SAS",
-    schoolId: 7,
   },
   {
     id: 21,
     teamName: "SBE TITANS",
-    schoolId: 6,
   },
   {
     id: 22,
     teamName: "SOE BISONS",
-    schoolId: 1,
   },
   {
     id: 23,
     teamName: "SAFAD RHINOS",
-    schoolId: 2,
   },
   {
     id: 24,
     teamName: "SAS BLUEKNIGHTS",
-    schoolId: 7,
   },
   {
     id: 25,
     teamName: "SLG SILVERBACKS",
-    schoolId: 3,
   },
   {
     id: 26,
     teamName: "International Students",
-    schoolId: 8,
   },
 ];
 
@@ -156,6 +138,104 @@ const schools: School[] = [
   {
     id: 8,
     schoolName: "International Students",
+  },
+];
+
+const teamSchools: TeamSchool[] = [
+  {
+    id: 26,
+    teamId: 8,
+    schoolId: 1,
+  },
+  {
+    id: 27,
+    teamId: 9,
+    schoolId: 1,
+  },
+  {
+    id: 28,
+    teamId: 10,
+    schoolId: 6,
+  },
+  {
+    id: 29,
+    teamId: 11,
+    schoolId: 7,
+  },
+  {
+    id: 30,
+    teamId: 12,
+    schoolId: 7,
+  },
+  {
+    id: 31,
+    teamId: 13,
+    schoolId: 6,
+  },
+  {
+    id: 32,
+    teamId: 14,
+    schoolId: 3,
+  },
+  {
+    id: 33,
+    teamId: 15,
+    schoolId: 2,
+  },
+  {
+    id: 34,
+    teamId: 16,
+    schoolId: 4,
+  },
+  {
+    id: 35,
+    teamId: 17,
+    schoolId: 5,
+  },
+  {
+    id: 36,
+    teamId: 18,
+    schoolId: 6,
+  },
+  {
+    id: 37,
+    teamId: 19,
+    schoolId: 1,
+  },
+  {
+    id: 38,
+    teamId: 20,
+    schoolId: 7,
+  },
+  {
+    id: 39,
+    teamId: 21,
+    schoolId: 6,
+  },
+  {
+    id: 40,
+    teamId: 22,
+    schoolId: 1,
+  },
+  {
+    id: 41,
+    teamId: 23,
+    schoolId: 2,
+  },
+  {
+    id: 42,
+    teamId: 24,
+    schoolId: 7,
+  },
+  {
+    id: 43,
+    teamId: 25,
+    schoolId: 3,
+  },
+  {
+    id: 44,
+    teamId: 26,
+    schoolId: 8,
   },
 ];
 
@@ -7983,6 +8063,7 @@ const champions: ChampionMock[] = [
 export {
   teams,
   schools,
+  teamSchools,
   gameTypes,
   teamGameTypes,
   games,

@@ -44,6 +44,3 @@ next-env.d.ts
 
 # prettier
 .prettierrc
-
-# generated prisma files
-/src/lib/prisma/generated/*

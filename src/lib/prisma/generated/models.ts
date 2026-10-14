@@ -10,6 +10,7 @@
  */
 export type * from './models/Team'
 export type * from './models/School'
+export type * from './models/TeamSchool'
 export type * from './models/GameType'
 export type * from './models/TeamGameType'
 export type * from './models/Game'

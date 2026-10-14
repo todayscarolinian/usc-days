@@ -9,12 +9,16 @@ export const AddTeamSchema = z.object({
                     : 'teamName must be a string.',
         })
         .min(1, 'teamName cannot be empty.'),
-    schoolId: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? 'schoolId is required.'
-                : 'schoolId must be a number.',
-    }),
+    schoolIds: z
+        .array(
+            z.number({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? 'Each schoolId must be a number.'
+                        : 'schoolIds must be an array of numbers.',
+            })
+        )
+        .nonempty('schoolIds cannot be empty.'),
     gameTypeIds: z
         .array(
             z.number({
@@ -42,12 +46,16 @@ export const EditTeamSchema = z.object({
                     : 'teamName must be a string.',
         })
         .min(1, 'teamName cannot be empty.'),
-    schoolId: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? 'schoolId is required.'
-                : 'schoolId must be a number.',
-    }),
+    schoolIds: z
+        .array(
+            z.number({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? 'Each schoolId must be a number.'
+                        : 'schoolIds must be an array of numbers.',
+            })
+        )
+        .nonempty('schoolIds cannot be empty.'),
     gameTypeIds: z
         .array(
             z.number({
