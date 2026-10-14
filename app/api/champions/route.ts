@@ -1,65 +1,57 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import ChampionService from "@/src/services/champions.service";
-import { EditChampionSchema } from "@/src/types/champions.types";
+import { AddChampionSchema } from "@/src/types/champions.types";
 import {
   requireHeraldAccess,
   isAccessError,
 } from "@/src/lib/herald/require-access";
 import {
   accessErrorResponse,
+  endOfDayQuery,
   handleRouteError,
-  parseIdParam,
+  idQuery,
   parseJsonBody,
+  parseQuery,
+  startOfDayQuery,
 } from "@/src/lib/api";
 
 const championService = new ChampionService();
 
-// Full replacement: id comes from the URL, every other field is required.
-const ReplaceChampionBodySchema = EditChampionSchema.omit({ id: true });
+const GetChampionsQuerySchema = z.object({
+  teamId: idQuery,
+  gameTypeId: idQuery,
+  rank: idQuery,
+  startDate: startOfDayQuery,
+  endDate: endOfDayQuery,
+});
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function GET(_req: NextRequest, { params }: RouteContext) {
-  const id = parseIdParam((await params).id);
-  if (!id.ok) return id.response;
+export async function GET(req: NextRequest) {
+  const query = parseQuery(req.nextUrl.searchParams, GetChampionsQuerySchema);
+  if (!query.ok) return query.response;
 
   try {
-    const champion = await championService.getChampionById(id.data);
-    return NextResponse.json(champion);
+    const data = await championService.getChampions(query.data);
+    return NextResponse.json({ data });
   } catch (error) {
-    return handleRouteError(error, "Could not fetch champion.");
+    return handleRouteError(error, "Could not fetch champions.");
   }
 }
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export async function POST(req: NextRequest) {
   const access = await requireHeraldAccess(req.headers.get("cookie"));
   if (isAccessError(access)) return accessErrorResponse(access);
 
-  const id = parseIdParam((await params).id);
-  if (!id.ok) return id.response;
-
-  const body = await parseJsonBody(req, ReplaceChampionBodySchema);
+  const body = await parseJsonBody(req, AddChampionSchema);
   if (!body.ok) return body.response;
 
   try {
-    const champion = await championService.editChampion(id.data, body.data);
-    return NextResponse.json(champion);
+    const champion = await championService.addChampion(body.data);
+    return NextResponse.json(champion, {
+      status: 201,
+      headers: { Location: `/api/champions/${champion.id}` },
+    });
   } catch (error) {
-    return handleRouteError(error, "Could not update champion.");
-  }
-}
-
-export async function DELETE(req: NextRequest, { params }: RouteContext) {
-  const access = await requireHeraldAccess(req.headers.get("cookie"));
-  if (isAccessError(access)) return accessErrorResponse(access);
-
-  const id = parseIdParam((await params).id);
-  if (!id.ok) return id.response;
-
-  try {
-    await championService.deleteChampion(id.data);
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    return handleRouteError(error, "Could not delete champion.");
+    return handleRouteError(error, "Could not create champion.");
   }
 }
