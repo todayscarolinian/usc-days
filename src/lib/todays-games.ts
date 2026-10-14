@@ -1,11 +1,13 @@
+import {
+  USC_DAYS_END_DATE,
+  USC_DAYS_START_DATE,
+} from "@/src/constants/event";
 import type {
   MatchdayGameStatus,
   TodaysGamesSelection,
 } from "@/src/types/games.types";
 import type { Schedules } from "@/src/types/types";
 
-const EVENT_START_DATE =
-  process.env.NEXT_PUBLIC_USC_DAYS_START_DATE || "2026-10-19";
 const EVENT_CALENDAR = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Manila",
   year: "numeric",
@@ -13,9 +15,14 @@ const EVENT_CALENDAR = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-export function getEventDay(now: Date, startDate = EVENT_START_DATE): number {
+export function getEventDay(
+  now: Date,
+  startDate: string = USC_DAYS_START_DATE,
+  endDate: string = USC_DAYS_END_DATE,
+): number {
   const start = Date.parse(`${startDate}T00:00:00Z`);
-  if (!Number.isFinite(start)) return 0;
+  const end = Date.parse(`${endDate}T00:00:00Z`);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return 0;
 
   const parts = EVENT_CALENDAR.formatToParts(now);
   const year = Number(parts.find((part) => part.type === "year")?.value);
@@ -24,8 +31,9 @@ export function getEventDay(now: Date, startDate = EVENT_START_DATE): number {
   // Compare calendar dates at UTC midnight, not elapsed hours since opening.
   const today = Date.UTC(year, month - 1, day);
   const daysSinceStart = Math.floor((today - start) / 86_400_000);
+  const lastEventDay = Math.floor((end - start) / 86_400_000) + 1;
 
-  return Math.max(0, daysSinceStart + 1);
+  return Math.min(lastEventDay, Math.max(0, daysSinceStart + 1));
 }
 
 export function getMatchdayGameStatus(
