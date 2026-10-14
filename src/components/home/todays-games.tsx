@@ -193,7 +193,7 @@ export default function TodaysGames() {
   return (
     <div
       ref={sectionRef}
-      className="space-y-6 px-4 py-8 text-[#171717] md:p-8 xl:p-12"
+      className="space-y-6 py-8 text-[#171717] xl:py-12"
     >
       <header className="space-y-8 border-b border-[#171717] pb-8">
         <div className="space-y-3">
