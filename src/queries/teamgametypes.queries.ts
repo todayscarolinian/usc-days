@@ -8,16 +8,15 @@ type TeamType = TeamGameType & {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getTeamGameTypesQuery = (sport: Number) =>
+export const getTeamGameTypesQuery = (sportId: number) =>
     useQuery<TeamType[]>({
-        queryKey: ["teamgametypes", sport],
+        queryKey: ["teamgametypes", sportId],
         queryFn: async () => {
             const response = await axios.get(
-                `/api/teamgametypes?sportId=${sport}`
+                `/api/sports/${sportId}/teams`
             );
-            console.table("Fetched team game types:", response.data.teams);
-            return response.data.teams;
+            return response.data.data;
         },
-        enabled: !!sport,
+        enabled: sportId > 0,
         staleTime: STALE_TIME,
     });
