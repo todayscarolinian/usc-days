@@ -229,6 +229,13 @@ export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
 export type DeleteGamePayload = z.infer<typeof DeleteGameSchema>;
 
+export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
+
+export type TodaysGamesSelection = {
+  featured: Schedules[];
+  compact: Schedules[];
+};
+
 // Pagination types
 export interface PaginationParams {
   cursor?: string;
