@@ -192,13 +192,13 @@ export type SchoolWhereInput = {
   NOT?: Prisma.SchoolWhereInput | Prisma.SchoolWhereInput[]
   schoolName?: Prisma.StringFilter<"School"> | string
   id?: Prisma.IntFilter<"School"> | number
-  teams?: Prisma.TeamSchoolListRelationFilter
+  teams?: Prisma.TeamListRelationFilter
 }
 
 export type SchoolOrderByWithRelationInput = {
   schoolName?: Prisma.SortOrder
   id?: Prisma.SortOrder
-  teams?: Prisma.TeamSchoolOrderByRelationAggregateInput
+  teams?: Prisma.TeamOrderByRelationAggregateInput
 }
 
 export type SchoolWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type SchoolWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.SchoolWhereInput | Prisma.SchoolWhereInput[]
   OR?: Prisma.SchoolWhereInput[]
   NOT?: Prisma.SchoolWhereInput | Prisma.SchoolWhereInput[]
-  teams?: Prisma.TeamSchoolListRelationFilter
+  teams?: Prisma.TeamListRelationFilter
 }, "id" | "schoolName">
 
 export type SchoolOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type SchoolScalarWhereWithAggregatesInput = {
 
 export type SchoolCreateInput = {
   schoolName: string
-  teams?: Prisma.TeamSchoolCreateNestedManyWithoutSchoolInput
+  teams?: Prisma.TeamCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateInput = {
   schoolName: string
   id?: number
-  teams?: Prisma.TeamSchoolUncheckedCreateNestedManyWithoutSchoolInput
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUpdateInput = {
   schoolName?: Prisma.StringFieldUpdateOperationsInput | string
-  teams?: Prisma.TeamSchoolUpdateManyWithoutSchoolNestedInput
+  teams?: Prisma.TeamUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateInput = {
   schoolName?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  teams?: Prisma.TeamSchoolUncheckedUpdateManyWithoutSchoolNestedInput
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateManyInput = {
@@ -262,6 +262,11 @@ export type SchoolUpdateManyMutationInput = {
 export type SchoolUncheckedUpdateManyInput = {
   schoolName?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type SchoolScalarRelationFilter = {
+  is?: Prisma.SchoolWhereInput
+  isNot?: Prisma.SchoolWhereInput
 }
 
 export type SchoolCountOrderByAggregateInput = {
@@ -285,11 +290,6 @@ export type SchoolMinOrderByAggregateInput = {
 
 export type SchoolSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-}
-
-export type SchoolScalarRelationFilter = {
-  is?: Prisma.SchoolWhereInput
-  isNot?: Prisma.SchoolWhereInput
 }
 
 export type SchoolCreateNestedOneWithoutTeamsInput = {
@@ -367,7 +367,7 @@ export type SchoolCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
  * SchoolCountOutputType without action
  */
 export type SchoolCountOutputTypeCountTeamsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TeamSchoolWhereInput
+  where?: Prisma.TeamWhereInput
 }
 
 
@@ -404,7 +404,7 @@ export type SchoolIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $SchoolPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "School"
   objects: {
-    teams: Prisma.$TeamSchoolPayload<ExtArgs>[]
+    teams: Prisma.$TeamPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     schoolName: string
@@ -803,7 +803,7 @@ readonly fields: SchoolFieldRefs;
  */
 export interface Prisma__SchoolClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  teams<T extends Prisma.School$teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamSchoolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teams<T extends Prisma.School$teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1227,23 +1227,23 @@ export type SchoolDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
  */
 export type School$teamsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the TeamSchool
+   * Select specific fields to fetch from the Team
    */
-  select?: Prisma.TeamSchoolSelect<ExtArgs> | null
+  select?: Prisma.TeamSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the TeamSchool
+   * Omit specific fields from the Team
    */
-  omit?: Prisma.TeamSchoolOmit<ExtArgs> | null
+  omit?: Prisma.TeamOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.TeamSchoolInclude<ExtArgs> | null
-  where?: Prisma.TeamSchoolWhereInput
-  orderBy?: Prisma.TeamSchoolOrderByWithRelationInput | Prisma.TeamSchoolOrderByWithRelationInput[]
-  cursor?: Prisma.TeamSchoolWhereUniqueInput
+  include?: Prisma.TeamInclude<ExtArgs> | null
+  where?: Prisma.TeamWhereInput
+  orderBy?: Prisma.TeamOrderByWithRelationInput | Prisma.TeamOrderByWithRelationInput[]
+  cursor?: Prisma.TeamWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.TeamSchoolScalarFieldEnum | Prisma.TeamSchoolScalarFieldEnum[]
+  distinct?: Prisma.TeamScalarFieldEnum | Prisma.TeamScalarFieldEnum[]
 }
 
 /**

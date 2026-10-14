@@ -8,34 +8,25 @@ datasource db {
 }
 
 model Team {
-  teamName    String         @map("team_name") @db.VarChar(100)
-  id          Int            @id @default(autoincrement())
-  Champion    Champion[]
-  teamAGames  Game[]         @relation("TeamAGames")
-  teamBGames  Game[]         @relation("TeamBGames")
-  gameWinner  Game[]         @relation("GameWinner")
-  gameTypes   TeamGameType[]
-  teamSchools TeamSchool[]
+  teamName   String         @map("team_name") @db.VarChar(100)
+  id         Int            @id @default(autoincrement())
+  schoolId   Int            @map("school_id")
+  school     School         @relation(fields: [schoolId], references: [id])
+  Champion   Champion[]
+  teamAGames Game[]         @relation("TeamAGames")
+  teamBGames Game[]         @relation("TeamBGames")
+  gameWinner Game[]         @relation("GameWinner")
+  gameTypes  TeamGameType[]
 
   @@map("teams")
 }
 
 model School {
-  schoolName String       @unique @map("school_name") @db.VarChar(100)
-  id         Int          @id @default(autoincrement())
-  teams      TeamSchool[]
+  schoolName String @unique @map("school_name") @db.VarChar(100)
+  id         Int    @id @default(autoincrement())
+  teams      Team[]
 
   @@map("schools")
-}
-
-model TeamSchool {
-  id       Int    @id @default(autoincrement())
-  teamId   Int    @map("team_id")
-  schoolId Int    @map("school_id")
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@map("team_schools")
 }
 
 model GameType {
