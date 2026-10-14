@@ -15,11 +15,7 @@ class TeamService {
               gameType: true,
             },
           },
-          teamSchools: {
-            include: {
-              school: true,
-            },
-          },
+          school: true,
         },
       });
       return teams;
@@ -28,19 +24,15 @@ class TeamService {
       throw new Error("An unexpected error occurred while fetching teams.");
     }
   }
-  async addTeam({ teamName, schoolIds, gameTypeIds }: AddTeamPayload) {
+  async addTeam({ teamName, schoolId, gameTypeIds }: AddTeamPayload) {
     try {
       const newTeam = await prisma.team.create({
         data: {
           teamName,
+          schoolId,
           gameTypes: {
             create: gameTypeIds.map((gameTypeId) => ({
               gameTypeId,
-            })),
-          },
-          teamSchools: {
-            create: schoolIds.map((schoolId) => ({
-              schoolId,
             })),
           },
         },
@@ -51,22 +43,17 @@ class TeamService {
       throw new Error("An unexpected error occurred while adding the team.");
     }
   }
-  async editTeam({ id, schoolIds, teamName, gameTypeIds }: EditTeamPayload) {
+  async editTeam({ id, schoolId, teamName, gameTypeIds }: EditTeamPayload) {
     try {
       const updatedTeam = await prisma.team.update({
         where: { id },
         data: {
           teamName,
+          schoolId,
           gameTypes: {
             deleteMany: {},
             create: gameTypeIds.map((gameTypeId) => ({
               gameTypeId,
-            })),
-          },
-          teamSchools: {
-            deleteMany: {},
-            create: schoolIds.map((schoolId) => ({
-              schoolId,
             })),
           },
         },
