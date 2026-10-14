@@ -3,9 +3,8 @@ import {
     AddGameSchema,
     EditGameSchema,
     DeleteGameSchema,
-    SCORES_REQUIRE_TEAMS_MESSAGE,
-    isScoresRequireTeamsError,
 } from "@/src/types/games.types";
+import { handleRouteError } from "@/src/lib/api";
 import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -163,16 +162,6 @@ export async function PUT(req: NextRequest) {
         const result = EditGameSchema.safeParse(body);
 
         if (!result.success) {
-            const teamsMessage = result.error.issues.find(
-                (issue) => issue.message === SCORES_REQUIRE_TEAMS_MESSAGE,
-            );
-            if (teamsMessage) {
-                return NextResponse.json(
-                    { error: teamsMessage.message },
-                    { status: 400 },
-                );
-            }
-
             console.log("Error validating edit game data:", result.error);
             return NextResponse.json({ error: result.error }, { status: 400 });
         }
@@ -181,14 +170,7 @@ export async function PUT(req: NextRequest) {
         const updatedGame = await gameService.editGame(validatedBody);
         return NextResponse.json({ updatedGame }, { status: 200 });
     } catch (error) {
-        console.error("Error updating game:", error);
-        if (isScoresRequireTeamsError(error)) {
-            return NextResponse.json(
-                { error: SCORES_REQUIRE_TEAMS_MESSAGE },
-                { status: 400 },
-            );
-        }
-        return NextResponse.json({ error: `${error}` }, { status: 500 });
+        return handleRouteError(error, "Could not update game");
     }
 }
 

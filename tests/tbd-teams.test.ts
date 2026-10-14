@@ -6,8 +6,8 @@ import {
   EditGameSchema,
   SCORES_REQUIRE_TEAMS_MESSAGE,
   hasSavedResult,
-  isScoresRequireTeamsError,
 } from "@/src/types/games.types";
+import { ApiError } from "@/src/lib/api";
 import {
   assertTeamsSetForResults,
   duplicateTeamMatchupFilter,
@@ -188,6 +188,13 @@ describe("EditGameSchema results", () => {
     );
   });
 
+  it("rejects an edit that leaves out a team id", () => {
+    const payload = editPayload({ teamAScore: 2, teamBScore: 1, winnerId: 10 });
+    delete payload.teamAId;
+    const result = EditGameSchema.safeParse(payload);
+    assert.equal(result.success, false);
+  });
+
   it("allows a score of 0 once both teams are set", () => {
     const result = EditGameSchema.safeParse(
       editPayload({
@@ -204,19 +211,28 @@ describe("effective edit state", () => {
   const scored = storedGame();
 
   it("preserves stored results when the edit omits them", () => {
-    const resolved = resolveEditedGame(scored, { teamAId: null });
+    const resolved = resolveEditedGame(scored, {
+      teamAId: null,
+      teamBId: scored.teamBId,
+    });
     assert.equal(resolved.teamAId, null);
     assert.equal(resolved.teamBId, 20);
     assert.equal(resolved.teamAScore, 2);
     assert.equal(resolved.winnerId, 10);
     assert.throws(
       () => assertTeamsSetForResults(resolved),
-      (error: unknown) => isScoresRequireTeamsError(error),
+      (error: unknown) =>
+        error instanceof ApiError &&
+        error.code === "VALIDATION_ERROR" &&
+        error.message === SCORES_REQUIRE_TEAMS_MESSAGE,
     );
   });
 
   it("treats explicit null as clearing a team", () => {
-    const resolved = resolveEditedGame(scored, { teamBId: null });
+    const resolved = resolveEditedGame(scored, {
+      teamAId: scored.teamAId,
+      teamBId: null,
+    });
     assert.equal(resolved.teamBId, null);
     assert.throws(() => assertTeamsSetForResults(resolved), {
       message: SCORES_REQUIRE_TEAMS_MESSAGE,
@@ -235,7 +251,13 @@ describe("effective edit state", () => {
     for (const existing of cases) {
       assert.equal(hasSavedResult(existing), true);
       assert.throws(
-        () => assertTeamsSetForResults(resolveEditedGame(existing, { teamAId: null })),
+        () =>
+          assertTeamsSetForResults(
+            resolveEditedGame(existing, {
+              teamAId: null,
+              teamBId: existing.teamBId,
+            }),
+          ),
         { message: SCORES_REQUIRE_TEAMS_MESSAGE },
       );
     }

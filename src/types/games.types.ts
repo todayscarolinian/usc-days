@@ -23,12 +23,6 @@ export function hasSavedResult(data: {
   );
 }
 
-export function isScoresRequireTeamsError(error: unknown): boolean {
-  return (
-    error instanceof Error && error.message === SCORES_REQUIRE_TEAMS_MESSAGE
-  );
-}
-
 export const AddGameSchema = z
   .object({
     gameTypeId: z.number({
@@ -102,14 +96,12 @@ export const EditGameSchema = z
       .number({
         error: "teamAId must be a number.",
       })
-      .nullable()
-      .optional(),
+      .nullable(),
     teamBId: z
       .number({
         error: "teamBId must be a number.",
       })
-      .nullable()
-      .optional(),
+      .nullable(),
     teamAScore: z
       .number({
         error: (issue) =>

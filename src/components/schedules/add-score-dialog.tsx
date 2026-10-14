@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/src/components/ui/select";
 import type { Schedules } from "@/src/types/types";
+import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
 import { useEditGamesQuery } from "@/src/queries/games.queries";
 
 function getDbScores(g: Schedules) {
@@ -117,7 +118,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
           <DialogHeader>
             <DialogTitle>Add / Edit Score</DialogTitle>
             <DialogDescription>
-              Scores and results cannot be saved until both teams are set.
+              {SCORES_REQUIRE_TEAMS_MESSAGE}
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

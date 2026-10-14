@@ -11,6 +11,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import type { Schedules } from "@/src/types/types";
+import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 
 type Props = {
@@ -142,7 +143,7 @@ export default function GameDetailsDialog({
 
         {hasAccess && !teamsAreSet && (
           <p className="text-sm text-muted-foreground">
-            Scores and results cannot be saved until both teams are set.
+            {SCORES_REQUIRE_TEAMS_MESSAGE}
           </p>
         )}
 

@@ -7,8 +7,8 @@ import {
   PaginatedGamesResponse,
   SCORES_REQUIRE_TEAMS_MESSAGE,
   hasSavedResult,
-  isScoresRequireTeamsError,
 } from "@/src/types/games.types";
+import { ApiError } from "@/src/lib/api";
 import { Prisma } from "@/src/lib/prisma/generated/client";
 import { Schedules } from "../types/types";
 
@@ -24,8 +24,8 @@ export type StoredGameTeams = {
 };
 
 export type GameTeamEdit = {
-  teamAId?: number | null;
-  teamBId?: number | null;
+  teamAId: number | null;
+  teamBId: number | null;
   teamAScore?: unknown;
   teamBScore?: unknown;
   winnerId?: number | null;
@@ -34,14 +34,14 @@ export type GameTeamEdit = {
   isDraw?: boolean;
 };
 
-/** Omitted fields keep the stored value. Explicit null clears a team or result. */
+/** Team ids come from the edit. Omitted result fields keep the stored value. */
 export function resolveEditedGame(
   existing: StoredGameTeams,
   edit: GameTeamEdit,
 ): StoredGameTeams {
   return {
-    teamAId: edit.teamAId !== undefined ? edit.teamAId : existing.teamAId,
-    teamBId: edit.teamBId !== undefined ? edit.teamBId : existing.teamBId,
+    teamAId: edit.teamAId,
+    teamBId: edit.teamBId,
     teamAScore:
       edit.teamAScore !== undefined ? edit.teamAScore : existing.teamAScore,
     teamBScore:
@@ -64,7 +64,7 @@ export function assertTeamsSetForResults(state: StoredGameTeams) {
     hasSavedResult(state) &&
     (state.teamAId == null || state.teamBId == null)
   ) {
-    throw new Error(SCORES_REQUIRE_TEAMS_MESSAGE);
+    throw new ApiError("VALIDATION_ERROR", SCORES_REQUIRE_TEAMS_MESSAGE);
   }
 }
 
@@ -344,7 +344,7 @@ class GameService {
     try {
       const existing = await prisma.game.findUnique({ where: { id } });
       if (!existing) {
-        throw new Error("Game not found.");
+        throw new ApiError("NOT_FOUND", "Game not found.");
       }
 
       assertTeamsSetForResults(
@@ -422,9 +422,7 @@ class GameService {
       return updatedGame;
     } catch (error) {
       console.error("Error updating game:", error);
-      if (isScoresRequireTeamsError(error)) {
-        throw error;
-      }
+      if (error instanceof ApiError) throw error;
       throw new Error("An unexpected error occurred while updating the game.");
     }
   }
