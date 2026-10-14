@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import MerchandiseModal from "@/src/components/merchandise/merchandise-modal";
 import Breadcrumb from "@/src/components/merchandise/breadcrumb";
-import { getProductsQuery } from "@/src/queries/product.queries";
+import { useProductsQuery } from "@/src/queries/product.queries";
 import type { MerchandiseProduct } from "@/src/lib/prisma/generated/client";
 
 interface CategoryProductsClientProps {
@@ -24,7 +24,7 @@ export default function CategoryProductsClient({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data = [], error, isLoading } = getProductsQuery({ categoryId });
+  const { data = [], error, isLoading } = useProductsQuery({ categoryId });
 
   const products = data as Product[];
 

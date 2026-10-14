@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { getTeamsQuery } from "@/src/queries/teams.queries";
+import { useTeamsQuery } from "@/src/queries/teams.queries";
 import {
   SearchableSelect,
   SelectOption,
@@ -53,7 +53,7 @@ export default function TeamSelector({
   emptyMessage = DEFAULT_PROPS.emptyMessage,
   disabled = false,
 }: TeamSelectorProps) {
-  const { data: teams = [], isLoading, error } = getTeamsQuery();
+  const { data: teams = [], isLoading, error } = useTeamsQuery();
 
   // Memoize options to prevent unnecessary re-renders
   const options: SelectOption[] = useMemo(() => {

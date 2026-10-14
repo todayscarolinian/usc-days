@@ -37,6 +37,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import DatePicker from "../ui/date-picker";
+import { parseApiError } from "@/src/lib/error-handler";
 import {
   useAddChampionsQuery,
   useEditChampionsQuery,
@@ -124,12 +125,10 @@ export default function StandingFormDialog({
         );
         onCloseAction(true);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error("Error saving standing:", error);
 
-        const errorMessage =
-          error.response?.data?.error ||
-          "Failed to save standing. Please try again.";
+        const errorMessage = parseApiError(error);
         toast.error(errorMessage);
 
         setError("root", {
@@ -150,12 +149,10 @@ export default function StandingFormDialog({
           toast.success("Standing deleted successfully");
           onCloseAction(true);
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           console.error("Error deleting standing:", error);
 
-          const errorMessage =
-            error.response?.data?.error ||
-            "Failed to delete standing. Please try again.";
+          const errorMessage = parseApiError(error);
           toast.error(errorMessage);
         },
       },

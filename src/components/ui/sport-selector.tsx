@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
+import { useGameTypesQuery } from "@/src/queries/gametypes.queries";
 import {
   SearchableSelect,
   SelectOption,
@@ -52,7 +52,7 @@ export default function SportSelector({
   emptyMessage = DEFAULT_PROPS.emptyMessage,
   disabled = false,
 }: SportSelectorProps) {
-  const { data: sports = [], isLoading, error } = getGameTypesQuery();
+  const { data: sports = [], isLoading, error } = useGameTypesQuery();
 
   // Memoize options to prevent unnecessary re-renders
   const options: SelectOption[] = useMemo(() => {

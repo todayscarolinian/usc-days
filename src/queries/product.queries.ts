@@ -20,7 +20,7 @@ interface GetProductsParams {
   search?: string;
 }
 
-export const getProductsQuery = (params?: GetProductsParams) => {
+export const useProductsQuery = (params?: GetProductsParams) => {
   return useQuery<MerchandiseProduct[]>({
     queryKey: ["products", params],
     queryFn: async () => {
@@ -49,8 +49,7 @@ export const useAddProductsQuery = () => {
   return useMutation<
     MerchandiseProduct,
     Error,
-    AddMerchProductPayload,
-    { prevProducts?: any[] }
+    AddMerchProductPayload
   >({
     mutationFn: async (data) => {
       const response = await axios.post("/api/products", data);
@@ -58,11 +57,6 @@ export const useAddProductsQuery = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
-    },
-    onError: (err, g, context: any) => {
-      if (context?.prevProducts) {
-        queryClient.setQueryData(["products"], context.prevProducts);
-      }
     },
   });
 };
@@ -78,11 +72,6 @@ export const useEditProductsQuery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: (err, g, context: any) => {
-      if (context?.prevProducts) {
-        queryClient.setQueryData(["products"], context.prevProducts);
-      }
-    },
   });
 };
 
@@ -97,11 +86,6 @@ export const useDeleteProductsQuery = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
-    },
-    onError: (err, g, context: any) => {
-      if (context?.prevProducts) {
-        queryClient.setQueryData(["products"], context.prevProducts);
-      }
     },
   });
 };

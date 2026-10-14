@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 type GameType = {
@@ -8,7 +8,7 @@ type GameType = {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getGameTypesQuery = () =>
+export const useGameTypesQuery = () =>
   useQuery<GameType[]>({
     queryKey: ["sports"],
     queryFn: async () => {

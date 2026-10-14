@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getCategoriesQuery } from "@/src/queries/categories.queries";
+import { useCategoriesQuery } from "@/src/queries/categories.queries";
 
 export default function MerchSection() {
-  const { data: categories, isLoading, error } = getCategoriesQuery();
+  const { data: categories, isLoading, error } = useCategoriesQuery();
 
   // Loading skeleton
   if (isLoading) {

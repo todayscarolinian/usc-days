@@ -15,10 +15,10 @@ interface ScheduleInputs {
   location?: string;
 }
 
-interface UseScheduleFormOptions<T = any> {
+interface UseScheduleFormOptions<T = unknown> {
   initialValues?: Partial<ScheduleInputs>;
   schema?: ZodSchema<T>;
-  transformData?: (inputs: ScheduleInputs, additionalData?: any) => T;
+  transformData?: (inputs: ScheduleInputs, additionalData?: unknown) => T;
 }
 
 const getDefaultInputs = (): ScheduleInputs => ({
@@ -35,7 +35,7 @@ const getDefaultInputs = (): ScheduleInputs => ({
   location: undefined,
 });
 
-export function useScheduleForm<T = any>(options: UseScheduleFormOptions<T> = {}) {
+export function useScheduleForm<T = unknown>(options: UseScheduleFormOptions<T> = {}) {
   const {
     initialValues,
     schema = AddGameSchema,
@@ -61,7 +61,7 @@ export function useScheduleForm<T = any>(options: UseScheduleFormOptions<T> = {}
     []
   );
 
-  const validate = useCallback((additionalData?: any): boolean => {
+  const validate = useCallback((additionalData?: unknown): boolean => {
     try {
       // Use custom transform if provided, otherwise use default for AddGameSchema
       const dataToValidate = transformData

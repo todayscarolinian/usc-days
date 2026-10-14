@@ -37,7 +37,6 @@ class GameService {
       const where: Prisma.GameWhereInput = {};
       const cursor = params?.cursor;
       const limit = params?.limit;
-      const offset = params?.offset;
 
       if (params?.gameTypeId) {
         where.gameTypeId = params.gameTypeId;

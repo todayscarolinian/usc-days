@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Team, TeamGameType } from "../lib/prisma/generated/client";
 
@@ -8,7 +8,7 @@ type TeamType = TeamGameType & {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getTeamGameTypesQuery = (sport: Number) =>
+export const useTeamGameTypesQuery = (sport: number) =>
     useQuery<TeamType[]>({
         queryKey: ["teamgametypes", sport],
         queryFn: async () => {

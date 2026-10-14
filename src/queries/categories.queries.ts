@@ -11,7 +11,7 @@ import { MerchandiseCategory } from "../lib/prisma/generated/client";
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getCategoriesQuery = () => {
+export const useCategoriesQuery = () => {
   return useQuery<MerchandiseCategory[]>({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -22,7 +22,7 @@ export const getCategoriesQuery = () => {
   });
 };
 
-export const getCategoryQuery = (categoryId?: number) => {
+export const useCategoryQuery = (categoryId?: number) => {
   return useQuery<MerchandiseCategory>({
     queryKey: ["categories", categoryId],
     queryFn: async () => {
@@ -51,11 +51,6 @@ export const useAddCategoriesQuery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
-    onError: (err, g, context: any) => {
-      if (context?.prevCategories) {
-        queryClient.setQueryData(["categories"], context.prevCategories);
-      }
-    },
   });
 };
 
@@ -70,11 +65,6 @@ export const useEditCategoriesQuery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
-    onError: (err, g, context: any) => {
-      if (context?.prevCategories) {
-        queryClient.setQueryData(["categories"], context.prevCategories);
-      }
-    },
   });
 };
 
@@ -87,11 +77,6 @@ export const useDeleteCategoriesQuery = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-    },
-    onError: (err, g, context: any) => {
-      if (context?.prevCategories) {
-        queryClient.setQueryData(["categories"], context.prevCategories);
-      }
     },
   });
 };

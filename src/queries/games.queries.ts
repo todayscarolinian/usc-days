@@ -7,7 +7,7 @@ import axios from "axios";
 import { Schedules } from "../types/types";
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getGamesQuery = (params?: {
+export const useGamesQuery = (params?: {
   startDate?: string;
   endDate?: string;
 }) =>
@@ -27,18 +27,13 @@ export const getGamesQuery = (params?: {
 
 export const useAddGamesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<Game, Error, AddGamePayload, { prevGames?: any[] }>({
+  return useMutation<Game, Error, AddGamePayload>({
     mutationFn: async (data) => {
       const response = await axios.post(`/api/games`, data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] });
-    },
-    onError: (err, g, context: any) => {
-      if (context?.prevGames) {
-        queryClient.setQueryData(["games"], context.prevGames);
-      }
     },
   });
 };
