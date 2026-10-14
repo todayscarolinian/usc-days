@@ -4,6 +4,7 @@ import TodaysGames from "./todays-games";
 import SportsSection from "./sports-section";
 import ContactSection from "./contact-section";
 import SchoolsSection from "./schools-section";
+import NewsSection from "./news-section";
 
 export default function Home() {
   return (
@@ -11,6 +12,12 @@ export default function Home() {
       <HeroCarousel />
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+        <NewsSection
+          hashtag={process.env.FB_NEWS_HASHTAG?.trim() || undefined}
+          startDate={process.env.FB_NEWS_START_DATE?.trim() || undefined}
+          endDate={process.env.FB_NEWS_END_DATE?.trim() || undefined}
+        />
+
         <section id="featured-merch" aria-labelledby="featured-merch">
           <MerchSection />
         </section>
