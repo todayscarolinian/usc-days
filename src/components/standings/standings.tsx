@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useChampionsQuery } from "@/src/queries/champions.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { getGamesQuery } from "@/src/queries/games.queries";
+import { useGamesQuery } from "@/src/queries/games.queries";
 import { getTeamsQuery } from "@/src/queries/teams.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
 import Cards from "@/src/components/standings/standings-cards";
@@ -75,7 +75,7 @@ export default function Standings() {
     data: gamesQueryData = [],
     error: gamesError,
     isLoading: gamesLoading,
-  } = getGamesQuery();
+  } = useGamesQuery();
 
   // Show error toast when errors occur
   useEffect(() => {

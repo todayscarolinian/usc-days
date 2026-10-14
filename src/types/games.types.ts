@@ -82,10 +82,6 @@ export const AddGameSchema = z
 
 export const EditGameSchema = z
   .object({
-    id: z.number({
-      error: (issue) =>
-        issue.input === undefined ? "id is required." : "id must be a number.",
-    }),
     gameTypeId: z.number({
       error: (issue) =>
         issue.input === undefined
@@ -258,18 +254,9 @@ export const EditGameSchema = z
     },
   );
 
-// Schema for DeleteGame
-export const DeleteGameSchema = z.object({
-  id: z.number({
-    error: (issue) =>
-      issue.input === undefined ? "id is required." : "id must be a number.",
-  }),
-});
-
 // Export inferred types
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
-export type DeleteGamePayload = z.infer<typeof DeleteGameSchema>;
 
 export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
 
@@ -286,9 +273,7 @@ export interface PaginationParams {
 }
 
 export interface PaginatedGamesResponse {
-  games: Schedules[];
+  data: Schedules[];
   hasMore: boolean;
   nextCursor: string | null;
-  count: number;
-  total?: number;
 }
