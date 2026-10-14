@@ -87,8 +87,8 @@ function schedule(overrides: Partial<Schedules> = {}): Schedules {
     teamBForfeited: false,
     isDraw: false,
     gameType: { id: 3, gameName: "Basketball" },
-    teamA: { id: 10, teamName: "SOE Blue" },
-    teamB: { id: 20, teamName: "SBE Red" },
+    teamA: { id: 10, teamName: "SOE Blue", schoolId: 1, school: { id: 1, schoolName: "SOE" } },
+    teamB: { id: 20, teamName: "SBE Red", schoolId: 2, school: { id: 2, schoolName: "SBE" } },
     winner: null,
     ...overrides,
   } as Schedules;
@@ -316,8 +316,8 @@ describe("duplicate matchup filter", () => {
 describe("standings and leaderboards", () => {
   it("skips games that are missing a team and counts a finished game", () => {
     const rows = transformTeamsData([
-      schedule({ id: 1, teamA: null, teamB: { id: 20, teamName: "SBE Red" }, teamAId: null }),
-      schedule({ id: 2, teamA: { id: 10, teamName: "SOE Blue" }, teamB: null, teamBId: null }),
+      schedule({ id: 1, teamA: null, teamB: { id: 20, teamName: "SBE Red", schoolId: 2, school: { id: 2, schoolName: "SBE" } }, teamAId: null }),
+      schedule({ id: 2, teamA: { id: 10, teamName: "SOE Blue", schoolId: 1, school: { id: 1, schoolName: "SOE" } }, teamB: null, teamBId: null }),
       schedule({ id: 3, teamA: null, teamB: null, teamAId: null, teamBId: null }),
       schedule({
         id: 4,

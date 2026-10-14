@@ -186,8 +186,8 @@ class GameService {
           where,
           include: {
             gameType: true,
-            teamA: true,
-            teamB: true,
+            teamA: { include: { school: true } },
+            teamB: { include: { school: true } },
             winner: true,
           },
           orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
@@ -213,8 +213,8 @@ class GameService {
         where,
         include: {
           gameType: true,
-          teamA: true,
-          teamB: true,
+          teamA: { include: { school: true } },
+          teamB: { include: { school: true } },
           winner: true,
         },
         orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
