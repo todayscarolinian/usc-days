@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getChampionsQuery } from "@/src/queries/champions.queries";
+import { useChampionsQuery } from "@/src/queries/champions.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { useGamesQuery } from "@/src/queries/games.queries";
 import { getTeamsQuery } from "@/src/queries/teams.queries";
@@ -70,7 +70,7 @@ export default function Standings() {
     data: championsQueryData = [],
     error: championsError,
     isLoading: championsLoading,
-  } = getChampionsQuery();
+  } = useChampionsQuery();
   const {
     data: gamesQueryData = [],
     error: gamesError,

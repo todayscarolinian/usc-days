@@ -59,6 +59,7 @@ export async function PUT(
 
 - Query params: build a `z.object` from `idQuery`, `boolQuery`, `startOfDayQuery`, `limitQuery()`, etc. and call `parseQuery`. Invalid values are a 400, not silently ignored.
 - Dates in query strings are `YYYY-MM-DD`, server-local, with `endDate` covering the whole day.
+- Facebook posts interpret date ranges in `Asia/Manila`. Homepage news uses the fixed inclusive range October 17–24, 2026; event posts remain visible afterward.
 
 ## Services
 
