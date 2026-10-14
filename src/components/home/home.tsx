@@ -5,6 +5,7 @@ import SportsSection from "./sports-section";
 import ContactSection from "./contact-section";
 import SchoolsSection from "./schools-section";
 import NewsSection from "./news-section";
+import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 
 export default function Home() {
   return (
@@ -13,7 +14,7 @@ export default function Home() {
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
         <NewsSection
-          hashtag={process.env.FB_NEWS_HASHTAG?.trim() || undefined}
+          hashtag={FACEBOOK_NEWS_CONFIG.hashtag?.trim() || undefined}
         />
 
         <section id="featured-merch" aria-labelledby="featured-merch">
