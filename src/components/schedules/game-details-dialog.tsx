@@ -67,8 +67,9 @@ export default function GameDetailsDialog({
   const start = new Date(game.startDate);
   const end = new Date(game.endDate);
   const sport = game.gameType?.gameName ?? "-";
-  const home = game.teamA.teamName ?? "-";
-  const away = game.teamB.teamName ?? "-";
+  const home = game.teamA?.teamName ?? "TBD";
+  const away = game.teamB?.teamName ?? "TBD";
+  const teamsAreSet = game.teamA != null && game.teamB != null;
   const location = game.location ?? "TBA";
 
   const { a: dbA, b: dbB } = getDbScores(game);
@@ -139,6 +140,12 @@ export default function GameDetailsDialog({
           </div>
         </div>
 
+        {hasAccess && !teamsAreSet && (
+          <p className="text-sm text-muted-foreground">
+            Scores and results cannot be saved until both teams are set.
+          </p>
+        )}
+
         <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
@@ -160,6 +167,7 @@ export default function GameDetailsDialog({
 
               <Button
                 onClick={() => onAddScore?.(game)}
+                disabled={!teamsAreSet}
                 className="w-full sm:w-auto"
               >
                 Add Score

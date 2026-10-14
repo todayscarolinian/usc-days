@@ -50,11 +50,11 @@ export type Schedules = Game & {
     teamA: {
         id: number;
         teamName: string;
-    };
+    } | null;
     teamB: {
         id: number;
         teamName: string;
-    };
+    } | null;
     winner: {
         id: number;
         teamName: string;

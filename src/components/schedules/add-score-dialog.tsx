@@ -37,8 +37,8 @@ function toEditPayload(
   isDraw: boolean,
 ) {
   const gameTypeId = game.gameType.id;
-  const teamAId = game.teamA.id;
-  const teamBId = game.teamB.id;
+  const teamAId = game.teamA?.id;
+  const teamBId = game.teamB?.id;
 
   if (
     typeof gameTypeId !== "number" ||
@@ -107,8 +107,38 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
   if (!game) return null;
 
-  const home = game.teamA.teamName ?? `Team A${game.teamA.id}`;
-  const away = game.teamB.teamName ?? `Team B${game.teamB.id}`;
+  const teamA = game.teamA;
+  const teamB = game.teamB;
+
+  if (!teamA || !teamB) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>Add / Edit Score</DialogTitle>
+            <DialogDescription>
+              Scores and results cannot be saved until both teams are set.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button disabled className="w-full sm:w-auto">
+              Save Score
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  const home = teamA.teamName ?? `Team A${teamA.id}`;
+  const away = teamB.teamName ?? `Team B${teamB.id}`;
 
   const { a: dbA, b: dbB } = getDbScores(game);
   const dbWinnerId = game.winnerId ?? null;
@@ -202,13 +232,13 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                     setBScore(0);
                     setIsDraw(false); // Clear draw if forfeit is set
                     // If B also forfeited, clear winner; otherwise B wins
-                    setWinnerId(teamBForfeited ? null : game.teamB.id);
+                    setWinnerId(teamBForfeited ? null : teamB.id);
                   } else if (!teamBForfeited) {
                     // Neither forfeited now, clear winner
                     setWinnerId(null);
                   } else {
                     // Only B forfeited now, so A wins
-                    setWinnerId(game.teamA.id);
+                    setWinnerId(teamA.id);
                   }
                 }}
                 disabled={editGameMutation.isPending}
@@ -232,13 +262,13 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                     setBScore(0);
                     setIsDraw(false); // Clear draw if forfeit is set
                     // If A also forfeited, clear winner; otherwise A wins
-                    setWinnerId(teamAForfeited ? null : game.teamA.id);
+                    setWinnerId(teamAForfeited ? null : teamA.id);
                   } else if (!teamAForfeited) {
                     // Neither forfeited now, clear winner
                     setWinnerId(null);
                   } else {
                     // Only A forfeited now, so B wins
-                    setWinnerId(game.teamB.id);
+                    setWinnerId(teamB.id);
                   }
                 }}
                 disabled={editGameMutation.isPending}
@@ -311,10 +341,10 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                     <SelectValue placeholder="Select winning team or draw" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={game.teamA.id.toString()}>
+                    <SelectItem value={teamA.id.toString()}>
                       {home}
                     </SelectItem>
-                    <SelectItem value={game.teamB.id.toString()}>
+                    <SelectItem value={teamB.id.toString()}>
                       {away}
                     </SelectItem>
                     <SelectItem value="draw">Draw</SelectItem>
@@ -345,9 +375,9 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                 {isDraw
                   ? "Result: Draw"
                   : `Winner: ${
-                      winnerId === game.teamA.id
+                      winnerId === teamA.id
                         ? home
-                        : winnerId === game.teamB.id
+                        : winnerId === teamB.id
                           ? away
                           : "TBD"
                     }${oneForfeited ? " (forfeit)" : ""}`}
