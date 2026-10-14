@@ -4,7 +4,6 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   AddMerchCategoryPayload,
   EditMerchCategoryPayload,
-  DeleteMerchCategoryPayload,
 } from "../types/merchCategories.types";
 import axios from "axios";
 import { MerchandiseCategory } from "../lib/prisma/generated/client";
@@ -16,7 +15,7 @@ export const getCategoriesQuery = () => {
     queryKey: ["categories"],
     queryFn: async () => {
       const response = await axios.get("/api/merchandise/categories");
-      return response.data.categories;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });
@@ -26,10 +25,10 @@ export const getCategoryQuery = (categoryId?: number) => {
   return useQuery<MerchandiseCategory>({
     queryKey: ["categories", categoryId],
     queryFn: async () => {
-      const response = await axios.get(`/api/merchandise/categories?categoryId`, {
-        params: { categoryId },
-      });
-      return response.data.category;
+      const response = await axios.get(
+        `/api/merchandise/categories/${categoryId}`,
+      );
+      return response.data;
     },
     staleTime: STALE_TIME,
     enabled: !!categoryId,
@@ -61,7 +60,11 @@ export const useAddCategoriesQuery = () => {
 
 export const useEditCategoriesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<MerchandiseCategory, Error, EditMerchCategoryPayload>({
+  return useMutation<
+    MerchandiseCategory,
+    Error,
+    EditMerchCategoryPayload & { id: number }
+  >({
     mutationFn: async (catData) => {
       const { id, ...rest } = catData;
       const { data } = await axios.put(`/api/merchandise/categories/${id}`, rest);
@@ -80,9 +83,9 @@ export const useEditCategoriesQuery = () => {
 
 export const useDeleteCategoriesQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, DeleteMerchCategoryPayload>({
-    mutationFn: async (catData) => {
-      await axios.delete(`/api/merchandise/categories/${catData.id}`);
+  return useMutation<void, Error, { id: number }>({
+    mutationFn: async ({ id }) => {
+      await axios.delete(`/api/merchandise/categories/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
