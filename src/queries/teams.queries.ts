@@ -5,6 +5,7 @@ import axios from "axios";
 type Team = {
   id: number;
   teamName: string;
+  schoolId: number;
 };
 
 const STALE_TIME = 1000 * 60 * 5;
