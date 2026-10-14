@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Newspaper } from "lucide-react";
+import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import type { FacebookPost } from "@/src/types/facebook.types";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
   day: "numeric",
   year: "numeric",
-  timeZone: "Asia/Manila",
+  timeZone: FACEBOOK_NEWS_CONFIG.timeZone,
 });
 
 export default function NewsCard({ post }: { post: FacebookPost }) {

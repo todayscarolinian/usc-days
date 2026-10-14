@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
+import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import { useFacebookPostsQuery } from "@/src/queries/facebook.queries";
 import NewsCard from "./news-card";
 
@@ -11,24 +12,23 @@ interface NewsSectionProps {
   endDate?: string;
 }
 
-const POST_LIMIT = 4;
 const gridClassName = "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4";
 
 export default function NewsSection({
-  hashtag = "USCDays2025",
+  hashtag = FACEBOOK_NEWS_CONFIG.hashtag,
   startDate,
   endDate,
 }: NewsSectionProps) {
   // Keep the rolling range stable across rerenders so the query key stays stable.
   const [defaultRange] = useState(() => {
     const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Manila",
+      timeZone: FACEBOOK_NEWS_CONFIG.timeZone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
     const start = new Date(`${today}T00:00:00Z`);
-    start.setUTCDate(start.getUTCDate() - 29);
+    start.setUTCDate(start.getUTCDate() - (FACEBOOK_NEWS_CONFIG.lookbackDays - 1));
 
     return { startDate: start.toISOString().slice(0, 10), endDate: today };
   });
@@ -42,7 +42,7 @@ export default function NewsSection({
     hashtag,
     startDate ?? defaultRange.startDate,
     endDate ?? defaultRange.endDate,
-    POST_LIMIT,
+    FACEBOOK_NEWS_CONFIG.postLimit,
   );
 
   return (
@@ -56,7 +56,7 @@ export default function NewsSection({
 
       {isPending ? (
         <div role="status" aria-label="Loading news" className={gridClassName}>
-          {Array.from({ length: POST_LIMIT }, (_, index) => (
+          {Array.from({ length: FACEBOOK_NEWS_CONFIG.postLimit }, (_, index) => (
             <div
               key={index}
               aria-hidden="true"

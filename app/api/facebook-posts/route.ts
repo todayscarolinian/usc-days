@@ -9,7 +9,6 @@ const facebookService = new FacebookService();
  * GET /api/facebook-posts: Page posts matching a hashtag within an inclusive
  * YYYY-MM-DD date range, newest first. Returns `{ data: FacebookPost[] }`.
  * Invalid query params return 400; service failures use the shared error format.
- * Successful responses allow browser and shared caching for one hour.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -29,14 +28,7 @@ export async function GET(req: NextRequest) {
       limit,
     });
 
-    return NextResponse.json(
-      { data: posts },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
-        },
-      },
-    );
+    return NextResponse.json({ data: posts });
   } catch (error) {
     return handleRouteError(error, "Could not fetch Facebook posts.");
   }
