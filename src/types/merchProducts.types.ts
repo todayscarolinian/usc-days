@@ -58,23 +58,11 @@ export const AddMerchProductSchema = z.object({
     })).nullable(),
 });
 
-export const EditMerchProductSchema = AddMerchProductSchema.extend({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "id is required."
-                : "id must be a number.",
-    }),
-});
+// PUT is a full replacement, so the edit body has the same shape as create.
+// The product id comes from the URL path, not the body.
+export const EditMerchProductSchema = AddMerchProductSchema;
 
-export const DeleteMerchProductSchema = z.object({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "id is required."
-                : "id must be a number.",
-    }),
-});
+
 
 // replace with actual category type when available
 export type ProductWithCategory = 
@@ -100,4 +88,3 @@ export type ProductWithCategory =
 
 export type AddMerchProductPayload = z.infer<typeof AddMerchProductSchema>;
 export type EditMerchProductPayload = z.infer<typeof EditMerchProductSchema>;
-export type DeleteMerchProductPayload = z.infer<typeof DeleteMerchProductSchema>;
