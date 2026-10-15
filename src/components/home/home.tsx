@@ -10,7 +10,7 @@ import StandingsSection from "@/app/components/StandingsSection/StandingsSection
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-slate-900">
+    <div className="min-h-screen bg-[url('/white-bg.png')] bg-top bg-repeat text-slate-900">
       <HeroCarousel />
       
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
