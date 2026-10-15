@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import GameTypeService from "@/src/services/gametypes.service";
-import { getSportsTeamData } from "@/src/lib/actions";
 import { handleRouteError, parseIdParam } from "@/src/lib/api";
 
 
@@ -14,8 +13,7 @@ export async function GET(
     if(!id.ok) return id.response;
 
     try {
-        await gameTypeService.getGameTypeById(id.data);
-        const teams = await getSportsTeamData(id.data);
+        const teams = await gameTypeService.getGameTypeTeams(id.data);
         return NextResponse.json({ data: teams});
     } catch (error) {
         return handleRouteError(error, "Could not fetch sport teams.");

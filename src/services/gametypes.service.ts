@@ -18,6 +18,23 @@ class GameTypeService {
     return gameType;
   }
 
+  async getGameTypeTeams(id: number) {
+    const gameType = await prisma.gameType.findUnique({
+      where: { id },
+      select: {
+        teams: {
+          include: {
+            team: { select: { teamName: true } },
+          },
+        },
+      },
+    });
+    if(!gameType) {
+      throw new ApiError("NOT_FOUND", "Sport not found.");
+    }
+    return gameType.teams;
+  }
+
   async addGameType({ gameName }: AddGameTypePayload) {
     return prisma.gameType.create({
       data: { gameName },
