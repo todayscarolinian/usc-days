@@ -3,6 +3,7 @@ import { Roboto_Condensed } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/src/components/layout/navbar";
+import SiteFooter from "@/src/components/layout/site-footer";
 import { Toaster } from "@/src/components/ui/sonner";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import QueryProvider from "@/src/components/provider";
@@ -63,6 +64,7 @@ export default function RootLayout({
             <Navbar />
           </Suspense>
           <main className="relative z-0">{children}</main>
+          <SiteFooter />
           <Toaster />
               </QueryProvider>
               <GoogleAnalytics gaId="G-ZF7QYY6WNC" />

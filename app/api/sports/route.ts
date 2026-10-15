@@ -1,94 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import GameTypeService from "@/src/services/gametypes.service";
-import { AddGameTypeSchema, DeleteGameTypeSchema, EditGameTypeSchema } from "@/src/types/gametypes.types";
+import { AddGameTypeSchema } from "@/src/types/gametypes.types";
 import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
+import { accessErrorResponse, handleRouteError, parseJsonBody } from "@/src/lib/api";
 
 const gameTypeService = new GameTypeService()
-
-function accessErrorResponse(error: "UNAUTHENTICATED" | "FORBIDDEN" | "SERVICE_ERROR", message: string) {
-    return NextResponse.json(
-        { error: message },
-        { status: error === "UNAUTHENTICATED" ? 401 : error === "FORBIDDEN" ? 403 : 502 }
-    );
-}
 
 export async function GET() {
     try {
         const sports = await gameTypeService.getGameTypes()
-        return NextResponse.json({ sports, count: sports.length }, { status: 200 });
+        return NextResponse.json({ data: sports});
     }
     catch (error) {
-        console.error("Error in fetching sports: ", error);
-        return NextResponse.json({ error: "An unexpected error occurred while fetching sports." }, { status: 500 });
+        return handleRouteError(error, "Could not fetch sports.");
     }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
     const access = await requireHeraldAccess(req.headers.get("cookie"));
-    if (isAccessError(access)) {
-        return accessErrorResponse(access.error, access.message);
-    }
+    if (isAccessError(access)) return accessErrorResponse(access);
+    
+    const body = await parseJsonBody(req, AddGameTypeSchema);
+    if(!body.ok) return body.response;
 
     try {
-        const body = await req.json();
-        const result = AddGameTypeSchema.safeParse(body);
+        const sport = await gameTypeService.addGameType(body.data);
 
-        if (!result.success) {
-            return NextResponse.json({ error: result.error }, { status: 400 });
-        }
-
-        const validatedBody = result.data;
-
-        const newSport = await gameTypeService.addGameType(validatedBody);
-        return NextResponse.json({ newSport }, { status: 201 });
+        return NextResponse.json(sport, {
+            status: 201,
+            headers: {Location: `/api/sports/${sport.id}`},
+        });
     } catch (error) {
-        console.error('Error adding sport:', error);
-        return NextResponse.json({ error: 'An unexpected error occurred while adding the sport.' }, { status: 500 });
-    }
-}
-
-export async function PUT(req: NextRequest) {
-    const access = await requireHeraldAccess(req.headers.get("cookie"));
-    if (isAccessError(access)) {
-        return accessErrorResponse(access.error, access.message);
-    }
-
-    try {
-        const body = await req.json();
-        const result = EditGameTypeSchema.safeParse(body);
-
-        if (!result.success) {
-            return NextResponse.json({ error: result.error }, { status: 400 });
-        }
-
-        const validatedBody = result.data;
-        const updatedSport = await gameTypeService.editGameType(validatedBody);
-        return NextResponse.json({ updatedSport }, { status: 200 });
-    } catch (error) {
-        console.error('Error updating sport:', error);
-        return NextResponse.json({ error: 'An unexpected error occurred while updating the sport.' }, { status: 500 });
-    }
-}
-
-export async function DELETE(req: NextRequest) {
-    const access = await requireHeraldAccess(req.headers.get("cookie"));
-    if (isAccessError(access)) {
-        return accessErrorResponse(access.error, access.message);
-    }
-
-    try {
-        const body = await req.json();
-        const result = DeleteGameTypeSchema.safeParse(body);
-
-        if (!result.success) {
-            return NextResponse.json({ error: result.error }, { status: 400 });
-        }
-
-        const validatedBody = result.data;
-        const deletedSport = await gameTypeService.deleteGameType(validatedBody);
-        return NextResponse.json({ deletedSport }, { status: 200 });
-    } catch (error) {
-        console.error('Error deleting sport:', error);
-        return NextResponse.json({ error: 'An unexpected error occurred while deleting the sport.' }, { status: 500 });
+        return handleRouteError(error, "Could not create sport.");
     }
 }

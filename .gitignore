@@ -47,3 +47,7 @@ next-env.d.ts
 
 # generated prisma files
 /src/lib/prisma/generated/*
+
+# graphify generated output
+/graphify-out/
+/graphify-out

@@ -4,6 +4,6 @@ export const PUBLICATION = {
   social: {
     facebook: "https://www.facebook.com/todayscarolinian",
     instagram: "https://www.instagram.com/todaysusc/",
-    youtube: "https://www.youtube.com/@todayscarolinianusc",
+    twitter: "https://x.com/todaysusc",
   },
 } as const;

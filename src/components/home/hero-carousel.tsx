@@ -27,6 +27,7 @@ export default function HeroCarousel() {
           alt={`USC Days carousel slide ${i + 1}`}
           fill
           priority={i === 0}
+          placeholder="blur"
           sizes="100vw"
           className={`object-cover transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         />

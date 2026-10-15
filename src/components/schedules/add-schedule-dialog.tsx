@@ -26,6 +26,7 @@ import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { cn, getTimezoneOffset } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
+import { eventDateTimeToISO } from "@/src/lib/time";
 
 const SCHEDULE_LOCATIONS = [
   "Bunzel Lobby, Talamban Campus",
@@ -82,16 +83,20 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
-    if (sportsError && !shownErrorsRef.current.has('sportsError')) {
+    if (sportsError && !shownErrorsRef.current.has("sportsError")) {
       showToast("error", "Failed to load sports", parseApiError(sportsError));
-      shownErrorsRef.current.add('sportsError');
+      shownErrorsRef.current.add("sportsError");
     }
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError && !shownErrorsRef.current.has('teamSportsError')) {
-      showToast("error", "Failed to load teams", parseApiError(teamSportsError));
-      shownErrorsRef.current.add('teamSportsError');
+    if (teamSportsError && !shownErrorsRef.current.has("teamSportsError")) {
+      showToast(
+        "error",
+        "Failed to load teams",
+        parseApiError(teamSportsError),
+      );
+      shownErrorsRef.current.add("teamSportsError");
     }
   }, [teamSportsError, showToast]);
 
@@ -133,7 +138,11 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
 
     // Validate form inputs using existing AddGameSchema
     if (!validate()) {
-      showToast("error", "Validation Error", firstError || "Please check your inputs");
+      showToast(
+        "error",
+        "Validation Error",
+        firstError || "Please check your inputs",
+      );
       return;
     }
 
@@ -141,8 +150,8 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
+      endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location || undefined,
     };
 
@@ -151,7 +160,7 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
         showToast(
           "success",
           "Schedule created!",
-          "The game schedule has been added successfully."
+          "The game schedule has been added successfully.",
         );
         setOpen(false);
       },
@@ -195,8 +204,10 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
               <Input
                 type="date"
                 value={inputs.startDate}
-                onChange={(e) => { updateInput("startDate", e.target.value)
-                    updateInput("endDate", e.target.value) }}
+                onChange={(e) => {
+                  updateInput("startDate", e.target.value);
+                  updateInput("endDate", e.target.value);
+                }}
                 className={
                   validationErrors.startDate
                     ? "border-red-500 focus-visible:ring-red-500"

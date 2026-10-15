@@ -1,6 +1,12 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet";
+import { usePathname, useSearchParams } from "next/navigation";
+import { CircleUser, Menu } from "lucide-react";
+
+import TCRedLogo from "@/src/assets/tc-logo-red.png";
 import { Button } from "@/src/components/ui/button";
 import {
   DropdownMenu,
@@ -10,190 +16,359 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
-import { CircleUser, Menu } from "lucide-react";
-import Image from "next/image";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/src/components/ui/sheet";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { signOutFromHerald } from "@/src/lib/herald/auth-client";
-import { useEffect, useState, useMemo } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 
-const nav_items = [
+type NavigationItem = {
+  href: string;
+  name: string;
+  external?: boolean;
+};
+
+const leftNavigation: NavigationItem[] = [
   {
     href: "/",
     name: "Home",
-    protected: false,
   },
+  {
+    href: "/#featured-merch",
+    name: "Merch",
+  },
+  {
+    // Replace this URL if TC News uses a different address.
+    href: "/#news",
+    name: "News",
+    external: true,
+  },
+];
+
+const rightNavigation: NavigationItem[] = [
   {
     href: "/schedules",
     name: "Schedules",
-    protected: false,
-  },
-  {
-    href: "/leaderboards",
-    name: "Leaderboards",
-    protected: false,
   },
   {
     href: "/standings",
     name: "Standings",
-    protected: false,
   },
-  // {
-  //   href: "/management",
-  //   name: "Management",
-  //   protected: true,
-  // },
+  {
+    href: "/leaderboards",
+    name: "Leaderboards",
+  },
 ];
 
-function UserAvatar({
-  handleLogout,
-  isPending,
-}: {
-  handleLogout: () => void;
+const allNavigation = [
+  ...leftNavigation,
+  ...rightNavigation,
+];
+
+type UserAvatarProps = {
+  onLogout: () => void;
   isPending: boolean;
-}) {
+};
+
+function UserAvatar({
+  onLogout,
+  isPending,
+}: UserAvatarProps) {
   return (
-    <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-      <div className="ml-auto flex-1 sm:flex-initial"></div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="text-muted-foreground">
-            My Account
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="rounded-full text-white hover:bg-white/15 hover:text-white"
+        >
+          <CircleUser className="size-5" />
+          <span className="sr-only">Open user menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel className="text-muted-foreground">
+          My Account
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          disabled={isPending}
+          onClick={onLogout}
+        >
+          {isPending ? "Logging out..." : "Logout"}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
 export default function Navbar() {
-  const { isAuthenticated, hasAccess } = useHasHeraldDomainAccess();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const pathName = usePathname();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isAuthenticated } = useHasHeraldDomainAccess();
 
-  // Preserve sport parameter across navigation
-  const sportParam = searchParams.get("sport");
-  const queryString = useMemo(() => {
-    return sportParam ? `?sport=${sportParam}` : "";
-  }, [sportParam]);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [hasHero, setHasHero] = useState(
+    pathname === "/standings",
+  );
+  const [isOverHero, setIsOverHero] = useState(
+    pathname === "/standings",
+  );
+
+  const sportParameter = searchParams.get("sport");
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 150) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+    function updateNavbar() {
+      const hero = document.getElementById("page-hero");
 
-    window.addEventListener("scroll", handleScroll);
+      setHasHero(Boolean(hero));
+      setIsOverHero(
+        Boolean(
+          hero &&
+            hero.getBoundingClientRect().bottom > 64,
+        ),
+      );
+    }
+
+    updateNavbar();
+
+    window.addEventListener("scroll", updateNavbar, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateNavbar);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", updateNavbar);
+      window.removeEventListener("resize", updateNavbar);
     };
-  }, [pathName]);
+  }, [pathname]);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await signOutFromHerald();
-    window.location.reload();
-  };
+  async function handleLogout() {
+    try {
+      setIsLoggingOut(true);
+      await signOutFromHerald();
+      window.location.reload();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
+  function getHref(item: NavigationItem) {
+    if (
+      item.external ||
+      !sportParameter ||
+      item.href === "/" ||
+      item.href.includes("#")
+    ) {
+      return item.href;
+    }
+
+    return `${item.href}?sport=${encodeURIComponent(
+      sportParameter,
+    )}`;
+  }
+
+  function isActive(item: NavigationItem) {
+    if (item.external || item.href.includes("#")) {
+      return false;
+    }
+
+    return pathname === item.href;
+  }
+
+  function renderDesktopLink(item: NavigationItem) {
+    const active = isActive(item);
+
+    const className = [
+      "relative px-2 py-2 text-sm font-normal text-white",
+      "transition-colors hover:text-white/75",
+      active
+        ? "after:absolute after:-bottom-0.5 after:left-2 after:right-2 after:h-0.5 after:bg-tc_primary-500"
+        : "",
+    ].join(" ");
+
+    if (item.external) {
+      return (
+        <a
+          key={item.name}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={className}
+        >
+          {item.name}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        key={item.name}
+        href={getHref(item)}
+        className={className}
+      >
+        {item.name}
+      </Link>
+    );
+  }
+
+  function renderMobileLink(item: NavigationItem) {
+    const className = [
+      "block border-b border-white/10 py-3 text-base",
+      isActive(item)
+        ? "font-bold text-white"
+        : "text-white/75",
+    ].join(" ");
+
+    if (item.external) {
+      return (
+        <a
+          key={item.name}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={className}
+          onClick={() => setIsSheetOpen(false)}
+        >
+          {item.name}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        key={item.name}
+        href={getHref(item)}
+        className={className}
+        onClick={() => setIsSheetOpen(false)}
+      >
+        {item.name}
+      </Link>
+    );
+  }
 
   return (
     <header
-      className={`w-full top-0 z-50 flex h-16 items-center gap-4 px-4 md:px-6 transition-all duration-500 ${isScrolled || pathName !== "/" ? "bg-tc_primary sticky" : "fixed bg-tc_primary md:bg-transparent"}`}
+      className={[
+        "top-0 z-50 flex h-16 w-full items-center transition-all duration-300",
+        hasHero ? "fixed" : "sticky",
+        isOverHero
+          ? "bg-transparent"
+          : "bg-tc_primary shadow-md",
+      ].join(" ")}
     >
-      {/* Desktop Nav */}
-      <nav className="hidden text-lg font-medium md:flex md:flex-row md:items-center md:justify-between w-full">
-        <Link href="/">
-          <Image src="/tc-logo-red.png" alt="tc-logo" width={50} height={50} />
-        </Link>
-        <div className="flex items-center lg:gap-6">
-          {nav_items.map((n) =>
-            n.protected ? (
-              hasAccess && (
-                <Button
-                  key={n.name}
-                  className={`${isScrolled || pathName !== "/" ? "bg-tc_primary shadow-none" : "bg-transparent shadow-none"}`}
-                  asChild
-                >
-                  <Link
-                    href={`${n.href}${n.href === "/" ? "" : queryString}`}
-                    className="text-white transition-colors hover:text-white"
-                  >
-                    {n.name}
-                  </Link>
-                </Button>
-              )
-            ) : (
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        {/* Desktop navigation */}
+        <nav
+          aria-label="Main navigation"
+          className="hidden grid-cols-[1fr_auto_1fr] items-center gap-8 md:grid"
+        >
+          <div className="flex items-center justify-end gap-5 lg:gap-15">
+            {leftNavigation.map(renderDesktopLink)}
+          </div>
+
+          <Link
+            href="/"
+            aria-label="Today's Carolinian home"
+            className="flex items-center justify-center px-4"
+          >
+            <Image
+              src={TCRedLogo}
+              alt="Today's Carolinian logo"
+              width={48}
+              height={48}
+              priority
+              className="size-11 object-contain"
+            />
+          </Link>
+
+          <div className="flex items-center justify-start gap-5 lg:gap-15">
+            {rightNavigation.map(renderDesktopLink)}
+
+            {isAuthenticated && (
+              <UserAvatar
+                onLogout={handleLogout}
+                isPending={isLoggingOut}
+              />
+            )}
+          </div>
+        </nav>
+
+        {/* Mobile navigation */}
+        <div className="relative flex items-center justify-between md:hidden">
+          <Sheet
+            open={isSheetOpen}
+            onOpenChange={setIsSheetOpen}
+          >
+            <SheetTrigger asChild>
               <Button
-                key={n.name}
-                className={`${pathName === "/" ? "bg-transparent shadow-none" : "bg-tc_primary shadow-none"}`}
-                asChild
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/15 hover:text-white"
               >
-                <Link
-                  href={`${n.href}${n.href === "/" ? "" : queryString}`}
-                  className="text-white transition-colors hover:text-white"
-                >
-                  {n.name}
-                </Link>
+                <Menu className="size-6" />
+                <span className="sr-only">
+                  Open navigation menu
+                </span>
               </Button>
-            ),
-          )}
-          {isAuthenticated && (
-            <UserAvatar handleLogout={handleLogout} isPending={isLoggingOut} />
+            </SheetTrigger>
+
+            <SheetContent
+              side="left"
+              className="border-none bg-[#151515] p-6 text-white"
+            >
+              <Link
+                href="/"
+                aria-label="Today's Carolinian home"
+                onClick={() => setIsSheetOpen(false)}
+              >
+                <Image
+                  src={TCRedLogo}
+                  alt="Today's Carolinian logo"
+                  width={56}
+                  height={56}
+                  className="mb-8 size-14 object-contain"
+                />
+              </Link>
+
+              <nav aria-label="Mobile navigation">
+                {allNavigation.map(renderMobileLink)}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          <Link
+            href="/"
+            aria-label="Today's Carolinian home"
+            className="absolute left-1/2 -translate-x-1/2"
+          >
+            <Image
+              src={TCRedLogo}
+              alt="Today's Carolinian logo"
+              width={42}
+              height={42}
+              priority
+              className="size-10 object-contain"
+            />
+          </Link>
+
+          {isAuthenticated ? (
+            <UserAvatar
+              onLogout={handleLogout}
+              isPending={isLoggingOut}
+            />
+          ) : (
+            <div className="size-10" aria-hidden="true" />
           )}
         </div>
-      </nav>
-
-      {/* Mobile Nav */}
-      <div className="md:hidden flex w-full items-center justify-between">
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
-            <Button size="icon" className="shrink-0 bg-tc_primary-600">
-              <Menu />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="bg-tc_primary p-4">
-            <nav className="grid gap-6 text-lg font-medium">
-              <Image
-                src="/tc-logo-white.png"
-                alt="tc-logo"
-                width={50}
-                height={50}
-              />
-              {nav_items
-                .filter((i) => !i.protected || hasAccess)
-                .map((i) => (
-                  <Link
-                    key={i.href}
-                    href={`${i.href}${i.href === "/" ? "" : queryString}`}
-                    className="text-white"
-                    onClick={() => setIsSheetOpen(false)}
-                  >
-                    {i.name}
-                  </Link>
-                ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
-        {isAuthenticated && (
-          <UserAvatar handleLogout={handleLogout} isPending={isLoggingOut} />
-        )}
       </div>
     </header>
   );
