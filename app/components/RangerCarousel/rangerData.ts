@@ -20,11 +20,11 @@ export interface Ranger {
 /** Deck order: index 0 is the front card. */
 export const RANGERS: Ranger[] = [
   { id: "purple", name: "SHCP",  color: "#5b17b8", cardImage: img("SHCP_card.svg"),  iconImage: img("SHCP_ranger.png") },
-  { id: "blue",   name: "SED",   color: "#3b82c0", cardImage: img("SED_card.png"),    iconImage: img("SED_ranger.png") },
-  { id: "yellow", name: "SOE",   color: "#d6b633", cardImage: img("SOE_card.png"),    iconImage: img("SOE_ranger.png") },
+  { id: "blue",   name: "SED",   color: "#3b82c0", cardImage: img("SED_card.svg"),    iconImage: img("SED_ranger.png") },
+  { id: "yellow", name: "SOE",   color: "#d6b633", cardImage: img("SOE_card.svg"),    iconImage: img("SOE_ranger.png") },
   { id: "black",  name: "SLG",   color: "#3a3a3a", cardImage: img("SLG_card.svg"),    iconImage: img("SLG_ranger.png") },
   { id: "red",    name: "SAFAD", color: "#b80000", cardImage: img("SAFAD_card.svg"),  iconImage: img("SAFAD_ranger.png") },
-  { id: "navy",   name: "SAS",   color: "#1f3a9e", cardImage: img("SAS_card.png"),    iconImage: img("SAS_ranger.png") },
+  { id: "navy",   name: "SAS",   color: "#1f3a9e", cardImage: img("SAS_card.svg"),    iconImage: img("SAS_ranger.png") },
   { id: "green",  name: "SBE",   color: "#2fa516", cardImage: img("SBE_card.svg"),    iconImage: img("SBE_ranger.png") },
 ];
 
