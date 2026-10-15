@@ -165,7 +165,6 @@ export function buildScheduleEvents(
 export function groupScheduleGames(
   games: readonly Schedules[],
   filters: ScheduleFilters,
-  today: string | null,
   anchorDate?: string | null,
 ): ScheduleDay[] {
   const groups = new Map<string, Schedules[]>();
@@ -187,13 +186,7 @@ export function groupScheduleGames(
   if (anchorDate && !groups.has(anchorDate)) groups.set(anchorDate, []);
 
   return [...groups]
-    .sort(([a], [b]) => {
-      if (!today) return a.localeCompare(b);
-      if (a === today) return -1;
-      if (b === today) return 1;
-      if ((a >= today) !== (b >= today)) return a >= today ? -1 : 1;
-      return a >= today ? a.localeCompare(b) : b.localeCompare(a);
-    })
+    .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, games]) => ({
       date,
       games: games.sort((a, b) => +new Date(a.startDate) - +new Date(b.startDate) || a.id - b.id),

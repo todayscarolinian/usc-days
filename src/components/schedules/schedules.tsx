@@ -53,6 +53,13 @@ export default function SchedulesPage() {
               isError={schedules.games.isError}
               isFetching={schedules.games.isFetching}
               onRetry={() => void schedules.games.refetch()}
+              hasOlder={schedules.games.hasOlder}
+              hasNewer={schedules.games.hasNewer}
+              isLoadingOlder={schedules.games.isLoadingOlder}
+              isLoadingNewer={schedules.games.isLoadingNewer}
+              olderPageCount={schedules.games.pastPageCount}
+              onLoadOlder={() => void schedules.games.loadOlder()}
+              onLoadNewer={() => void schedules.games.loadNewer()}
             />
           </div>
         </section>

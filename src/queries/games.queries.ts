@@ -13,7 +13,7 @@ const STALE_TIME = 1000 * 60 * 5;
 export const useGamesQuery = (params?: {
   startDate?: string;
   endDate?: string;
-}, options?: { refetchInterval?: number }) =>
+}, options?: { refetchInterval?: number; enabled?: boolean }) =>
   useQuery<Schedules[]>({
     queryKey: ["games", params],
     queryFn: async ({ signal }) => {
@@ -27,6 +27,7 @@ export const useGamesQuery = (params?: {
     },
     staleTime: STALE_TIME,
     refetchInterval: options?.refetchInterval,
+    enabled: options?.enabled,
   });
 
 export const useAddGamesQuery = () => {
@@ -169,6 +170,8 @@ export function useScheduleWindow({
     // A filter matching no sports is settled with nothing to show.
     isPending: enabled ? day.isPending || past.isPending || future.isPending : gameTypeIds === undefined || anchor === null,
     isError: day.isError || past.isError || future.isError,
+    isFetching: day.isFetching || past.isFetching || future.isFetching,
+    refetch: () => Promise.all([day.refetch(), past.refetch(), future.refetch()]),
     pastPageCount: past.data?.pages.length ?? 0,
     hasOlder,
     hasNewer,
