@@ -6,6 +6,7 @@ import SchoolsSection from "./schools-section";
 import NewsSection from "./news-section";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import RangerCarousel from "@/app/components/RangerCarousel/RangerCarousel";
+import StandingsSection from "@/app/components/StandingsSection/StandingsSection";
 
 export default function Home() {
   return (
@@ -24,7 +25,11 @@ export default function Home() {
         <section id="todays-games" aria-labelledby="todays-games">
           <TodaysGames />
         </section>
+      </main>
 
+      <StandingsSection />
+
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
         <section id="schools" aria-labelledby="schools">
           <SchoolsSection />
         </section>
@@ -49,6 +54,7 @@ export default function Home() {
           <RangerCarousel />
         </section>
       </main>
+
     </div>
   );
 }
