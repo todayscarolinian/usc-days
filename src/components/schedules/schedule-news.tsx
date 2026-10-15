@@ -92,7 +92,7 @@ export default function ScheduleNews() {
 
   return (
     <aside aria-label="Latest news" className="min-w-0 xl:sticky xl:top-28 xl:max-h-[calc(100dvh-10rem)] xl:overflow-y-auto">
-      <h2 className="py-2.5 font-[family-name:var(--font-roboto-condensed)] text-[32px] font-bold">NEWS</h2>
+      <h2 className="py-2.5 font-[family-name:var(--font-roboto-condensed)] text-[32px] font-semibold">NEWS</h2>
       {content}
       {query.isError && !!query.data?.length && (
         <p role="status" className="py-2 text-sm text-neutral-600">

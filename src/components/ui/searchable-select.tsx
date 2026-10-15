@@ -114,7 +114,7 @@ export function SearchableSelect({
   const isDisabled = disabled || loading;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -163,13 +163,16 @@ export function SearchableSelect({
         side="bottom"
         align="start"
       >
-        <Command shouldFilter={!filterFunction}>
+        <Command shouldFilter={!filterFunction} className="h-auto max-h-[var(--radix-popover-content-available-height)]">
           <CommandInput
             placeholder={searchPlaceholder}
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList>
+          <CommandList
+            className="min-h-0 max-h-60 touch-pan-y overscroll-contain overflow-y-auto"
+            onWheel={(event) => event.stopPropagation()}
+          >
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup heading={groupLabel}>
               {(filterFunction ? filteredOptions : options).map((option) => {

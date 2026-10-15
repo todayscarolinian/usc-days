@@ -25,7 +25,10 @@ export function useScheduleFilters() {
 
   function setFilter(key: FilterKey, value: string | null) {
     const next = new URLSearchParams(params.toString());
-    if (key === "event") next.delete("sport");
+    if (key === "event") {
+      next.delete("sport");
+      next.delete("date");
+    }
     if (value) next.set(key, value);
     else next.delete(key);
     navigate(next);

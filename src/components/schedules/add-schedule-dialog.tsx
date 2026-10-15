@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { getTeamsQuery } from "@/src/queries/teams.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
@@ -23,10 +24,13 @@ import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
-import { getTimezoneOffset } from "@/src/lib/utils";
+import { cn, getTimezoneOffset } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 
-export default function AddScheduleDialog() {
+export default function AddScheduleDialog({ compactTrigger = false, preview = false }: {
+  compactTrigger?: boolean;
+  preview?: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   const {
@@ -57,6 +61,8 @@ export default function AddScheduleDialog() {
   } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
 
   const add = useAddGamesQuery();
+  const teams = getTeamsQuery();
+  const useAllTeams = inputs.gameTypeId > 0 && !teamLoading && !teamSportsError && fetchedTeamSportsData.length === 0;
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
@@ -88,13 +94,19 @@ export default function AddScheduleDialog() {
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
+  const teamOptions: SelectOption[] = useAllTeams ? (teams.data ?? []).map((team) => ({
+    value: team.id.toString(),
+    label: team.teamName,
+    id: team.id,
+  })) : fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
   async function createSchedule() {
+    if (preview) return;
+
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -132,20 +144,28 @@ export default function AddScheduleDialog() {
     });
   }
 
-  const loading = sportsLoading || teamLoading || add.isPending;
+  const loading = sportsLoading || teamLoading || (useAllTeams && teams.isPending) || add.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild onClick={() => setOpen(true)}>
-        <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-          Add Schedule
+        <Button className={cn(
+          "bg-tc_primary-500 hover:bg-tc_primary-600",
+          compactTrigger && "size-10 p-0 sm:h-9 sm:w-auto sm:px-3",
+        )}>
+          {compactTrigger && <Plus className="size-4" aria-hidden="true" />}
+          <span className={compactTrigger ? "sr-only sm:not-sr-only" : undefined}>
+            {preview ? "Preview Schedule" : "Add Schedule"}
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>Add Schedule</DialogTitle>
           <DialogDescription>
-            Add a new game schedule. Click Submit when you&apos;re done.
+            {preview
+              ? "Preview only. You can try the form, but schedules won’t be saved."
+              : <>Add a new game schedule. Click Submit when you&apos;re done.</>}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
@@ -201,14 +221,27 @@ export default function AddScheduleDialog() {
               emptyMessage="No sports found."
               options={sportsOptions}
               value={inputs.gameTypeId > 0 ? inputs.gameTypeId.toString() : ""}
-              onValueChange={(value) =>
-                updateInput("gameTypeId", value ? Number(value) : -1)
-              }
+              onValueChange={(value) => {
+                updateInput("gameTypeId", value ? Number(value) : -1);
+                updateInput("teamAId", null);
+                updateInput("teamBId", null);
+              }}
               disabled={loading}
               loading={sportsLoading}
               className="w-full"
             />
           </div>
+          {inputs.gameTypeId <= 0 && (
+            <p className="text-sm text-muted-foreground">Select a sport to choose teams.</p>
+          )}
+          {useAllTeams && !teams.isPending && !teams.isError && (
+            <p className="text-sm text-muted-foreground">No teams are registered for this sport yet. Showing all existing teams.</p>
+          )}
+          {useAllTeams && teams.isError && (
+            <div role="alert" className="text-sm text-destructive">
+              Could not load teams. <button type="button" className="underline" onClick={() => void teams.refetch()}>Try again</button>
+            </div>
+          )}
           <div className="w-full flex justify-between items-center gap-4">
             <div className="flex flex-col gap-1 w-full">
               <Label htmlFor="teamA" className="font-bold opacity-50">
@@ -281,7 +314,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={inputs.gameTypeId <= 0 || loading}
+            disabled={preview || inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>

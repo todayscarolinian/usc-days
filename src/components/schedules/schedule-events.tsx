@@ -27,7 +27,7 @@ export default function ScheduleEvents({
 
   return (
     <aside aria-label="Filter by event" className="min-w-0 xl:sticky xl:top-28 xl:max-h-[calc(100dvh-10rem)] xl:overflow-y-auto">
-      <h2 className="py-2.5 font-[family-name:var(--font-roboto-condensed)] text-[32px] font-bold">EVENTS</h2>
+      <h2 className="py-2.5 font-[family-name:var(--font-roboto-condensed)] text-[32px] font-semibold">EVENTS</h2>
       <label htmlFor="schedule-event" className="sr-only">Filter schedules by event</label>
       <select
         id="schedule-event"
@@ -51,7 +51,7 @@ export default function ScheduleEvents({
         disabled={disabled}
         onClick={() => onSelect(null)}
         className={cn(
-          "my-2 hidden h-9 w-full justify-start rounded-none px-2 text-[15px] xl:flex",
+          "my-2 hidden h-9 w-full justify-start rounded-none px-2 text-[15px] motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none xl:flex",
           !selectedEvent && "bg-white/40 font-bold",
         )}
       >
@@ -72,7 +72,7 @@ export default function ScheduleEvents({
                   disabled={disabled}
                   onClick={() => onSelect(event.name)}
                   className={cn(
-                    "flex h-auto min-h-9 w-full justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal",
+                    "flex h-auto min-h-9 w-full justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none",
                     selectedEvent === event.name && "bg-white/40 font-bold",
                   )}
                 >
