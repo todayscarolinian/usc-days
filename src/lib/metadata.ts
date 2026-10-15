@@ -31,7 +31,7 @@ export function generateMetadata(options: MetadataOptions): Metadata {
           alt: title,
         },
       ],
-      siteName: "USC Days 2025 Scoreboard - Today's Carolinian",
+      siteName: "USC Days 2026 Scoreboard - Today's Carolinian",
     },
     twitter: {
       card: "summary_large_image",
@@ -51,8 +51,8 @@ export function generateMetadata(options: MetadataOptions): Metadata {
 }
 
 export const defaultMetadata = generateMetadata({
-  title: "USC Days 2025 Scoreboard - Today's Carolinian",
+  title: "USC Days 2026 Scoreboard - Today's Carolinian",
   description:
-    "Scoreboard of the different school teams per game for USC Days 2025",
+    "Scoreboard of the different school teams per game for USC Days 2026",
   url: "/",
 });

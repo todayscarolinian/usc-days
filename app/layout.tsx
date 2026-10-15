@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_BASE_URL || "https://uscdays.todayscarolinian.com/",
   ),
   ...generateMeta({
-    title: "USC Days 2025 Scoreboard - Today's Carolinian",
+    title: "USC Days 2026 Scoreboard - Today's Carolinian",
     description:
-      "Scoreboard of the different school teams per game for USC Days 2025",
+      "Scoreboard of the different school teams per game for USC Days 2026",
     url: "/",
     image: "/og_image.jpg",
   }),
