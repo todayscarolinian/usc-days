@@ -21,22 +21,22 @@ import Frisbee from "@/src/assets/icons/light-gray/frisbee.png";
 const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 
 const sports = [
-  { name: "Basketball", href: "/sports/basketball", icon: Basketball },
-  { name: "Volleyball", href: "/sports/volleyball", icon: Volleyball },
-  { name: "Cheer", href: null, icon: Cheer },
-  { name: "Contemporary", href: null, icon: Contemporary },
-  { name: "Mr. & Ms. USC Days", href: null, icon: MrAndMsUSCDays },
-  { name: "Flag Football", href: "/sports/flag-football", icon: FlagFootball },
-  { name: "Football", href: "/sports/soccer", icon: Football },
-  { name: "Futsal", href: "/sports/futsal", icon: Futsal },
-  { name: "Table Tennis", href: "/sports/table-tennis", icon: TableTennis },
-  { name: "Lawn Tennis", href: "/sports/lawn-tennis", icon: LawnTennis },
-  { name: "Badminton", href: "/sports/badminton", icon: Badminton },
-  { name: "Swimming", href: "/sports/swimming", icon: Swimming },
-  { name: "Chess", href: "/sports/chess", icon: Chess },
-  { name: "Esports", href: "/schedules", icon: Esports },
-  { name: "Pickleball", href: "/sports/pickleball", icon: Pickleball },
-  { name: "Frisbee", href: "/sports/frisbee", icon: Frisbee },
+  { name: "Basketball", href: `/schedules?event=${encodeURIComponent("Basketball")}`, icon: Basketball },
+  { name: "Volleyball", href: `/schedules?event=${encodeURIComponent("Volleyball")}`, icon: Volleyball },
+  { name: "Cheer", href: `/schedules?event=${encodeURIComponent("Cheer Dance")}`, icon: Cheer },
+  { name: "Contemporary", href: `/schedules?event=${encodeURIComponent("Contemporary Dance")}`, icon: Contemporary },
+  { name: "Mr. & Ms. USC Days", href: `/schedules?event=${encodeURIComponent("Mr. & Ms. USC")}`, icon: MrAndMsUSCDays },
+  { name: "Flag Football", href: `/schedules?event=${encodeURIComponent("Flag Football")}`, icon: FlagFootball },
+  { name: "Football", href: `/schedules?event=${encodeURIComponent("Soccer")}`, icon: Football },
+  { name: "Futsal", href: `/schedules?event=${encodeURIComponent("Futsal")}`, icon: Futsal },
+  { name: "Table Tennis", href: `/schedules?event=${encodeURIComponent("Table Tennis")}`, icon: TableTennis },
+  { name: "Lawn Tennis", href: `/schedules?event=${encodeURIComponent("Lawn Tennis")}`, icon: LawnTennis },
+  { name: "Badminton", href: `/schedules?event=${encodeURIComponent("Badminton")}`, icon: Badminton },
+  { name: "Swimming", href: `/schedules?event=${encodeURIComponent("Swimming")}`, icon: Swimming },
+  { name: "Chess", href: `/schedules?event=${encodeURIComponent("Chess")}`, icon: Chess },
+  { name: "Esports", href: `/schedules?event=${encodeURIComponent("Esports")}`, icon: Esports },
+  { name: "Pickleball", href: `/schedules?event=${encodeURIComponent("Pickleball")}`, icon: Pickleball },
+  { name: "Frisbee", href: `/schedules?event=${encodeURIComponent("Frisbee")}`, icon: Frisbee },
 ];
 
 export default function SportsSection() {
