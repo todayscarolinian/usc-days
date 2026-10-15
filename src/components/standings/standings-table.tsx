@@ -33,15 +33,23 @@ export default function StandingsTable({
   });
 
   return (
-    <section className="border border-neutral-300 bg-white p-4 sm:p-5">
+    <section className="min-w-0 border border-neutral-300 bg-white bg-[url('/white-bg.png')] bg-top bg-repeat-y p-3 sm:p-5">
       <header className="mb-4 border-l-4 border-tc_primary pl-3">
-        <h2 className="text-lg font-bold uppercase text-neutral-950">
+        <h2 className="text-base font-bold uppercase text-neutral-950 sm:text-lg">
           {sportName || "Standings"}
         </h2>
       </header>
 
-      <div className="overflow-x-auto border border-neutral-300">
-        <Table className="min-w-160 text-xs sm:text-sm">
+      <div className="min-w-0 border border-neutral-300">
+        <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
+          <colgroup>
+            <col className="w-[8%] sm:w-auto" />
+            <col className="w-[42%] sm:w-auto" />
+            <col className="w-[17%] sm:w-auto" />
+            <col className="w-[15%] sm:w-auto" />
+            <col className="w-[18%] sm:w-auto" />
+          </colgroup>
+
           <TableHeader className="bg-neutral-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -53,8 +61,8 @@ export default function StandingsTable({
                     key={header.id}
                     className={
                       index === 1
-                        ? "h-10 px-4 text-left text-[11px] font-bold uppercase text-neutral-700"
-                        : "h-10 px-3 text-center text-[11px] font-bold uppercase text-neutral-700"
+                        ? "h-9 overflow-hidden px-1.5 text-left text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-4 sm:text-[11px]"
+                        : "h-9 overflow-hidden px-1 text-center text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-3 sm:text-[11px]"
                     }
                   >
                     {header.isPlaceholder
@@ -81,8 +89,8 @@ export default function StandingsTable({
                       key={cell.id}
                       className={
                         index === 1
-                          ? "h-12 px-4 text-left"
-                          : "h-12 px-3 text-center font-medium"
+                          ? "h-10 overflow-hidden px-1.5 text-left sm:h-12 sm:px-4"
+                          : "h-10 overflow-hidden px-1 text-center font-medium sm:h-12 sm:px-3"
                       }
                     >
                       {flexRender(
@@ -97,7 +105,7 @@ export default function StandingsTable({
               <TableRow>
                 <TableCell
                   colSpan={standingColumns.length}
-                  className="h-24 text-center text-neutral-500"
+                  className="h-24 whitespace-normal px-3 text-center text-neutral-500"
                 >
                   No completed games for this sport yet.
                 </TableCell>
@@ -107,7 +115,7 @@ export default function StandingsTable({
         </Table>
       </div>
 
-      <p className="mt-3 text-[11px] italic text-neutral-500">
+      <p className="mt-3 text-[10px] italic text-neutral-500 sm:text-[11px]">
         Records are calculated from completed tournament games.
       </p>
     </section>

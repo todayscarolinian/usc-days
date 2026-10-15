@@ -49,6 +49,8 @@ export function transformTeamsData(
   }
 
   for (const game of filteredGames) {
+    if (!game.teamA || !game.teamB) continue;
+
     const teamAName = game.teamA.teamName;
     const teamBName = game.teamB.teamName;
 

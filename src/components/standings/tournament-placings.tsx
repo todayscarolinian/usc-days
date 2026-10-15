@@ -35,8 +35,8 @@ export default function TournamentPlacings({
   onSelect,
 }: TournamentPlacingsProps) {
   return (
-    <div className="space-y-4">
-      <section className="overflow-hidden bg-neutral-950 text-white">
+    <div className="min-w-0 space-y-4">
+      <section className="overflow-hidden bg-neutral-950 bg-[url('/black-bg.png')] bg-top bg-repeat-y text-white">
         <header className="border-t-4 border-tc_primary px-4 py-3">
           <h2 className="text-sm font-bold uppercase">
             Tournament Placements
@@ -73,12 +73,12 @@ export default function TournamentPlacings({
                     />
                 )}
 
-                <span>
+                <span className="min-w-0">
                   <span className="block text-xs font-semibold uppercase">
                     {placement.label}
                   </span>
 
-                  <span className="block text-xs text-white/55">
+                  <span className="block truncate text-xs text-white/55">
                     {loading
                       ? "Loading..."
                       : champion?.team.teamName || "TBD"}

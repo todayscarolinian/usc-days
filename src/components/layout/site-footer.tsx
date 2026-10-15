@@ -1,76 +1,182 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
-    Twitter,
-    Facebook,
-    Instagram,
+  ChevronDown,
+  Facebook,
+  Instagram,
+  Twitter,
 } from "lucide-react";
+
 import { PUBLICATION } from "@/src/constants/publication";
-import Image from "next/image";
+
+const contactEmail = "todaysusc@gmail.com";
 
 const links = [
-    { href: "/#news", label: "News" },
-    { href: "/#featured-merch", label: "Merch" },
-    { href: "/schedules", label: "Schedules" },
-    { href: "/standings", label: "Standings" },
-    { href: "/leaderboards", label: "Leaderboards" },
+  { href: "/#news", label: "News" },
+  { href: "/#featured-merch", label: "Merch" },
+  { href: "/schedules", label: "Schedules" },
+  { href: "/standings", label: "Standings" },
+  { href: "/leaderboards", label: "Leaderboards" },
 ];
 
+const socialLinks = [
+  {
+    href: PUBLICATION.social.twitter,
+    label: "Visit Today's Carolinian on Twitter",
+    Icon: Twitter,
+  },
+  {
+    href: PUBLICATION.social.instagram,
+    label: "Visit Today's Carolinian on Instagram",
+    Icon: Instagram,
+  },
+  {
+    href: PUBLICATION.social.facebook,
+    label: "Visit Today's Carolinian on Facebook",
+    Icon: Facebook,
+  },
+];
+
+function SocialLinks({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex flex-wrap items-center gap-5 ${className}`}>
+      {socialLinks.map(({ href, label, Icon }) => (
+        <a
+          key={href}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          className="text-white transition-colors hover:text-tc_primary-300"
+        >
+          <Icon className="size-6" />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 export default function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden border-t-8 border-tc_primary bg-[#151515] text-white"
-            style={{
-                backgroundImage: "url('/black-bg.png')",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-            }}
+    <footer
+      className="relative isolate w-full overflow-hidden border-t-8 border-tc_primary bg-[#151515] text-white"
+      style={{
+        backgroundImage: "url('/black-bg.png')",
+        backgroundPosition: "top center",
+        backgroundRepeat: "repeat-y",
+        backgroundSize: "100% auto",
+      }}
     >
+      {/* Desktop decorations */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden min-[1440px]:block"
+      >
         <Image
-            src="/ribbon3.png"
-            alt=""
-            aria-hidden="true"
-            width={333}
-            height={800}
-            className="pointer-events-none absolute right-0 -top-40 z-[1] hidden h-auto w-28 object-contain sm:block md:-top-52 md:w-36 lg:-top-64 lg:w-48"
+          src="/ribbon.png"
+          alt=""
+          width={548}
+          height={325}
+          className="absolute -bottom-4 -left-20 h-auto w-[clamp(18rem,38vw,28rem)] object-contain opacity-60"
         />
 
         <Image
-            src="/ribbon.png"
-            alt=""
-            aria-hidden="true"
-            width={548}
-            height={325}
-            className="pointer-events-none absolute bottom-0 -left-13 z-0 h-auto w-56 object-contain sm:w-72z md:w-80 lg:w-[28rem]"
+          src="/ribbon2.png"
+          alt=""
+          width={889}
+          height={391}
+          className="absolute -right-24 -bottom-8 h-auto w-[clamp(22rem,42vw,32rem)] object-contain opacity-60"
         />
 
         <Image
-            src="/ribbon2.png"
-            alt=""
-            aria-hidden="true"
-            width={889}
-            height={391}
-            className="pointer-events-none absolute bottom-0 right-0 z-0 h-auto w-64 object-contain sm:w-80 md:w-96 lg:w-[32rem]"
+          src="/ribbon3.png"
+          alt=""
+          width={333}
+          height={800}
+          className="absolute -top-48 -right-12 hidden h-auto w-[clamp(9rem,14vw,12rem)] object-contain opacity-60 lg:block"
         />
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-[2fr_1fr_1fr]">
-        <div>
-          <div className="mb-5 flex max-w-sm flex-col items-start gap-3">
+      </div>
 
+      {/* Mobile footer */}
+      <div className="relative z-10 mx-auto max-w-lg px-6 py-10 md:hidden">
+        <div className="pb-8">
+          <Image
+            src="/tc-print-logo-white.png"
+            alt="Today's Carolinian logo"
+            width={2000}
+            height={304}
+            className="mx-auto h-auto w-full max-w-64"
+          />
+        </div>
+
+        <div className="border-t border-white/20">
+          <details className="group border-b border-white/20">
+            <summary className="flex cursor-pointer list-none items-center justify-between py-5 text-sm font-bold uppercase tracking-wider text-white [&::-webkit-details-marker]:hidden">
+              Explore
+
+              <ChevronDown
+                aria-hidden="true"
+                className="size-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              />
+            </summary>
+
+            <ul className="space-y-3 pb-5 text-sm text-white/70">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="inline-block py-1 transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </details>
+
+          <details className="group border-b border-white/20">
+            <summary className="flex cursor-pointer list-none items-center justify-between py-5 text-sm font-bold uppercase tracking-wider text-white [&::-webkit-details-marker]:hidden">
+              Contact Us
+
+              <ChevronDown
+                aria-hidden="true"
+                className="size-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              />
+            </summary>
+
+            <div className="pb-5">
+              <a
+                href={`mailto:${contactEmail}`}
+                className="inline-block max-w-full break-all text-sm text-white/70 transition-colors hover:text-white"
+              >
+                {contactEmail}
+              </a>
+            </div>
+          </details>
+        </div>
+
+        <SocialLinks className="mt-8" />
+      </div>
+
+      {/* Desktop footer */}
+      <div className="relative z-10 mx-auto hidden max-w-7xl grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-8 px-6 py-12 md:grid lg:px-8 lg:py-14">
+        <div className="min-w-0">
+          <div className="mb-4 max-w-80">
             <Image
-                src="/tc-print-logo-white.png"
-                alt="Today's Carolinian Logo"
-                width={2000}
-                height={304}
-                className="h-auto w-full max-w-80"
+              src="/tc-print-logo-white.png"
+              alt="Today's Carolinian logo"
+              width={2000}
+              height={304}
+              className="h-auto w-full"
             />
           </div>
 
-          <p className="max-w-md text-sm text-white/60">
+          <p className="max-w-md text-sm leading-6 text-white/65">
             {PUBLICATION.bio}
           </p>
         </div>
 
-        <nav aria-label="Footer navigation">
+        <nav className="min-w-0" aria-label="Footer navigation">
           <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-tc_primary-300">
             Explore
           </h2>
@@ -80,7 +186,7 @@ export default function SiteFooter() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="transition hover:text-white"
+                  className="inline-block py-0.5 transition-colors hover:text-white"
                 >
                   {link.label}
                 </Link>
@@ -89,52 +195,23 @@ export default function SiteFooter() {
           </ul>
         </nav>
 
-        <div>
+        <div className="min-w-0">
           <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-tc_primary-300">
-            CONTACT US
+            Contact Us
           </h2>
 
-          <span
-            className="mb-5 flex items-center gap-2 text-sm text-white/70 hover:text-white"
+          <a
+            href={`mailto:${contactEmail}`}
+            className="inline-block max-w-full break-all text-sm text-white/70 transition-colors hover:text-white"
           >
-            todaysusc@gmail.com
-          </span>
+            {contactEmail}
+          </a>
 
-          <div className="mt-6 flex items-center gap-6">
-            <a
-                href={PUBLICATION.social.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Visit Today's Carolinian on Facebook"
-                className="text-white transition-colors hover:text-tc_primary-300"
-            >
-                <Twitter className="size-6" />
-            </a>
-
-            <a
-                href={PUBLICATION.social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Visit Today's Carolinian on Instagram"
-                className="text-white transition-colors hover:text-tc_primary-300"
-            >
-                <Instagram className="size-6" />
-            </a>
-
-            <a
-                href={PUBLICATION.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Visit Today's Carolinian on YouTube"
-                className="text-white transition-colors hover:text-tc_primary-300"
-            >
-                <Facebook className="size-6" />
-            </a>
-          </div>
+          <SocialLinks className="mt-6" />
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl border-t border-white/25 px-6 py-5 text-center text-xs text-white/50">
+      <div className="relative z-10 mx-auto max-w-7xl border-t border-white/25 px-5 py-5 text-center text-[11px] leading-relaxed text-white/50 sm:px-6 sm:text-xs lg:px-8">
         © Copyright {new Date().getFullYear()}. All Rights Reserved
       </div>
     </footer>

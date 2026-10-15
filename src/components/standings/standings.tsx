@@ -177,7 +177,7 @@ export default function Standings() {
           />
         </div>
 
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
           {loading ? (
             <StandingsTableSkeleton rows={6} />
           ) : (

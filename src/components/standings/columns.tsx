@@ -19,14 +19,16 @@ const standingColumns: ColumnDef<TeamStandingData>[] = [
       const logo = getLogoForSchool(team);
 
       return (
-        <div className="flex min-w-44 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-1.5 sm:min-w-44 sm:gap-3">
           <Image
             src={logo}
             alt={`${team} logo`}
-            className="size-7 object-contain"
+            className="size-5 shrink-0 object-contain sm:size-7"
           />
 
-          <span className="font-semibold text-neutral-900">{team}</span>
+          <span className="min-w-0 truncate font-semibold text-neutral-900">
+            {team}
+          </span>
         </div>
       );
     },
