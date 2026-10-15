@@ -31,7 +31,7 @@ export default async function CategoryPage({
 
   if (error) {
     return (
-      <div className="p-12">
+      <div className="p-12 pt-28">
         <h2 className="text-3xl font-bold mb-4">Error loading category</h2>
         <p className="text-red-600">
           {error instanceof Error
@@ -48,14 +48,14 @@ export default async function CategoryPage({
 
   if (!category) {
     return (
-      <div className="py-12">
+      <div className="pt-28 pb-12">
         <h2 className="text-3xl font-bold">Category not found</h2>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="pt-16">
       <CategoryProductsClient
         categoryId={category.id}
         categoryName={category.categoryName}

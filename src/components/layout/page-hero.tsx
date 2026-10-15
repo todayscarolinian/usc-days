@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image, { type StaticImageData } from "next/image";
+import { useSharedCarouselIndex } from "@/src/hooks/use-shared-carousel-index";
 
 type PageHeroImage = {
     src: StaticImageData;
@@ -23,17 +23,7 @@ export default function PageHero({
     imagePosition = "center",
     interval = 5000,
 }: PageHeroProps) {
-    const [activeIndex, setActiveIndex] = useState(0);
-
-    useEffect(() => {
-        if (images.length < 2) return;
-
-        const timer = window.setInterval(() => {
-            setActiveIndex((current) => (current + 1) % images.length);
-        }, interval);
-
-        return () => window.clearInterval(timer);
-    }, [images.length, interval]);
+    const { activeIndex } = useSharedCarouselIndex(images.length, interval);
 
     return (
         <section
@@ -47,7 +37,7 @@ export default function PageHero({
                     alt=""
                     aria-hidden="true"
                     fill
-                    priority={index === 0}
+                    priority={index === activeIndex}
                     placeholder="blur"
                     sizes="100vw"
                     style={{ objectPosition: image.position ?? imagePosition }}
