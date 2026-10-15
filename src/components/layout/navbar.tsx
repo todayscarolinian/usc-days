@@ -116,17 +116,19 @@ export default function Navbar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [hasHero, setHasHero] = useState(
-    pathname === "/standings",
+    pathname === "/" || pathname === "/standings",
   );
   const [isOverHero, setIsOverHero] = useState(
-    pathname === "/standings",
+    pathname === "/" || pathname === "/standings",
   );
 
   const sportParameter = searchParams.get("sport");
 
   useEffect(() => {
     function updateNavbar() {
-      const hero = document.getElementById("page-hero");
+      const hero =
+        document.getElementById("page-hero") ??
+        document.getElementById("site-hero");
 
       setHasHero(Boolean(hero));
       setIsOverHero(

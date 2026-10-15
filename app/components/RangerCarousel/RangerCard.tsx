@@ -25,8 +25,7 @@ export default function RangerCard({ ranger, position, total }: RangerCardProps)
         alt={`${ranger.name} card`}
         draggable={false}
         fill
-        // Matches --card-w in RangerCarousel.css: clamp(220px, 50vw, 760px).
-        sizes="(min-width: 1520px) 760px, 50vw"
+        sizes="(min-width: 1520px) 760px, (min-width: 640px) 50vw, 74vw"
         className="scale-[1.04] object-cover"
         // Hide a missing asset instead of displaying the broken-image icon.
         onError={(e) => {

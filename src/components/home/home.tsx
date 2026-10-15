@@ -27,26 +27,30 @@ export default function Home() {
         />
       </main>
 
-      <section id="sports" aria-labelledby="sports">
+      <section id="sports" aria-labelledby="sports-heading">
         <SportsSection />
       </section>
 
-      <main className="flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-white">
-        <section className="w-full px-6 pt-16 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-black md:text-6xl">
+      <section
+        id="schools"
+        aria-labelledby="schools-heading"
+        className="schools-section w-full bg-white"
+      >
+        <div className="w-full shrink-0 px-6 text-center">
+          <h2 id="schools-heading" className="text-3xl font-bold tracking-tight text-black sm:text-4xl lg:text-5xl">
             Meet the Schools
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 md:text-lg">
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-600 sm:text-base">
             Get to know the different schools and departments that make up our
             Carolinian community. Discover their unique identities, programs,
             and what makes each one stand out.
           </p>
-        </section>
-        <section className="flex w-full items-center justify-center py-12">
+        </div>
+        <div className="schools-carousel">
           <RangerCarousel />
-        </section>
-      </main>
-      
+        </div>
+      </section>
+
       <LeaderboardSection />
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
@@ -54,7 +58,6 @@ export default function Home() {
           <MerchSection />
         </section>
       </main>
-
     </div>
   );
 }

@@ -44,8 +44,8 @@ function NewsItem({ post }: { post: FacebookPost }) {
           <Newspaper className="size-6 text-neutral-500" aria-hidden="true" />
         )}
       </span>
-      <span className="min-w-0">
-        <span className="line-clamp-3 block text-lg leading-tight font-medium">{headline}</span>
+      <span className="min-w-0 flex-1">
+        <span className="line-clamp-3 break-words text-lg leading-tight font-medium">{headline}</span>
         {!Number.isNaN(+date) && (
           <time dateTime={post.createdTime} className="mt-1 block text-sm text-neutral-600">
             {dateFormatter.format(date)}
