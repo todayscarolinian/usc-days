@@ -1,0 +1,35 @@
+/*
+ * Deck geometry measured from the reference (front card 842 x 542).
+ * Offsets are % of the card's own size, so the fan scales with --card-w.
+ * Tweak --rot / --tx / --ty per position to fine-tune the fan.
+ */
+.ranger-deck {
+  --card-w: clamp(220px, 50vw, 760px);
+  position: relative;
+  width: var(--card-w);
+  aspect-ratio: 842 / 542;
+  /* reserve room for the fanned cards so nothing clips or overflows */
+  margin-right: calc(var(--card-w) * 0.36);
+  margin-bottom: calc(var(--card-w) * 0.3);
+  flex-shrink: 0;
+}
+
+.ranger-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.2% / 1.9%;
+  overflow: hidden;
+  transform-origin: top left;
+  transform: translate(var(--tx, 0%), var(--ty, 0%)) rotate(var(--rot, 0deg));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  user-select: none;
+}
+
+.ranger-card[data-pos="0"] { --rot: 0deg;    --tx: 0%;    --ty: 0%; }
+.ranger-card[data-pos="1"] { --rot: 3.5deg;  --tx: 5.9%;  --ty: 1.5%; }
+.ranger-card[data-pos="2"] { --rot: 9deg;    --tx: 13.1%; --ty: 3.5%; }
+.ranger-card[data-pos="3"] { --rot: 11.5deg; --tx: 17.5%; --ty: 6.8%; }
+.ranger-card[data-pos="4"] { --rot: 13.5deg; --tx: 22.5%; --ty: 9%; }
+.ranger-card[data-pos="5"] { --rot: 15.5deg; --tx: 28%;   --ty: 11.5%; }
+.ranger-card[data-pos="6"] { --rot: 17.5deg; --tx: 33.5%; --ty: 14%; }
+
