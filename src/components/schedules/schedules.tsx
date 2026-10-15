@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import type { Schedules } from "@/src/types/types";
 import { useSchedules } from "@/src/hooks/use-schedules";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import ScheduleEvents from "./schedule-events";
@@ -10,9 +13,24 @@ import ScheduleNews from "./schedule-news";
 import ScheduleBackground from "./schedule-background";
 import styles from "./schedules.module.css";
 
+const GameDetailsDialog = dynamic(() => import("./game-details-dialog"), { ssr: false });
+const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
+const EditScheduleDialog = dynamic(() => import("./edit-schedule-dialog"), { ssr: false });
+
 export default function SchedulesPage() {
   const schedules = useSchedules();
   const { hasAccess } = useHasHeraldDomainAccess();
+  const [detailsGame, setDetailsGame] = useState<Schedules | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [scoreGame, setScoreGame] = useState<Schedules | null>(null);
+  const [scoreOpen, setScoreOpen] = useState(false);
+  const [editGame, setEditGame] = useState<Schedules | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
+  function openGame(game: Schedules) {
+    setDetailsGame(game);
+    setDetailsOpen(true);
+  }
   // The client session may resolve before this route finishes hydrating.
   const canManage = hasAccess && schedules.now !== null;
 
@@ -60,11 +78,36 @@ export default function SchedulesPage() {
               olderPageCount={schedules.games.pastPageCount}
               onLoadOlder={() => void schedules.games.loadOlder()}
               onLoadNewer={() => void schedules.games.loadNewer()}
+              onOpenGame={openGame}
             />
           </div>
         </section>
         <ScheduleNews />
       </div>
+      {detailsGame && (
+        <GameDetailsDialog
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+          game={detailsGame}
+          now={schedules.now ?? undefined}
+          onEditSchedule={(game) => {
+            setDetailsOpen(false);
+            setEditGame(game);
+            setEditOpen(true);
+          }}
+          onAddScore={(game) => {
+            setDetailsOpen(false);
+            setScoreGame(game);
+            setScoreOpen(true);
+          }}
+        />
+      )}
+      {scoreGame && (
+        <AddScoreDialog open={scoreOpen} onOpenChange={setScoreOpen} game={scoreGame} />
+      )}
+      {editGame && (
+        <EditScheduleDialog open={editOpen} onOpenChange={setEditOpen} schedule={editGame} />
+      )}
     </div>
   );
 }
