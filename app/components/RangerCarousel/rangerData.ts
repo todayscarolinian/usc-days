@@ -1,10 +1,6 @@
 /**
  * Central place for all Ranger data and image paths.
- *
- * TO REPLACE IMAGES:
- * - Put your files in public/rangers/
- * - Edit only the cardImage / iconImage filenames in the RANGERS array.
- */
+ **/
 
 const IMAGE_BASE = "/rangers";
 
