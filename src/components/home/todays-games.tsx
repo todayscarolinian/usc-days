@@ -25,7 +25,7 @@ function GamesSkeleton() {
     <div
       role="status"
       aria-label="Loading today's games"
-      className="space-y-6 md:px-6 xl:px-12"
+      className="space-y-6"
     >
       <span className="sr-only">Loading today&apos;s games…</span>
       <div
@@ -115,7 +115,7 @@ function GamesContent({
   }
 
   return (
-    <div className="space-y-6 md:px-6 xl:px-12">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 gap-5 py-2.5 md:grid-cols-2 xl:grid-cols-3">
         {featured.map((game) => (
           <TodaysGamesCard
