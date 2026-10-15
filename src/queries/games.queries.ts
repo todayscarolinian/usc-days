@@ -1,7 +1,10 @@
 "use client";
 
 import { AddGamePayload, EditGamePayload } from "@/src/types/games.types";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { fetchGamesPage } from "@/src/services/games.client";
+import { addScheduleDays, getScheduleLoadedRange } from "@/src/lib/schedules";
 import { Game } from "../lib/prisma/generated/client";
 import axios from "axios";
 import { Schedules } from "../types/types";
@@ -77,3 +80,102 @@ export const useDeleteGamesQuery = () => {
     },
   });
 };
+
+const SCHEDULE_PAGE_SIZE = 5;
+
+/**
+ * Games around `anchor`: every game starting that day, plus pages of
+ * `SCHEDULE_PAGE_SIZE` games before and after it, in chronological order.
+ * `gameTypeIds` is `undefined` while it can't be resolved yet (the queries
+ * wait), `null` for no sport filter, and `[]` when no sport matches.
+ */
+export function useScheduleWindow({
+  anchor,
+  gameTypeIds,
+  teamId,
+}: {
+  anchor: string | null;
+  gameTypeIds: number[] | null | undefined;
+  teamId: number | null;
+}) {
+  const filters = { gameTypeIds: gameTypeIds ?? undefined, teamId };
+  const enabled = anchor !== null && gameTypeIds !== undefined && gameTypeIds?.length !== 0;
+  const nextDay = anchor ? addScheduleDays(anchor, 1) : undefined;
+  const key = { anchor, gameTypeIds, teamId };
+
+  const day = useQuery({
+    queryKey: ["games", "schedule", "day", key],
+    queryFn: ({ signal }) =>
+      fetchGamesPage({ ...filters, startsFrom: anchor ?? undefined, startsBefore: nextDay }, signal),
+    enabled,
+    staleTime: STALE_TIME,
+    refetchInterval: 60_000,
+  });
+
+  const past = useInfiniteQuery({
+    queryKey: ["games", "schedule", "past", key],
+    queryFn: ({ pageParam, signal }) =>
+      fetchGamesPage({
+        ...filters,
+        startsBefore: anchor ?? undefined,
+        order: "desc",
+        limit: SCHEDULE_PAGE_SIZE,
+        cursor: pageParam,
+      }, signal),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => page.nextCursor,
+    enabled,
+    staleTime: STALE_TIME,
+  });
+
+  const future = useInfiniteQuery({
+    queryKey: ["games", "schedule", "future", key],
+    queryFn: ({ pageParam, signal }) =>
+      fetchGamesPage({
+        ...filters,
+        startsFrom: nextDay,
+        order: "asc",
+        limit: SCHEDULE_PAGE_SIZE,
+        cursor: pageParam,
+      }, signal),
+    initialPageParam: null as string | null,
+    getNextPageParam: (page) => page.nextCursor,
+    enabled,
+    staleTime: STALE_TIME,
+  });
+
+  const pastGames = useMemo(
+    () => (past.data?.pages.flatMap(page => page.data) ?? []).reverse(),
+    [past.data],
+  );
+  const futureGames = useMemo(
+    () => future.data?.pages.flatMap(page => page.data) ?? [],
+    [future.data],
+  );
+  const games = useMemo(
+    () => [...pastGames, ...(day.data?.data ?? []), ...futureGames],
+    [pastGames, day.data, futureGames],
+  );
+
+  const hasOlder = past.hasNextPage;
+  const hasNewer = future.hasNextPage;
+  const loadedRange = useMemo(
+    () => anchor ? getScheduleLoadedRange(anchor, pastGames[0], futureGames.at(-1), hasOlder, hasNewer) : null,
+    [anchor, pastGames, futureGames, hasOlder, hasNewer],
+  );
+
+  return {
+    games,
+    // A filter matching no sports is settled with nothing to show.
+    isPending: enabled ? day.isPending || past.isPending || future.isPending : gameTypeIds === undefined || anchor === null,
+    isError: day.isError || past.isError || future.isError,
+    pastPageCount: past.data?.pages.length ?? 0,
+    hasOlder,
+    hasNewer,
+    isLoadingOlder: past.isFetchingNextPage,
+    isLoadingNewer: future.isFetchingNextPage,
+    loadOlder: () => past.fetchNextPage(),
+    loadNewer: () => future.fetchNextPage(),
+    loadedRange,
+  };
+}

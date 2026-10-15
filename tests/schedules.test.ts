@@ -3,7 +3,11 @@ import { describe, it } from "vitest";
 import { getGameStatus } from "@/src/lib/game-status";
 import { getMatchdayGameStatus } from "@/src/lib/todays-games";
 import {
+  addScheduleDays,
   buildScheduleEvents,
+  getScheduleGameTypeIds,
+  getScheduleLoadedRange,
+  isScheduleDateLoaded,
   getScheduleDay,
   getScheduleEventName,
   groupScheduleGames,
@@ -168,5 +172,47 @@ describe("schedule filtering and ordering", () => {
     assert.deepEqual(days.map(day => day.date), [today, "2026-10-16", "2026-10-14", "2026-10-13"]);
     assert.deepEqual(days[0].games.map(match => match.id), [1, 2]);
     assert.deepEqual(matches.map(match => match.id), originalOrder);
+  });
+});
+
+describe("schedule window helpers", () => {
+  const sports = [
+    { id: 1, gameName: "Men's Basketball" },
+    { id: 2, gameName: "Women's Basketball" },
+    { id: 3, gameName: "Men's Volleyball" },
+  ];
+
+  it("adds calendar days across month boundaries", () => {
+    assert.equal(addScheduleDays("2026-10-31", 1), "2026-11-01");
+    assert.equal(addScheduleDays("2026-11-01", -1), "2026-10-31");
+  });
+
+  it("resolves an event to all of its sports", () => {
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: "Basketball", sportId: 3 }), [1, 2]);
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: "Chess", sportId: null }), []);
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: null, sportId: 3 }), [3]);
+    assert.equal(getScheduleGameTypeIds(sports, { event: null, sportId: null }), null);
+  });
+
+  it("treats only fully loaded days as loaded", () => {
+    const oldest = game({ startDate: "2026-10-10T03:00:00Z" });
+    const newest = game({ startDate: "2026-10-20T03:00:00Z" });
+    const range = getScheduleLoadedRange(today, oldest, newest, true, true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-10"), false);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-11"), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-19"), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-20"), false);
+  });
+
+  it("keeps the anchor loaded before either side has games", () => {
+    const range = getScheduleLoadedRange(today, undefined, undefined, true, true);
+    assert.equal(isScheduleDateLoaded(range, today), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-14"), false);
+  });
+
+  it("is unbounded on a side with no more pages", () => {
+    const range = getScheduleLoadedRange(today, undefined, undefined, false, false);
+    assert.equal(isScheduleDateLoaded(range, "2020-01-01"), true);
+    assert.equal(isScheduleDateLoaded(range, "2030-01-01"), true);
   });
 });
