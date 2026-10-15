@@ -5,6 +5,7 @@ import axios from "axios";
 type Team = {
   id: number;
   teamName: string;
+  schoolId: number;
 };
 
 const STALE_TIME = 1000 * 60 * 5;
@@ -14,7 +15,7 @@ export const getTeamsQuery = () =>
     queryKey: ["teams"],
     queryFn: async () => {
       const response = await axios.get("/api/teams");
-      return response.data.teams;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });

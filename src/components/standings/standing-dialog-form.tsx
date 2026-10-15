@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { AxiosError } from "axios";
 import {
   Dialog,
   DialogContent,
@@ -124,11 +125,12 @@ export default function StandingFormDialog({
         );
         onCloseAction(true);
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         console.error("Error saving standing:", error);
 
+        const axiosError = error as AxiosError<{ error?: string }>;
         const errorMessage =
-          error.response?.data?.error ||
+          axiosError.response?.data?.error ||
           "Failed to save standing. Please try again.";
         toast.error(errorMessage);
 
@@ -150,11 +152,12 @@ export default function StandingFormDialog({
           toast.success("Standing deleted successfully");
           onCloseAction(true);
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           console.error("Error deleting standing:", error);
 
+          const axiosError = error as AxiosError<{ error?: string }>;
           const errorMessage =
-            error.response?.data?.error ||
+            axiosError.response?.data?.error ||
             "Failed to delete standing. Please try again.";
           toast.error(errorMessage);
         },

@@ -9,112 +9,89 @@ import {
   TableHeader,
   TableRow,
 } from "@/src/components/ui/table";
-import { Roboto } from "next/font/google";
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
-
-interface StandingsTableSkeletonProps {
+type StandingsTableSkeletonProps = {
   rows?: number;
-}
+};
+
+const headers = ["#", "Team", "Played", "W / L", "D", "Win %"];
 
 export default function StandingsTableSkeleton({
   rows = 8,
 }: StandingsTableSkeletonProps) {
   return (
-    <div className={`border overflow-x-auto ${roboto.className}`}>
-      <Table
-        className="w-full border-collapse text-sm [&_th]:border-0! [&_td]:border-0! [&_tr]:border-0! [&_thead]:border-0! [&_tbody]:border-0!"
-        style={{ borderCollapse: "collapse" }}
-      >
-        <TableHeader
-          className="bg-[#FAFAFA] text-[#080808] [&_tr]:border-0! [&_th]:border-0!"
-          style={{ border: "none" }}
-        >
-          <TableRow className="h-15 border-0!">
-            <TableHead
-              className="h-15 px-4 font-bold uppercase w-235.5 text-left border-0!"
-              style={{ border: "none" }}
-            >
-              TEAM
-            </TableHead>
-            <TableHead
-              className="h-15 px-4 font-bold uppercase w-35.5 text-center border-0!"
-              style={{ border: "none" }}
-            >
-              W
-            </TableHead>
-            <TableHead
-              className="h-15 px-4 font-bold uppercase w-35.5 text-center border-0!"
-              style={{ border: "none" }}
-            >
-              L
-            </TableHead>
-            <TableHead
-              className="h-15 px-4 font-bold uppercase w-35.5 text-center border-0!"
-              style={{ border: "none" }}
-            >
-              WIN %
-            </TableHead>
-          </TableRow>
-        </TableHeader>
+    <section className="min-w-0 border border-neutral-300 bg-white bg-[url('/white-bg.png')] bg-top bg-repeat-y p-3 sm:p-5">
+      <header className="mb-4 border-l-4 border-tc_primary pl-3">
+        <Skeleton className="h-6 w-48 max-w-full" />
+      </header>
 
-        <TableBody
-          className="text-[#3A3A3A] [&_tr]:border-0! [&_td]:border-0!"
-          style={{ border: "none" }}
-        >
-          {Array.from({ length: rows }).map((_, index) => (
-            <TableRow
-              key={index}
-              className="h-15 border-0!"
-              style={{ border: "none" }}
-            >
-              {/* Team column */}
-              <TableCell
-                className="h-15 px-4 w-235.5 text-left border-0!"
-                style={{ border: "none" }}
-              >
-                <div className="flex items-center gap-2">
-                  <Skeleton className="size-6 rounded" />
-                  <Skeleton className="h-4 w-30" />
-                </div>
-              </TableCell>
+      <div className="min-w-0 border border-neutral-300">
+        <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
+          <colgroup>
+            <col className="w-[8%] sm:w-auto" />
+            <col className="w-[36%] sm:w-auto" />
+            <col className="w-[15%] sm:w-auto" />
+            <col className="w-[15%] sm:w-auto" />
+            <col className="w-[8%] sm:w-auto" />
+            <col className="w-[18%] sm:w-auto" />
+          </colgroup>
 
-              {/* Wins column */}
-              <TableCell
-                className="h-15 px-4 w-35.5 text-center border-0!"
-                style={{ border: "none" }}
-              >
-                <div className="flex justify-center">
-                  <Skeleton className="h-4 w-7.5" />
-                </div>
-              </TableCell>
-
-              {/* Losses column */}
-              <TableCell
-                className="h-15 px-4 w-35.5 text-center border-0!"
-                style={{ border: "none" }}
-              >
-                <div className="flex justify-center">
-                  <Skeleton className="h-4 w-7.5" />
-                </div>
-              </TableCell>
-
-              {/* Win % column */}
-              <TableCell
-                className="h-15 px-4 w-35.5 text-center border-0!"
-                style={{ border: "none" }}
-              >
-                <div className="flex justify-center">
-                  <Skeleton className="h-4 w-10" />
-                </div>
-              </TableCell>
+          <TableHeader className="bg-neutral-200">
+            <TableRow className="border-neutral-300">
+              {headers.map((header, index) => (
+                <TableHead
+                  key={header}
+                  className={
+                    index === 1
+                      ? "h-9 overflow-hidden px-1.5 text-left text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-4 sm:text-[11px]"
+                      : "h-9 overflow-hidden px-1 text-center text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-3 sm:text-[11px]"
+                  }
+                >
+                  {header}
+                </TableHead>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+
+          <TableBody>
+            {Array.from({ length: rows }, (_, index) => (
+              <TableRow
+                key={index}
+                className="border-neutral-300 odd:bg-white even:bg-neutral-100"
+              >
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-3" />
+                </TableCell>
+
+                <TableCell className="h-10 overflow-hidden px-1.5 sm:h-12 sm:px-4">
+                  <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+                    <Skeleton className="size-5 shrink-0 rounded-full sm:size-7" />
+                    <Skeleton className="h-3 min-w-0 flex-1 sm:h-4" />
+                  </div>
+                </TableCell>
+
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-4" />
+                </TableCell>
+
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-7" />
+                </TableCell>
+
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-3" />
+                </TableCell>
+
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-8" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Skeleton className="mt-3 h-3 w-56 max-w-full" />
+    </section>
   );
 }

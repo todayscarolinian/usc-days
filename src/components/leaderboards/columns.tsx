@@ -51,6 +51,11 @@ export const columns: ColumnDef<StandingData>[] = [
     meta: { className: "w-16 text-center" },
   },
   {
+    accessorKey: "draws",
+    header: "D",
+    meta: { className: "w-16 text-center" },
+  },
+  {
     accessorKey: "winPercentage",
     header: "WIN %",
     meta: { className: "w-20 text-center" },

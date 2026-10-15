@@ -25,6 +25,7 @@ export interface SelectOption {
 }
 
 type SearchableSelectProps = {
+  id?: string;
   // Content
   placeholder?: string;
   searchPlaceholder?: string;
@@ -40,6 +41,7 @@ type SearchableSelectProps = {
 
   // Features
   clearable?: boolean;
+  allowCustom?: boolean;
   showCheckmark?: boolean;
 
   // Styling
@@ -61,6 +63,7 @@ const DEFAULT_PROPS = {
 } as const;
 
 export function SearchableSelect({
+  id,
   placeholder = DEFAULT_PROPS.placeholder,
   searchPlaceholder = DEFAULT_PROPS.searchPlaceholder,
   emptyMessage = DEFAULT_PROPS.emptyMessage,
@@ -71,6 +74,7 @@ export function SearchableSelect({
   disabled = false,
   loading = DEFAULT_PROPS.loading,
   clearable = DEFAULT_PROPS.clearable,
+  allowCustom = false,
   showCheckmark = DEFAULT_PROPS.showCheckmark,
   className,
   popoverClassName,
@@ -81,8 +85,9 @@ export function SearchableSelect({
 
   // Memoize selected option lookup
   const selectedOption = useMemo(
-    () => options.find((option) => option.value === value),
-    [options, value],
+    () => options.find((option) => option.value === value) ??
+      (allowCustom && value ? { value, label: value } : undefined),
+    [options, value, allowCustom],
   );
 
   // Memoize filtered options if custom filter is provided
@@ -114,9 +119,10 @@ export function SearchableSelect({
   const isDisabled = disabled || loading;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -163,13 +169,16 @@ export function SearchableSelect({
         side="bottom"
         align="start"
       >
-        <Command shouldFilter={!filterFunction}>
+        <Command shouldFilter={!filterFunction} className="h-auto max-h-[var(--radix-popover-content-available-height)]">
           <CommandInput
             placeholder={searchPlaceholder}
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList>
+          <CommandList
+            className="min-h-0 max-h-60 touch-pan-y overscroll-contain overflow-y-auto"
+            onWheel={(event) => event.stopPropagation()}
+          >
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup heading={groupLabel}>
               {(filterFunction ? filteredOptions : options).map((option) => {
@@ -214,6 +223,17 @@ export function SearchableSelect({
                 );
               })}
             </CommandGroup>
+            {allowCustom && search.trim() && !options.some(option => option.label.toLowerCase() === search.trim().toLowerCase()) && (
+              <CommandGroup heading="Custom location">
+                <CommandItem
+                  value={search.trim()}
+                  onSelect={() => handleSelect(search.trim())}
+                  className="cursor-pointer"
+                >
+                  Use “{search.trim()}”
+                </CommandItem>
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

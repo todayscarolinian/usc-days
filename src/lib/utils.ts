@@ -1,10 +1,10 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { sportIcons } from "../constants/sportIcons";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { sportIconAliases, sportIcons } from "../constants/sportIcons";
 import { schoolLogos } from "../constants/schoolLogos";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 const swimmingAliases = [
@@ -17,28 +17,25 @@ const swimmingAliases = [
 ];
 
 export const getIconFor = (name: string) => {
-  if (swimmingAliases.some((alias) => name.includes(alias))) {
+  const normalizedName = name.toLowerCase();
+  if (swimmingAliases.some((alias) => normalizedName.includes(alias.toLowerCase()))) {
     return sportIcons["Swimming"];
   }
 
-  const key = Object.keys(sportIcons).find((k) => name.includes(k));
+  const key = Object.keys(sportIcons).find((k) =>
+    k !== "Default" && normalizedName.includes(k.toLowerCase())
+  );
 
-  return key ? sportIcons[key] : sportIcons["Default"];
+  if (key) return sportIcons[key];
+
+  const alias = Object.keys(sportIconAliases).find((k) =>
+    normalizedName.includes(k.toLowerCase())
+  );
+
+  return alias ? sportIcons[sportIconAliases[alias]] : sportIcons["Default"];
 };
 
 export const getLogoForSchool = (schoolName: string) => {
-    const key = Object.keys(schoolLogos).find((k) => schoolName.includes(k));
-    return key ? schoolLogos[key] : schoolLogos["Default"];
-}
-
-/**
- * Get the current timezone offset in ISO 8601 format (e.g., "+08:00" or "-05:00")
- * This ensures dates are stored in the user's local timezone
- */
-export function getTimezoneOffset(): string {
-  const offset = -new Date().getTimezoneOffset();
-  const hours = Math.floor(Math.abs(offset) / 60);
-  const minutes = Math.abs(offset) % 60;
-  const sign = offset >= 0 ? "+" : "-";
-  return `${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-}
+  const key = Object.keys(schoolLogos).find((k) => schoolName.includes(k));
+  return key ? schoolLogos[key] : schoolLogos["Default"];
+};

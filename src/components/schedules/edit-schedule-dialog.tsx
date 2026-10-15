@@ -10,8 +10,11 @@ import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
-import { getTimezoneOffset } from "@/src/lib/utils";
-import { FaRegEdit } from "react-icons/fa";
+import {
+  getEventDayKey,
+  getEventTimeOfDay,
+  eventDateTimeToISO,
+} from "@/src/lib/time";
 
 import { Button } from "@/src/components/ui/button";
 import {
@@ -60,26 +63,12 @@ export default function EditScheduleDialog({
   } = useScheduleForm({
     initialValues: {
       gameTypeId: schedule.gameType.id,
-      teamAId: schedule.teamA.id,
-      teamBId: schedule.teamB.id,
-      startDate: new Date(schedule.startDate).toLocaleDateString("en-CA", {
-        timeZone: "Asia/Manila",
-      }),
-      endDate: new Date(schedule.endDate).toLocaleDateString("en-CA", {
-        timeZone: "Asia/Manila",
-      }),
-      startTime: new Date(schedule.startDate).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Manila",
-      }),
-      endTime: new Date(schedule.endDate).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Manila",
-      }),
+      teamAId: schedule.teamA?.id ?? null,
+      teamBId: schedule.teamB?.id ?? null,
+      startDate: getEventDayKey(schedule.startDate),
+      endDate: getEventDayKey(schedule.endDate),
+      startTime: getEventTimeOfDay(schedule.startDate),
+      endTime: getEventTimeOfDay(schedule.endDate),
       location: schedule.location ? schedule.location : undefined,
     },
     schema: EditGameSchema,
@@ -88,8 +77,8 @@ export default function EditScheduleDialog({
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
+      endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location,
       teamAScore:
         schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
@@ -174,14 +163,13 @@ export default function EditScheduleDialog({
       return;
     }
 
-    const data: EditGamePayload = {
+    const data: EditGamePayload & { id: number } = {
       id: schedule.id,
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
-      //revert the location to default "TBA" display if undefined
+      startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
+      endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location:
         inputs.location && inputs.location.trim() !== ""
           ? inputs.location
@@ -245,7 +233,7 @@ export default function EditScheduleDialog({
         }
       }}
     >
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>
           <DialogDescription>
@@ -332,9 +320,10 @@ export default function EditScheduleDialog({
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamAId !== -1 ? inputs.teamAId.toString() : ""}
+                clearable
+                value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamAId", value ? Number(value) : -1)
+                  updateInput("teamAId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
@@ -356,9 +345,10 @@ export default function EditScheduleDialog({
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamBId !== -1 ? inputs.teamBId.toString() : ""}
+                clearable
+                value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamBId", value ? Number(value) : -1)
+                  updateInput("teamBId", value ? Number(value) : null)
                 }
                 disabled={loading || inputs.gameTypeId <= 0}
                 loading={teamLoading}

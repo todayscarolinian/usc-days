@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useId } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { getTeamsQuery } from "@/src/queries/teams.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useScheduleForm } from "@/src/hooks/use-schedule-form";
@@ -23,11 +24,31 @@ import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
-import { getTimezoneOffset } from "@/src/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
+import { eventDateTimeToISO } from "@/src/lib/time";
 
-export default function AddScheduleDialog() {
+const SCHEDULE_LOCATIONS = [
+  "Bunzel Lobby, Talamban Campus",
+  "Domain Talamban Branch, Talamban Campus",
+  "AB Gymnasium, Downtown Campus",
+  "Tennis Court, Downtown Campus",
+  "AB Basement, Downtown Campus",
+  "BCT 1, Talamban Campus",
+  "BCT 2, Talamban Campus",
+  "USC Stadium, Talamban Campus",
+  "AB 202 (Court 1), Downtown Campus",
+  "AB 202 (Court 2), Downtown Campus",
+  "Pelota Court, Downtown Campus",
+];
+
+export default function AddScheduleDialog({ compactTrigger = false, preview = false }: {
+  compactTrigger?: boolean;
+  preview?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  const sportId = useId();
+  const locationId = useId();
 
   const {
     inputs,
@@ -57,19 +78,25 @@ export default function AddScheduleDialog() {
   } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
 
   const add = useAddGamesQuery();
+  const teams = getTeamsQuery();
+  const useAllTeams = inputs.gameTypeId > 0 && !teamLoading && !teamSportsError && fetchedTeamSportsData.length === 0;
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
-    if (sportsError && !shownErrorsRef.current.has('sportsError')) {
+    if (sportsError && !shownErrorsRef.current.has("sportsError")) {
       showToast("error", "Failed to load sports", parseApiError(sportsError));
-      shownErrorsRef.current.add('sportsError');
+      shownErrorsRef.current.add("sportsError");
     }
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError && !shownErrorsRef.current.has('teamSportsError')) {
-      showToast("error", "Failed to load teams", parseApiError(teamSportsError));
-      shownErrorsRef.current.add('teamSportsError');
+    if (teamSportsError && !shownErrorsRef.current.has("teamSportsError")) {
+      showToast(
+        "error",
+        "Failed to load teams",
+        parseApiError(teamSportsError),
+      );
+      shownErrorsRef.current.add("teamSportsError");
     }
   }, [teamSportsError, showToast]);
 
@@ -82,19 +109,27 @@ export default function AddScheduleDialog() {
     }
   }, [open, reset, dismissAll]);
 
-  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
+  const sportsOptions: SelectOption[] = fetchedSportsData
+    .filter((sport) => !/dance|\b(?:mr|ms)\b/i.test(sport.gameName))
+    .map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = fetchedTeamSportsData.map((team) => ({
+  const teamOptions: SelectOption[] = useAllTeams ? (teams.data ?? []).map((team) => ({
+    value: team.id.toString(),
+    label: team.teamName,
+    id: team.id,
+  })) : fetchedTeamSportsData.map((team) => ({
     value: team.teamId.toString(),
     label: team.team.teamName,
     id: team.teamId,
   }));
 
   async function createSchedule() {
+    if (preview) return;
+
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -103,7 +138,11 @@ export default function AddScheduleDialog() {
 
     // Validate form inputs using existing AddGameSchema
     if (!validate()) {
-      showToast("error", "Validation Error", firstError || "Please check your inputs");
+      showToast(
+        "error",
+        "Validation Error",
+        firstError || "Please check your inputs",
+      );
       return;
     }
 
@@ -111,8 +150,8 @@ export default function AddScheduleDialog() {
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
       teamBId: inputs.teamBId,
-      startDate: `${inputs.startDate}T${inputs.startTime}:00${getTimezoneOffset()}`,
-      endDate: `${inputs.endDate}T${inputs.endTime}:00${getTimezoneOffset()}`,
+      startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
+      endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location || undefined,
     };
 
@@ -121,7 +160,7 @@ export default function AddScheduleDialog() {
         showToast(
           "success",
           "Schedule created!",
-          "The game schedule has been added successfully."
+          "The game schedule has been added successfully.",
         );
         setOpen(false);
       },
@@ -132,20 +171,28 @@ export default function AddScheduleDialog() {
     });
   }
 
-  const loading = sportsLoading || teamLoading || add.isPending;
+  const loading = sportsLoading || teamLoading || (useAllTeams && teams.isPending) || add.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild onClick={() => setOpen(true)}>
-        <Button className="bg-tc_primary-500 hover:bg-tc_primary-600">
-          Add Schedule
+        <Button className={cn(
+          "bg-tc_primary-500 hover:bg-tc_primary-600",
+          compactTrigger && "size-10 p-0 sm:h-9 sm:w-auto sm:px-3",
+        )}>
+          {compactTrigger && <Plus className="size-4" aria-hidden="true" />}
+          <span className={compactTrigger ? "sr-only sm:not-sr-only" : undefined}>
+            {preview ? "Preview Schedule" : "Add Schedule"}
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">
         <DialogHeader>
-          <DialogTitle>Add Schedule</DialogTitle>
+          <DialogTitle className="text-2xl sm:text-3xl">Add Schedule</DialogTitle>
           <DialogDescription>
-            Add a new game schedule. Click Submit when you&apos;re done.
+            {preview
+              ? "Preview only. You can try the form, but schedules won’t be saved."
+              : <>Add a new game schedule. Click Submit when you&apos;re done.</>}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
@@ -157,8 +204,10 @@ export default function AddScheduleDialog() {
               <Input
                 type="date"
                 value={inputs.startDate}
-                onChange={(e) => { updateInput("startDate", e.target.value)
-                    updateInput("endDate", e.target.value) }}
+                onChange={(e) => {
+                  updateInput("startDate", e.target.value);
+                  updateInput("endDate", e.target.value);
+                }}
                 className={
                   validationErrors.startDate
                     ? "border-red-500 focus-visible:ring-red-500"
@@ -194,21 +243,38 @@ export default function AddScheduleDialog() {
               />
             </div>
           </div>
-          <div className="w-full">
+          <div className="w-full flex flex-col gap-1">
+            <Label htmlFor={sportId} className="font-bold opacity-50">
+              Sport
+            </Label>
             <SearchableSelect
+              id={sportId}
               placeholder="Select a Sport"
               searchPlaceholder="Search sports..."
               emptyMessage="No sports found."
               options={sportsOptions}
               value={inputs.gameTypeId > 0 ? inputs.gameTypeId.toString() : ""}
-              onValueChange={(value) =>
-                updateInput("gameTypeId", value ? Number(value) : -1)
-              }
+              onValueChange={(value) => {
+                updateInput("gameTypeId", value ? Number(value) : -1);
+                updateInput("teamAId", null);
+                updateInput("teamBId", null);
+              }}
               disabled={loading}
               loading={sportsLoading}
               className="w-full"
             />
           </div>
+          {inputs.gameTypeId <= 0 && (
+            <p className="text-sm text-muted-foreground">Select a sport to choose teams.</p>
+          )}
+          {useAllTeams && !teams.isPending && !teams.isError && (
+            <p className="text-sm text-muted-foreground">No teams are registered for this sport yet. Showing all existing teams.</p>
+          )}
+          {useAllTeams && teams.isError && (
+            <div role="alert" className="text-sm text-destructive">
+              Could not load teams. <button type="button" className="underline" onClick={() => void teams.refetch()}>Try again</button>
+            </div>
+          )}
           <div className="w-full flex justify-between items-center gap-4">
             <div className="flex flex-col gap-1 w-full">
               <Label htmlFor="teamA" className="font-bold opacity-50">
@@ -219,9 +285,10 @@ export default function AddScheduleDialog() {
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamAId !== -1 ? inputs.teamAId.toString() : ""}
+                clearable
+                value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamAId", value ? Number(value) : -1)
+                  updateInput("teamAId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
@@ -243,9 +310,10 @@ export default function AddScheduleDialog() {
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamBId !== -1 ? inputs.teamBId.toString() : ""}
+                clearable
+                value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamBId", value ? Number(value) : -1)
+                  updateInput("teamBId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
@@ -259,14 +327,19 @@ export default function AddScheduleDialog() {
             </div>
           </div>
           <div className="w-full flex flex-col gap-1">
-            <Label htmlFor="location" className="font-bold opacity-50">
+            <Label htmlFor={locationId} className="font-bold opacity-50">
               Location
             </Label>
-            <Input
-              type="text"
-              placeholder="Location"
+            <SearchableSelect
+              id={locationId}
+              placeholder="Select or type a location"
+              searchPlaceholder="Search or type a new location..."
+              groupLabel="Locations"
+              options={SCHEDULE_LOCATIONS.map(location => ({ value: location, label: location }))}
+              allowCustom
+              clearable
               value={inputs.location || ""}
-              onChange={(e) => updateInput("location", e.target.value)}
+              onValueChange={(value) => updateInput("location", value)}
             />
           </div>
         </div>
@@ -279,7 +352,7 @@ export default function AddScheduleDialog() {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={inputs.gameTypeId <= 0 || loading}
+            disabled={preview || inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>

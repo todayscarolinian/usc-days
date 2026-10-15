@@ -1,41 +1,52 @@
 import TCRedLogo from "@/src/assets/tc-logo-red.png";
-import Badminton from "@/src/assets/icons/Diamond/Badminton.svg";
-import Basketball from "@/src/assets/icons/Diamond/Basketball.svg";
-import Cheerdance from "@/src/assets/icons/Diamond/Cheerdance.svg";
-import Chess from "@/src/assets/icons/Diamond/Chess.svg";
-import Esports from "@/src/assets/icons/Diamond/Esports.svg";
-import FlagFootball from "@/src/assets/icons/Diamond/Flag Football.svg";
-import Football from "@/src/assets/icons/Diamond/Football.svg";
-import Frisbee from "@/src/assets/icons/Diamond/Frisbee.svg";
-import Futsal from "@/src/assets/icons/Diamond/Futsal.svg";
-import LawnTennis from "@/src/assets/icons/Diamond/Lawn Tennis.svg";
-import MrIntrams from "@/src/assets/icons/Diamond/Mr Intrams.svg";
-import MsIntrams from "@/src/assets/icons/Diamond/Ms Intrams.svg";
-import Swimming from "@/src/assets/icons/Diamond/Swimming.svg";
-import TableTennis from "@/src/assets/icons/Diamond/Table Tennis.svg";
-import ThreeByThreeBasketball from "@/src/assets/icons/Diamond/ThreeByThreeBasketball.svg";
-import Volleyball from "@/src/assets/icons/Diamond/Volleyball.svg";
+import Badminton from "@/src/assets/icons/Diamond/Badminton.png";
+import Basketball from "@/src/assets/icons/Diamond/Basketball.png";
+import Cheerdance from "@/src/assets/icons/Diamond/Cheerdance.png";
+import Chess from "@/src/assets/icons/Diamond/Chess.png";
+import ContemporaryDance from "@/src/assets/icons/Diamond/Contemporarydance.png";
+import Esports from "@/src/assets/icons/Diamond/ESports.png";
+import FlagFootball from "@/src/assets/icons/Diamond/Flag Football.png";
+import Frisbee from "@/src/assets/icons/Diamond/Frisbee.png";
+import Futsal from "@/src/assets/icons/Diamond/Futsal.png";
+import LawnTennis from "@/src/assets/icons/Diamond/Lawn Tennis.png";
+import MrAndMsUSC from "@/src/assets/icons/Diamond/Mr. & Ms. USC.png";
+import Pickleball from "@/src/assets/icons/Diamond/Pickleball.png";
+import Soccer from "@/src/assets/icons/Diamond/Soccer.png";
+import Swimming from "@/src/assets/icons/Diamond/Swimming.png";
+import TableTennis from "@/src/assets/icons/Diamond/Table Tennis.png";
+import Volleyball from "@/src/assets/icons/Diamond/Volleyball.png";
 import type { StaticImageData } from "next/image";
 
 export const sportIcons: Record<string, StaticImageData> = {
   Badminton,
   Basketball,
   "Cheer Dance": Cheerdance,
-  "Contemporary Dance": Cheerdance,
+  "Contemporary Dance": ContemporaryDance,
   Chess,
   "Esports": Esports,
   "Flag Football": FlagFootball,
-  Football,
   Frisbee,
   Futsal,
   "Lawn Tennis": LawnTennis,
-  "Mr. USC Days": MrIntrams,
-  "Ms. USC Days": MsIntrams,
+  "Mr. & Ms. USC": MrAndMsUSC,
+  Pickleball,
+  Soccer,
   Swimming,
   "Table Tennis": TableTennis,
-  "3x3 Basketball": ThreeByThreeBasketball,
   Volleyball,
   Default: TCRedLogo,
+};
+
+// Keep historical game names compatible without duplicating sports in the grid.
+export const sportIconAliases: Record<string, string> = {
+  Cheerdance: "Cheer Dance",
+  "E-Sports": "Esports",
+  "Mobile Legends": "Esports",
+  Valorant: "Esports",
+  Football: "Soccer",
+  "3x3 Basketball": "Basketball",
+  "Mr. USC Days": "Mr. & Ms. USC",
+  "Ms. USC Days": "Mr. & Ms. USC",
 };
 
 export const sports = Object.entries(sportIcons)

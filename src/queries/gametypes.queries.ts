@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 type GameType = {
@@ -13,7 +13,7 @@ export const getGameTypesQuery = () =>
     queryKey: ["sports"],
     queryFn: async () => {
       const response = await axios.get("/api/sports");
-      return response.data.sports;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });

@@ -11,12 +11,12 @@ import {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const getChampionsQuery = () =>
+export const useChampionsQuery = () =>
   useQuery<Champions[]>({
     queryKey: ["champions"],
     queryFn: async () => {
-      const response = await axios.get("/api/champions");
-      return response.data.champions;
+      const response = await axios.get<{ data: Champions[] }>("/api/champions");
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });
@@ -24,17 +24,19 @@ export const getChampionsQuery = () =>
 export const useAddChampionsQuery = () => {
   const queryClient = useQueryClient();
   return useMutation<Champions, Error, AddChampionPayload>({
-    mutationFn: async (data) => {
-      const response = await axios.post(`/api/champions`, data);
+    mutationFn: async ({ gameTypeId, teamId, startDate, endDate, rank }) => {
+      // Explicit fields so the dialog's placeholder `id: -1` is never sent.
+      const response = await axios.post<Champions>("/api/champions", {
+        gameTypeId,
+        teamId,
+        startDate,
+        endDate,
+        rank,
+      });
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["champions"] });
-    },
-    onError: (err, c, context: any) => {
-      if (context?.prevChampions) {
-        queryClient.setQueryData(["champions"], context.prevChampions);
-      }
     },
   });
 };
@@ -42,14 +44,13 @@ export const useAddChampionsQuery = () => {
 export const useEditChampionsQuery = () => {
   const queryClient = useQueryClient();
   return useMutation<Champions, Error, EditChampionPayload>({
-    mutationFn: async (data) => {
-      const response = await axios.put(`/api/champions`, data);
+    mutationFn: async ({ id, ...body }) => {
+      const response = await axios.put<Champions>(`/api/champions/${id}`, body);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["champions"] });
     },
-
     onError: (error) => {
       console.error("Error editing champion: ", error);
     },
@@ -58,12 +59,9 @@ export const useEditChampionsQuery = () => {
 
 export const useDeleteChampionsQuery = () => {
   const queryClient = useQueryClient();
-  return useMutation<Champions, Error, DeleteChampionPayload>({
+  return useMutation<void, Error, DeleteChampionPayload>({
     mutationFn: async ({ id }) => {
-      const { data } = await axios.delete(`/api/champions`, {
-        data: { id },
-      });
-      return data;
+      await axios.delete(`/api/champions/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["champions"] });

@@ -44,3 +44,10 @@ next-env.d.ts
 
 # prettier
 .prettierrc
+
+# generated prisma files
+/src/lib/prisma/generated/*
+
+# graphify generated output
+/graphify-out/
+/graphify-out

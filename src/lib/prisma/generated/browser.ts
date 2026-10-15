@@ -28,11 +28,6 @@ export type Team = Prisma.TeamModel
  */
 export type School = Prisma.SchoolModel
 /**
- * Model TeamSchool
- * 
- */
-export type TeamSchool = Prisma.TeamSchoolModel
-/**
  * Model GameType
  * 
  */
