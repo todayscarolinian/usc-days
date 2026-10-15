@@ -62,7 +62,7 @@ export default function ScheduleNews() {
     FACEBOOK_NEWS_CONFIG.hashtag,
     FACEBOOK_NEWS_CONFIG.startDate,
     FACEBOOK_NEWS_CONFIG.endDate,
-    3,
+    6,
   );
   let content;
 
