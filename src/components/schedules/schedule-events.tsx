@@ -1,27 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { sportIcons, sportIconAliases } from "@/src/constants/sportIcons";
 import { cn } from "@/src/lib/utils";
 import type { ScheduleEventGroup } from "@/src/lib/schedules";
-
-const eventRoutes: Record<string, string> = {
-  Basketball: "/sports/basketball",
-  Volleyball: "/sports/volleyball",
-  "Flag Football": "/sports/flag-football",
-  Soccer: "/sports/soccer",
-  Futsal: "/sports/futsal",
-  Frisbee: "/sports/frisbee",
-  Pickleball: "/sports/pickleball",
-  Badminton: "/sports/badminton",
-  "Lawn Tennis": "/sports/lawn-tennis",
-  "Table Tennis": "/sports/table-tennis",
-  Chess: "/sports/chess",
-  "Mobile Legends": "/sports/mobile-legends",
-  Valorant: "/sports/valorant",
-  Swimming: "/sports/swimming",
-};
 
 type ScheduleEventsProps = {
   groups: ScheduleEventGroup[];
@@ -41,14 +22,7 @@ function eventIcon(name: string) {
 export default function ScheduleEvents({
   groups, selectedEvent, isLoading, isError, disabled, onSelect, onRetry,
 }: ScheduleEventsProps) {
-  const router = useRouter();
   const visibleGroups = groups.filter(group => group.name !== "Other Events");
-
-  function selectMobileEvent(eventName: string) {
-    const route = eventRoutes[eventName];
-    if (route) router.push(route);
-    else onSelect(eventName || null);
-  }
 
   return (
     <aside aria-label="Filter by event" className="min-w-0 xl:sticky xl:top-28 xl:max-h-[calc(100dvh-10rem)] xl:overflow-y-auto">
@@ -58,7 +32,7 @@ export default function ScheduleEvents({
         id="schedule-event"
         value={selectedEvent ?? ""}
         disabled={disabled || isLoading}
-        onChange={event => selectMobileEvent(event.target.value)}
+        onChange={event => onSelect(event.target.value || null)}
         className="mt-3 h-12 w-full rounded border border-neutral-300 bg-[#f7f6f6] px-3 text-base focus-visible:outline-2 focus-visible:outline-tc_primary-400 disabled:opacity-50 xl:hidden"
       >
         <option value="">All Events</option>
@@ -89,38 +63,23 @@ export default function ScheduleEvents({
           <div key={group.name}>
             <h3 className="mb-1 text-base text-neutral-500">{group.name}</h3>
             <div>
-              {group.events.map(event => {
-                const route = eventRoutes[event.name];
-                const className = cn(
-                  "flex h-auto min-h-9 w-full items-center justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none",
-                  route && "cursor-pointer hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-tc_primary-400",
-                  selectedEvent === event.name && "bg-white/40 font-bold",
-                );
-                const content = (
-                  <>
-                    <Image src={eventIcon(event.name)} width={26} height={26} alt="" className="shrink-0 object-contain" />
-                    <span className="min-w-0 text-left">{event.name}</span>
-                    {event.isLive && <span className="ml-auto bg-tc_primary-400 px-2 py-0.5 text-xs text-white">Live</span>}
-                  </>
-                );
-
-                return route ? (
-                  <Link key={event.name} href={route} className={className}>
-                    {content}
-                  </Link>
-                ) : (
-                  <Button
-                    key={event.name}
-                    variant="ghost"
-                    aria-pressed={selectedEvent === event.name}
-                    disabled={disabled}
-                    onClick={() => onSelect(event.name)}
-                    className={className}
-                  >
-                    {content}
-                  </Button>
-                );
-              })}
+              {group.events.map(event => (
+                <Button
+                  key={event.name}
+                  variant="ghost"
+                  aria-pressed={selectedEvent === event.name}
+                  disabled={disabled}
+                  onClick={() => onSelect(event.name)}
+                  className={cn(
+                    "flex h-auto min-h-9 w-full justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none",
+                    selectedEvent === event.name && "bg-white/40 font-bold",
+                  )}
+                >
+                  <Image src={eventIcon(event.name)} width={26} height={26} alt="" className="shrink-0 object-contain" />
+                  <span className="min-w-0 text-left">{event.name}</span>
+                  {event.isLive && <span className="ml-auto bg-tc_primary-400 px-2 py-0.5 text-xs text-white">Live</span>}
+                </Button>
+              ))}
             </div>
           </div>
         ))}
