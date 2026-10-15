@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { after, before, describe, it } from "node:test";
+import { afterAll, beforeAll, describe, it } from "vitest";
 import { Client } from "pg";
 import GameService from "@/src/services/games.service";
 import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
@@ -10,7 +10,8 @@ const databaseUrl = process.env.POSTGRES_DB_URL ?? "";
 const local =
   databaseUrl.includes("127.0.0.1") || databaseUrl.includes("localhost");
 
-describe("game service against local database", { skip: local ? false : "POSTGRES_DB_URL is not a local database" }, () => {
+// Runs only against a local database; skipped otherwise.
+describe.skipIf(!local)("game service against local database", () => {
   const games = new GameService();
   const client = new Client({ connectionString: databaseUrl });
   const createdGameIds: number[] = [];
@@ -20,7 +21,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
   const start = "2035-01-01T01:00:00.000Z";
   const end = "2035-01-01T02:00:00.000Z";
 
-  before(async () => {
+  beforeAll(async () => {
     await client.connect();
     const sport = await client.query(
       `INSERT INTO game_types (game_name) VALUES ('TBD regression sport') RETURNING id`,
@@ -33,7 +34,7 @@ describe("game service against local database", { skip: local ? false : "POSTGRE
     teamBId = teams.rows[1].id;
   });
 
-  after(async () => {
+  afterAll(async () => {
     if (createdGameIds.length > 0) {
       await client.query(`DELETE FROM games WHERE id = ANY($1::int[])`, [
         createdGameIds,
