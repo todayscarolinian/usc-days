@@ -12,7 +12,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 
 const robotoCondensed = Roboto_Condensed({
   subsets: ["latin"],
-  weight: ["100", "300", "400", "700"],
+  weight: ["100", "300", "400", "600", "700"],
   variable: "--font-roboto-condensed",
 });
 

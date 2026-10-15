@@ -4,9 +4,9 @@ import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import SchedulesPageClient from "@/src/components/schedules/schedules";
 
 export const metadata: Metadata = generateMeta({
-  title: "Game Schedules - USC Days 2025",
+  title: "Game Schedules - USC Days 2026",
   description:
-    "Check upcoming game schedules for USC Days 2025. Never miss a match with our comprehensive schedule overview.",
+    "Check game schedules, live matches, and results for USC Days 2026.",
   url: "/schedules",
   image: "/og_image.jpg",
 });

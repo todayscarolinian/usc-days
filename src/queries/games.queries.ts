@@ -10,19 +10,20 @@ const STALE_TIME = 1000 * 60 * 5;
 export const useGamesQuery = (params?: {
   startDate?: string;
   endDate?: string;
-}) =>
+}, options?: { refetchInterval?: number }) =>
   useQuery<Schedules[]>({
     queryKey: ["games", params],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const queryParams = new URLSearchParams();
       if (params?.startDate) queryParams.append("startDate", params.startDate);
       if (params?.endDate) queryParams.append("endDate", params.endDate);
 
       const url = `/api/games${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, { signal });
       return response.data.data;
     },
     staleTime: STALE_TIME,
+    refetchInterval: options?.refetchInterval,
   });
 
 export const useAddGamesQuery = () => {

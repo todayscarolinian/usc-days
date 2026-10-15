@@ -1,107 +1,63 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
-import SchedulesList from "@/src/components/schedules/schedules-list";
-import { filterType } from "@/src/types/types";
-import AddScheduleDialog from "./add-schedule-dialog";
-import ScheduleFilter from "./schedule-filter";
+import { useSchedules } from "@/src/hooks/use-schedules";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
-import { format, parse } from "date-fns";
+import ScheduleEvents from "./schedule-events";
+import ScheduleDateNavigation from "./schedule-date-navigation";
+import AddScheduleDialog from "./add-schedule-dialog";
+import ScheduleFeed from "./schedule-feed";
+import ScheduleNews from "./schedule-news";
+import ScheduleBackground from "./schedule-background";
+import styles from "./schedules.module.css";
 
 export default function SchedulesPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const selectedSport = searchParams.get("sport")
-    ? Number(searchParams.get("sport"))
-    : null;
-
-  const selectedDate = useMemo(() => {
-    const dateParam = searchParams.get("date");
-    if (!dateParam) return undefined;
-    try {
-      return parse(dateParam, "yyyy-MM-dd", new Date());
-    } catch {
-      return undefined;
-    }
-  }, [searchParams]);
-
-  const selectedTeam = searchParams.get("team")
-    ? Number(searchParams.get("team"))
-    : null;
-
+  const schedules = useSchedules();
   const { hasAccess } = useHasHeraldDomainAccess();
-  console.log("hasAccess", hasAccess);
-
-  const currentFilters: filterType | undefined = useMemo(() => {
-    const filters: filterType = {};
-
-    if (selectedSport && selectedSport !== 0) {
-      filters.game = String(selectedSport);
-    }
-
-    if (selectedDate) {
-      filters.date = format(selectedDate, "yyyy-MM-dd");
-    }
-
-    if (selectedTeam && selectedTeam !== 0) {
-      filters.teams = { home: String(selectedTeam) };
-    }
-
-    return Object.keys(filters).length > 0 ? filters : undefined;
-  }, [selectedSport, selectedDate, selectedTeam]);
-
-  const handleSportSelect = (sportId: number | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (sportId) {
-      params.set("sport", sportId.toString());
-    } else {
-      params.delete("sport");
-    }
-    router.push(`?${params.toString()}`);
-  };
-
-  const handleTeamSelect = (teamId: number | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (teamId) {
-      params.set("team", teamId.toString());
-    } else {
-      params.delete("team");
-    }
-    router.push(`?${params.toString()}`);
-  };
-
-  const handleDateSelect = (date: Date | undefined) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (date) {
-      params.set("date", format(date, "yyyy-MM-dd"));
-    } else {
-      params.delete("date");
-    }
-    router.push(`?${params.toString()}`);
-  };
+  // The client session may resolve before this route finishes hydrating.
+  const canManage = hasAccess && schedules.now !== null;
 
   return (
-    <>
-      <ScheduleFilter
-        onSportSelect={handleSportSelect}
-        selectedSport={selectedSport}
-        onDateSelect={handleDateSelect}
-              selectedDate={selectedDate}
-              onTeamSelect={handleTeamSelect}
-              selectedTeam={selectedTeam}
-      />
-      <div className="p-4 sm:py-10 sm:max-w-5xl mx-auto relative">
-        <div className="flex flex-col gap-4">
-          {hasAccess && (
-            <div className="flex justify-end">
-              <AddScheduleDialog />
-            </div>
-          )}
-          <SchedulesList filters={currentFilters} selectedDate={selectedDate} />
-        </div>
+    <div className="relative min-h-[calc(100vh-64px)] bg-[#f7f6f6] text-[#171717]">
+      <ScheduleBackground />
+      <div className="relative mx-auto grid max-w-[1600px] grid-cols-1 items-start gap-8 p-4 sm:p-8 xl:grid-cols-[minmax(200px,1fr)_minmax(0,2.75fr)_minmax(200px,1fr)] xl:gap-10 xl:p-12">
+        <ScheduleEvents
+          groups={schedules.eventGroups}
+          selectedEvent={schedules.selectedEvent}
+          isLoading={schedules.sports.isPending}
+          isError={schedules.sports.isError}
+          disabled={schedules.isNavigating}
+          onSelect={schedules.selectEvent}
+          onRetry={() => void schedules.sports.refetch()}
+        />
+        <section aria-label="Game schedules" aria-busy={schedules.isNavigating} className="min-w-0 space-y-6">
+          <h1 className="sr-only">USC Days game schedules</h1>
+          <ScheduleDateNavigation
+            date={schedules.navigationDate}
+            today={schedules.today}
+            disabled={schedules.isNavigating}
+            onSelect={schedules.navigateToDate}
+            actions={canManage ? (
+              <AddScheduleDialog compactTrigger />
+            ) : process.env.NODE_ENV === "development" ? (
+              <AddScheduleDialog compactTrigger preview />
+            ) : undefined}
+          />
+          <div key={schedules.selectedEvent ?? "all"} className={styles.feed}>
+            <ScheduleFeed
+              categorizeSwimming={schedules.selectedEvent === "Swimming"}
+              showEventLabel
+              days={schedules.days}
+              today={schedules.today}
+              now={schedules.now}
+              isLoading={schedules.isLoading}
+              isError={schedules.games.isError}
+              isFetching={schedules.games.isFetching}
+              onRetry={() => void schedules.games.refetch()}
+            />
+          </div>
+        </section>
+        <ScheduleNews />
       </div>
-    </>
+    </div>
   );
 }
