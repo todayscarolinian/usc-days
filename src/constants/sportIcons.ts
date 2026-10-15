@@ -41,6 +41,8 @@ export const sportIcons: Record<string, StaticImageData> = {
 export const sportIconAliases: Record<string, string> = {
   Cheerdance: "Cheer Dance",
   "E-Sports": "Esports",
+  "Mobile Legends": "Esports",
+  Valorant: "Esports",
   Football: "Soccer",
   "3x3 Basketball": "Basketball",
   "Mr. USC Days": "Mr. & Ms. USC",

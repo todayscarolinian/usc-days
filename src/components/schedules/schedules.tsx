@@ -8,13 +8,11 @@ import AddScheduleDialog from "./add-schedule-dialog";
 import ScheduleFeed from "./schedule-feed";
 import ScheduleNews from "./schedule-news";
 import ScheduleBackground from "./schedule-background";
-import { cn } from "@/src/lib/utils";
 import styles from "./schedules.module.css";
 
 export default function SchedulesPage() {
   const schedules = useSchedules();
   const { hasAccess } = useHasHeraldDomainAccess();
-  const { filters } = schedules;
   // The client session may resolve before this route finishes hydrating.
   const canManage = hasAccess && schedules.now !== null;
 
@@ -38,14 +36,16 @@ export default function SchedulesPage() {
             today={schedules.today}
             disabled={schedules.isNavigating}
             onSelect={schedules.navigateToDate}
-            actions={canManage ? <AddScheduleDialog compactTrigger /> : undefined}
+            actions={canManage ? (
+              <AddScheduleDialog compactTrigger />
+            ) : process.env.NODE_ENV === "development" ? (
+              <AddScheduleDialog compactTrigger preview />
+            ) : undefined}
           />
-          <div
-            key={filters.event ?? (filters.sportId ? `sport-${filters.sportId}` : "all")}
-            className={cn(styles.feed, schedules.isSwitchingEvent && styles.switching)}
-          >
+          <div key={schedules.selectedEvent ?? "all"} className={styles.feed}>
             <ScheduleFeed
-              showEventLabel={!filters.event && !filters.sportId}
+              categorizeSwimming={schedules.selectedEvent === "Swimming"}
+              showEventLabel
               days={schedules.days}
               today={schedules.today}
               now={schedules.now}

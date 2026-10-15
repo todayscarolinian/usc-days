@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGamesQuery } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import {
@@ -22,7 +22,6 @@ function scrollToScheduleDate(date: string) {
 
 export function useSchedules() {
   const navigation = useScheduleFilters();
-  const [isSwitchingEvent, startEventTransition] = useTransition();
   const { requestedDate, setRequestedDate } = useScheduleScrollTarget();
   const games = useGamesQuery(undefined, { refetchInterval: 60_000 });
   const sports = getGameTypesQuery();
@@ -66,7 +65,7 @@ export function useSchedules() {
 
   function selectEvent(event: string | null) {
     setRequestedDate(null);
-    startEventTransition(() => navigation.setFilter("event", event));
+    navigation.setFilter("event", event);
     // Each tab starts fresh; cancel any in-progress jump from the previous sport.
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -89,7 +88,6 @@ export function useSchedules() {
     isLoading,
     navigateToDate,
     selectEvent,
-    isSwitchingEvent,
     visibleDate,
     navigationDate: requestedDate ?? visibleDate ?? navigation.filters.date,
   };

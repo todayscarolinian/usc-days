@@ -57,6 +57,24 @@ export function getScheduleEventName(name: string): string {
   return EVENT_DEFINITIONS.find(event => event.pattern.test(name))?.name ?? name;
 }
 
+export function groupSwimmingMatches(games: readonly Schedules[]) {
+  const categories = new Map<string, Schedules[]>();
+  for (const game of games) {
+    const name = game.gameType.gameName;
+    let category = "Swimming";
+    const variation = name.match(/\b(\d+\s*x\s*\d+\s*m?|\d+\s*m)\s+(.+)$/i);
+    if (variation) {
+      const distance = variation[1].replace(/\s/g, "").toLowerCase().replace(/m?$/, "m");
+      const stroke = variation[2].trim().replace(/\b\w+/g, word => word[0].toUpperCase() + word.slice(1).toLowerCase());
+      category = `${distance} ${stroke}`;
+    }
+    const matches = categories.get(category) ?? [];
+    matches.push(game);
+    categories.set(category, matches);
+  }
+  return [...categories].map(([name, games]) => ({ name, games }));
+}
+
 export function getScheduleDay(date: Date): string {
   return dayFormatter.format(date);
 }

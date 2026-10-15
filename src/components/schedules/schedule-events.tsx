@@ -16,7 +16,6 @@ type ScheduleEventsProps = {
 
 function eventIcon(name: string) {
   const key = sportIconAliases[name] ?? name;
-  if (name === "Mobile Legends" || name === "Valorant") return sportIcons.Esports;
   return sportIcons[key] ?? sportIcons.Default;
 }
 

@@ -66,14 +66,14 @@ export default function ScheduleMatch({ game, now, showEventLabel }: ScheduleMat
     <article
       aria-label={`${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
       className={cn(
-        "block w-full min-w-0 overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717]",
+        "block w-full min-w-0 select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717]",
         featured && "border-t-2 border-tc_primary-400",
       )}
     >
       {featured ? (
         <span className="block p-3 sm:p-5">
-          <span className="flex items-center justify-between gap-3 text-xs uppercase">
-            <span className="bg-tc_primary-400 px-2 py-1 text-white">Live</span>
+          <span className="flex items-center justify-between gap-3 text-xs">
+            <span className="bg-tc_primary-400 px-2 py-1 text-white uppercase">Live</span>
             <span className="min-w-0 text-right text-neutral-600">{location}</span>
           </span>
           <span className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
@@ -109,7 +109,7 @@ export default function ScheduleMatch({ game, now, showEventLabel }: ScheduleMat
                 {game.gameType.gameName}{status !== "upcoming" && ` · ${statusLabel}`}
               </span>
             )}
-            <span title={location} className="min-w-0 truncate text-right uppercase">{location}</span>
+            <span title={location} className="min-w-0 truncate text-right">{location}</span>
           </span>
         </>
       )}

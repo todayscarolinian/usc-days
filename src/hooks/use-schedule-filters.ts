@@ -1,15 +1,13 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { parseScheduleDate, parseScheduleId } from "@/src/lib/schedules";
 
 type FilterKey = "event" | "date" | "team";
 
 export function useScheduleFilters() {
   const params = useSearchParams();
-  const router = useRouter();
-  const [isNavigating, startTransition] = useTransition();
   const filters = useMemo(() => ({
     event: params.get("event") || null,
     sportId: parseScheduleId(params.get("sport")),
@@ -18,9 +16,9 @@ export function useScheduleFilters() {
   }), [params]);
 
   function navigate(next: URLSearchParams) {
-    startTransition(() => {
-      router.push(`/schedules${next.size ? `?${next}` : ""}`, { scroll: false });
-    });
+    // These filters use data already on the client. Update the current URL
+    // without a server navigation that briefly disables and dims the controls.
+    window.history.replaceState(null, "", `/schedules${next.size ? `?${next}` : ""}`);
   }
 
   function setFilter(key: FilterKey, value: string | null) {
@@ -37,6 +35,6 @@ export function useScheduleFilters() {
   return {
     filters,
     setFilter,
-    isNavigating,
+    isNavigating: false,
   };
 }

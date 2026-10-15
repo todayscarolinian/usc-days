@@ -1,30 +1,14 @@
 .feed {
-  animation: feed-enter 240ms ease-out;
-  transition: opacity 120ms ease-out;
+  animation: enter 200ms ease-in-out;
 }
 
-.switching {
-  opacity: 0.35;
-}
-
-@keyframes feed-enter {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes enter {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .feed {
     animation: none;
-    transition: none;
-  }
-
-  .switching {
-    opacity: 1;
   }
 }

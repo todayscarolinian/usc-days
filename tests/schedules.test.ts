@@ -7,6 +7,7 @@ import {
   getScheduleDay,
   getScheduleEventName,
   groupScheduleGames,
+  groupSwimmingMatches,
   parseScheduleDate,
   parseScheduleId,
   type ScheduleFilters,
@@ -110,6 +111,25 @@ describe("event categories", () => {
       { name: "Court", events: [{ name: "Basketball", isLive: true }] },
       { name: "Field", events: [{ name: "Flag Football", isLive: false }] },
     ]);
+  });
+
+  it("keeps one Swimming tab and groups its matches by distance and stroke", () => {
+    const sports = [
+      { id: 25, gameName: "Men's Swimming 200m Freestyle" },
+      { id: 26, gameName: "Women's Swimming 200m Freestyle" },
+      { id: 27, gameName: "Men's 50m Backstroke" },
+      { id: 35, gameName: "Men's 4x50 Medley Relay" },
+      { id: 36, gameName: "Women's 4x50m Medley Relay" },
+    ];
+    const matches = sports.map((sport, index) => game({ id: index + 1, gameType: sport }));
+    const aquatics = buildScheduleEvents(sports, matches, now).find(group => group.name === "Aquatics");
+    assert.deepEqual(aquatics?.events.map(event => event.name), ["Swimming"]);
+    assert.equal(aquatics?.events[0].isLive, true);
+    assert.equal(groupScheduleGames(matches, { ...noFilters, event: "Swimming" }, today)[0].games.length, 5);
+    const categories = groupSwimmingMatches(matches);
+    assert.deepEqual(categories.map(category => category.name), ["200m Freestyle", "50m Backstroke", "4x50m Medley Relay"]);
+    assert.deepEqual(categories.map(category => category.games.map(match => match.id)), [[1, 2], [3], [4, 5]]);
+    assert.deepEqual(groupSwimmingMatches([game({ gameType: { id: 13, gameName: "Swimming" } })]).map(category => category.name), ["Swimming"]);
   });
 });
 

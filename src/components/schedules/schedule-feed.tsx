@@ -1,10 +1,12 @@
 import { format, parseISO } from "date-fns";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
-import type { ScheduleDay } from "@/src/lib/schedules";
+import { groupSwimmingMatches, type ScheduleDay } from "@/src/lib/schedules";
 import ScheduleMatch from "./schedule-match";
 
 type ScheduleFeedProps = {
   showEventLabel: boolean;
+  categorizeSwimming?: boolean;
   days: ScheduleDay[];
   today: string | null;
   now: Date | null;
@@ -14,8 +16,24 @@ type ScheduleFeedProps = {
   onRetry: () => void;
 };
 
+function EmptySchedule({ forDate = false }: { forDate?: boolean }) {
+  return (
+    <div role="status" className="flex min-h-52 flex-col items-center justify-center rounded-lg bg-white/60 px-5 py-8 text-center sm:py-10">
+      <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
+        <CalendarDays className="size-6" strokeWidth={1.5} aria-hidden="true" />
+      </span>
+      <p className="font-[family-name:var(--font-roboto-condensed)] text-xl font-semibold text-neutral-800">
+        {forDate ? "No matches on this date" : "No matches scheduled"}
+      </p>
+      <p className="mt-1.5 max-w-64 text-sm leading-relaxed text-neutral-500">
+        Try another date or explore a different event.
+      </p>
+    </div>
+  );
+}
+
 export default function ScheduleFeed({
-  days, today, now, isLoading, isError, isFetching, onRetry, showEventLabel,
+  days, today, now, isLoading, isError, isFetching, onRetry, showEventLabel, categorizeSwimming = false,
 }: ScheduleFeedProps) {
   if (isLoading || !now) {
     return (
@@ -41,9 +59,8 @@ export default function ScheduleFeed({
 
   if (!days.length) {
     return (
-      <div role="status" className="rounded-xl bg-[#f7f6f6] p-8 text-center">
-        <p className="text-xl font-bold">No matches scheduled.</p>
-        <p className="mt-2 text-neutral-500">Choose another date or event to see more matches.</p>
+      <div className="rounded-xl bg-[#f7f6f6] p-4 sm:p-5">
+        <EmptySchedule />
       </div>
     );
   }
@@ -62,9 +79,16 @@ export default function ScheduleFeed({
             {day.date === today ? "Today" : format(parseISO(day.date), "MMM d, yyyy").toUpperCase()}
           </h2>
           {!day.games.length && (
-            <p className="py-4 text-neutral-500">No matches scheduled for this date.</p>
+            <EmptySchedule forDate />
           )}
-          {day.games.map(game => (
+          {categorizeSwimming ? groupSwimmingMatches(day.games).map(category => (
+            <section key={category.name} aria-label={category.name} className="space-y-3 pt-2">
+              <h3 className="font-[family-name:var(--font-roboto-condensed)] text-lg font-semibold text-neutral-600">{category.name}</h3>
+              {category.games.map(game => (
+                <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} />
+              ))}
+            </section>
+          )) : day.games.map(game => (
             <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} />
           ))}
         </section>

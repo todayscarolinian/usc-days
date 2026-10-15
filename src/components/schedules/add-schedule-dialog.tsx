@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useId } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { getTeamsQuery } from "@/src/queries/teams.queries";
@@ -27,10 +27,27 @@ import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { cn, getTimezoneOffset } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 
-export default function AddScheduleDialog({ compactTrigger = false }: {
+const SCHEDULE_LOCATIONS = [
+  "Bunzel Lobby, Talamban Campus",
+  "Domain Talamban Branch, Talamban Campus",
+  "AB Gymnasium, Downtown Campus",
+  "Tennis Court, Downtown Campus",
+  "AB Basement, Downtown Campus",
+  "BCT 1, Talamban Campus",
+  "BCT 2, Talamban Campus",
+  "USC Stadium, Talamban Campus",
+  "AB 202 (Court 1), Downtown Campus",
+  "AB 202 (Court 2), Downtown Campus",
+  "Pelota Court, Downtown Campus",
+];
+
+export default function AddScheduleDialog({ compactTrigger = false, preview = false }: {
   compactTrigger?: boolean;
+  preview?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const sportId = useId();
+  const locationId = useId();
 
   const {
     inputs,
@@ -87,7 +104,9 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     }
   }, [open, reset, dismissAll]);
 
-  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
+  const sportsOptions: SelectOption[] = fetchedSportsData
+    .filter((sport) => !/dance|\b(?:mr|ms)\b/i.test(sport.gameName))
+    .map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
@@ -104,6 +123,8 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
   }));
 
   async function createSchedule() {
+    if (preview) return;
+
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -152,15 +173,17 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
         )}>
           {compactTrigger && <Plus className="size-4" aria-hidden="true" />}
           <span className={compactTrigger ? "sr-only sm:not-sr-only" : undefined}>
-            Add Schedule
+            {preview ? "Preview Schedule" : "Add Schedule"}
           </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">
         <DialogHeader>
-          <DialogTitle>Add Schedule</DialogTitle>
+          <DialogTitle className="text-2xl sm:text-3xl">Add Schedule</DialogTitle>
           <DialogDescription>
-            Add a new game schedule. Click Submit when you&apos;re done.
+            {preview
+              ? "Preview only. You can try the form, but schedules won’t be saved."
+              : <>Add a new game schedule. Click Submit when you&apos;re done.</>}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
@@ -209,8 +232,12 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
               />
             </div>
           </div>
-          <div className="w-full">
+          <div className="w-full flex flex-col gap-1">
+            <Label htmlFor={sportId} className="font-bold opacity-50">
+              Sport
+            </Label>
             <SearchableSelect
+              id={sportId}
               placeholder="Select a Sport"
               searchPlaceholder="Search sports..."
               emptyMessage="No sports found."
@@ -289,14 +316,19 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
             </div>
           </div>
           <div className="w-full flex flex-col gap-1">
-            <Label htmlFor="location" className="font-bold opacity-50">
+            <Label htmlFor={locationId} className="font-bold opacity-50">
               Location
             </Label>
-            <Input
-              type="text"
-              placeholder="Location"
+            <SearchableSelect
+              id={locationId}
+              placeholder="Select or type a location"
+              searchPlaceholder="Search or type a new location..."
+              groupLabel="Locations"
+              options={SCHEDULE_LOCATIONS.map(location => ({ value: location, label: location }))}
+              allowCustom
+              clearable
               value={inputs.location || ""}
-              onChange={(e) => updateInput("location", e.target.value)}
+              onValueChange={(value) => updateInput("location", value)}
             />
           </div>
         </div>
@@ -309,7 +341,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={inputs.gameTypeId <= 0 || loading}
+            disabled={preview || inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>
