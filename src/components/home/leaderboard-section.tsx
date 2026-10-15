@@ -4,16 +4,22 @@ import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { DataTable } from "@/src/components/leaderboards/data-table";
-import { homeLeaderboardColumns } from "@/src/components/leaderboards/columns";
 import { transformSchoolsData } from "@/src/components/leaderboards/transformSchoolsData";
-import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboards-table-skeleton";
+import StandingsTable from "@/src/components/standings/standings-table";
+import StandingsTableSkeleton from "@/src/components/standings/standings-table-skeleton";
 import { useGamesQuery } from "@/src/queries/games.queries";
 
 export default function LeaderboardSection() {
-  const { data: games = [], error, isLoading } = useGamesQuery();
+  const { data: games = [], isLoading } = useGamesQuery();
 
-  const standings = useMemo(() => transformSchoolsData(games), [games]);
+  const standings = useMemo(
+    () =>
+      transformSchoolsData(games).map((school) => ({
+        ...school,
+        played: school.wins + school.losses + school.draws,
+      })),
+    [games],
+  );
 
   return (
     <section
@@ -30,14 +36,12 @@ export default function LeaderboardSection() {
       />
       <div aria-hidden className="absolute inset-0 bg-black/40" />
 
-      <div className="relative mx-auto grid max-w-6xl px-4 py-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:py-20">
-        <div className="bg-neutral-100 px-2 py-3 md:px-4">
-          {error || isLoading ? (
-            <LeaderboardsTableSkeleton error={error?.message} />
-          ) : (
-            <DataTable columns={homeLeaderboardColumns} data={standings} />
-          )}
-        </div>
+      <div className="relative mx-auto grid max-w-7xl px-4 py-12 lg:grid-cols-[minmax(700px,3fr)_minmax(0,2fr)] lg:py-20">
+        {isLoading ? (
+          <StandingsTableSkeleton rows={7} />
+        ) : (
+          <StandingsTable data={standings} sportName="Leaderboards" />
+        )}
 
         <div className="flex flex-col justify-end gap-8 bg-black/60 px-6 py-10 text-white md:px-10">
           <div className="space-y-2">
