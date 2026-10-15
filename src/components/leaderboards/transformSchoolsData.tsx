@@ -7,7 +7,13 @@ export function transformSchoolsData(
 ): StandingData[] {
   const leaderboard: Record<
     string,
-    { school: string; wins: number; losses: number; sport: string }
+    {
+      school: string;
+      wins: number;
+      losses: number;
+      draws: number;
+      sport: string;
+    }
   > = {};
 
   // Filter by sport if specified
@@ -31,6 +37,7 @@ export function transformSchoolsData(
         school: schoolA,
         wins: 0,
         losses: 0,
+        draws: 0,
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
@@ -41,6 +48,7 @@ export function transformSchoolsData(
         school: schoolB,
         wins: 0,
         losses: 0,
+        draws: 0,
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
@@ -52,8 +60,10 @@ export function transformSchoolsData(
       continue;
     }
 
-    // Skip draws - no wins or losses for either team
+    // Draws count for both schools but not toward wins or losses
     if (g.isDraw) {
+      leaderboard[schoolA].draws++;
+      leaderboard[schoolB].draws++;
       continue;
     }
 
@@ -87,6 +97,7 @@ export function transformSchoolsData(
         team: entry.school, // 'team' field now holds the school name
         wins: entry.wins,
         losses: entry.losses,
+        draws: entry.draws,
         winPercentage: totalGames > 0 ? (entry.wins / totalGames) * 100 : 0,
         sport: entry.sport,
       };

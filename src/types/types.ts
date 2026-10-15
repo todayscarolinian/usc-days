@@ -38,6 +38,7 @@ export type StandingData = {
     team: string;
     wins: number;
     losses: number;
+    draws: number;
     winPercentage: number;
     sport: string;
 };

@@ -9,6 +9,7 @@ type MutableStanding = {
   team: string;
   wins: number;
   losses: number;
+  draws: number;
   played: number;
   sport: string;
 };
@@ -40,6 +41,7 @@ export function transformTeamsData(
       team,
       wins: 0,
       losses: 0,
+      draws: 0,
       played: 0,
       sport: sportId !== undefined ? sport : "Overall",
     };
@@ -78,6 +80,8 @@ export function transformTeamsData(
     if (game.isDraw) {
       teamA.played++;
       teamB.played++;
+      teamA.draws++;
+      teamB.draws++;
       continue;
     }
 

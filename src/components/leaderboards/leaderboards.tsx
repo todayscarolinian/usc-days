@@ -43,7 +43,7 @@ export default function Leaderboards() {
         {error || loading ? (
           <LeaderboardsTableSkeleton error={error?.message} />
         ) : (
-          <DataTable columns={columns} data={transformed} title="USC DAYS" />
+          <DataTable columns={columns} data={transformed} />
         )}
       </div>
     </div>

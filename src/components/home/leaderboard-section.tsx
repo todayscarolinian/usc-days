@@ -1,0 +1,69 @@
+"use client";
+
+import { useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { DataTable } from "@/src/components/leaderboards/data-table";
+import { homeLeaderboardColumns } from "@/src/components/leaderboards/columns";
+import { transformSchoolsData } from "@/src/components/leaderboards/transformSchoolsData";
+import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboards-table-skeleton";
+import { useGamesQuery } from "@/src/queries/games.queries";
+
+export default function LeaderboardSection() {
+  const { data: games = [], error, isLoading } = useGamesQuery();
+
+  const standings = useMemo(() => transformSchoolsData(games), [games]);
+
+  return (
+    <section
+      id="leaderboard"
+      aria-labelledby="leaderboard-heading"
+      className="relative w-full overflow-hidden"
+    >
+      <Image
+        src="/carousel/frisbee.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
+      />
+      <div aria-hidden className="absolute inset-0 bg-black/40" />
+
+      <div className="relative mx-auto grid max-w-6xl px-4 py-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:py-20">
+        <div className="bg-neutral-100 px-2 py-3 md:px-4">
+          {error || isLoading ? (
+            <LeaderboardsTableSkeleton error={error?.message} />
+          ) : (
+            <DataTable columns={homeLeaderboardColumns} data={standings} />
+          )}
+        </div>
+
+        <div className="flex flex-col justify-end gap-8 bg-black/60 px-6 py-10 text-white md:px-10">
+          <div className="space-y-2">
+            <h2
+              id="leaderboard-heading"
+              className="text-3xl leading-none font-bold capitalize lg:text-5xl"
+            >
+              The Game Is On.
+              <br />
+              Bring The Heat!
+            </h2>
+            <p className="text-base leading-normal lg:text-lg">
+              See who&apos;s leading the competition, track the latest
+              standings, and find out who&apos;s climbing the ranks.
+            </p>
+          </div>
+
+          <Link
+            href="/leaderboards"
+            className="inline-flex w-fit items-center gap-2 bg-tc_primary px-6 py-3 text-base font-medium uppercase transition-colors hover:bg-tc_primary-600"
+          >
+            Check Leaderboards
+            <ArrowUpRight className="size-5" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
