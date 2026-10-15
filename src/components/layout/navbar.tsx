@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CircleUser, Menu } from "lucide-react";
 
+import TCRedLogo from "@/src/assets/tc-logo-red.png";
 import { Button } from "@/src/components/ui/button";
 import {
   DropdownMenu,
@@ -279,7 +280,7 @@ export default function Navbar() {
             className="flex items-center justify-center px-4"
           >
             <Image
-              src="/tc-logo-red.png"
+              src={TCRedLogo}
               alt="Today's Carolinian logo"
               width={48}
               height={48}
@@ -330,7 +331,7 @@ export default function Navbar() {
                 onClick={() => setIsSheetOpen(false)}
               >
                 <Image
-                  src="/tc-logo-red.png"
+                  src={TCRedLogo}
                   alt="Today's Carolinian logo"
                   width={56}
                   height={56}
@@ -350,7 +351,7 @@ export default function Navbar() {
             className="absolute left-1/2 -translate-x-1/2"
           >
             <Image
-              src="/tc-logo-red.png"
+              src={TCRedLogo}
               alt="Today's Carolinian logo"
               width={42}
               height={42}

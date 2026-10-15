@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 type PageHeroImage = {
-    src: string;
+    src: StaticImageData;
     position?: string;
 };
 
@@ -42,12 +42,13 @@ export default function PageHero({
         >
             {images.map((image, index) => (
                 <Image
-                    key={image.src}
+                    key={image.src.src}
                     src={image.src}
                     alt=""
                     aria-hidden="true"
                     fill
                     priority={index === 0}
+                    placeholder="blur"
                     sizes="100vw"
                     style={{ objectPosition: image.position ?? imagePosition }}
                     className={`object-cover transition-opacity duration-700 ${

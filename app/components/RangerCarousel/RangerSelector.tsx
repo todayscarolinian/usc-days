@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import type { Ranger } from "./rangerData";
 
 interface RangerSelectorProps {
@@ -37,10 +39,11 @@ export default function RangerSelector({
               "flex aspect-square w-[clamp(32px,8vw,94px)] cursor-pointer items-center justify-center rounded-md p-[14%] transition-shadow sm:w-[clamp(45px,6.5vw,94px)]",
             ].join(" ")}
           >
-            <img
+            <Image
               src={ranger.iconImage}
               alt=""
               draggable={false}
+              sizes="94px"
               className="h-full w-full object-contain"
               onError={(e) => {
                 e.currentTarget.style.visibility = "hidden";

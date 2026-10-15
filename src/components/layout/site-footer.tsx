@@ -7,6 +7,10 @@ import {
   Twitter,
 } from "lucide-react";
 
+import Ribbon from "@/src/assets/footer/ribbon.png";
+import Ribbon2 from "@/src/assets/footer/ribbon2.png";
+import Ribbon3 from "@/src/assets/footer/ribbon3.png";
+import TCPrintLogoWhite from "@/src/assets/footer/tc-print-logo-white.png";
 import { PUBLICATION } from "@/src/constants/publication";
 
 const contactEmail = "todaysusc@gmail.com";
@@ -73,26 +77,20 @@ export default function SiteFooter() {
         className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden min-[1440px]:block"
       >
         <Image
-          src="/ribbon.png"
+          src={Ribbon}
           alt=""
-          width={548}
-          height={325}
           className="absolute -bottom-4 -left-20 h-auto w-[clamp(18rem,38vw,28rem)] object-contain opacity-60"
         />
 
         <Image
-          src="/ribbon2.png"
+          src={Ribbon2}
           alt=""
-          width={889}
-          height={391}
           className="absolute -right-24 -bottom-8 h-auto w-[clamp(22rem,42vw,32rem)] object-contain opacity-60"
         />
 
         <Image
-          src="/ribbon3.png"
+          src={Ribbon3}
           alt=""
-          width={333}
-          height={800}
           className="absolute -top-48 -right-12 hidden h-auto w-[clamp(9rem,14vw,12rem)] object-contain opacity-60 lg:block"
         />
       </div>
@@ -101,10 +99,8 @@ export default function SiteFooter() {
       <div className="relative z-10 mx-auto max-w-lg px-6 py-10 md:hidden">
         <div className="pb-8">
           <Image
-            src="/tc-print-logo-white.png"
+            src={TCPrintLogoWhite}
             alt="Today's Carolinian logo"
-            width={2000}
-            height={304}
             className="mx-auto h-auto w-full max-w-64"
           />
         </div>
@@ -163,10 +159,8 @@ export default function SiteFooter() {
         <div className="min-w-0">
           <div className="mb-4 max-w-80">
             <Image
-              src="/tc-print-logo-white.png"
+              src={TCPrintLogoWhite}
               alt="Today's Carolinian logo"
-              width={2000}
-              height={304}
               className="h-auto w-full"
             />
           </div>

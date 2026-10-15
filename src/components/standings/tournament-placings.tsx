@@ -3,6 +3,10 @@
 import type { Champions } from "@/src/types/types";
 import Image from "next/image";
 
+import BronzeMedal from "@/src/assets/medals/bronze-medal.png";
+import GoldMedal from "@/src/assets/medals/gold-medal.png";
+import SilverMedal from "@/src/assets/medals/silver-medal.png";
+
 type TournamentPlacingsProps = {
   champions: Champions[];
   canEdit: boolean;
@@ -14,17 +18,17 @@ const placements = [
   {
     rank: 1,
     label: "Champion",
-    medalSrc: "/medals/gold-medal.png",
+    medalSrc: GoldMedal,
   },
   {
     rank: 2,
     label: "First runner-up",
-    medalSrc: "/medals/silver-medal.png",
+    medalSrc: SilverMedal,
   },
   {
     rank: 3,
     label: "Second runner-up",
-    medalSrc: "/medals/bronze-medal.png",
+    medalSrc: BronzeMedal,
   },
 ];
 
