@@ -28,8 +28,8 @@ interface UseScheduleFormOptions<T = any> {
 
 const getDefaultInputs = (): ScheduleInputs => ({
   gameTypeId: -1,
-  teamAId: -1,
-  teamBId: -1,
+  teamAId: null,
+  teamBId: null,
   startDate: getEventDayKey(),
   endDate: getEventDayKey(),
   startTime: getEventTimeOfDay(),

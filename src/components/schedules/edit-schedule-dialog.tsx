@@ -63,8 +63,8 @@ export default function EditScheduleDialog({
   } = useScheduleForm({
     initialValues: {
       gameTypeId: schedule.gameType.id,
-      teamAId: schedule.teamA.id,
-      teamBId: schedule.teamB.id,
+      teamAId: schedule.teamA?.id ?? null,
+      teamBId: schedule.teamB?.id ?? null,
       startDate: getEventDayKey(schedule.startDate),
       endDate: getEventDayKey(schedule.endDate),
       startTime: getEventTimeOfDay(schedule.startDate),
