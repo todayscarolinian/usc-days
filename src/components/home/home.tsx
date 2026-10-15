@@ -4,6 +4,7 @@ import TodaysGames from "./todays-games";
 import SportsSection from "./sports-section";
 import SchoolsSection from "./schools-section";
 import NewsSection from "./news-section";
+import LeaderboardSection from "./leaderboard-section";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import RangerCarousel from "@/app/components/RangerCarousel/RangerCarousel";
 import StandingsSection from "@/app/components/StandingsSection/StandingsSection";
@@ -38,6 +39,8 @@ export default function Home() {
           <SportsSection />
         </section>
       </main>
+
+      <LeaderboardSection />
 
       <main className="flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-white">
         <section className="w-full px-6 pt-16 text-center">

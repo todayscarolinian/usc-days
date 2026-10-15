@@ -45,6 +45,11 @@ const standingColumns: ColumnDef<TeamStandingData>[] = [
       `${row.original.wins} / ${row.original.losses}`,
   },
   {
+    accessorKey: "draws",
+    header: "D",
+    cell: ({ row }) => row.original.draws,
+  },
+  {
     accessorKey: "winPercentage",
     header: "Win %",
     cell: ({ row }) => `${row.original.winPercentage.toFixed(2)}%`,

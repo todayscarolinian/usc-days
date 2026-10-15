@@ -14,7 +14,7 @@ type StandingsTableSkeletonProps = {
   rows?: number;
 };
 
-const headers = ["#", "Team", "Played", "W / L", "Win %"];
+const headers = ["#", "Team", "Played", "W / L", "D", "Win %"];
 
 export default function StandingsTableSkeleton({
   rows = 8,
@@ -29,9 +29,10 @@ export default function StandingsTableSkeleton({
         <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
           <colgroup>
             <col className="w-[8%] sm:w-auto" />
-            <col className="w-[42%] sm:w-auto" />
-            <col className="w-[17%] sm:w-auto" />
+            <col className="w-[36%] sm:w-auto" />
             <col className="w-[15%] sm:w-auto" />
+            <col className="w-[15%] sm:w-auto" />
+            <col className="w-[8%] sm:w-auto" />
             <col className="w-[18%] sm:w-auto" />
           </colgroup>
 
@@ -75,6 +76,10 @@ export default function StandingsTableSkeleton({
 
                 <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
                   <Skeleton className="mx-auto h-3 w-7" />
+                </TableCell>
+
+                <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
+                  <Skeleton className="mx-auto h-3 w-3" />
                 </TableCell>
 
                 <TableCell className="h-10 px-1 text-center sm:h-12 sm:px-3">
