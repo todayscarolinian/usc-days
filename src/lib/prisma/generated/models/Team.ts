@@ -451,18 +451,22 @@ export type TeamCreateNestedOneWithoutGameWinnerInput = {
   connect?: Prisma.TeamWhereUniqueInput
 }
 
-export type TeamUpdateOneRequiredWithoutTeamAGamesNestedInput = {
+export type TeamUpdateOneWithoutTeamAGamesNestedInput = {
   create?: Prisma.XOR<Prisma.TeamCreateWithoutTeamAGamesInput, Prisma.TeamUncheckedCreateWithoutTeamAGamesInput>
   connectOrCreate?: Prisma.TeamCreateOrConnectWithoutTeamAGamesInput
   upsert?: Prisma.TeamUpsertWithoutTeamAGamesInput
+  disconnect?: Prisma.TeamWhereInput | boolean
+  delete?: Prisma.TeamWhereInput | boolean
   connect?: Prisma.TeamWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeamUpdateToOneWithWhereWithoutTeamAGamesInput, Prisma.TeamUpdateWithoutTeamAGamesInput>, Prisma.TeamUncheckedUpdateWithoutTeamAGamesInput>
 }
 
-export type TeamUpdateOneRequiredWithoutTeamBGamesNestedInput = {
+export type TeamUpdateOneWithoutTeamBGamesNestedInput = {
   create?: Prisma.XOR<Prisma.TeamCreateWithoutTeamBGamesInput, Prisma.TeamUncheckedCreateWithoutTeamBGamesInput>
   connectOrCreate?: Prisma.TeamCreateOrConnectWithoutTeamBGamesInput
   upsert?: Prisma.TeamUpsertWithoutTeamBGamesInput
+  disconnect?: Prisma.TeamWhereInput | boolean
+  delete?: Prisma.TeamWhereInput | boolean
   connect?: Prisma.TeamWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeamUpdateToOneWithWhereWithoutTeamBGamesInput, Prisma.TeamUpdateWithoutTeamBGamesInput>, Prisma.TeamUncheckedUpdateWithoutTeamBGamesInput>
 }

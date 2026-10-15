@@ -1,6 +1,28 @@
 import { z } from "zod";
 import { Schedules } from "./types";
 
+export const SCORES_REQUIRE_TEAMS_MESSAGE =
+  "Scores and results cannot be saved until both teams are set.";
+
+/** A numeric score (including 0) or an actual result. False flags and nulls do not count. */
+export function hasSavedResult(data: {
+  teamAScore?: unknown;
+  teamBScore?: unknown;
+  winnerId?: number | null;
+  teamAForfeited?: boolean | null;
+  teamBForfeited?: boolean | null;
+  isDraw?: boolean | null;
+}): boolean {
+  return (
+    data.teamAScore != null ||
+    data.teamBScore != null ||
+    data.winnerId != null ||
+    data.teamAForfeited === true ||
+    data.teamBForfeited === true ||
+    data.isDraw === true
+  );
+}
+
 export const AddGameSchema = z
   .object({
     gameTypeId: z.number({
@@ -9,18 +31,18 @@ export const AddGameSchema = z
           ? "Please select a sport."
           : "Sport selection is invalid.",
     }),
-    teamAId: z.number({
-      error: (issue) =>
-        issue.input === undefined
-          ? "Please select the first team."
-          : "First team selection is invalid.",
-    }),
-    teamBId: z.number({
-      error: (issue) =>
-        issue.input === undefined
-          ? "Please select the second team."
-          : "Second team selection is invalid.",
-    }),
+    teamAId: z
+      .number({
+        error: "First team selection is invalid.",
+      })
+      .nullable()
+      .optional(),
+    teamBId: z
+      .number({
+        error: "Second team selection is invalid.",
+      })
+      .nullable()
+      .optional(),
     startDate: z
       .string({
         error: (issue) =>
@@ -43,10 +65,16 @@ export const AddGameSchema = z
       }),
     location: z.string().optional(),
   })
-  .refine((data) => data.teamAId !== data.teamBId, {
-    message: "Please select two different teams.",
-    path: ["teamBId"],
-  })
+  .refine(
+    (data) =>
+      data.teamAId == null ||
+      data.teamBId == null ||
+      data.teamAId !== data.teamBId,
+    {
+      message: "Please select two different teams.",
+      path: ["teamBId"],
+    },
+  )
   .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
     message: "End date must be on or after start date.",
     path: ["endDate"],
@@ -54,28 +82,22 @@ export const AddGameSchema = z
 
 export const EditGameSchema = z
   .object({
-    id: z.number({
-      error: (issue) =>
-        issue.input === undefined ? "id is required." : "id must be a number.",
-    }),
     gameTypeId: z.number({
       error: (issue) =>
         issue.input === undefined
           ? "gameTypeId is required."
           : "gameTypeId must be a number.",
     }),
-    teamAId: z.number({
-      error: (issue) =>
-        issue.input === undefined
-          ? "teamAId is required."
-          : "teamAId must be a number.",
-    }),
-    teamBId: z.number({
-      error: (issue) =>
-        issue.input === undefined
-          ? "teamBId is required."
-          : "teamBId must be a number.",
-    }),
+    teamAId: z
+      .number({
+        error: "teamAId must be a number.",
+      })
+      .nullable(),
+    teamBId: z
+      .number({
+        error: "teamBId must be a number.",
+      })
+      .nullable(),
     teamAScore: z
       .number({
         error: (issue) =>
@@ -130,10 +152,26 @@ export const EditGameSchema = z
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),
   })
-  .refine((data) => data.teamAId !== data.teamBId, {
-    message: "teamAId and teamBId cannot be the same.",
-    path: ["teamBId"],
-  })
+  .refine(
+    (data) =>
+      data.teamAId == null ||
+      data.teamBId == null ||
+      data.teamAId !== data.teamBId,
+    {
+      message: "teamAId and teamBId cannot be the same.",
+      path: ["teamBId"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!hasSavedResult(data)) return true;
+      return data.teamAId != null && data.teamBId != null;
+    },
+    {
+      message: SCORES_REQUIRE_TEAMS_MESSAGE,
+      path: ["teamAId"],
+    },
+  )
   .refine(
     (data) => {
       // If isDraw is true, scores must be equal
@@ -216,18 +254,16 @@ export const EditGameSchema = z
     },
   );
 
-// Schema for DeleteGame
-export const DeleteGameSchema = z.object({
-  id: z.number({
-    error: (issue) =>
-      issue.input === undefined ? "id is required." : "id must be a number.",
-  }),
-});
-
 // Export inferred types
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
-export type DeleteGamePayload = z.infer<typeof DeleteGameSchema>;
+
+export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
+
+export type TodaysGamesSelection = {
+  featured: Schedules[];
+  compact: Schedules[];
+};
 
 // Pagination types
 export interface PaginationParams {
@@ -237,9 +273,7 @@ export interface PaginationParams {
 }
 
 export interface PaginatedGamesResponse {
-  games: Schedules[];
+  data: Schedules[];
   hasMore: boolean;
   nextCursor: string | null;
-  count: number;
-  total?: number;
 }

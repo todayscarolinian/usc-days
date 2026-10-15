@@ -15,24 +15,9 @@ export const AddMerchCategorySchema = z.object({
     }).min(1, "imgUrl cannot be empty."),
 });
 
-export const EditMerchCategorySchema = AddMerchCategorySchema.extend({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "id is required."
-                : "id must be a number.",
-    }),
-});
-
-export const DeleteMerchCategorySchema = z.object({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "id is required."
-                : "id must be a number.",
-    }),
-});
+// PUT is a full replacement, so it takes the same fields as create.
+// The id comes from the URL path, never the body.
+export const EditMerchCategorySchema = AddMerchCategorySchema;
 
 export type AddMerchCategoryPayload = z.infer<typeof AddMerchCategorySchema>;
 export type EditMerchCategoryPayload = z.infer<typeof EditMerchCategorySchema>;
-export type DeleteMerchCategoryPayload = z.infer<typeof DeleteMerchCategorySchema>;

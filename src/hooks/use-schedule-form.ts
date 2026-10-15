@@ -6,8 +6,8 @@ import { getTimezoneOffset } from "@/src/lib/utils";
 
 interface ScheduleInputs {
   gameTypeId: number;
-  teamAId: number;
-  teamBId: number;
+  teamAId: number | null;
+  teamBId: number | null;
   startDate: string;
   endDate: string;
   startTime: string;
@@ -23,8 +23,8 @@ interface UseScheduleFormOptions<T = any> {
 
 const getDefaultInputs = (): ScheduleInputs => ({
   gameTypeId: -1,
-  teamAId: -1,
-  teamBId: -1,
+  teamAId: null,
+  teamBId: null,
   startDate: new Date().toISOString().split("T")[0],
   endDate: new Date().toISOString().split("T")[0],
   startTime: new Date().toISOString().split("T")[1].substring(0, 5),

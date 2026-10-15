@@ -1,23 +1,10 @@
 import { Schedules } from "@/src/types/types";
 import { StandingData } from "@/src/types/types";
-import { schoolLogos } from "@/src/constants/schoolLogos";
 
 export function transformSchoolsData(
   games: Schedules[],
   sportId?: number,
 ): StandingData[] {
-  // Get school keys (e.g., SOE, SAFAD, etc.)
-  const schoolKeys = Object.keys(schoolLogos).filter((k) => k !== "Default");
-
-  // Helper to get school from team name
-  function getSchoolFromTeam(teamName: string): string | null {
-    if (!teamName) return null;
-    const match = schoolKeys.find((school) =>
-      teamName.toLowerCase().startsWith(school.toLowerCase()),
-    );
-    return match || null;
-  }
-
   const leaderboard: Record<
     string,
     { school: string; wins: number; losses: number; sport: string }
@@ -30,16 +17,13 @@ export function transformSchoolsData(
       : games;
 
   for (const g of filteredGames) {
+    if (!g.teamA || !g.teamB) continue;
+
     const sport = g.gameType.gameName;
-    const teamA = g.teamA.teamName;
-    const teamB = g.teamB.teamName;
 
-    // Map team names to schools
-    const schoolA = getSchoolFromTeam(teamA);
-    const schoolB = getSchoolFromTeam(teamB);
-
-    // Omit if either team does not match a school
-    if (!schoolA || !schoolB) continue;
+    // Each team belongs to exactly one school
+    const schoolA = g.teamA.school.schoolName;
+    const schoolB = g.teamB.school.schoolName;
 
     // Initialize School A entry if it doesn't exist
     if (!leaderboard[schoolA]) {
