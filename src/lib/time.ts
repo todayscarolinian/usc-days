@@ -30,7 +30,17 @@ export function getEventTimeOfDay(value: DateInput = new Date()): string {
   return format(inEventTz(value), TIME_FORMAT);
 }
 
+export function isEventTimeOfDay(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
 export function eventDateTimeToISO(dayKey: string, time: string): string {
+  if (!isEventDayKey(dayKey)) {
+    throw new RangeError(`Invalid event day key: "${dayKey}"`);
+  }
+  if (!isEventTimeOfDay(time)) {
+    throw new RangeError(`Invalid event time: "${time}"`);
+  }
   const [y, m, d] = dayKey.split("-").map(Number);
   const [h, min] = time.split(":").map(Number);
   return new TZDate(y, m - 1, d, h, min, EVENT_TIMEZONE).toISOString();

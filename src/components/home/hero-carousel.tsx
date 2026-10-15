@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { carouselImages } from "@/src/constants/carouselImages";
+import { useSharedCarouselIndex } from "@/src/hooks/use-shared-carousel-index";
 
 const SLIDE_INTERVAL = 5000;
 
 export default function HeroCarousel() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % carouselImages.length), SLIDE_INTERVAL);
-    return () => clearInterval(t);
-  }, []);
+  const { activeIndex: index, goTo } = useSharedCarouselIndex(
+    carouselImages.length,
+    SLIDE_INTERVAL,
+  );
 
   return (
     <section
@@ -26,7 +24,8 @@ export default function HeroCarousel() {
           src={image}
           alt={`USC Days carousel slide ${i + 1}`}
           fill
-          priority={i === 0}
+          priority={i === index}
+          placeholder="blur"
           sizes="100vw"
           className={`object-cover transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         />
@@ -45,7 +44,7 @@ export default function HeroCarousel() {
         {carouselImages.map((_, i) => (
           <button
             key={i}
-            onClick={() => setIndex(i)}
+            onClick={() => goTo(i)}
             className={`w-3 h-3 rounded-full ${i === index ? "bg-white" : "bg-white/60"}`}
             aria-label={`Go to slide ${i + 1}`}
           />

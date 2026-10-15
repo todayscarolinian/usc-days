@@ -19,10 +19,12 @@ export const FACEBOOK_QUERY_CONFIG = {
   refetchOnWindowFocus: false,
 } as const;
 
-/** Defaults used when homepage news filters are not supplied through .env. */
+/** Homepage news is limited to the USC Days 2026 event dates, inclusive. */
 export const FACEBOOK_NEWS_CONFIG = {
   hashtag: "USCDays2025",
   postLimit: 4,
-  lookbackDays: 30,
+  startDate: "2026-01-01",
+  endDate: "2026-06-24",
   timeZone: "Asia/Manila",
+  utcOffset: "+08:00",
 } as const;

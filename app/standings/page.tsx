@@ -2,6 +2,11 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import Standings from "@/src/components/standings/standings";
+import PageHero from "@/src/components/layout/page-hero";
+import BasketballImage from "@/src/assets/carousel/bball.jpg";
+import FlagImage from "@/src/assets/carousel/flag.jpg";
+import TableTennisImage from "@/src/assets/carousel/table-tennis.jpg";
+import VolleyballImage from "@/src/assets/carousel/vball.jpg";
 
 export const metadata: Metadata = generateMeta({
   title: "Standings - USC Days 2025",
@@ -13,12 +18,31 @@ export const metadata: Metadata = generateMeta({
 
 const StandingsPage = () => {
   return (
-    <div>
-      <Suspense fallback={<div />}>
+    <>
+      <PageHero
+        eyebrow="USC Days 2026"
+        title="Standings"
+        images={[
+            { src: BasketballImage, position: "center 25%" },
+            { src: FlagImage, position: "center 20%" },
+            { src: TableTennisImage, position: "center 45%" },
+            { src: VolleyballImage, position: "center 48%" },
+        ]}
+      />
+
+      <Suspense fallback={<div className="min-h-96 bg-neutral-50" />}>
         <Standings />
       </Suspense>
-    </div>
+    </>
   );
 };
 
 export default StandingsPage;
+
+/*
+
+<Suspense fallback={<div />}>
+  <Standings />
+</Suspense>
+
+*/

@@ -15,7 +15,7 @@ export const getTeamsQuery = () =>
     queryKey: ["teams"],
     queryFn: async () => {
       const response = await axios.get("/api/teams");
-      return response.data.teams;
+      return response.data.data;
     },
     staleTime: STALE_TIME,
   });

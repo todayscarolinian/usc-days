@@ -1,0 +1,14 @@
+.feed {
+  animation: enter 200ms ease-in-out;
+}
+
+@keyframes enter {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed {
+    animation: none;
+  }
+}

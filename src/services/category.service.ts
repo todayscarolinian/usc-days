@@ -1,90 +1,62 @@
 import { prisma } from "@/src/lib/prisma";
+import { ApiError } from "@/src/lib/api";
 
 import {
   AddMerchCategoryPayload,
   EditMerchCategoryPayload,
-  DeleteMerchCategoryPayload 
 } from "@/src/types/merchCategories.types";
 
+// Prisma errors are left to propagate so route handlers can map them
+// (P2025 -> 404, P2002 / P2003 -> 409) via handleRouteError.
 class CategoryService {
   async getCategories() {
-    try {
-      return await prisma.merchandiseCategory.findMany({
-        orderBy: [
-          {
-            createdAt: "desc",
-          },
-        ],
-      });
-    } catch (error) {
-      console.error("getCategories error:", error);
-      throw new Error("Could not fetch categories");
-    }
+    return prisma.merchandiseCategory.findMany({
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
   }
 
-  async getCategoryById(categoryId: string) {
-    try {
-      const category = await prisma.merchandiseCategory.findUnique({
-        where: { id: parseInt(categoryId) },
-        include: {
-          merchandiseProducts: true,
-        },
-      });
+  async getCategoryById(categoryId: number) {
+    const category = await prisma.merchandiseCategory.findUnique({
+      where: { id: categoryId },
+      include: {
+        merchandiseProducts: true,
+      },
+    });
 
-      if (!category) {
-        throw new Error("Category not found");
-      }
-
-      return category;
-    } catch (error) {
-      console.error("getCategoryById error:", error);
-      throw new Error("Could not fetch category");
+    if (!category) {
+      throw new ApiError("NOT_FOUND", "Category not found.");
     }
+
+    return category;
   }
 
   async addCategory(payload: AddMerchCategoryPayload) {
-    try {
-      const data = {
+    return prisma.merchandiseCategory.create({
+      data: {
         categoryName: payload.name,
         imgUrl: payload.imgUrl,
-      };
-      
-      return await prisma.merchandiseCategory.create({
-        data,
-      });
-    } catch (error) {
-      console.error("addCategory error:", error);
-      throw new Error("Could not create category");
-    }
+      },
+    });
   }
 
-  async editCategory(categoryId: string, payload: EditMerchCategoryPayload) {
-    try {
-      const {...updateData } = payload;
-      const data = {
-        categoryName: updateData.name,
-        imgUrl: updateData.imgUrl,
-      };
-      
-      return await prisma.merchandiseCategory.update({
-        where: { id: parseInt(categoryId) },
-        data,
-      });
-    } catch (error) {
-      console.error("editCategory error:", error);
-      throw new Error("Could not update category");
-    }
+  async editCategory(categoryId: number, payload: EditMerchCategoryPayload) {
+    return prisma.merchandiseCategory.update({
+      where: { id: categoryId },
+      data: {
+        categoryName: payload.name,
+        imgUrl: payload.imgUrl,
+      },
+    });
   }
 
-  async deleteCategory(payload: DeleteMerchCategoryPayload) {
-    try {
-      return await prisma.merchandiseCategory.delete({
-        where: { id: payload.id },
-      });
-    } catch (error) {
-      console.error("deleteCategory error:", error);
-      throw new Error("Could not delete category");
-    }
+  async deleteCategory(categoryId: number) {
+    return prisma.merchandiseCategory.delete({
+      where: { id: categoryId },
+    });
   }
 }
 

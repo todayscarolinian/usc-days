@@ -63,8 +63,8 @@ export default function EditScheduleDialog({
   } = useScheduleForm({
     initialValues: {
       gameTypeId: schedule.gameType.id,
-      teamAId: schedule.teamA.id,
-      teamBId: schedule.teamB.id,
+      teamAId: schedule.teamA?.id ?? null,
+      teamBId: schedule.teamB?.id ?? null,
       startDate: getEventDayKey(schedule.startDate),
       endDate: getEventDayKey(schedule.endDate),
       startTime: getEventTimeOfDay(schedule.startDate),
@@ -163,7 +163,7 @@ export default function EditScheduleDialog({
       return;
     }
 
-    const data: EditGamePayload = {
+    const data: EditGamePayload & { id: number } = {
       id: schedule.id,
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
@@ -320,9 +320,10 @@ export default function EditScheduleDialog({
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamAId !== -1 ? inputs.teamAId.toString() : ""}
+                clearable
+                value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamAId", value ? Number(value) : -1)
+                  updateInput("teamAId", value ? Number(value) : null)
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
@@ -344,9 +345,10 @@ export default function EditScheduleDialog({
                 searchPlaceholder="Search teams..."
                 emptyMessage="No teams found."
                 options={teamOptions}
-                value={inputs.teamBId !== -1 ? inputs.teamBId.toString() : ""}
+                clearable
+                value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
                 onValueChange={(value) =>
-                  updateInput("teamBId", value ? Number(value) : -1)
+                  updateInput("teamBId", value ? Number(value) : null)
                 }
                 disabled={loading || inputs.gameTypeId <= 0}
                 loading={teamLoading}

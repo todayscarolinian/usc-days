@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/src/components/leaderboards/data-table";
 import { columns } from "@/src/components/leaderboards/columns";
 import { transformSchoolsData } from "@/src/components/leaderboards/transformSchoolsData";
-import { getGamesQuery } from "@/src/queries/games.queries";
+import { useGamesQuery } from "@/src/queries/games.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
 import LeaderboardsTableSkeleton from "@/src/components/leaderboards/leaderboards-table-skeleton";
 
@@ -16,7 +16,7 @@ export default function Leaderboards() {
     ? Number(searchParams.get("sport"))
     : null;
 
-  const { data: games = [], error, isLoading: loading } = getGamesQuery();
+  const { data: games = [], error, isLoading: loading } = useGamesQuery();
 
   const transformed = useMemo(() => {
     return transformSchoolsData(games, selectedSport || undefined);
@@ -43,7 +43,7 @@ export default function Leaderboards() {
         {error || loading ? (
           <LeaderboardsTableSkeleton error={error?.message} />
         ) : (
-          <DataTable columns={columns} data={transformed} title="USC DAYS" />
+          <DataTable columns={columns} data={transformed} />
         )}
       </div>
     </div>

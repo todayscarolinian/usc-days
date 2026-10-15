@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Roboto_Condensed } from "next/font/google";
 import { Suspense } from "react";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 import Navbar from "@/src/components/layout/navbar";
+import SiteFooter from "@/src/components/layout/site-footer";
+import SmoothScroll from "@/src/components/layout/smooth-scroll";
 import { Toaster } from "@/src/components/ui/sonner";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import QueryProvider from "@/src/components/provider";
@@ -11,7 +14,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 
 const robotoCondensed = Roboto_Condensed({
   subsets: ["latin"],
-  weight: ["100", "300", "400", "700"],
+  weight: ["100", "300", "400", "600", "700"],
   variable: "--font-roboto-condensed",
 });
 
@@ -57,12 +60,14 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className={`${robotoCondensed.variable}`}>
+      <body className={`${robotoCondensed.variable} flex min-h-dvh flex-col`}>
+        <SmoothScroll />
         <QueryProvider>
           <Suspense fallback={<div />}>
             <Navbar />
           </Suspense>
-          <main className="relative z-0">{children}</main>
+          <main className="relative z-0 flex-1">{children}</main>
+          <SiteFooter />
           <Toaster />
               </QueryProvider>
               <GoogleAnalytics gaId="G-ZF7QYY6WNC" />

@@ -11,5 +11,9 @@ export const metadata: Metadata = generateMeta({
 });
 
 export default function Home() {
-  return <HomePageClient />;
+  return (
+    <>
+      <HomePageClient />
+    </>
+  );
 }

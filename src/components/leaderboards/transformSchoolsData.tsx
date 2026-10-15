@@ -1,26 +1,19 @@
 import { Schedules } from "@/src/types/types";
 import { StandingData } from "@/src/types/types";
-import { schoolLogos } from "@/src/constants/schoolLogos";
 
 export function transformSchoolsData(
   games: Schedules[],
   sportId?: number,
 ): StandingData[] {
-  // Get school keys (e.g., SOE, SAFAD, etc.)
-  const schoolKeys = Object.keys(schoolLogos).filter((k) => k !== "Default");
-
-  // Helper to get school from team name
-  function getSchoolFromTeam(teamName: string): string | null {
-    if (!teamName) return null;
-    const match = schoolKeys.find((school) =>
-      teamName.toLowerCase().startsWith(school.toLowerCase()),
-    );
-    return match || null;
-  }
-
   const leaderboard: Record<
     string,
-    { school: string; wins: number; losses: number; sport: string }
+    {
+      school: string;
+      wins: number;
+      losses: number;
+      draws: number;
+      sport: string;
+    }
   > = {};
 
   // Filter by sport if specified
@@ -30,16 +23,13 @@ export function transformSchoolsData(
       : games;
 
   for (const g of filteredGames) {
+    if (!g.teamA || !g.teamB) continue;
+
     const sport = g.gameType.gameName;
-    const teamA = g.teamA.teamName;
-    const teamB = g.teamB.teamName;
 
-    // Map team names to schools
-    const schoolA = getSchoolFromTeam(teamA);
-    const schoolB = getSchoolFromTeam(teamB);
-
-    // Omit if either team does not match a school
-    if (!schoolA || !schoolB) continue;
+    // Each team belongs to exactly one school
+    const schoolA = g.teamA.school.schoolName;
+    const schoolB = g.teamB.school.schoolName;
 
     // Initialize School A entry if it doesn't exist
     if (!leaderboard[schoolA]) {
@@ -47,6 +37,7 @@ export function transformSchoolsData(
         school: schoolA,
         wins: 0,
         losses: 0,
+        draws: 0,
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
@@ -57,6 +48,7 @@ export function transformSchoolsData(
         school: schoolB,
         wins: 0,
         losses: 0,
+        draws: 0,
         sport: sportId !== undefined ? sport : "Overall",
       };
     }
@@ -68,8 +60,10 @@ export function transformSchoolsData(
       continue;
     }
 
-    // Skip draws - no wins or losses for either team
+    // Draws count for both schools but not toward wins or losses
     if (g.isDraw) {
+      leaderboard[schoolA].draws++;
+      leaderboard[schoolB].draws++;
       continue;
     }
 
@@ -103,6 +97,7 @@ export function transformSchoolsData(
         team: entry.school, // 'team' field now holds the school name
         wins: entry.wins,
         losses: entry.losses,
+        draws: entry.draws,
         winPercentage: totalGames > 0 ? (entry.wins / totalGames) * 100 : 0,
         sport: entry.sport,
       };

@@ -1,0 +1,62 @@
+.dateLabel {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.currentLabel,
+.previousLabel {
+  display: block;
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.forward .currentLabel {
+  animation-name: date-forward-in;
+}
+
+.forward .previousLabel {
+  animation-name: date-forward-out;
+}
+
+.backward .currentLabel {
+  animation-name: date-backward-in;
+}
+
+.backward .previousLabel {
+  animation-name: date-backward-out;
+}
+
+@keyframes date-forward-in {
+  from { transform: translateX(110%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes date-forward-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(-110%); }
+}
+
+@keyframes date-backward-in {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes date-backward-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(110%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dateLabel .currentLabel,
+  .dateLabel .previousLabel {
+    animation: none;
+  }
+
+  .previousLabel {
+    display: none;
+  }
+}

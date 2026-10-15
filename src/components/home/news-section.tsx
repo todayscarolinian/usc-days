@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import { useFacebookPostsQuery } from "@/src/queries/facebook.queries";
@@ -8,30 +7,13 @@ import NewsCard from "./news-card";
 
 interface NewsSectionProps {
   hashtag?: string;
-  startDate?: string;
-  endDate?: string;
 }
 
 const gridClassName = "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4";
 
 export default function NewsSection({
   hashtag = FACEBOOK_NEWS_CONFIG.hashtag,
-  startDate,
-  endDate,
 }: NewsSectionProps) {
-  // Keep the rolling range stable across rerenders so the query key stays stable.
-  const [defaultRange] = useState(() => {
-    const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: FACEBOOK_NEWS_CONFIG.timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    const start = new Date(`${today}T00:00:00Z`);
-    start.setUTCDate(start.getUTCDate() - (FACEBOOK_NEWS_CONFIG.lookbackDays - 1));
-
-    return { startDate: start.toISOString().slice(0, 10), endDate: today };
-  });
   const {
     data: posts,
     isPending,
@@ -40,8 +22,8 @@ export default function NewsSection({
     refetch,
   } = useFacebookPostsQuery(
     hashtag,
-    startDate ?? defaultRange.startDate,
-    endDate ?? defaultRange.endDate,
+    FACEBOOK_NEWS_CONFIG.startDate,
+    FACEBOOK_NEWS_CONFIG.endDate,
     FACEBOOK_NEWS_CONFIG.postLimit,
   );
 
