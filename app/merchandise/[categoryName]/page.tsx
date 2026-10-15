@@ -6,9 +6,9 @@ import CategoryService from "@/src/services/category.service";
 const categoryService = new CategoryService();
 
 export const metadata: Metadata = generateMeta({
-  title: "Merchandise Category - USC Days 2025",
+  title: "Merchandise Category - USC Days 2026",
   description:
-    "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
+    "Browse merchandise by category for USC Days 2026. Find apparel, accessories, and more to show your school spirit.",
   url: "/merchandise/[categoryName]",
   image: "/og_image.jpg",
 });

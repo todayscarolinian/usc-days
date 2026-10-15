@@ -9,9 +9,9 @@ import TableTennisImage from "@/src/assets/carousel/table-tennis.jpg";
 import VolleyballImage from "@/src/assets/carousel/vball.jpg";
 
 export const metadata: Metadata = generateMeta({
-  title: "Standings - USC Days 2025",
+  title: "Standings - USC Days 2026",
   description:
-    "View the latest standings for USC Days 2025 intramural competitions.",
+    "View the latest standings for USC Days 2026 intramural competitions.",
   url: "/standings",
   image: "/og_image.jpg",
 });

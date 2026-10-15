@@ -21,7 +21,7 @@ export const FACEBOOK_QUERY_CONFIG = {
 
 /** Homepage news is limited to the USC Days 2026 event dates, inclusive. */
 export const FACEBOOK_NEWS_CONFIG = {
-  hashtag: "USCDays2025",
+  hashtag: "USCDays2026",
   postLimit: 4,
   startDate: "2026-02-10",
   endDate: "2026-02-15",
