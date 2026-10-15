@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import Standings from "@/src/components/standings/standings";
 import PageHero from "@/src/components/layout/page-hero";
-import SiteFooter from "@/src/components/layout/site-footer";
 
 export const metadata: Metadata = generateMeta({
   title: "Standings - USC Days 2025",
@@ -30,8 +29,6 @@ const StandingsPage = () => {
       <Suspense fallback={<div className="min-h-96 bg-neutral-50" />}>
         <Standings />
       </Suspense>
-
-      <SiteFooter />
     </>
   );
 };

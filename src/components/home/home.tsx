@@ -2,7 +2,6 @@ import HeroCarousel from "./hero-carousel";
 import MerchSection from "./merch-section";
 import TodaysGames from "./todays-games";
 import SportsSection from "./sports-section";
-import ContactSection from "./contact-section";
 import SchoolsSection from "./schools-section";
 import NewsSection from "./news-section";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
@@ -50,14 +49,6 @@ export default function Home() {
           <RangerCarousel />
         </section>
       </main>
-
-      <footer className="border-t bg-tc_primary mt-6">
-        <div className="max-w-6xl mx-auto px-4 py-16 space-y-6">
-          <section id="contact" aria-labelledby="contact">
-            <ContactSection />
-          </section>
-        </div>
-      </footer>
     </div>
   );
 }
