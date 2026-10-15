@@ -48,11 +48,11 @@ export default function PublicationInfo() {
           <Instagram size={18} />
         </a>
         <a
-          href={PUBLICATION.social.youtube}
+          href={PUBLICATION.social.twitter}
           target="_blank"
           rel="noopener noreferrer"
           className="border-2 border-white/30 rounded-lg p-2 text-white hover:text-white/70 transition"
-          aria-label="Visit Today's Carolinian YouTube channel"
+          aria-label="Visit Today's Carolinian Twitter page"
         >
           <Youtube size={18} />
         </a>
