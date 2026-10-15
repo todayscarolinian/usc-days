@@ -24,7 +24,7 @@ import { Label } from "@/src/components/ui/label";
 
 import { AddGamePayload } from "@/src/types/games.types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
-import { cn, getTimezoneOffset } from "@/src/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 import { eventDateTimeToISO } from "@/src/lib/time";
 
