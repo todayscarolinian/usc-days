@@ -8,6 +8,7 @@ import {
   hasSavedResult,
 } from "@/src/types/games.types";
 import { ApiError } from "@/src/lib/api";
+import { decodeGamesCursor, encodeGamesCursor } from "@/src/lib/games-cursor";
 import { Prisma } from "@/src/lib/prisma/generated/client";
 
 export type StoredGameTeams = {
@@ -85,6 +86,7 @@ export function duplicateTeamMatchupFilter(
 
 export interface GetGamesParams {
   gameTypeId?: number;
+  gameTypeIds?: number[];
   teamAId?: number;
   teamBId?: number;
   teamId?: number; // matches either teamA or teamB
@@ -92,6 +94,10 @@ export interface GetGamesParams {
   location?: string;
   startDate?: Date;
   endDate?: Date;
+  /** Games that start at or after this instant. Unlike `startDate`, ignores overlap. */
+  startsFrom?: Date;
+  /** Games that start before this instant. Unlike `endDate`, ignores overlap. */
+  startsBefore?: Date;
   hasWinner?: boolean;
   createdByHeraldId?: string;
 }
@@ -109,12 +115,17 @@ class GameService {
     params?: GetGamesWithPaginationParams,
   ): Promise<PaginatedGamesResponse> {
     const where: Prisma.GameWhereInput = {};
+    const and: Prisma.GameWhereInput[] = [];
     const cursor = params?.cursor;
     const limit = params?.limit;
-    const offset = params?.offset;
+    const order = params?.order ?? "asc";
 
     if (params?.gameTypeId) {
       where.gameTypeId = params.gameTypeId;
+    }
+
+    if (params?.gameTypeIds) {
+      and.push({ gameTypeId: { in: params.gameTypeIds } });
     }
 
     if (params?.teamAId) {
@@ -164,21 +175,41 @@ class GameService {
         dateConditions.push({ startDate: { lte: params.endDate } });
       }
 
-      if (dateConditions.length > 0) {
-        where.AND = dateConditions;
-      }
+      and.push(...dateConditions);
+    }
+
+    if (params?.startsFrom) {
+      and.push({ startDate: { gte: params.startsFrom } });
+    }
+
+    if (params?.startsBefore) {
+      and.push({ startDate: { lt: params.startsBefore } });
     }
 
     if (cursor !== undefined || limit !== undefined) {
-      const cursorDate = cursor ? new Date(cursor) : null;
+      const after = cursor ? decodeGamesCursor(cursor) : null;
       const pageSize = Math.min(limit || 20, 100);
 
-      if (cursorDate) {
-        where.AND = where.AND || [];
-        (where.AND as Prisma.GameWhereInput[]).push({
-          startDate: { gt: cursorDate },
+      if (cursor && !after) {
+        throw new ApiError("VALIDATION_ERROR", "Invalid cursor.");
+      }
+
+      // Games are ordered by (startDate, id), so the id breaks start-time ties.
+      if (after) {
+        and.push({
+          OR: order === "asc"
+            ? [
+                { startDate: { gt: after.startDate } },
+                { startDate: after.startDate, id: { gt: after.id } },
+              ]
+            : [
+                { startDate: { lt: after.startDate } },
+                { startDate: after.startDate, id: { lt: after.id } },
+              ],
         });
       }
+
+      if (and.length > 0) where.AND = and;
 
       const games = await prisma.game.findMany({
         where,
@@ -188,18 +219,19 @@ class GameService {
           teamB: { include: { school: true } },
           winner: true,
         },
-        orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
+        orderBy: [{ startDate: order }, { id: order }],
         take: pageSize + 1,
       });
 
       const hasMore = games.length > pageSize;
       const paginatedGames = games.slice(0, pageSize);
-      const nextCursor = hasMore
-        ? paginatedGames[paginatedGames.length - 1]?.startDate.toISOString()
-        : null;
+      const last = paginatedGames[paginatedGames.length - 1];
+      const nextCursor = hasMore && last ? encodeGamesCursor(last) : null;
 
       return { data: paginatedGames, hasMore, nextCursor };
     }
+
+    if (and.length > 0) where.AND = and;
 
     // No pagination: return all games
     const games = await prisma.game.findMany({
