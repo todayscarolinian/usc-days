@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +12,8 @@ import { Button } from "@/src/components/ui/button";
 import type { Schedules } from "@/src/types/types";
 import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
+import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
+import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 
 type Props = {
   open: boolean;
@@ -21,6 +22,7 @@ type Props = {
   onSaved?: (updated: Schedules) => void;
   onEditSchedule?: (game: Schedules) => void;
   onAddScore?: (game: Schedules) => void;
+  now?: Date;
 };
 
 function getDbScores(g: Schedules) {
@@ -29,35 +31,13 @@ function getDbScores(g: Schedules) {
   return { a, b };
 }
 
-function getGameStatus(game: Schedules): string {
-  const now = new Date();
-  const start = new Date(game.startDate);
-  const end = new Date(game.endDate);
-  const hasScores = game.teamAScore != null && game.teamBScore != null;
-
-  // If no scores and no forfeits, determine status based on time
-  if (!hasScores && !(game.teamAForfeited || game.teamBForfeited)) {
-    // Game hasn't started yet
-    if (start > now) {
-      return "Scheduled";
-    }
-
-    // Game is currently in progress
-    if (end > now) {
-      return "Ongoing";
-    }
-  }
-
-  // Otherwise, if scores exist or forfeits occurred, the game is finished
-  return "Finished";
-}
-
 export default function GameDetailsDialog({
   open,
   onOpenChange,
   game,
   onEditSchedule,
   onAddScore,
+  now = new Date(),
 }: Props) {
   const [busyEdit, setBusyEdit] = React.useState(false);
 
@@ -74,7 +54,13 @@ export default function GameDetailsDialog({
   const location = game.location ?? "TBA";
 
   const { a: dbA, b: dbB } = getDbScores(game);
-  const status = getGameStatus(game);
+  const status = GAME_STATUS_LABELS[getGameStatus(game, now)];
+  const dateLabel = new Intl.DateTimeFormat("en-US", {
+    timeZone: SCHEDULE_TIME_ZONE, month: "short", day: "numeric", year: "numeric",
+  }).format(start);
+  const timeFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: SCHEDULE_TIME_ZONE, hour: "numeric", minute: "2-digit",
+  });
 
   function goEditSchedule() {
     try {
@@ -102,8 +88,8 @@ export default function GameDetailsDialog({
           <div className="grid grid-cols-3 gap-2">
             <span className="text-muted-foreground">Date</span>
             <span className="col-span-2">
-              {format(start, "MMM d, yyyy")} · {format(start, "h:mm a")} -{" "}
-              {format(end, "h:mm a")}
+              {dateLabel} · {timeFormatter.format(start)} -{" "}
+              {timeFormatter.format(end)}
             </span>
           </div>
 

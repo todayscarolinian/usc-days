@@ -1,91 +1,75 @@
 "use client";
 
-import * as React from "react";
-import { Button } from "@/src/components/ui/button";
-import { Calendar } from "@/src/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/src/components/ui/popover";
+import { useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, X } from "lucide-react";
+import { Button } from "@/src/components/ui/button";
+import { Calendar } from "@/src/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { cn } from "@/src/lib/utils";
 
 interface DateFilterProps {
+  id?: string;
   selectedDate: Date | undefined;
   onDateSelect: (date: Date | undefined) => void;
   className?: string;
   showClear?: boolean;
+  disabled?: boolean;
 }
 
 export function DateFilter({
-  selectedDate,
-  onDateSelect,
-  className,
+  id, selectedDate, onDateSelect, className, showClear = true, disabled = false,
 }: DateFilterProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const canClear = showClear && selectedDate;
 
-  const handleDateSelect = (date: Date | undefined) => {
+  function selectDate(date: Date | undefined) {
     onDateSelect(date);
     setIsOpen(false);
-  };
-
-  const handleClearDate = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDateSelect(undefined);
-  };
+  }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <div className="relative">
+      <Popover open={isOpen && !disabled} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id={id}
+            disabled={disabled}
+            variant="outline"
+            aria-label={selectedDate ? `Choose date, ${format(selectedDate, "MMMM d, yyyy")}` : "Choose date"}
+            className={cn(
+              "flex h-13.5 w-full items-center justify-start gap-2 overflow-hidden rounded-[2px] border border-neutral-200 border-l-2 bg-white px-4 shadow-sm hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500",
+              canClear && "border-l-tc_primary-500 pr-12",
+              className,
+            )}
+          >
+            <CalendarIcon className="size-4 shrink-0" />
+            <span className={cn("truncate text-sm", selectedDate ? "font-medium" : "text-muted-foreground")}>
+              {selectedDate ? format(selectedDate, "MMM d") : "Select date"}
+            </span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={selectDate}
+            defaultMonth={selectedDate}
+          />
+        </PopoverContent>
+      </Popover>
+      {canClear && (
         <Button
-          variant="outline"
-          className={cn(
-            "relative flex items-center justify-start gap-2 w-full px-4! py-1.75! h-13.5! bg-white shadow-sm rounded-[2px] border border-neutral-200 border-l-2 transition-colors hover:border-l-tc_primary-500 data-[state=open]:border-l-tc_primary-500 outline-none overflow-hidden",
-            selectedDate && "border-l-tc_primary-500 pr-10", // Reduced padding when date is selected
-            className,
-          )}
+          variant="ghost"
+          size="icon"
+          disabled={disabled}
+          aria-label="Clear date"
+          className="absolute top-1/2 right-1 -translate-y-1/2"
+          onClick={() => selectDate(undefined)}
         >
-          <CalendarIcon className="h-4 w-4 shrink-0" />
-          {selectedDate ? (
-            <span className="text-sm font-medium truncate">
-              {format(selectedDate, "MMM d")}
-            </span>
-          ) : (
-            <span className="text-sm text-muted-foreground truncate">
-              Select date
-            </span>
-          )}
-          {selectedDate && (
-            // Converted to div since Button inside Button is not allowed
-            <div
-              role="button"
-              tabIndex={0}
-              aria-label="Clear date"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-5.5 w-5.5 rounded-sm hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center z-10 transition-colors cursor-pointer"
-              onClick={handleClearDate}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleClearDate(e as unknown as React.MouseEvent);
-                }
-              }}
-            >
-              <X className="h-3 w-3" />
-            </div>
-          )}
+          <X className="size-4" />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDateSelect}
-          defaultMonth={selectedDate}
-        />
-      </PopoverContent>
-    </Popover>
+      )}
+    </div>
   );
 }
