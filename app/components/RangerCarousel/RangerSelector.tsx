@@ -15,7 +15,7 @@ export default function RangerSelector({
 }: RangerSelectorProps) {
   return (
     <div
-      className="flex flex-row gap-2 sm:flex-col sm:gap-[11px]"
+      className="ranger-selector"
       role="group"
       aria-label="Rangers"
     >
@@ -36,14 +36,14 @@ export default function RangerSelector({
                 : undefined,
             }}
             className={[
-              "flex aspect-square w-[clamp(32px,8vw,94px)] cursor-pointer items-center justify-center rounded-md p-[14%] transition-shadow sm:w-[clamp(45px,6.5vw,94px)]",
+              "ranger-selector-button flex aspect-square shrink-0 cursor-pointer items-center justify-center rounded-md transition-shadow duration-300 motion-reduce:transition-none",
             ].join(" ")}
           >
             <Image
               src={ranger.iconImage}
               alt=""
               draggable={false}
-              sizes="94px"
+              sizes="84px"
               className="h-full w-full object-contain"
               onError={(e) => {
                 e.currentTarget.style.visibility = "hidden";

@@ -15,8 +15,8 @@ export default function RangerCarousel() {
   ];
 
   return (
-    <div className="w-full overflow-x-clip">
-      <div className="mx-auto flex max-w-[1500px] flex-col items-center gap-8 px-4 py-8 sm:flex-row sm:items-start sm:justify-center sm:gap-[clamp(16px,4vw,60px)]">
+    <div className="ranger-carousel">
+      <div className="ranger-carousel-layout">
 
         <div className="ranger-deck" aria-label="Ranger cards">
           {RANGERS.map((ranger) => {
