@@ -34,11 +34,11 @@ export default function Home() {
         <section id="schools" aria-labelledby="schools">
           <SchoolsSection />
         </section>
-
-        <section id="sports" aria-labelledby="sports">
-          <SportsSection />
-        </section>
       </main>
+
+      <section id="sports" aria-labelledby="sports">
+        <SportsSection />
+      </section>
 
       <LeaderboardSection />
 
