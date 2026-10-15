@@ -6,6 +6,7 @@ import ContactSection from "./contact-section";
 import SchoolsSection from "./schools-section";
 import NewsSection from "./news-section";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
+import RangerCarousel from "@/app/components/RangerCarousel/RangerCarousel";
 
 export default function Home() {
   return (
@@ -31,6 +32,22 @@ export default function Home() {
 
         <section id="sports" aria-labelledby="sports">
           <SportsSection />
+        </section>
+      </main>
+
+      <main className="flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden bg-white">
+        <section className="w-full px-6 pt-16 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-black md:text-6xl">
+            Meet the Schools
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 md:text-lg">
+            Get to know the different schools and departments that make up our
+            Carolinian community. Discover their unique identities, programs,
+            and what makes each one stand out.
+          </p>
+        </section>
+        <section className="flex w-full items-center justify-center py-12">
+          <RangerCarousel />
         </section>
       </main>
 
