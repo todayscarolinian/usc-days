@@ -38,11 +38,7 @@ export default function SchedulesPage() {
             today={schedules.today}
             disabled={schedules.isNavigating}
             onSelect={schedules.navigateToDate}
-            actions={canManage ? (
-              <AddScheduleDialog compactTrigger />
-            ) : process.env.NODE_ENV === "development" ? (
-              <AddScheduleDialog compactTrigger preview />
-            ) : undefined}
+            actions={canManage ? <AddScheduleDialog compactTrigger /> : undefined}
           />
           <div
             key={filters.event ?? (filters.sportId ? `sport-${filters.sportId}` : "all")}

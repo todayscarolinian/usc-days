@@ -27,9 +27,8 @@ import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { cn, getTimezoneOffset } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 
-export default function AddScheduleDialog({ compactTrigger = false, preview = false }: {
+export default function AddScheduleDialog({ compactTrigger = false }: {
   compactTrigger?: boolean;
-  preview?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -105,8 +104,6 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
   }));
 
   async function createSchedule() {
-    if (preview) return;
-
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -155,7 +152,7 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
         )}>
           {compactTrigger && <Plus className="size-4" aria-hidden="true" />}
           <span className={compactTrigger ? "sr-only sm:not-sr-only" : undefined}>
-            {preview ? "Preview Schedule" : "Add Schedule"}
+            Add Schedule
           </span>
         </Button>
       </DialogTrigger>
@@ -163,9 +160,7 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
         <DialogHeader>
           <DialogTitle>Add Schedule</DialogTitle>
           <DialogDescription>
-            {preview
-              ? "Preview only. You can try the form, but schedules won’t be saved."
-              : <>Add a new game schedule. Click Submit when you&apos;re done.</>}
+            Add a new game schedule. Click Submit when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-4">
@@ -314,7 +309,7 @@ export default function AddScheduleDialog({ compactTrigger = false, preview = fa
           <Button
             type="submit"
             onClick={createSchedule}
-            disabled={preview || inputs.gameTypeId <= 0 || loading}
+            disabled={inputs.gameTypeId <= 0 || loading}
           >
             {add.isPending ? "Creating..." : "Submit"}
           </Button>
