@@ -28,12 +28,6 @@ export const AddTeamSchema = z.object({
 });
 
 export const EditTeamSchema = z.object({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? 'id is required.'
-                : 'id must be a number.',
-    }),
     teamName: z
         .string({
             error: (issue) =>
@@ -60,15 +54,5 @@ export const EditTeamSchema = z.object({
         .nonempty('gameTypeIds cannot be empty.'),
 });
 
-export const DeleteTeamSchema = z.object({
-    id: z.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? 'id is required.'
-                : 'id must be a number.',
-    }),
-});
-
 export type AddTeamPayload = z.infer<typeof AddTeamSchema>;
 export type EditTeamPayload = z.infer<typeof EditTeamSchema>;
-export type DeleteTeamPayload = z.infer<typeof DeleteTeamSchema>;

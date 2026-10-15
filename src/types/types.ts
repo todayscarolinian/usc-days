@@ -50,10 +50,14 @@ export type Schedules = Game & {
     teamA: {
         id: number;
         teamName: string;
+        schoolId: number;
+        school: { id: number; schoolName: string };
     } | null;
     teamB: {
         id: number;
         teamName: string;
+        schoolId: number;
+        school: { id: number; schoolName: string };
     } | null;
     winner: {
         id: number;

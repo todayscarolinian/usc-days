@@ -1,9 +1,6 @@
 import { z } from "zod";
-import {
-  endOfDayQuery,
-  limitQuery,
-  startOfDayQuery,
-} from "@/src/lib/api/query-params";
+import { limitQuery } from "@/src/lib/api/query-params";
+import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 
 /** Raw post as returned by the Graph API. */
 export interface GraphPost {
@@ -55,8 +52,13 @@ export const FacebookPostsQuerySchema = z
             "hashtag may only contain letters, numbers, and underscores.",
           ),
       ),
-    startDate: startOfDayQuery,
-    endDate: endOfDayQuery,
+    // Interpret event dates in Manila, independent of the server's timezone.
+    startDate: z.iso.date().transform((value) =>
+      new Date(`${value}T00:00:00${FACEBOOK_NEWS_CONFIG.utcOffset}`)
+    ).optional(),
+    endDate: z.iso.date().transform((value) =>
+      new Date(`${value}T23:59:59.999${FACEBOOK_NEWS_CONFIG.utcOffset}`)
+    ).optional(),
     limit: limitQuery(100),
   })
   .superRefine((query, ctx) => {
@@ -66,7 +68,8 @@ export const FacebookPostsQuerySchema = z
     if (!query.endDate) {
       ctx.addIssue({ code: "custom", path: ["endDate"], message: "endDate is required." });
     }
-    if (!query.startDate || !query.endDate) return;
+    // Failed date validation may leave untransformed strings in the refinement.
+    if (!(query.startDate instanceof Date) || !(query.endDate instanceof Date)) return;
 
     if (query.endDate < query.startDate) {
       ctx.addIssue({

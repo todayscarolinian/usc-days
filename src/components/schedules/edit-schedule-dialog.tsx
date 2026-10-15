@@ -163,7 +163,7 @@ export default function EditScheduleDialog({
       return;
     }
 
-    const data: EditGamePayload = {
+    const data: EditGamePayload & { id: number } = {
       id: schedule.id,
       gameTypeId: inputs.gameTypeId,
       teamAId: inputs.teamAId,
