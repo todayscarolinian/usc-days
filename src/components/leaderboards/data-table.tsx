@@ -17,6 +17,8 @@ import {
 } from "@/src/components/ui/table";
 import { CustomColumnDef } from "./columns";
 import { useState } from "react";
+import { Trophy } from "lucide-react";
+import { EmptyState } from "@/src/components/ui/empty-state";
 
 interface DataTableProps<TData> {
   columns: CustomColumnDef<TData>[];
@@ -89,8 +91,13 @@ export function DataTable<TValue>({ columns, data }: DataTableProps<TValue>) {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No Records Found.
+              <TableCell colSpan={columns.length} className="p-0 whitespace-normal">
+                <EmptyState
+                  icon={Trophy}
+                  title="No leaderboard records yet"
+                  description="Rankings will appear once match results are recorded."
+                  className="rounded-none"
+                />
               </TableCell>
             </TableRow>
           )}

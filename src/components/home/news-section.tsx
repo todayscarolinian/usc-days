@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
+import { EmptyState } from "@/src/components/ui/empty-state";
+import { Newspaper } from "lucide-react";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import { useFacebookPostsQuery } from "@/src/queries/facebook.queries";
 import NewsCard from "./news-card";
@@ -31,7 +33,7 @@ export default function NewsSection({
     <section id="latest-news" aria-labelledby="latest-news-heading">
       <h2
         id="latest-news-heading"
-        className="mb-6 border-b-2 border-foreground pb-3 text-3xl font-bold text-foreground"
+        className="mb-8 border-b-2 border-foreground pb-4 text-3xl font-bold text-foreground sm:text-4xl"
       >
         LATEST NEWS
       </h2>
@@ -42,7 +44,7 @@ export default function NewsSection({
             <div
               key={index}
               aria-hidden="true"
-              className="relative aspect-4/3 overflow-hidden border-b-2 border-zinc-400 bg-zinc-200 motion-safe:animate-pulse dark:bg-zinc-800"
+              className="relative aspect-[6/5] overflow-hidden border-b-2 border-zinc-400 bg-zinc-200 motion-safe:animate-pulse dark:bg-zinc-800"
             >
               <div className="absolute inset-x-0 bottom-0 space-y-3 p-4">
                 <div className="h-3 w-1/2 bg-zinc-300 dark:bg-zinc-700" />
@@ -86,12 +88,11 @@ export default function NewsSection({
           </Button>
         </div>
       ) : (
-        <p
-          role="status"
-          className="border border-border bg-muted/40 p-6 text-muted-foreground"
-        >
-          No news posts for this date range. Check back soon for updates.
-        </p>
+        <EmptyState
+          icon={Newspaper}
+          title="No news posts for this date range"
+          description="Check back soon for the latest campus updates."
+        />
       )}
     </section>
   );

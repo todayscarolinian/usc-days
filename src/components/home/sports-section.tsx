@@ -17,6 +17,7 @@ import Chess from "@/src/assets/icons/light-gray/chess.png";
 import Esports from "@/src/assets/icons/light-gray/esports.png";
 import Pickleball from "@/src/assets/icons/light-gray/pickleball.png";
 import Frisbee from "@/src/assets/icons/light-gray/frisbee.png";
+import styles from "./sports-section.module.css";
 
 const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 
@@ -42,41 +43,37 @@ const sports = [
 export default function SportsSection() {
   return (
     <div
-      className={`${roboto.className} @container w-full bg-neutral-950 bg-[url('/black-bg.png')] bg-top bg-repeat text-[#f7f6f6]`}
+      className={`${roboto.className} ${styles.carousel} w-full bg-neutral-950 bg-[url('/black-bg.png')] bg-top bg-repeat text-[#f7f6f6]`}
     >
       <h2 id="sports-heading" className="sr-only">Sports</h2>
-      <ul className="mx-auto grid max-w-[1718px] grid-cols-2 justify-between gap-x-4 gap-y-6 px-4 py-8 @lg:grid-cols-4 @lg:px-8 @lg:py-10 @5xl:grid-cols-[repeat(8,6.25rem)] @5xl:px-12 @5xl:py-12 @7xl:px-20 @7xl:py-12">
-        {sports.map((sport) => {
-          const content = (
-            <figure className="flex flex-col items-center py-2.5 text-center">
-              <Image
-                src={sport.icon}
-                alt=""
-                width={100}
-                height={103}
-                sizes="100px"
-                className="h-[103px] w-[100px] max-w-full object-contain"
-              />
-              <figcaption className="mt-2 text-xs leading-[18px] font-normal tracking-[0.05em] uppercase @5xl:whitespace-nowrap">
-                {sport.name}
-              </figcaption>
-            </figure>
-          );
-
-          return (
-            <li key={sport.name} className="min-w-0">
-              {sport.href ? (
-                <Link
-                  href={sport.href}
-                  className="block cursor-pointer transition-opacity hover:opacity-80 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  {content}
-                </Link>
-              ) : content}
-            </li>
-          );
-        })}
-      </ul>
+      <div className={`${styles.track} py-3 sm:py-6 lg:py-8`}>
+        {[0, 1].map((copy) => (
+          <ul
+            key={copy}
+            aria-hidden={copy === 1 ? true : undefined}
+            aria-labelledby={copy === 0 ? "sports-heading" : undefined}
+            className="flex shrink-0"
+          >
+            {sports.map((sport) => (
+              <li key={sport.name} className="w-28 shrink-0 px-2 sm:w-40 sm:px-3 lg:w-44">
+                <figure className="flex flex-col items-center py-1 text-center sm:py-2">
+                  <Image
+                    src={sport.icon}
+                    alt=""
+                    width={64}
+                    height={66}
+                    sizes="(max-width: 639px) 44px, 64px"
+                    className="h-[46px] w-[44px] max-w-full object-contain sm:h-[66px] sm:w-[64px]"
+                  />
+                  <figcaption className="mt-1.5 min-h-7 text-[10px] leading-[14px] font-normal tracking-[0.05em] uppercase sm:mt-2 sm:min-h-0 sm:text-xs sm:leading-[18px] sm:whitespace-nowrap">
+                    {sport.name}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
     </div>
   );
 }

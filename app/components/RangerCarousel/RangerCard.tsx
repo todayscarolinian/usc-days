@@ -25,7 +25,7 @@ export default function RangerCard({ ranger, position, total }: RangerCardProps)
         alt={`${ranger.name} card`}
         draggable={false}
         fill
-        sizes="(min-width: 1520px) 760px, (min-width: 640px) 50vw, 74vw"
+        sizes="(min-width: 1520px) 940px, (min-width: 640px) 60vw, 80vw"
         className="scale-[1.04] object-cover"
         // Hide a missing asset instead of displaying the broken-image icon.
         onError={(e) => {

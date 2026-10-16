@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Newspaper } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
+import { EmptyState } from "@/src/components/ui/empty-state";
 import { FACEBOOK_NEWS_CONFIG } from "@/src/constants/facebook";
 import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { useFacebookPostsQuery } from "@/src/queries/facebook.queries";
@@ -62,7 +63,7 @@ export default function ScheduleNews() {
     FACEBOOK_NEWS_CONFIG.hashtag,
     FACEBOOK_NEWS_CONFIG.startDate,
     FACEBOOK_NEWS_CONFIG.endDate,
-    6,
+    5,
   );
   let content;
 
@@ -76,7 +77,7 @@ export default function ScheduleNews() {
       </div>
     );
   } else if (query.data?.length) {
-    content = query.data.map(post => <NewsItem key={post.id} post={post} />);
+    content = query.data.slice(0, 5).map(post => <NewsItem key={post.id} post={post} />);
   } else if (query.isError) {
     content = (
       <div role="alert" className="py-4 text-neutral-600">
@@ -87,7 +88,13 @@ export default function ScheduleNews() {
       </div>
     );
   } else {
-    content = <p role="status" className="py-4 text-neutral-600">No news posts yet. Check back for updates.</p>;
+    content = (
+      <EmptyState
+        icon={Newspaper}
+        title="No news posts yet"
+        description="Check back soon for the latest campus updates."
+      />
+    );
   }
 
   return (

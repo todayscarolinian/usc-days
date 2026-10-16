@@ -23,6 +23,8 @@ export function useScheduleFilters() {
 
   function setFilter(key: FilterKey, value: string | null) {
     const next = new URLSearchParams(params.toString());
+    next.delete("match");
+    next.delete("preview");
     if (key === "event") {
       next.delete("sport");
       next.delete("date");
