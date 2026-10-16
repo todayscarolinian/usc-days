@@ -147,7 +147,7 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
   }, []);
 
   const todayString = now ? format(now, "yyyy-MM-dd") : null;
-  const eventDay = now ? getEventDay(now) : 0;
+  const eventDay = now ? getEventDay(now, "2026-10-19") : 0;
 
   function openGame(game: Schedules) {
     const params = new URLSearchParams({
