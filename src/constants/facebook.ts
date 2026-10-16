@@ -1,3 +1,8 @@
+import {
+  USC_DAYS_END_DATE,
+  USC_DAYS_START_DATE,
+} from "@/src/constants/event";
+
 /** Public fetching settings. Credentials are read by the server-only service. */
 export const FACEBOOK_GRAPH_CONFIG = {
   url: "https://graph.facebook.com/v26.0",
@@ -23,8 +28,8 @@ export const FACEBOOK_QUERY_CONFIG = {
 export const FACEBOOK_NEWS_CONFIG = {
   hashtag: "USCDays2026",
   postLimit: 4,
-  startDate: "2026-10-16",
-  endDate: "2026-10-23",
+  startDate: USC_DAYS_START_DATE,
+  endDate: USC_DAYS_END_DATE,
   timeZone: "Asia/Manila",
   utcOffset: "+08:00",
 } as const;
