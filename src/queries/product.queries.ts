@@ -4,18 +4,11 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AddMerchProductPayload, EditMerchProductPayload } from "../types/merchProducts.types";
 import axios from "axios";
 import { MerchandiseProduct } from "../lib/prisma/generated/client";
+import { GetProductsParams } from "../services/product.service";
 
 const STALE_TIME = 1000 * 60 * 5;
 const PRODUCTS_URL = "/api/merchandise/products";
 
-interface GetProductsParams {
-  categoryId?: number;
-  isAvailable?: boolean;
-  minPrice?: number;
-  maxPrice?: number;
-  size?: string;
-  search?: string;
-}
 
 interface EditProductVariables {
   id: number;
@@ -41,6 +34,8 @@ export const useGetProductsQuery = (params?: GetProductsParams) => {
         queryParams.append("maxPrice", params.maxPrice.toString());
       if (params?.size) queryParams.append("size", params.size);
       if (params?.search) queryParams.append("search", params.search);
+      if(params?.page) queryParams.append("page", params.page.toString());
+      if(params?.pageSize) queryParams.append("pageSize", params.pageSize.toString());
 
       const url = `${PRODUCTS_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
       const response = await axios.get(url);

@@ -23,6 +23,9 @@ const GetProductsQuery = z.object({
   maxPrice: numberQuery,
   size: stringQuery,
   search: stringQuery,
+
+  page: numberQuery,
+  pageSize: numberQuery,
 });
 
 export async function GET(req: NextRequest) {
