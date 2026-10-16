@@ -35,10 +35,11 @@ const leftNavigation: NavigationItem[] = [
     href: "/",
     name: "Home",
   },
-  {
-    href: "/merchandise",
-    name: "Merch",
-  },
+  // Hidden from prod until merch is ready to launch
+  // {
+  //   href: "/merchandise",
+  //   name: "Merch",
+  // },
 ];
 
 const rightNavigation: NavigationItem[] = [
