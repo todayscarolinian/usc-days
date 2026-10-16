@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createMockTodaysGames } from "@/src/components/home/todays-games.mock";
+import { useSearchParams } from "next/navigation";
 import { useGamesQuery, useScheduleWindow } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import {
@@ -23,6 +25,10 @@ function scrollToScheduleDate(date: string) {
 }
 
 export function useSchedules() {
+  const params = useSearchParams();
+  const matchId = /^-?[1-9]\d*$/.test(params.get("match") ?? "") ? params.get("match") : null;
+  const previewTime = Date.parse(params.get("preview") ?? "");
+  const isPreview = Number.isFinite(previewTime);
   const navigation = useScheduleFilters();
   const { filters } = navigation;
   const { requestedDate, setRequestedDate } = useScheduleScrollTarget();
@@ -46,7 +52,16 @@ export function useSchedules() {
   const gameTypeIds = sports.data
     ? getScheduleGameTypeIds(sports.data, filters)
     : filters.event || filters.sportId ? undefined : null;
-  const games = useScheduleWindow({ anchor: windowAnchor, gameTypeIds, teamId: filters.teamId });
+  const liveGames = useScheduleWindow({ anchor: windowAnchor, gameTypeIds, teamId: filters.teamId });
+  const previewGames = useMemo(
+    () => isPreview ? createMockTodaysGames(new Date(previewTime)) : [],
+    [isPreview, previewTime],
+  );
+  const games = isPreview ? {
+    ...liveGames, games: previewGames,
+    isPending: false, isError: false, isFetching: false,
+    hasOlder: false, hasNewer: false, isLoadingOlder: false, isLoadingNewer: false,
+  } : liveGames;
   // Live markers cover every event, not just the filtered window.
   const todayGames = useGamesQuery(
     today ? { startDate: today, endDate: today } : undefined,
@@ -72,11 +87,21 @@ export function useSchedules() {
   const scrollKey = `${windowAnchor}|${filters.event}|${filters.sportId}|${filters.teamId}|${scrollTarget}`;
   const scrolledKey = useRef<string | null>(null);
   useEffect(() => {
-    if (isLoading || !scrollTarget || scrolledKey.current === scrollKey) return;
-    scrolledKey.current = scrollKey;
-    const frame = requestAnimationFrame(() => scrollToScheduleDate(scrollTarget));
+    if (isLoading || !scrollTarget || scrolledKey.current === `${scrollKey}|${matchId}`) return;
+    const frame = requestAnimationFrame(() => {
+      const target = matchId ? document.getElementById(`schedule-match-${matchId}`) : null;
+      scrolledKey.current = `${scrollKey}|${matchId}`;
+      if (target) {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // Offset the center to account for the fixed 64px navigation bar.
+        const top = target.getBoundingClientRect().top + window.scrollY -
+          (window.innerHeight + 64 - target.getBoundingClientRect().height) / 2;
+        target.focus({ preventScroll: true });
+        window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion ? "instant" : "smooth" });
+      } else scrollToScheduleDate(scrollTarget);
+    });
     return () => cancelAnimationFrame(frame);
-  }, [isLoading, scrollTarget, scrollKey]);
+  }, [isLoading, scrollTarget, scrollKey, matchId]);
 
   function selectEvent(event: string | null) {
     setRequestedDate(null);

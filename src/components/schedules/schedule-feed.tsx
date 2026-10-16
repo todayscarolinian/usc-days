@@ -24,7 +24,9 @@ type ScheduleFeedProps = {
   olderPageCount: number;
   onLoadOlder: () => void;
   onLoadNewer: () => void;
-  onOpenGame: (game: Schedules) => void;
+  canManage: boolean;
+  onEditScore: (game: Schedules) => void;
+  onEditSchedule: (game: Schedules) => void;
 };
 
 function LoadMoreButton({ label, isLoading, onClick }: { label: string; isLoading: boolean; onClick: () => void }) {
@@ -48,7 +50,7 @@ function EmptySchedule({ forDate = false }: { forDate?: boolean }) {
 
 export default function ScheduleFeed({
   days, today, now, isLoading, isError, isFetching, onRetry, showEventLabel, categorizeSwimming = false,
-  hasOlder, hasNewer, isLoadingOlder, isLoadingNewer, olderPageCount, onLoadOlder, onLoadNewer, onOpenGame,
+  hasOlder, hasNewer, isLoadingOlder, isLoadingNewer, olderPageCount, onLoadOlder, onLoadNewer, canManage, onEditScore, onEditSchedule,
 }: ScheduleFeedProps) {
   // Older games are added above the viewport; shift the scroll by the added
   // height so the games already on screen stay put.
@@ -117,11 +119,11 @@ export default function ScheduleFeed({
             <section key={category.name} aria-label={category.name} className="space-y-3 pt-2">
               <h3 className="font-[family-name:var(--font-roboto-condensed)] text-lg font-semibold text-neutral-600">{category.name}</h3>
               {category.games.map(game => (
-                <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} onOpen={onOpenGame} />
+                <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
               ))}
             </section>
           )) : day.games.map(game => (
-            <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} onOpen={onOpenGame} />
+            <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
           ))}
         </section>
       ))}

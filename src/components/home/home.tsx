@@ -22,13 +22,13 @@ export default function Home() {
       <div className="space-y-8 sm:space-y-12">
         <MatchdayBanner />
 
-          <main className="mx-auto max-w-[1600px] px-3 py-8">
+          <main className="mx-auto max-w-[1600px] px-3">
             <section
               id="todays-games"
               aria-labelledby="todays-games-heading"
-              className="flex min-h-[calc(100svh-4rem)] w-full flex-col"
+              className="flex w-full scroll-mt-16 flex-col"
             >
-              <TodaysGames />
+              <TodaysGames mock />
           </section>
         </main>
 

@@ -3,7 +3,8 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { format } from "date-fns";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { getScheduleDay } from "@/src/lib/schedules";
 import { useGamesQuery } from "@/src/queries/games.queries";
 import type { Schedules } from "@/src/types/types";
 import { Button } from "@/src/components/ui/button";
@@ -11,65 +12,19 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
 import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
 import { TodaysGamesCard } from "./todays-games-card";
-
-const GameDetailsDialog = dynamic(
-  () => import("@/src/components/schedules/game-details-dialog"),
-  { ssr: false },
-);
-const AddScoreDialog = dynamic(
-  () => import("@/src/components/schedules/add-score-dialog"),
-  { ssr: false },
-);
+import styles from "./todays-games.module.css";
+import { createMockTodaysGames } from "./todays-games.mock";
 
 function GamesSkeleton() {
   return (
-    <div
-      role="status"
-      aria-label="Loading today's games"
-      className="space-y-6 md:px-5 xl:px-6"
-    >
+    <div role="status" aria-label="Loading today's games" className={styles.fixtures}>
       <span className="sr-only">Loading today&apos;s games…</span>
-      <div className="flex items-center justify-between text-xs leading-4 font-bold uppercase">
-        <span>On the Court</span>
-        <span className="text-[11px] font-medium normal-case text-black/50">
-          Live &amp; upcoming
-        </span>
-      </div>
-      <div
-        aria-hidden="true"
-        className="grid grid-cols-1 gap-5 py-2.5 md:grid-cols-2 lg:grid-cols-3"
-      >
-        {Array.from({ length: 3 }, (_, index) => (
-          <div key={index} className="h-[216px] bg-white p-2.5">
-            <div className="flex h-full flex-col border border-neutral-300">
-              <Skeleton className="mx-3 mt-7 h-5 w-24 animate-none rounded-none bg-neutral-200" />
-              <Skeleton className="mx-3 my-auto h-16 animate-none rounded-none bg-neutral-100" />
-              <div className="border-t-2 border-neutral-300 p-2">
-                <Skeleton className="h-3 w-40 animate-none rounded-none bg-neutral-200" />
-              </div>
-            </div>
-          </div>
+      <Skeleton className={`${styles.featureSkeleton} rounded-none`} />
+      <div className={styles.sidebar} aria-hidden="true">
+        <Skeleton className="h-5 w-32 rounded-none" />
+        {Array.from({ length: 4 }, (_, index) => (
+          <Skeleton key={index} className="h-[105px] w-full rounded-none" />
         ))}
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-5 w-32 animate-none rounded-none bg-neutral-200" />
-        <div
-          aria-hidden="true"
-          className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-4"
-        >
-          {Array.from({ length: 4 }, (_, index) => (
-            <div
-              key={index}
-              className="h-[78px] border border-neutral-300 bg-white p-3"
-            >
-              <div className="flex h-full flex-col">
-                <Skeleton className="h-4 animate-none rounded-none border-b border-neutral-300 bg-neutral-100" />
-                <Skeleton className="my-auto h-8 animate-none rounded-none bg-neutral-100" />
-                <Skeleton className="h-4 animate-none rounded-none border-t border-neutral-300 bg-neutral-100" />
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -79,7 +34,9 @@ function GamesContent({
   dateLabel,
   now,
   onOpenGame,
+  mock,
 }: {
+  mock: boolean;
   dateLabel: string;
   now: Date;
   onOpenGame: (g: Schedules) => void;
@@ -93,16 +50,17 @@ function GamesContent({
   } = useGamesQuery({
     startDate: dateLabel,
     endDate: dateLabel,
-  });
+  }, { enabled: !mock });
 
-  const { featured, compact } = useMemo(
-    () => selectTodaysGames(todaysGames),
-    [todaysGames],
-  );
+  const { featured, compact } = useMemo(() => {
+    const selection = selectTodaysGames(mock ? createMockTodaysGames(now) : todaysGames);
+    const games = [...selection.featured, ...selection.compact];
+    return { featured: games.slice(0, 1), compact: games.slice(1, 5) };
+  }, [mock, now, todaysGames]);
 
-  if (loading) return <GamesSkeleton />;
+  if (!mock && loading) return <GamesSkeleton />;
 
-  if (error) {
+  if (!mock && error) {
     return (
       <div
         role="alert"
@@ -133,40 +91,17 @@ function GamesContent({
   }
 
   return (
-    <div className="space-y-4 border-b border-[#92908d] pb-5 md:px-5 xl:px-6">
-      <div className="flex items-center justify-between gap-4 text-xs leading-4 font-bold uppercase">
-        <h3>On the Court</h3>
-        <span className="text-[11px] font-medium normal-case text-black/60">
-          Live &amp; upcoming
-        </span>
-      </div>
-      <div className="grid grid-cols-1 gap-5 py-2.5 md:grid-cols-2 lg:grid-cols-3">
-        {featured.map((game) => (
-          <TodaysGamesCard
-            key={game.id}
-            game={game}
-            now={now}
-            onOpen={onOpenGame}
-          />
-        ))}
-      </div>
+    <div className={styles.fixtures}>
+      <TodaysGamesCard game={featured[0]} now={now} onOpen={onOpenGame} />
       {compact.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-4 text-xs leading-4 font-bold uppercase">
-            <h3>More Fixtures</h3>
-            <span className="text-[11px] font-medium normal-case text-black/60">
-              {format(now, "MMMM d, yyyy")}
-            </span>
+        <div className={styles.sidebar}>
+          <div className={styles.sidebarHeading}>
+            <h3>MORE SCHEDULES</h3>
+            <span>{format(now, "MMMM d, yyyy")}</span>
           </div>
-          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-4">
+          <div className={styles.moreGames}>
             {compact.map((game) => (
-              <TodaysGamesCard
-                key={game.id}
-                game={game}
-                now={now}
-                compact
-                onOpen={onOpenGame}
-              />
+              <TodaysGamesCard key={game.id} game={game} now={now} compact onOpen={onOpenGame} />
             ))}
           </div>
         </div>
@@ -175,14 +110,11 @@ function GamesContent({
   );
 }
 
-export default function TodaysGames() {
-  const [selectedGame, setSelectedGame] = useState<Schedules | null>(null);
-  const [open, setOpen] = useState(false);
+export default function TodaysGames({ mock = false }: { mock?: boolean }) {
+  const router = useRouter();
   const [inView, setInView] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const sectionRef = useRef<HTMLDivElement | null>(null);
-  const [scoreOpen, setScoreOpen] = useState(false);
-  const [scoreGame, setScoreGame] = useState<Schedules | null>(null);
 
   useEffect(() => {
     const updateClock = () => setNow(new Date());
@@ -218,18 +150,22 @@ export default function TodaysGames() {
   const eventDay = now ? getEventDay(now) : 0;
 
   function openGame(game: Schedules) {
-    setSelectedGame(game);
-    setOpen(true);
+    const params = new URLSearchParams({
+      date: getScheduleDay(new Date(game.startDate)),
+      match: String(game.id),
+    });
+    if (mock && now) params.set("preview", now.toISOString());
+    router.push(`/schedules?${params}`, { scroll: false });
   }
 
   return (
     <div
       ref={sectionRef}
-      className="flex flex-1 flex-col gap-6 py-8 text-[#171717] xl:py-12"
+      className={styles.section}
     >
-      <header className="shrink-0 space-y-6 border-b border-[#171717] pb-4 md:mx-5 xl:mx-6">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-4 text-xs leading-4 md:text-sm md:leading-5">
+      <header className={styles.header}>
+        <div className={styles.masthead}>
+          <div className={styles.mastheadRow}>
             <p className="font-bold">THE MATCHDAY DESK</p>
             <Link
               href="/schedules"
@@ -238,12 +174,12 @@ export default function TodaysGames() {
               FULL SCHEDULE <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <div className="h-0.5 bg-[#171717]" />
+          <div className={styles.rule} />
         </div>
-        <div className="flex items-center justify-between gap-4 md:gap-8">
-          <div className="min-w-0 space-y-4">
-            <div className="space-y-2">
-              <p className="min-h-4 text-[10px] leading-4 font-bold text-tc_primary-400 md:text-xs">
+        <div className={styles.headingRow}>
+          <div className="min-w-0">
+            <div className={styles.titleGroup}>
+              <p className={styles.eyebrow}>
                 {now ? (
                   `${format(now, "EEEE").toUpperCase()} / USC DAYS`
                 ) : (
@@ -255,21 +191,21 @@ export default function TodaysGames() {
               </p>
               <h2
                 id="todays-games-heading"
-                className="text-4xl leading-none font-extrabold min-[375px]:text-[40px] md:text-5xl xl:text-6xl"
+                className={styles.title}
               >
                 TODAY’S GAMES
               </h2>
             </div>
-            <p className="text-sm leading-5 font-medium text-[#4B5563] md:text-base md:leading-6">
+            <p className={styles.intro}>
               On the court. Across campus.
             </p>
           </div>
           <div
             aria-label={`Event day ${eventDay}`}
-            className="flex shrink-0 flex-col items-end gap-1 font-bold text-tc_primary-400"
+            className={styles.day}
           >
-            <span className="text-[10px] leading-4 md:text-xs">DAY</span>
-            <span className="text-4xl leading-none md:text-5xl">
+            <span className={styles.dayLabel}>DAY</span>
+            <span className={styles.dayNumber}>
               {String(eventDay).padStart(2, "0")}
             </span>
           </div>
@@ -277,6 +213,7 @@ export default function TodaysGames() {
       </header>
       {inView && now && todayString ? (
         <GamesContent
+          mock={mock}
           dateLabel={todayString}
           now={now}
           onOpenGame={openGame}
@@ -284,25 +221,7 @@ export default function TodaysGames() {
       ) : (
         <GamesSkeleton />
       )}
-      {selectedGame && (
-        <GameDetailsDialog
-          open={open}
-          onOpenChange={setOpen}
-          game={selectedGame}
-          readOnly={selectedGame.id < 0}
-          onAddScore={(g) => {
-            setScoreGame(g);
-            setScoreOpen(true);
-          }}
-        />
-      )}
-      {scoreGame && (
-        <AddScoreDialog
-          open={scoreOpen}
-          onOpenChange={setScoreOpen}
-          game={scoreGame}
-        />
-      )}
+
     </div>
   );
 }

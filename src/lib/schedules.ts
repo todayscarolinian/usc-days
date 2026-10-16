@@ -41,7 +41,7 @@ const EVENT_DEFINITIONS = [
   { name: "Badminton", group: "Racket", pattern: /badminton/i },
   { name: "Lawn Tennis", group: "Racket", pattern: /lawn tennis/i },
   { name: "Table Tennis", group: "Racket", pattern: /table tennis/i },
-  { name: "Chess", group: "Esports", pattern: /chess/i },
+  { name: "Chess", group: "Board Games", pattern: /chess/i },
   { name: "Mobile Legends", group: "Esports", pattern: /mobile legends/i },
   { name: "Valorant", group: "Esports", pattern: /valorant/i },
   { name: "Esports", group: "Esports", pattern: /e-?sports/i },
@@ -51,7 +51,7 @@ const EVENT_DEFINITIONS = [
   { name: "Mr. & Ms. USC", group: "Other Events", pattern: /mr\.|ms\./i },
 ] as const;
 
-const EVENT_GROUPS = ["Court", "Field", "Racket", "Esports", "Aquatics", "Other Events"];
+const EVENT_GROUPS = ["Court", "Field", "Racket", "Esports", "Board Games", "Aquatics", "Other Events"];
 
 export function getScheduleEventName(name: string): string {
   return EVENT_DEFINITIONS.find(event => event.pattern.test(name))?.name ?? name;

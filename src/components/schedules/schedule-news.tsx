@@ -63,7 +63,7 @@ export default function ScheduleNews() {
     FACEBOOK_NEWS_CONFIG.hashtag,
     FACEBOOK_NEWS_CONFIG.startDate,
     FACEBOOK_NEWS_CONFIG.endDate,
-    6,
+    5,
   );
   let content;
 
@@ -77,7 +77,7 @@ export default function ScheduleNews() {
       </div>
     );
   } else if (query.data?.length) {
-    content = query.data.map(post => <NewsItem key={post.id} post={post} />);
+    content = query.data.slice(0, 5).map(post => <NewsItem key={post.id} post={post} />);
   } else if (query.isError) {
     content = (
       <div role="alert" className="py-4 text-neutral-600">

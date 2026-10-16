@@ -45,7 +45,7 @@ export default function SportsSection() {
       className={`${roboto.className} ${styles.carousel} w-full bg-neutral-950 bg-[url('/black-bg.png')] bg-top bg-repeat text-[#f7f6f6]`}
     >
       <h2 id="sports-heading" className="sr-only">Sports</h2>
-      <div className={`${styles.track} py-6 lg:py-8`}>
+      <div className={`${styles.track} py-3 sm:py-6 lg:py-8`}>
         {[0, 1].map((copy) => (
           <ul
             key={copy}
@@ -54,17 +54,17 @@ export default function SportsSection() {
             className="flex shrink-0"
           >
             {sports.map((sport) => (
-              <li key={sport.name} className="w-40 shrink-0 px-3 lg:w-44">
-                <figure className="flex flex-col items-center py-2 text-center">
+              <li key={sport.name} className="w-28 shrink-0 px-2 sm:w-40 sm:px-3 lg:w-44">
+                <figure className="flex flex-col items-center py-1 text-center sm:py-2">
                   <Image
                     src={sport.icon}
                     alt=""
                     width={64}
                     height={66}
-                    sizes="64px"
-                    className="h-[66px] w-[64px] max-w-full object-contain"
+                    sizes="(max-width: 639px) 44px, 64px"
+                    className="h-[46px] w-[44px] max-w-full object-contain sm:h-[66px] sm:w-[64px]"
                   />
-                  <figcaption className="mt-2 text-xs leading-[18px] font-normal tracking-[0.05em] whitespace-nowrap uppercase">
+                  <figcaption className="mt-1.5 min-h-7 text-[10px] leading-[14px] font-normal tracking-[0.05em] uppercase sm:mt-2 sm:min-h-0 sm:text-xs sm:leading-[18px] sm:whitespace-nowrap">
                     {sport.name}
                   </figcaption>
                 </figure>

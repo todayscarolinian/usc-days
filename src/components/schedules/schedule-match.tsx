@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button } from "@/src/components/ui/button";
 import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
 import { scheduleTimeFormatter } from "@/src/lib/schedules";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
@@ -8,7 +9,9 @@ type ScheduleMatchProps = {
   showEventLabel: boolean;
   game: Schedules;
   now: Date;
-  onOpen: (game: Schedules) => void;
+  canManage: boolean;
+  onEditScore: (game: Schedules) => void;
+  onEditSchedule: (game: Schedules) => void;
 };
 
 type MatchTeamProps = {
@@ -51,7 +54,7 @@ function MatchTeam({ team, side, featured }: MatchTeamProps) {
   );
 }
 
-export default function ScheduleMatch({ game, now, showEventLabel, onOpen }: ScheduleMatchProps) {
+export default function ScheduleMatch({ game, now, showEventLabel, canManage, onEditScore, onEditSchedule }: ScheduleMatchProps) {
   const status = getGameStatus(game, now);
   const featured = status === "live";
   const statusLabel = GAME_STATUS_LABELS[status];
@@ -64,15 +67,25 @@ export default function ScheduleMatch({ game, now, showEventLabel, onOpen }: Sch
   const matchup = `${game.teamA?.teamName ?? "TBD"} vs ${game.teamB?.teamName ?? "TBD"}`;
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(game)}
-      aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
+    <article
+      id={`schedule-match-${game.id}`}
+      tabIndex={-1}
+      aria-label={`${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
       className={cn(
-        "block w-full min-w-0 cursor-pointer select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717] hover:bg-neutral-200/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 motion-safe:transition-colors",
+        "block w-full min-w-0 select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717] focus:outline-2 focus:outline-offset-4 focus:outline-tc_primary-400 motion-safe:transition-colors",
         featured && "border-t-2 border-tc_primary-400",
       )}
     >
+      {canManage && game.id > 0 && (
+        <div className="flex items-center justify-end gap-2 px-3 py-2">
+          {canManage && game.id > 0 && (
+            <Button size="sm" variant="outline" onClick={() => onEditSchedule(game)}>Edit schedule</Button>
+          )}
+          <Button size="sm" variant="ghost" onClick={() => onEditScore(game)} aria-label={`Edit score for ${matchup}`}>
+            Edit score
+          </Button>
+        </div>
+      )}
       {featured ? (
         <span className="block p-3 sm:p-5">
           <span className="flex items-center justify-between gap-3 text-xs">
@@ -116,6 +129,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, onOpen }: Sch
           </span>
         </>
       )}
-    </button>
+
+    </article>
   );
 }
