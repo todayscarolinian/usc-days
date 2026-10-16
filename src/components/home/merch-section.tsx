@@ -20,7 +20,7 @@ const MERCH_CATEGORIES: {
   { category: "Post Cards", label: "Postcards", icon: PostcardsIcon, labelClassName: "font-medium text-black" },
   { category: "Bookmarks", label: "Bookmarks", icon: BookmarksIcon, labelClassName: "text-black" },
   { category: "Stickers", label: "Stickers", icon: StickersIcon, labelClassName: "text-black" },
-  { category: "Lanyards", label: "Lanyards", icon: LanyardsIcon, labelClassName: "text-[red]" },
+  { category: "Lanyards", label: "Lanyards", icon: LanyardsIcon, labelClassName: "text-black" },
   { category: "Pins", label: "Pins", icon: PinsIcon, labelClassName: "text-black" },
 ];
 
