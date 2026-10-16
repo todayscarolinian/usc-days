@@ -41,11 +41,9 @@ const leftNavigation: NavigationItem[] = [
     href: "/",
     name: "Home",
   },
-  // Shown disabled until merch is ready to launch
   {
     href: "/merchandise",
     name: "Merch",
-    comingSoon: true,
   },
 ];
 

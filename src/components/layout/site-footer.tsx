@@ -22,8 +22,7 @@ const contactEmail = "todaysusc@gmail.com";
 
 const links: { href: string; label: string; comingSoon?: boolean }[] = [
   { href: "/#news", label: "News" },
-  // Shown disabled until merch is ready to launch
-  { href: "/merchandise", label: "Merch", comingSoon: true },
+  { href: "/merchandise", label: "Merch" },
   { href: "/schedules", label: "Schedules" },
   { href: "/standings", label: "Standings" },
 ];

@@ -2,474 +2,499 @@
     {
         "id": 1,
         "categoryId": 1,
-        "productTitle": "USC Days '26 Lanyard",
+        "productTitle": "USC Days '26 Shirt",
         "productSize": null,
-        "productPrice": 150.00,
+        "productPrice": 290,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/lanyard/lanyard.png",
-            "/merch/lanyard/lanyard-1.png",
-            "/merch/lanyard/lanyard-2.png",
-            "/merch/lanyard/lanyard-3.png"
+            "/merch/tshirt/front-back.webp",
+            "/merch/tshirt/front.webp",
+            "/merch/tshirt/back.webp",
+            "/merch/tshirt/back-print.webp"
         ],
-        "designers": [
-            "Jyreneah Angel"
-        ]
+        "designers": []
     },
     {
         "id": 2,
         "categoryId": 2,
-        "productTitle": "Soccer",
-        "productSize": "2.5 x 1.5 inches",
-        "productPrice": 15.00,
+        "productTitle": "USC Rangers Lanyard",
+        "productSize": null,
+        "productPrice": 150,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/1_soccer.png"
+            "/merch/lanyards/rangers-mockup.webp",
+            "/merch/lanyards/rangers.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 3,
         "categoryId": 2,
-        "productTitle": "Flag Football",
-        "productSize": "2.5 x 1.5 inches",
-        "productPrice": 15.00,
+        "productTitle": "USC Textile Lanyard",
+        "productSize": null,
+        "productPrice": 150,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/2_flag-football.png"
+            "/merch/lanyards/textile-mockup.webp",
+            "/merch/lanyards/textile.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 4,
-        "categoryId": 2,
-        "productTitle": "Basketball",
-        "productSize": "2.5 x 1.5 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SAFAD Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/3_basketball.png"
+            "/merch/pins/safad.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 5,
-        "categoryId": 2,
-        "productTitle": "Futsal",
-        "productSize": "2.5 x 1.5 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SAS Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/4_futsal.png"
+            "/merch/pins/sas.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 6,
-        "categoryId": 2,
-        "productTitle": "Frisbee",
-        "productSize": "2.5 x 1.5 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SBE Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/5_frisbee.png"
+            "/merch/pins/sbe.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 7,
-        "categoryId": 2,
-        "productTitle": "Badminton",
-        "productSize": "2.5 x 1.35 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SED Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/6_badminton.png"
+            "/merch/pins/sed.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 8,
-        "categoryId": 2,
-        "productTitle": "Swimming",
-        "productSize": "2.5 x 1.35 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SHCP Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/7_swimming.png"
+            "/merch/pins/shcp.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 9,
-        "categoryId": 2,
-        "productTitle": "Chess",
-        "productSize": "2.5 x 1.35 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SLG Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/8_chess.png"
+            "/merch/pins/slg.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 10,
-        "categoryId": 2,
-        "productTitle": "Lawn Tennis",
-        "productSize": "2.5 x 1.35 inches",
-        "productPrice": 15.00,
+        "categoryId": 3,
+        "productTitle": "SOE Pin",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/9_lawn-tennis.png"
+            "/merch/pins/soe.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 11,
-        "categoryId": 2,
-        "productTitle": "Cheerdance",
-        "productSize": "2.5 x 1.35 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SAFAD",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/10_cheerdance.png"
+            "/merch/stickers/chibi-safad.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 12,
-        "categoryId": 2,
-        "productTitle": "Contemporary Dance",
-        "productSize": "2.5 x 1.9 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SAS",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/11_contemporary-dance.png"
+            "/merch/stickers/chibi-sas.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 13,
-        "categoryId": 2,
-        "productTitle": "E-Sports",
-        "productSize": "2.5 x 1.9 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SBE",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/12_e-sports.png"
+            "/merch/stickers/chibi-sbe.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 14,
-        "categoryId": 2,
-        "productTitle": "MS & MR Intramurals",
-        "productSize": "2.5 x 1.9 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SED",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/13_ms&mr-intrams.png"
+            "/merch/stickers/chibi-sed.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 15,
-        "categoryId": 2,
-        "productTitle": "Volleyball",
-        "productSize": "2.5 x 1.9 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SHCP",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/stickers/14_volleyball.png"
+            "/merch/stickers/chibi-shcp.webp"
         ],
-        "designers": [
-            "Blaire Cadavilla",
-            "Nixie Lebosada"
-        ]
+        "designers": []
     },
     {
         "id": 16,
-        "categoryId": 3,
-        "productTitle": "SAFAD \"Got a lot on my plate\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SLG",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/safad.png"
+            "/merch/stickers/chibi-slg.webp"
         ],
-        "designers": [
-            "Janna Revero"
-        ]
+        "designers": []
     },
     {
         "id": 17,
-        "categoryId": 3,
-        "productTitle": "SAS \"Royal Flush!!\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Chibi Ranger Sticker – SOE",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/sas.png"
+            "/merch/stickers/chibi-soe.webp"
         ],
-        "designers": [
-            "Aleah Zoe Tan"
-        ]
+        "designers": []
     },
     {
         "id": 18,
-        "categoryId": 3,
-        "productTitle": "SBE \"I Make Money Moves\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Bagani Helmet Sticker – All-Nighter Igniter (SAFAD)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/sbe.png"
+            "/merch/stickers/helmet-safad.webp"
         ],
-        "designers": [
-            "Chessa Baluma"
-        ]
+        "designers": []
     },
     {
         "id": 19,
-        "categoryId": 3,
-        "productTitle": "SED \"Yes, We Exist\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Bagani Helmet Sticker – Hydrological (SAS)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/sed.png"
+            "/merch/stickers/helmet-sas.webp"
         ],
-        "designers": null
+        "designers": []
     },
     {
         "id": 20,
-        "categoryId": 3,
-        "productTitle": "SHCP \"SCHP lakers\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Bagani Helmet Sticker – Asset Quaker (SBE)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/shcp.png"
+            "/merch/stickers/helmet-sbe.webp"
         ],
-        "designers": [
-            "Marie Raffiñan"
-        ]
+        "designers": []
     },
     {
         "id": 21,
-        "categoryId": 3,
-        "productTitle": "SLG \"Codals over cuddles\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Bagani Helmet Sticker – Gale-Force Educator (SED)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/slg.png"
+            "/merch/stickers/helmet-sed.webp"
         ],
-        "designers": [
-            "Elle Villar"
-        ]
+        "designers": []
     },
     {
         "id": 22,
-        "categoryId": 3,
-        "productTitle": "SOE \"Sci-cal spammers\"",
-        "productSize": "1.25 inches",
-        "productPrice": 25.00,
+        "categoryId": 4,
+        "productTitle": "Bagani Helmet Sticker – Shift Shifter (SHCP)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/soe.png"
+            "/merch/stickers/helmet-shcp.webp"
         ],
-        "designers": [
-            "Reve Geormin Garrote"
-        ]
+        "designers": []
     },
     {
         "id": 23,
         "categoryId": 4,
-        "productTitle": "\"ang pagsulat ay di biro\" (Dark Red)",
-        "productSize": "2 x 4 inches",
-        "productPrice": 20.00,
+        "productTitle": "Bagani Helmet Sticker – Timeless Codal (SLG)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/bookmarks/dark-red.png"
+            "/merch/stickers/helmet-slg.webp"
         ],
-        "designers": [
-            "RC"
-        ]
+        "designers": []
     },
     {
         "id": 24,
         "categoryId": 4,
-        "productTitle": "\"ang pagsulat ay di biro\" (Light Red)",
-        "productSize": "2 x 4 inches",
-        "productPrice": 20.00,
+        "productTitle": "Bagani Helmet Sticker – Engineergizer (SOE)",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/bookmarks/light-red.png"
+            "/merch/stickers/helmet-soe.webp"
         ],
-        "designers": [
-            "RC"
-        ]
+        "designers": []
     },
     {
         "id": 25,
         "categoryId": 4,
-        "productTitle": "\"ang pagsulat ay di biro\" (Blue)",
-        "productSize": "2 x 4 inches",
-        "productPrice": 20.00,
+        "productTitle": "Bagani ID Sticker – SAFAD",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/bookmarks/blue.png"
+            "/merch/stickers/id-safad.webp"
         ],
-        "designers": [
-            "RC"
-        ]
+        "designers": []
     },
     {
         "id": 26,
         "categoryId": 4,
-        "productTitle": "\"Cut Ties\"",
-        "productSize": "2 x 4 inches",
-        "productPrice": 20.00,
+        "productTitle": "Bagani ID Sticker – SAS",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/bookmarks/cut-ties.png"
+            "/merch/stickers/id-sas.webp"
         ],
-        "designers": [
-            "Saiyenne Seth Soliano"
-        ]
+        "designers": []
     },
     {
         "id": 27,
-        "categoryId": 5,
-        "productTitle": "\"Streetfood Yum\" Print",
-        "productSize": "4 x 4 inches",
-        "productPrice": 30.00,
+        "categoryId": 4,
+        "productTitle": "Bagani ID Sticker – SBE",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/postcards/streetfood-yum.jpg"
+            "/merch/stickers/id-sbe.webp"
         ],
-        "designers": [
-            "Elle Villar"
-        ]
+        "designers": []
     },
     {
         "id": 28,
-        "categoryId": 5,
-        "productTitle": "\"Kapre\"",
-        "productSize": "4 x 4 inches",
-        "productPrice": 30.00,
+        "categoryId": 4,
+        "productTitle": "Bagani ID Sticker – SED",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/postcards/kapre.png"
+            "/merch/stickers/id-sed.webp"
         ],
-        "designers": [
-            "Aaron Bayer"
-        ]
+        "designers": []
     },
     {
         "id": 29,
-        "categoryId": 5,
-        "productTitle": "\"Adore\"",
-        "productSize": "4 x 6 inches",
-        "productPrice": 30.00,
+        "categoryId": 4,
+        "productTitle": "Bagani ID Sticker – SHCP",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/postcards/adore.png"
+            "/merch/stickers/id-shcp.webp"
         ],
-        "designers": [
-            "Milourd Catayas"
-        ]
+        "designers": []
     },
     {
         "id": 30,
-        "categoryId": 5,
-        "productTitle": "\"Shoes\"",
-        "productSize": "4 x 6 inches",
-        "productPrice": 30.00,
+        "categoryId": 4,
+        "productTitle": "Bagani ID Sticker – SLG",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/postcards/shoes.png"
+            "/merch/stickers/id-slg.webp"
         ],
-        "designers": [
-            "Milourd Catayas"
-        ]
+        "designers": []
     },
     {
         "id": 31,
-        "categoryId": 5,
-        "productTitle": "Home Away From Home",
-        "productSize": "4 x 6 inches",
-        "productPrice": 30.00,
+        "categoryId": 4,
+        "productTitle": "Bagani ID Sticker – SOE",
+        "productSize": null,
+        "productPrice": 35,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/postcards/home-away-from-home.png"
+            "/merch/stickers/id-soe.webp"
         ],
-        "designers": [
-            "Silke"
-        ]
+        "designers": []
     },
     {
         "id": 32,
-        "categoryId": 3,
-        "productTitle": "White",
-        "productSize": "1.46 inches",
-        "productPrice": 15.00,
+        "categoryId": 4,
+        "productTitle": "Magi Staff Morpher Sticker",
+        "productSize": null,
+        "productPrice": 25,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/tc-pin-white.png"
+            "/merch/stickers/magi-staff.webp"
         ],
-        "designers": null
+        "designers": []
     },
     {
         "id": 33,
-        "categoryId": 3,
-        "productTitle": "Pride",
-        "productSize": "1.46 inches",
-        "productPrice": 15.00,
+        "categoryId": 5,
+        "productTitle": "\"Ang Pag-angkon sa Gahum\"",
+        "productSize": null,
+        "productPrice": 30,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/pins/tc-pin-pride.png"
+            "/merch/bookmarks/pag-angkon-sa-gahum-front.webp",
+            "/merch/bookmarks/pag-angkon-sa-gahum-back.webp"
         ],
-        "designers": null
+        "designers": []
+    },
+    {
+        "id": 34,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SHCP",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/shcp.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 35,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SAFAD",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/safad.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 36,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SAS",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/sas.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 37,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SED",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/sed.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 38,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SLG",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/slg.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 39,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SBE",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/sbe.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 40,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – SOE",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/soe.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 41,
+        "categoryId": 6,
+        "productTitle": "Meet the Rangers Postcard – Naginid",
+        "productSize": null,
+        "productPrice": 45,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/postcards/naginid.webp"
+        ],
+        "designers": []
     }
 ]

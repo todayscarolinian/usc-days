@@ -1,96 +1,61 @@
-"use client";
-
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
-import { EmptyState } from "@/src/components/ui/empty-state";
-import { getCategoriesQuery } from "@/src/queries/categories.queries";
+import { Roboto } from "next/font/google";
+import TCRedLogo from "@/src/assets/tc-logo-red.png";
+import PostcardsIcon from "@/src/assets/icons/merch/postcards.svg";
+import BookmarksIcon from "@/src/assets/icons/merch/bookmarks.svg";
+import StickersIcon from "@/src/assets/icons/merch/stickers.svg";
+import LanyardsIcon from "@/src/assets/icons/merch/lanyards.svg";
+import PinsIcon from "@/src/assets/icons/merch/pins.svg";
+
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
+
+// `category` must match the category name in the database; `label` is the display text.
+const MERCH_CATEGORIES: {
+  category: string;
+  label: string;
+  icon: StaticImageData;
+  labelClassName: string;
+}[] = [
+  { category: "Post Cards", label: "Postcards", icon: PostcardsIcon, labelClassName: "font-medium text-black" },
+  { category: "Bookmarks", label: "Bookmarks", icon: BookmarksIcon, labelClassName: "text-black" },
+  { category: "Stickers", label: "Stickers", icon: StickersIcon, labelClassName: "text-black" },
+  { category: "Lanyards", label: "Lanyards", icon: LanyardsIcon, labelClassName: "text-[red]" },
+  { category: "Pins", label: "Pins", icon: PinsIcon, labelClassName: "text-black" },
+];
 
 export default function MerchSection() {
-  const { data: categories, isLoading, error } = getCategoriesQuery();
-
-  // Loading skeleton
-  if (isLoading) {
-    return (
-      <section className="py-12">
-        <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div
-              key={index}
-              className="bg-tc_primary border border-gray-300 rounded-lg overflow-hidden flex flex-col animate-pulse"
-            >
-              <div className="w-full h-48 bg-gray-300 shrink-0" />
-              <div className="p-3">
-                <div className="h-6 bg-gray-300 rounded mx-auto w-3/4" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <section className="py-12">
-        <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <p className="text-red-600 font-semibold mb-2">
-            Failed to load merchandise
-          </p>
-          <p className="text-red-500 text-sm">
-            {error instanceof Error
-              ? error.message
-              : "An unexpected error occurred"}
-          </p>
-        </div>
-      </section>
-    );
-  }
-
-  // No data state
-  if (!categories || categories.length === 0) {
-    return (
-      <section className="py-12">
-        <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-        <EmptyState
-          icon={ShoppingBag}
-          title="No merchandise available yet"
-          description="Check back soon for new collections and campus merchandise."
-        />
-      </section>
-    );
-    }
-
   return (
-    <section className="py-12">
-      <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
-        {categories.map((category) => (
+    <div
+      className={`${roboto.className} flex flex-col items-center gap-2.5 px-6 py-7 text-center text-black sm:px-12`}
+    >
+      <Image src={TCRedLogo} alt="Today's Carolinian logo" className="size-[101px]" />
+
+      <p className="text-lg leading-6 font-bold">Support us by buying our merch</p>
+
+      <h2 id="featured-merch-heading" className="text-4xl leading-11 font-bold">
+        Grab Your Today&apos;s
+        <br />
+        Carolinian Merch
+      </h2>
+
+      <nav
+        aria-label="Merchandise categories"
+        className="flex w-full max-w-[569px] flex-wrap items-center justify-center gap-4 p-2.5 sm:flex-nowrap sm:justify-between sm:gap-0"
+      >
+        {MERCH_CATEGORIES.map(({ category, label, icon, labelClassName }) => (
           <Link
-            key={category.id}
-            href={`/merchandise/${category.categoryName.toLowerCase()}`}
-            className="text-left bg-tc_primary border border-gray-300 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col"
+            key={category}
+            href={{ pathname: "/merchandise", query: { category } }}
+            className="flex h-[87px] w-[84px] flex-col items-center justify-between transition-transform hover:-translate-y-0.5"
           >
-            <div className="relative w-full h-48 bg-gray-100 shrink-0">
-              <Image
-                src={category.imgUrl}
-                alt={category.categoryName}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="p-3">
-              <h3 className="font-semibold text-lg text-center text-white">
-                {category.categoryName}
-              </h3>
-            </div>
+            <span className="flex size-[59px] items-center justify-center">
+              <Image src={icon} alt="" />
+            </span>
+            <span className={`text-base leading-6 ${labelClassName}`}>{label}</span>
           </Link>
         ))}
-      </div>
-    </section>
+      </nav>
+    </div>
   );
 }
