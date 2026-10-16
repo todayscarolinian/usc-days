@@ -9,9 +9,9 @@ import TableTennisImage from "@/src/assets/carousel/table-tennis.jpg";
 import VolleyballImage from "@/src/assets/carousel/vball.jpg";
 
 export const metadata: Metadata = generateMeta({
-  title: "Leaderboards - USC Days 2025",
+  title: "Leaderboards - USC Days 2026",
   description:
-    "Explore the leaderboards for USC Days 2025 intramural competitions and see how the different teams rank.",
+    "Explore the leaderboards for USC Days 2026 intramural competitions and see how the different teams rank.",
   url: "/leaderboards",
   image: "/og_image.jpg",
 });
