@@ -1,4 +1,4 @@
-import { format, isValid, parseISO } from "date-fns";
+import { addDays, format, isValid, parseISO } from "date-fns";
 import { getGameStatus } from "@/src/lib/game-status";
 import type { Schedules } from "@/src/types/types";
 
@@ -91,6 +91,53 @@ export function parseScheduleId(value: string | null): number | null {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+/** Calendar arithmetic on `yyyy-MM-dd` day keys. */
+export function addScheduleDays(date: string, days: number): string {
+  return format(addDays(parseISO(date), days), "yyyy-MM-dd");
+}
+
+/**
+ * Sport ids the server should filter by: every sport in the selected event,
+ * else the legacy sport id. `null` means no sport filter; an empty array means
+ * the event matched no sports, so nothing can be shown.
+ */
+export function getScheduleGameTypeIds(
+  sports: readonly { id: number; gameName: string }[],
+  filters: Pick<ScheduleFilters, "event" | "sportId">,
+): number[] | null {
+  if (filters.event) {
+    return sports
+      .filter(sport => getScheduleEventName(sport.gameName) === filters.event)
+      .map(sport => sport.id);
+  }
+  return filters.sportId ? [filters.sportId] : null;
+}
+
+/**
+ * Days whose games are all loaded. A bound is `null` once that side has no more
+ * pages. The outermost loaded day of a side with more pages may be partial, so
+ * it stays outside the range.
+ */
+export type ScheduleLoadedRange = { after: string | null; before: string | null };
+
+export function getScheduleLoadedRange(
+  anchor: string,
+  oldestPastGame: Schedules | undefined,
+  newestFutureGame: Schedules | undefined,
+  hasOlder: boolean,
+  hasNewer: boolean,
+): ScheduleLoadedRange {
+  const dayOf = (game: Schedules) => getScheduleDay(new Date(game.startDate));
+  return {
+    after: hasOlder ? (oldestPastGame ? dayOf(oldestPastGame) : addScheduleDays(anchor, -1)) : null,
+    before: hasNewer ? (newestFutureGame ? dayOf(newestFutureGame) : addScheduleDays(anchor, 1)) : null,
+  };
+}
+
+export function isScheduleDateLoaded(range: ScheduleLoadedRange, date: string): boolean {
+  return (range.after === null || date > range.after) && (range.before === null || date < range.before);
+}
+
 export function buildScheduleEvents(
   sports: readonly { id: number; gameName: string }[],
   games: readonly Schedules[],
@@ -118,7 +165,6 @@ export function buildScheduleEvents(
 export function groupScheduleGames(
   games: readonly Schedules[],
   filters: ScheduleFilters,
-  today: string | null,
   anchorDate?: string | null,
 ): ScheduleDay[] {
   const groups = new Map<string, Schedules[]>();
@@ -140,13 +186,7 @@ export function groupScheduleGames(
   if (anchorDate && !groups.has(anchorDate)) groups.set(anchorDate, []);
 
   return [...groups]
-    .sort(([a], [b]) => {
-      if (!today) return a.localeCompare(b);
-      if (a === today) return -1;
-      if (b === today) return 1;
-      if ((a >= today) !== (b >= today)) return a >= today ? -1 : 1;
-      return a >= today ? a.localeCompare(b) : b.localeCompare(a);
-    })
+    .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, games]) => ({
       date,
       games: games.sort((a, b) => +new Date(a.startDate) - +new Date(b.startDate) || a.id - b.id),

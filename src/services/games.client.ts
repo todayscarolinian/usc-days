@@ -1,33 +1,34 @@
 import axios from "axios";
-import { filterType } from "@/src/types/types";
 import { PaginatedGamesResponse } from "@/src/types/games.types";
 
+export type GamesPageParams = {
+  gameTypeIds?: readonly number[];
+  teamId?: number | null;
+  /** `YYYY-MM-DD` Manila day; games starting on or after it. */
+  startsFrom?: string;
+  /** `YYYY-MM-DD` Manila day; games starting before it. */
+  startsBefore?: string;
+  order?: "asc" | "desc";
+  limit?: number;
+  cursor?: string | null;
+};
+
 export async function fetchGamesPage(
-  cursor?: string | null,
-  limit = 20,
-  filters?: filterType,
-  signal?: AbortSignal
+  params: GamesPageParams,
+  signal?: AbortSignal,
 ): Promise<PaginatedGamesResponse> {
-  const params = new URLSearchParams();
-  
-  if (cursor) params.append("cursor", cursor);
-  params.append("limit", String(limit));
-  
-  // Apply filters
-  if (filters?.date) params.append("startDate", filters.date);
-  if (filters?.game) params.append("gameTypeId", filters.game);
+  const query = new URLSearchParams();
 
-  const teamId = filters?.teams?.home ?? filters?.teams?.away;
-  if (teamId) {
-    params.append("teamId", teamId);
-  }
+  if (params.gameTypeIds?.length) query.append("gameTypeIds", params.gameTypeIds.join(","));
+  if (params.teamId) query.append("teamId", String(params.teamId));
+  if (params.startsFrom) query.append("startsFrom", params.startsFrom);
+  if (params.startsBefore) query.append("startsBefore", params.startsBefore);
+  if (params.order) query.append("order", params.order);
+  if (params.limit) query.append("limit", String(params.limit));
+  if (params.cursor) query.append("cursor", params.cursor);
 
-  if (filters?.finishedGames !== undefined) {
-    params.append("hasWinner", String(filters.finishedGames));
-  }
-
-  const { data } = await axios.get<PaginatedGamesResponse>(`/api/games?${params.toString()}`, {
-    signal
+  const { data } = await axios.get<PaginatedGamesResponse>(`/api/games?${query.toString()}`, {
+    signal,
   });
 
   return data;

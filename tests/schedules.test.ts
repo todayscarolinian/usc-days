@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 import { getGameStatus } from "@/src/lib/game-status";
 import { getMatchdayGameStatus } from "@/src/lib/todays-games";
 import {
+  addScheduleDays,
   buildScheduleEvents,
+  getScheduleGameTypeIds,
+  getScheduleLoadedRange,
+  isScheduleDateLoaded,
   getScheduleDay,
   getScheduleEventName,
   groupScheduleGames,
@@ -125,7 +129,7 @@ describe("event categories", () => {
     const aquatics = buildScheduleEvents(sports, matches, now).find(group => group.name === "Aquatics");
     assert.deepEqual(aquatics?.events.map(event => event.name), ["Swimming"]);
     assert.equal(aquatics?.events[0].isLive, true);
-    assert.equal(groupScheduleGames(matches, { ...noFilters, event: "Swimming" }, today)[0].games.length, 5);
+    assert.equal(groupScheduleGames(matches, { ...noFilters, event: "Swimming" })[0].games.length, 5);
     const categories = groupSwimmingMatches(matches);
     assert.deepEqual(categories.map(category => category.name), ["200m Freestyle", "50m Backstroke", "4x50m Medley Relay"]);
     assert.deepEqual(categories.map(category => category.games.map(match => match.id)), [[1, 2], [3], [4, 5]]);
@@ -141,20 +145,20 @@ describe("schedule filtering and ordering", () => {
       game({ id: 3, gameType: { id: 3, gameName: "Volleyball" } }),
       game({ id: 4, startDate: "2026-10-16T03:00:00Z" }),
     ];
-    const days = groupScheduleGames(matches, { ...noFilters, event: "Basketball", teamId: 20, date: today }, today);
+    const days = groupScheduleGames(matches, { ...noFilters, event: "Basketball", teamId: 20, date: today });
     assert.deepEqual(days.map(day => day.games.map(match => match.id)), [[1]]);
-    assert.equal(groupScheduleGames(matches, { ...noFilters, teamId: 999 }, today).length, 0);
+    assert.equal(groupScheduleGames(matches, { ...noFilters, teamId: 999 }).length, 0);
   });
 
   it("preserves legacy sport IDs while allowing a named event to include all variants", () => {
     const matches = [game(), game({ id: 2, gameType: { id: 2, gameName: "Women's Basketball" } })];
-    const legacy = groupScheduleGames(matches, { ...noFilters, sportId: 1 }, today);
-    const event = groupScheduleGames(matches, { ...noFilters, sportId: 1, event: "Basketball" }, today);
+    const legacy = groupScheduleGames(matches, { ...noFilters, sportId: 1 });
+    const event = groupScheduleGames(matches, { ...noFilters, sportId: 1, event: "Basketball" });
     assert.equal(legacy[0].games.length, 1);
     assert.equal(event[0].games.length, 2);
   });
 
-  it("orders today, future dates, then recent past without mutating query records", () => {
+  it("orders days chronologically without mutating query records", () => {
     const matches = [
       game({ id: 5, startDate: "2026-10-13T04:00:00Z" }),
       game({ id: 3, startDate: "2026-10-16T04:00:00Z" }),
@@ -164,9 +168,51 @@ describe("schedule filtering and ordering", () => {
       game({ id: 6, startDate: "invalid" }),
     ];
     const originalOrder = matches.map(match => match.id);
-    const days = groupScheduleGames(matches, noFilters, today);
-    assert.deepEqual(days.map(day => day.date), [today, "2026-10-16", "2026-10-14", "2026-10-13"]);
-    assert.deepEqual(days[0].games.map(match => match.id), [1, 2]);
+    const days = groupScheduleGames(matches, noFilters);
+    assert.deepEqual(days.map(day => day.date), ["2026-10-13", "2026-10-14", today, "2026-10-16"]);
+    assert.deepEqual(days[2].games.map(match => match.id), [1, 2]);
     assert.deepEqual(matches.map(match => match.id), originalOrder);
+  });
+});
+
+describe("schedule window helpers", () => {
+  const sports = [
+    { id: 1, gameName: "Men's Basketball" },
+    { id: 2, gameName: "Women's Basketball" },
+    { id: 3, gameName: "Men's Volleyball" },
+  ];
+
+  it("adds calendar days across month boundaries", () => {
+    assert.equal(addScheduleDays("2026-10-31", 1), "2026-11-01");
+    assert.equal(addScheduleDays("2026-11-01", -1), "2026-10-31");
+  });
+
+  it("resolves an event to all of its sports", () => {
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: "Basketball", sportId: 3 }), [1, 2]);
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: "Chess", sportId: null }), []);
+    assert.deepEqual(getScheduleGameTypeIds(sports, { event: null, sportId: 3 }), [3]);
+    assert.equal(getScheduleGameTypeIds(sports, { event: null, sportId: null }), null);
+  });
+
+  it("treats only fully loaded days as loaded", () => {
+    const oldest = game({ startDate: "2026-10-10T03:00:00Z" });
+    const newest = game({ startDate: "2026-10-20T03:00:00Z" });
+    const range = getScheduleLoadedRange(today, oldest, newest, true, true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-10"), false);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-11"), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-19"), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-20"), false);
+  });
+
+  it("keeps the anchor loaded before either side has games", () => {
+    const range = getScheduleLoadedRange(today, undefined, undefined, true, true);
+    assert.equal(isScheduleDateLoaded(range, today), true);
+    assert.equal(isScheduleDateLoaded(range, "2026-10-14"), false);
+  });
+
+  it("is unbounded on a side with no more pages", () => {
+    const range = getScheduleLoadedRange(today, undefined, undefined, false, false);
+    assert.equal(isScheduleDateLoaded(range, "2020-01-01"), true);
+    assert.equal(isScheduleDateLoaded(range, "2030-01-01"), true);
   });
 });

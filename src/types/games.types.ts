@@ -270,6 +270,7 @@ export interface PaginationParams {
   cursor?: string;
   limit?: number;
   offset?: number;
+  order?: "asc" | "desc";
 }
 
 export interface PaginatedGamesResponse {

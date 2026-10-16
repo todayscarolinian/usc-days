@@ -8,6 +8,7 @@ import {
     boolQuery,
     endOfDayQuery,
     handleRouteError,
+    idListQuery,
     idQuery,
     limitQuery,
     parseJsonBody,
@@ -15,11 +16,13 @@ import {
     startOfDayQuery,
     stringQuery,
 } from "@/src/lib/api";
+import { decodeGamesCursor } from "@/src/lib/games-cursor";
 
 const gameService = new GameService();
 
 const GetGamesQuerySchema = z.object({
     gameTypeId: idQuery,
+    gameTypeIds: idListQuery,
     teamAId: idQuery,
     teamBId: idQuery,
     teamId: idQuery,
@@ -29,9 +32,13 @@ const GetGamesQuerySchema = z.object({
     hasWinner: boolQuery,
     startDate: startOfDayQuery,
     endDate: endOfDayQuery,
-    // ISO `startDate` of the last game on the previous page
-    cursor: z.iso.datetime().optional(),
+    // Filter on start time alone, so a game belongs to exactly one day.
+    startsFrom: startOfDayQuery,
+    startsBefore: startOfDayQuery,
+    // `nextCursor` from the previous page
+    cursor: z.string().refine((v) => decodeGamesCursor(v) !== null, "Invalid cursor.").optional(),
     limit: limitQuery(),
+    order: z.enum(["asc", "desc"]).default("asc"),
 });
 
 export async function GET(req: NextRequest) {

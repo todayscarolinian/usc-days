@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useGamesQuery } from "@/src/queries/games.queries";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useGamesQuery, useScheduleWindow } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
 import {
   buildScheduleEvents,
   getScheduleDay,
   getScheduleEventName,
+  getScheduleGameTypeIds,
   groupScheduleGames,
+  isScheduleDateLoaded,
 } from "@/src/lib/schedules";
 import { useScheduleFilters } from "./use-schedule-filters";
 import { useVisibleScheduleDate } from "./use-visible-schedule-date";
@@ -22,10 +24,12 @@ function scrollToScheduleDate(date: string) {
 
 export function useSchedules() {
   const navigation = useScheduleFilters();
+  const { filters } = navigation;
   const { requestedDate, setRequestedDate } = useScheduleScrollTarget();
-  const games = useGamesQuery(undefined, { refetchInterval: 60_000 });
   const sports = getGameTypesQuery();
   const [now, setNow] = useState<Date | null>(null);
+  // The day the loaded games are centred on. `null` follows today.
+  const [anchorDate, setAnchorDate] = useState<string | null>(filters.date);
 
   useEffect(() => {
     const initial = setTimeout(() => setNow(new Date()), 0);
@@ -37,34 +41,46 @@ export function useSchedules() {
   }, []);
 
   const today = now ? getScheduleDay(now) : null;
+  const windowAnchor = anchorDate ?? today;
+  // Wait for the sports list before filtering by event or sport.
+  const gameTypeIds = sports.data
+    ? getScheduleGameTypeIds(sports.data, filters)
+    : filters.event || filters.sportId ? undefined : null;
+  const games = useScheduleWindow({ anchor: windowAnchor, gameTypeIds, teamId: filters.teamId });
+  // Live markers cover every event, not just the filtered window.
+  const todayGames = useGamesQuery(
+    today ? { startDate: today, endDate: today } : undefined,
+    { refetchInterval: 60_000, enabled: today !== null },
+  );
+
   const isLoading = games.isPending || !now;
   const days = useMemo(
-    () => groupScheduleGames(
-      games.data ?? [],
-      { ...navigation.filters, date: null },
-      today,
-      navigation.filters.date ?? today,
-    ),
-    [games.data, navigation.filters, today],
+    () => groupScheduleGames(games.games, { ...filters, date: null }, filters.date ?? windowAnchor),
+    [games.games, filters, windowAnchor],
   );
   const eventGroups = useMemo(
-    () => buildScheduleEvents(sports.data ?? [], games.data ?? [], now),
-    [sports.data, games.data, now],
+    () => buildScheduleEvents(sports.data ?? [], todayGames.data ?? [], now),
+    [sports.data, todayGames.data, now],
   );
   const visibleDate = useVisibleScheduleDate(days, isLoading);
-  const selectedSport = sports.data?.find(sport => sport.id === navigation.filters.sportId);
-  const selectedEvent = navigation.filters.event ??
+  const selectedSport = sports.data?.find(sport => sport.id === filters.sportId);
+  const selectedEvent = filters.event ??
     (selectedSport ? getScheduleEventName(selectedSport.gameName) : null);
 
+  // Scroll to the anchor once per window, and again whenever the URL date changes.
+  const scrollTarget = filters.date ?? windowAnchor;
+  const scrollKey = `${windowAnchor}|${filters.event}|${filters.sportId}|${filters.teamId}|${scrollTarget}`;
+  const scrolledKey = useRef<string | null>(null);
   useEffect(() => {
-    if (isLoading || !navigation.filters.date) return;
-    const date = navigation.filters.date;
-    const frame = requestAnimationFrame(() => scrollToScheduleDate(date));
+    if (isLoading || !scrollTarget || scrolledKey.current === scrollKey) return;
+    scrolledKey.current = scrollKey;
+    const frame = requestAnimationFrame(() => scrollToScheduleDate(scrollTarget));
     return () => cancelAnimationFrame(frame);
-  }, [isLoading, navigation.filters.date]);
+  }, [isLoading, scrollTarget, scrollKey]);
 
   function selectEvent(event: string | null) {
     setRequestedDate(null);
+    setAnchorDate(null);
     navigation.setFilter("event", event);
     // Each tab starts fresh; cancel any in-progress jump from the previous sport.
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -72,7 +88,10 @@ export function useSchedules() {
 
   function navigateToDate(date: string) {
     setRequestedDate(date);
-    if (date === navigation.filters.date) scrollToScheduleDate(date);
+    if (games.loadedRange && !isScheduleDateLoaded(games.loadedRange, date)) {
+      setAnchorDate(date);
+    }
+    if (date === filters.date) scrollToScheduleDate(date);
     else navigation.setFilter("date", date);
   }
 
@@ -89,6 +108,6 @@ export function useSchedules() {
     navigateToDate,
     selectEvent,
     visibleDate,
-    navigationDate: requestedDate ?? visibleDate ?? navigation.filters.date,
+    navigationDate: requestedDate ?? visibleDate ?? filters.date,
   };
 }

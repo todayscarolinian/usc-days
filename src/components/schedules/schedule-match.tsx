@@ -8,6 +8,7 @@ type ScheduleMatchProps = {
   showEventLabel: boolean;
   game: Schedules;
   now: Date;
+  onOpen: (game: Schedules) => void;
 };
 
 type MatchTeamProps = {
@@ -50,7 +51,7 @@ function MatchTeam({ team, side, featured }: MatchTeamProps) {
   );
 }
 
-export default function ScheduleMatch({ game, now, showEventLabel }: ScheduleMatchProps) {
+export default function ScheduleMatch({ game, now, showEventLabel, onOpen }: ScheduleMatchProps) {
   const status = getGameStatus(game, now);
   const featured = status === "live";
   const statusLabel = GAME_STATUS_LABELS[status];
@@ -63,10 +64,12 @@ export default function ScheduleMatch({ game, now, showEventLabel }: ScheduleMat
   const matchup = `${game.teamA?.teamName ?? "TBD"} vs ${game.teamB?.teamName ?? "TBD"}`;
 
   return (
-    <article
-      aria-label={`${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
+    <button
+      type="button"
+      onClick={() => onOpen(game)}
+      aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
       className={cn(
-        "block w-full min-w-0 select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717]",
+        "block w-full min-w-0 cursor-pointer select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717] hover:bg-neutral-200/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 motion-safe:transition-colors",
         featured && "border-t-2 border-tc_primary-400",
       )}
     >
@@ -113,6 +116,6 @@ export default function ScheduleMatch({ game, now, showEventLabel }: ScheduleMat
           </span>
         </>
       )}
-    </article>
+    </button>
   );
 }

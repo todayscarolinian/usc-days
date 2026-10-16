@@ -10,24 +10,22 @@ import StandingsSection from "@/app/components/StandingsSection/StandingsSection
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-slate-900">
+    <div className="min-h-screen bg-[url('/white-bg.png')] bg-top bg-repeat text-slate-900">
       <HeroCarousel />
+      
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+        <section id="todays-games" aria-labelledby="todays-games">
+          <TodaysGames />
+        </section>
+      </main>
+        
+      <StandingsSection />
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
         <NewsSection
           hashtag={FACEBOOK_NEWS_CONFIG.hashtag?.trim() || undefined}
         />
-
-        <section id="featured-merch" aria-labelledby="featured-merch">
-          <MerchSection />
-        </section>
-
-        <section id="todays-games" aria-labelledby="todays-games">
-          <TodaysGames />
-        </section>
       </main>
-
-      <StandingsSection />
 
       <section id="sports" aria-labelledby="sports-heading">
         <SportsSection />
@@ -54,6 +52,12 @@ export default function Home() {
       </section>
 
       <LeaderboardSection />
+
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+        <section id="featured-merch" aria-labelledby="featured-merch">
+          <MerchSection />
+        </section>
+      </main>
     </div>
   );
 }

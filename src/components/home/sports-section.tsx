@@ -44,7 +44,7 @@ export default function SportsSection() {
       className={`${roboto.className} @container w-full bg-neutral-950 bg-[url('/black-bg.png')] bg-top bg-repeat text-[#f7f6f6]`}
     >
       <h2 id="sports-heading" className="sr-only">Sports</h2>
-      <ul className="grid w-full grid-cols-2 justify-between gap-x-4 gap-y-6 px-4 py-12 @lg:grid-cols-4 @lg:px-8 @lg:py-16 @5xl:grid-cols-[repeat(8,6.25rem)] @5xl:px-12 @5xl:py-20 @7xl:px-20 @7xl:py-25">
+      <ul className="mx-auto grid max-w-[1718px] grid-cols-2 justify-between gap-x-4 gap-y-6 px-4 py-8 @lg:grid-cols-4 @lg:px-8 @lg:py-10 @5xl:grid-cols-[repeat(8,6.25rem)] @5xl:px-12 @5xl:py-12 @7xl:px-20 @7xl:py-12">
         {sports.map((sport) => (
           <li key={sport.name} className="min-w-0">
             <figure className="flex flex-col items-center py-2.5 text-center">

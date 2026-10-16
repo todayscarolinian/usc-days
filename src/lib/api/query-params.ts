@@ -17,6 +17,13 @@ import { getEventDayRange } from "@/src/lib/time";
 /** Positive integer id, e.g. `?teamId=4`. */
 export const idQuery = z.coerce.number().int().positive().optional();
 
+/** Comma-separated positive integer ids, e.g. `?gameTypeIds=1,2,3`. */
+export const idListQuery = z
+  .string()
+  .transform((v) => v.split(",").map((part) => part.trim()))
+  .pipe(z.array(z.coerce.number<string>().int().positive()).min(1))
+  .optional();
+
 /** Any finite number, e.g. `?minPrice=99.5`. */
 export const numberQuery = z.coerce.number().optional();
 
