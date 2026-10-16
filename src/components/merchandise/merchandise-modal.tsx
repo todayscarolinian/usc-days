@@ -34,6 +34,7 @@ export default function MerchandiseModal({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
   const [displayedProductId, setDisplayedProductId] = useState(product.id);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
   const images = product.imgUrls;
   const THUMBNAIL_COUNT = 3;
 
@@ -42,6 +43,7 @@ export default function MerchandiseModal({
     setCurrentImageIndex(0);
     setThumbnailStartIndex(0);
     setDisplayedProductId(product.id);
+    setIsImageExpanded(false);
   }
 
   const nextImage = () => {
@@ -87,7 +89,12 @@ export default function MerchandiseModal({
             {/* Left: Image */}
             <div className="shrink-0 flex flex-col gap-3">
               {/* Main Image */}
-              <div className="relative w-[225px] aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setIsImageExpanded(true)}
+                className="relative w-[225px] aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in"
+                aria-label="Expand image"
+              >
                 <Image
                   src={images[currentImageIndex]}
                   alt={product.productTitle}
@@ -96,7 +103,7 @@ export default function MerchandiseModal({
                   className="object-contain"
                   priority
                 />
-              </div>
+              </button>
 
               {/* Thumbnail Strip */}
               {images.length > 1 && (
@@ -198,6 +205,44 @@ export default function MerchandiseModal({
           </div>
         </DialogContent>
       </DialogPortal>
+
+      {/* Expanded Image */}
+      <Dialog open={isImageExpanded} onOpenChange={setIsImageExpanded}>
+        <DialogContent
+          showCloseButton={true}
+          className="sm:max-w-[min(90vw,90vh)] max-w-[calc(100%-2rem)] p-0 border-0 bg-transparent shadow-none text-white"
+        >
+          <DialogTitle className="sr-only">{product.productTitle}</DialogTitle>
+          <div className="relative w-full aspect-square">
+            <Image
+              src={images[currentImageIndex]}
+              alt={product.productTitle}
+              fill
+              sizes="90vw"
+              className="object-contain"
+            />
+          </div>
+
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70"
+                aria-label="Next image"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
