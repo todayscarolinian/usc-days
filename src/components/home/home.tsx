@@ -28,7 +28,7 @@ export default function Home() {
               aria-labelledby="todays-games-heading"
               className="flex w-full scroll-mt-16 flex-col"
             >
-              <TodaysGames mock />
+              <TodaysGames />
           </section>
         </main>
 
