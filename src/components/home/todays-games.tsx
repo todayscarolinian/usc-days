@@ -11,7 +11,6 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
 import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
 import { TodaysGamesCard } from "./todays-games-card";
-import { createMockTodaysGames } from "@/src/constants/mock-todays-games";
 
 const GameDetailsDialog = dynamic(
   () => import("@/src/components/schedules/game-details-dialog"),
@@ -96,14 +95,9 @@ function GamesContent({
     endDate: dateLabel,
   });
 
-  const showMockGames =
-    process.env.NODE_ENV === "development" &&
-    !loading &&
-    !error &&
-    todaysGames.length === 0;
   const { featured, compact } = useMemo(
-    () => selectTodaysGames(showMockGames ? createMockTodaysGames(now) : todaysGames),
-    [showMockGames, now, todaysGames],
+    () => selectTodaysGames(todaysGames),
+    [todaysGames],
   );
 
   if (loading) return <GamesSkeleton />;
@@ -231,7 +225,7 @@ export default function TodaysGames() {
   return (
     <div
       ref={sectionRef}
-      className="flex flex-col gap-6 py-8 text-[#171717] xl:py-12"
+      className="flex flex-1 flex-col gap-6 py-8 text-[#171717] xl:py-12"
     >
       <header className="shrink-0 space-y-6 border-b border-[#171717] pb-4 md:mx-5 xl:mx-6">
         <div className="space-y-3">
