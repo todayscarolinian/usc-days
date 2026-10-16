@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { number, z } from "zod";
+import { z } from "zod";
 import ProductService from "@/src/services/product.service";
 import { AddMerchProductSchema } from "@/src/types/merchProducts.types";
 import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
