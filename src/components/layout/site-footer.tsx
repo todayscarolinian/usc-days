@@ -18,8 +18,6 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 
-const contactEmail = "todaysusc@gmail.com";
-
 const links: { href: string; label: string; comingSoon?: boolean }[] = [
   { href: "/#news", label: "News" },
   { href: "/merchandise", label: "Merch" },
@@ -159,10 +157,10 @@ export default function SiteFooter() {
 
             <div className="pb-5">
               <a
-                href={`mailto:${contactEmail}`}
+                href={`mailto:${PUBLICATION.email}`}
                 className="inline-block max-w-full break-all text-sm text-white/70 transition-colors hover:text-white"
               >
-                {contactEmail}
+                {PUBLICATION.email}
               </a>
             </div>
           </details>
@@ -228,10 +226,10 @@ export default function SiteFooter() {
           </h2>
 
           <a
-            href={`mailto:${contactEmail}`}
+            href={`mailto:${PUBLICATION.email}`}
             className="inline-block max-w-full break-all text-sm text-white/70 transition-colors hover:text-white"
           >
-            {contactEmail}
+            {PUBLICATION.email}
           </a>
 
           <SocialLinks className="mt-6" />
