@@ -159,7 +159,7 @@ export default function GameDetailsDialog({
                 disabled={!teamsAreSet}
                 className="w-full sm:w-auto"
               >
-                Add Score
+                Edit Score
               </Button>
             </>
           )}

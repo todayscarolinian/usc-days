@@ -10,6 +10,7 @@ type ScheduleMatchProps = {
   game: Schedules;
   now: Date;
   canManage: boolean;
+  onOpen: (game: Schedules) => void;
   onEditScore: (game: Schedules) => void;
   onEditSchedule: (game: Schedules) => void;
 };
@@ -54,7 +55,7 @@ function MatchTeam({ team, side, featured }: MatchTeamProps) {
   );
 }
 
-export default function ScheduleMatch({ game, now, showEventLabel, canManage, onEditScore, onEditSchedule }: ScheduleMatchProps) {
+export default function ScheduleMatch({ game, now, showEventLabel, canManage, onOpen, onEditScore, onEditSchedule }: ScheduleMatchProps) {
   const status = getGameStatus(game, now);
   const featured = status === "live";
   const statusLabel = GAME_STATUS_LABELS[status];
@@ -86,6 +87,12 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           </Button>
         </div>
       )}
+      <button
+        type="button"
+        onClick={() => onOpen(game)}
+        aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
+        className="block w-full cursor-pointer hover:bg-neutral-200/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 motion-safe:transition-colors"
+      >
       {featured ? (
         <span className="block p-3 sm:p-5">
           <span className="flex items-center justify-between gap-3 text-xs">
@@ -129,7 +136,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           </span>
         </>
       )}
-
+      </button>
     </article>
   );
 }

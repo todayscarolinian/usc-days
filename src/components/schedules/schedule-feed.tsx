@@ -25,6 +25,7 @@ type ScheduleFeedProps = {
   onLoadOlder: () => void;
   onLoadNewer: () => void;
   canManage: boolean;
+  onOpenGame: (game: Schedules) => void;
   onEditScore: (game: Schedules) => void;
   onEditSchedule: (game: Schedules) => void;
 };
@@ -50,7 +51,7 @@ function EmptySchedule({ forDate = false }: { forDate?: boolean }) {
 
 export default function ScheduleFeed({
   days, today, now, isLoading, isError, isFetching, onRetry, showEventLabel, categorizeSwimming = false,
-  hasOlder, hasNewer, isLoadingOlder, isLoadingNewer, olderPageCount, onLoadOlder, onLoadNewer, canManage, onEditScore, onEditSchedule,
+  hasOlder, hasNewer, isLoadingOlder, isLoadingNewer, olderPageCount, onLoadOlder, onLoadNewer, canManage, onOpenGame, onEditScore, onEditSchedule,
 }: ScheduleFeedProps) {
   // Older games are added above the viewport; shift the scroll by the added
   // height so the games already on screen stay put.
@@ -119,11 +120,11 @@ export default function ScheduleFeed({
             <section key={category.name} aria-label={category.name} className="space-y-3 pt-2">
               <h3 className="font-[family-name:var(--font-roboto-condensed)] text-lg font-semibold text-neutral-600">{category.name}</h3>
               {category.games.map(game => (
-                <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
+                <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onOpen={onOpenGame} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
               ))}
             </section>
           )) : day.games.map(game => (
-            <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
+            <ScheduleMatch key={game.id} game={game} now={now} showEventLabel={showEventLabel} canManage={canManage} onOpen={onOpenGame} onEditScore={onEditScore} onEditSchedule={onEditSchedule} />
           ))}
         </section>
       ))}
