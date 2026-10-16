@@ -1,6 +1,6 @@
 import HeroCarousel from "./hero-carousel";
 import MatchdayBanner from "./matchday-banner";
-import MerchSection from "./merch-section";
+// import MerchSection from "./merch-section";
 import TodaysGames from "./todays-games";
 import SportsSection from "./sports-section";
 import NewsSection from "./news-section";
@@ -56,11 +56,13 @@ export default function Home() {
           <LeaderboardSection />
         </div>
 
+        {/* Hidden from prod until merch is ready to launch
         <main className="mx-auto max-w-[1600px] px-3 py-8 space-y-12">
-          <section id="featured-merch" aria-labelledby="featured-merch">
+          <section id="featured-merch" aria-labelledby="featured-merch-heading">
             <MerchSection />
           </section>
         </main>
+        */}
       </div>
     </div>
   );
