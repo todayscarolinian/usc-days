@@ -9,9 +9,9 @@ import TableTennisImage from "@/src/assets/carousel/table-tennis.jpg";
 import VolleyballImage from "@/src/assets/carousel/vball.jpg";
 
 export const metadata: Metadata = generateMeta({
-  title: "Merchandise - USC Days 2025",
+  title: "Merchandise - USC Days 2026",
   description:
-    "Browse merchandise by category for USC Days 2025. Find apparel, accessories, and more to show your school spirit.",
+    "Browse merchandise by category for USC Days 2026. Find apparel, accessories, and more to show your school spirit.",
   url: "/merchandise",
   image: "/og_image.jpg",
 });
