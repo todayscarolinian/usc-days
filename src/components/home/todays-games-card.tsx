@@ -1,3 +1,4 @@
+import styles from "./todays-games.module.css";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
@@ -25,6 +26,10 @@ export function TodaysGamesCard({
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
   const sport = game.gameType.gameName;
+  const time = format(start, "h:mm a");
+  const gameStatus = ongoing ? "LIVE" : status ? "UPCOMING" : "FINAL";
+  const logoA = getLogoForSchool(teamA);
+  const logoB = getLogoForSchool(teamB);
 
   return (
     <Button
@@ -32,115 +37,70 @@ export function TodaysGamesCard({
       variant="ghost"
       onClick={() => onOpen(game)}
       aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}`}
-      className={cn(
-        "block w-full min-w-0 cursor-pointer rounded-none bg-white text-left whitespace-normal text-[#171717] shadow-none transition-none hover:bg-white hover:text-[#171717] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 dark:hover:bg-white dark:hover:text-[#171717]",
-        compact ? "h-[93px] border border-[#171717] p-2.5" : "h-[220px] p-2.5",
-      )}
+      className={cn(styles.card, compact ? styles.compact : styles.featured, ongoing && !compact && styles.live)}
     >
-      <span
-        className={cn(
-          "flex h-full min-w-0 flex-col",
-          !compact && "border",
-          !compact && (ongoing ? "border-tc_primary-400" : "border-[#171717]"),
-        )}
-      >
-        {compact ? (
-          <span className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#171717] py-1 font-medium leading-5">
-            <span className="truncate text-sm" title={sport}>
+      {compact ? (
+        <span className={styles.cardContent}>
+          <span className={styles.compactTop}>
+            <span className="min-w-0 truncate font-bold uppercase" title={sport}>
               {sport}
             </span>
-            <span
-              className="truncate text-center text-xs text-black/75"
-              title={location}
-            >
+            <span className="min-w-0 truncate text-right text-black/60" title={location}>
               {location}
             </span>
-            <span className="whitespace-nowrap text-xs text-black/75">
-              {format(start, "MMMM d, yyyy")}
+          </span>
+          <span className={styles.compactTeams}>
+            <span className="flex min-w-0 items-center gap-2">
+              <Image src={logoA} alt="" width={22} height={22} className="size-[30px] shrink-0 object-contain" />
+              <span className="min-w-0 truncate text-[22px] leading-[1.2] font-bold" title={teamA}>
+                {teamA}
+              </span>
+            </span>
+            <span className="text-[10px] leading-none font-medium text-black/65">vs</span>
+            <span className="flex min-w-0 items-center justify-end gap-2">
+              <span className="min-w-0 truncate text-right text-[22px] leading-[1.2] font-bold" title={teamB}>
+                {teamB}
+              </span>
+              <Image src={logoB} alt="" width={22} height={22} className="size-[30px] shrink-0 object-contain" />
             </span>
           </span>
-        ) : (
-          <span className="flex items-center justify-between gap-3 px-3 pt-7 pb-2.5 text-base leading-[22px] font-medium">
+        </span>
+      ) : (
+        <span className={styles.cardContent}>
+          <span className={styles.cardTop}>
             <span className="min-w-0 truncate uppercase" title={sport}>
               {sport}
             </span>
             <span
-              className={cn(
-                "shrink-0",
-                ongoing ? "text-[#BE0000]" : "text-black/65",
-              )}
+              className={cn(styles.status, ongoing && styles.liveStatus)}
             >
-              {status}
+              {ongoing && <span aria-hidden="true" className="size-2 rounded-full bg-white" />}
+              {gameStatus}
             </span>
           </span>
-        )}
 
-        <span
-          className={cn(
-            "grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 font-medium",
-            compact
-              ? "px-2.5 text-sm leading-5"
-              : "px-3 pb-2 text-[28px] leading-10 min-[375px]:text-[36px] min-[1400px]:text-[48px]",
-          )}
-        >
-          <span
-            className={cn(
-              "flex min-w-0 items-center",
-              compact ? "gap-1" : "gap-2",
-            )}
-          >
-            <span className="min-w-0 truncate" title={teamA}>
-              {teamA}
+          <span className={styles.matchup}>
+            <span className={styles.team}>
+              <Image src={logoA} alt="" width={106} height={106} className={styles.teamLogo} />
+              <span className={styles.teamName} title={teamA}>
+                {teamA}
+              </span>
             </span>
-            <Image
-              src={getLogoForSchool(teamA)}
-              alt=""
-              width={compact ? 40 : 68}
-              height={compact ? 40 : 68}
-              className={cn(
-                "shrink-0 object-contain",
-                compact
-                  ? "size-10"
-                  : "size-11 min-[375px]:size-[52px] min-[1400px]:size-[68px]",
-              )}
-            />
-          </span>
-          <span className={compact ? "text-xs" : "text-sm"}>
-            {compact ? "VS" : "vs"}
-          </span>
-          <span
-            className={cn(
-              "flex min-w-0 items-center justify-end",
-              compact ? "gap-1" : "gap-2",
-            )}
-          >
-            <Image
-              src={getLogoForSchool(teamB)}
-              alt=""
-              width={compact ? 40 : 68}
-              height={compact ? 40 : 68}
-              className={cn(
-                "shrink-0 object-contain",
-                compact
-                  ? "size-10"
-                  : "size-11 min-[375px]:size-[52px] min-[1400px]:size-[68px]",
-              )}
-            />
-            <span className="min-w-0 truncate text-right" title={teamB}>
-              {teamB}
+            <span className={styles.versus}>VS</span>
+            <span className={styles.team}>
+              <Image src={logoB} alt="" width={106} height={106} className={styles.teamLogo} />
+              <span className={styles.teamName} title={teamB}>
+                {teamB}
+              </span>
             </span>
+          </span>
+
+          <span className={styles.cardFooter}>
+            <span className="min-w-0 truncate" title={location}>{location}</span>
+            <span className={styles.time}>{time}</span>
           </span>
         </span>
-
-        {!compact && (
-          <span
-            className="truncate border-t-2 border-[#171717] px-3 py-1 text-sm leading-5 font-medium text-black/55"
-            title={`${location} · ${format(start, "h:mma").toLowerCase()}`}
-          >
-            {location} · {format(start, "h:mma").toLowerCase()}
-          </span>
-        )}
-      </span>
+      )}
     </Button>
   );
 }

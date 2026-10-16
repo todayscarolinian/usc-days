@@ -13,6 +13,8 @@ export interface GetProductsParams {
   maxPrice?: number;
   size?: string;
   search?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 // Maps the API payload onto the Prisma column names (shared by create and replace).
@@ -33,7 +35,7 @@ function toProductData(payload: AddMerchProductPayload) {
 
 class ProductService {
   async getProducts(params: GetProductsParams) {
-    const { categoryId, isAvailable, minPrice, maxPrice, size, search } = params;
+    const { categoryId, isAvailable, minPrice, maxPrice, size, search, page, pageSize} = params;
 
     const where: Prisma.MerchandiseProductWhereInput = {};
 
@@ -62,11 +64,18 @@ class ProductService {
       };
     }
 
-    return prisma.merchandiseProduct.findMany({
-      where,
-      include: { merchandiseCategory: true },
-      orderBy: [{ createdAt: "desc" }],
-    });
+    const [products, total] = await prisma.$transaction([
+      prisma.merchandiseProduct.findMany({
+        where,
+        include: { merchandiseCategory: true },
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page && pageSize) ? (page - 1) * pageSize : undefined,
+        take: pageSize,
+      }),
+      prisma.merchandiseProduct.count({ where }),
+    ]);
+
+    return { products, total };
   }
 
   async getProductById(productId: number) {

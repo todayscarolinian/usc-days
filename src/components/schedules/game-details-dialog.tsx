@@ -23,6 +23,7 @@ type Props = {
   onEditSchedule?: (game: Schedules) => void;
   onAddScore?: (game: Schedules) => void;
   now?: Date;
+  readOnly?: boolean;
 };
 
 function getDbScores(g: Schedules) {
@@ -38,6 +39,7 @@ export default function GameDetailsDialog({
   onEditSchedule,
   onAddScore,
   now = new Date(),
+  readOnly = false,
 }: Props) {
   const [busyEdit, setBusyEdit] = React.useState(false);
 
@@ -127,7 +129,7 @@ export default function GameDetailsDialog({
           </div>
         </div>
 
-        {hasAccess && !teamsAreSet && (
+        {hasAccess && !readOnly && !teamsAreSet && (
           <p className="text-sm text-muted-foreground">
             {SCORES_REQUIRE_TEAMS_MESSAGE}
           </p>
@@ -142,7 +144,7 @@ export default function GameDetailsDialog({
             Close
           </Button>
 
-          {hasAccess && (
+          {hasAccess && !readOnly && (
             <>
               <Button
                 onClick={goEditSchedule}

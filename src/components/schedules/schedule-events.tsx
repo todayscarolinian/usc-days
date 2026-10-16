@@ -22,7 +22,7 @@ function eventIcon(name: string) {
 export default function ScheduleEvents({
   groups, selectedEvent, isLoading, isError, disabled, onSelect, onRetry,
 }: ScheduleEventsProps) {
-  const visibleGroups = groups.filter(group => group.name !== "Other Events");
+  const visibleGroups = groups.filter(group => group.name !== "Other Events" && group.name !== "Aquatics");
 
   return (
     <aside aria-label="Filter by event" className="min-w-0 xl:sticky xl:top-28 xl:max-h-[calc(100dvh-10rem)] xl:overflow-y-auto">

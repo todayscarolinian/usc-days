@@ -15,7 +15,7 @@ export default function SmoothScroll() {
 
     // Radix locks the body while dialogs and mobile navigation are open.
     function syncScrollLock() {
-      if (document.body.hasAttribute("data-scroll-locked")) {
+      if (document.body.hasAttribute("data-scroll-locked") || document.body.hasAttribute("data-opening-screen")) {
         lenis.stop();
       } else {
         lenis.start();
@@ -25,7 +25,7 @@ export default function SmoothScroll() {
     const observer = new MutationObserver(syncScrollLock);
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ["data-scroll-locked"],
+      attributeFilter: ["data-scroll-locked", "data-opening-screen"],
     });
     syncScrollLock();
 

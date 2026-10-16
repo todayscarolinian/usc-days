@@ -117,6 +117,17 @@ describe("event categories", () => {
     ]);
   });
 
+  it("lists Chess under Board Games separately from Esports", () => {
+    const groups = buildScheduleEvents([
+      { id: 1, gameName: "Chess" },
+      { id: 2, gameName: "Valorant" },
+    ], [], now);
+    assert.deepEqual(groups, [
+      { name: "Esports", events: [{ name: "Valorant", isLive: false }] },
+      { name: "Board Games", events: [{ name: "Chess", isLive: false }] },
+    ]);
+  });
+
   it("keeps one Swimming tab and groups its matches by distance and stroke", () => {
     const sports = [
       { id: 25, gameName: "Men's Swimming 200m Freestyle" },

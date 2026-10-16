@@ -1,0 +1,50 @@
+.carousel {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 -8px 16px rgb(0 0 0 / 35%),
+    0 12px 20px rgb(0 0 0 / 55%);
+}
+
+.carousel::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  box-shadow:
+    inset 0 28px 28px -12px #000,
+    inset 0 -28px 28px -12px #000;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: sports-scroll 80s linear infinite;
+}
+
+@keyframes sports-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel {
+    overflow-x: auto;
+  }
+
+  .track {
+    animation: none;
+  }
+
+  .track > [aria-hidden="true"] {
+    display: none;
+  }
+}

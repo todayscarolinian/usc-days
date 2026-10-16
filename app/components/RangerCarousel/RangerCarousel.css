@@ -1,15 +1,37 @@
 .schools-section {
+  --section-extra-space: clamp(1rem, 3svh, 2rem);
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  padding-block: clamp(1rem, 3svh, 2rem);
+  height: calc(100dvh - 4rem + var(--section-extra-space) + var(--section-extra-space));
+  padding-block: calc(clamp(2rem, 5svh, 3rem) + var(--section-extra-space));
   scroll-margin-top: 4rem;
+  background-color: rgb(255 255 255 / 70%);
+}
+
+.schools-section::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  color: var(--school-color);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, currentColor var(--school-edge-strength, 30%), transparent),
+    transparent 35%,
+    transparent 65%,
+    color-mix(in srgb, currentColor var(--school-edge-strength, 30%), transparent)
+  );
+  transition: color 650ms ease;
 }
 
 .schools-carousel {
   flex: 1;
   min-height: 0;
   width: 100%;
+  padding-top: clamp(1rem, 3svh, 2rem);
 }
 
 .ranger-carousel {
@@ -22,7 +44,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 4vw, 3.75rem);
+  gap: clamp(2rem, 5vw, 5rem);
   width: 100%;
   height: 100%;
   padding: 1rem 1.5rem;
@@ -40,19 +62,26 @@
   padding: 14%;
 }
 
+@media (min-width: 640px) {
+  .ranger-carousel-layout {
+    padding-right: clamp(3rem, 6vw, 6rem);
+  }
+}
+
 /*
  * Deck geometry measured from the reference (front card 842 x 542).
+ * A tighter fan reserves 22% of the card width below and to the right.
  * Offsets are % of the card's own size, so the fan scales with --card-w.
  * Tweak --rot / --tx / --ty per position to fine-tune the fan.
  */
 .ranger-deck {
-  --card-w: min(760px, calc((100cqw - 208px) / 1.36), calc((100cqh - 32px) / 1.03));
+  --card-w: min(940px, calc((100cqw - 208px) / 1.22), calc((100cqh - 16px) / 0.87));
   position: relative;
   width: var(--card-w);
   aspect-ratio: 842 / 542;
   /* reserve room for the fanned cards so nothing clips or overflows */
-  margin-right: calc(var(--card-w) * 0.36);
-  margin-bottom: calc(var(--card-w) * 0.38);
+  margin-right: calc(var(--card-w) * 0.22);
+  margin-bottom: calc(var(--card-w) * 0.22);
   flex-shrink: 0;
 }
 
@@ -77,38 +106,117 @@
   --ty: 0%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
-.ranger-card[data-pos="1"] { --rot: 3.5deg;  --tx: 5.9%;  --ty: 1.5%; }
-.ranger-card[data-pos="2"] { --rot: 9deg;    --tx: 13.1%; --ty: 3.5%; }
-.ranger-card[data-pos="3"] { --rot: 11.5deg; --tx: 17.5%; --ty: 6.8%; }
-.ranger-card[data-pos="4"] { --rot: 13.5deg; --tx: 22.5%; --ty: 9%; }
-.ranger-card[data-pos="5"] { --rot: 15.5deg; --tx: 28%;   --ty: 11.5%; }
-.ranger-card[data-pos="6"] { --rot: 17.5deg; --tx: 33.5%; --ty: 14%; }
+.ranger-card[data-pos="1"] { --rot: 2deg;   --tx: 3.5%; --ty: 1%; }
+.ranger-card[data-pos="2"] { --rot: 4deg;   --tx: 7%;   --ty: 2%; }
+.ranger-card[data-pos="3"] { --rot: 5.5deg; --tx: 10%;  --ty: 3.5%; }
+.ranger-card[data-pos="4"] { --rot: 7deg;   --tx: 13.5%; --ty: 5%; }
+.ranger-card[data-pos="5"] { --rot: 8.5deg; --tx: 17%;  --ty: 6%; }
+.ranger-card[data-pos="6"] { --rot: 10deg;  --tx: 20%;  --ty: 7.5%; }
 
-@media (max-width: 639px) {
-  .ranger-carousel-layout {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+.ranger-card[data-interactive] {
+  cursor: pointer;
+}
+
+.ranger-card[data-interactive]:focus-visible {
+  outline: 3px solid var(--school-color);
+  outline-offset: 4px;
+}
+
+.ranger-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  width: min(94vw, calc(88dvh * 842 / 542));
+  height: auto;
+  aspect-ratio: 842 / 542;
+  margin: auto;
+  border-radius: 1.2% / 1.9%;
+  overflow: hidden;
+  transform-origin: top left;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  outline: none;
+  --lift: clamp(100px, 18dvh, 200px);
+  animation: ranger-card-expand 1100ms both;
+}
+
+.ranger-card-overlay[data-state="closed"] {
+  animation: ranger-card-collapse 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ranger-card-expand {
+  0% {
+    transform: translate(var(--from-x), var(--from-y)) scale(var(--from-scale));
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
   }
-
-  .ranger-deck {
-    --card-w: min(calc((100cqw - 32px) / 1.36), calc((100cqh - 100px) / 1.03));
+  35% {
+    transform: translate(var(--from-x), calc(var(--from-y) - var(--lift))) scale(calc(var(--from-scale) * 1.04));
   }
-
-  .ranger-selector {
-    flex-direction: row;
+  /* brief hold at the top of the lift before maximizing */
+  45% {
+    transform: translate(var(--from-x), calc(var(--from-y) - var(--lift))) scale(calc(var(--from-scale) * 1.04));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-
-  .ranger-selector-button {
-    width: min(44px, calc((100cqw - 80px) / 7));
-    padding: 0.375rem;
+  100% {
+    transform: none;
   }
 }
 
-@media (max-height: 540px) {
+@keyframes ranger-card-collapse {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translate(var(--from-x), var(--from-y)) scale(var(--from-scale));
+  }
+}
+
+@media (max-width: 639px) {
   .schools-section {
     height: auto;
-    min-height: 100dvh;
+    min-height: 0;
+    padding: 2rem 1rem;
+  }
+
+  .schools-carousel {
+    flex: none;
+    padding-top: 1.5rem;
+  }
+
+  .ranger-carousel {
+    container-type: inline-size;
+    height: auto;
+  }
+
+  .ranger-carousel-layout {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1.5rem;
+    height: auto;
+    padding: 0;
+  }
+
+  .ranger-deck {
+    --card-w: calc((100cqw - 24px) / 1.22);
+  }
+
+  .ranger-selector {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.375rem;
+    width: min(100%, 344px);
+  }
+
+  .ranger-selector-button {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.25rem;
+  }
+}
+
+@media (min-width: 640px) and (max-height: 540px) {
+  .schools-section {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
   }
 
   .schools-carousel {
@@ -118,8 +226,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .schools-section::before {
+    transition: none;
+  }
+
   .ranger-card {
     transition: none;
     will-change: auto;
+  }
+
+  .ranger-card-overlay,
+  .ranger-card-overlay[data-state="closed"] {
+    animation: none;
   }
 }

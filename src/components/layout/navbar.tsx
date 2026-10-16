@@ -21,6 +21,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/src/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { signOutFromHerald } from "@/src/lib/herald/auth-client";
 
@@ -28,6 +33,7 @@ type NavigationItem = {
   href: string;
   name: string;
   external?: boolean;
+  comingSoon?: boolean;
 };
 
 const leftNavigation: NavigationItem[] = [
@@ -35,15 +41,11 @@ const leftNavigation: NavigationItem[] = [
     href: "/",
     name: "Home",
   },
+  // Shown disabled until merch is ready to launch
   {
-    href: "/#featured-merch",
+    href: "/merchandise",
     name: "Merch",
-  },
-  {
-    // Replace this URL if TC News uses a different address.
-    href: "/#news",
-    name: "News",
-    external: true,
+    comingSoon: true,
   },
 ];
 
@@ -55,10 +57,6 @@ const rightNavigation: NavigationItem[] = [
   {
     href: "/standings",
     name: "Standings",
-  },
-  {
-    href: "/leaderboards",
-    name: "Leaderboards",
   },
 ];
 
@@ -189,12 +187,30 @@ export default function Navbar() {
     const active = isActive(item);
 
     const className = [
-      "relative px-2 py-2 text-sm font-normal text-white",
+      "relative px-2 py-2 text-base font-medium whitespace-nowrap text-white lg:text-lg",
       "transition-colors hover:text-white/75",
       active
         ? "after:absolute after:-bottom-0.5 after:left-2 after:right-2 after:h-0.5 after:bg-tc_primary-500"
         : "",
     ].join(" ");
+
+    if (item.comingSoon) {
+      return (
+        <Tooltip key={item.name}>
+          <TooltipTrigger asChild>
+            <span
+              role="link"
+              aria-disabled="true"
+              tabIndex={0}
+              className="relative cursor-not-allowed px-2 py-2 text-base font-medium whitespace-nowrap text-white/50 lg:text-lg"
+            >
+              {item.name}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Coming soon</TooltipContent>
+        </Tooltip>
+      );
+    }
 
     if (item.external) {
       return (
@@ -223,11 +239,27 @@ export default function Navbar() {
 
   function renderMobileLink(item: NavigationItem) {
     const className = [
-      "block border-b border-white/10 py-3 text-base",
+      "block border-b border-white/10 py-3 text-lg font-medium",
       isActive(item)
         ? "font-bold text-white"
         : "text-white/75",
     ].join(" ");
+
+    if (item.comingSoon) {
+      return (
+        <span
+          key={item.name}
+          role="link"
+          aria-disabled="true"
+          className="flex items-center gap-2 border-b border-white/10 py-3 text-lg font-medium text-white/40"
+        >
+          {item.name}
+          <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-normal text-white/70">
+            Coming soon
+          </span>
+        </span>
+      );
+    }
 
     if (item.external) {
       return (

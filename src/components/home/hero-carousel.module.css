@@ -1,0 +1,15 @@
+.title {
+  transform:translate3d(0, 40px, 0);
+  will-change:transform;
+}
+.revealed {
+  animation:hero-rise 1600ms cubic-bezier(.16, 1, .3, 1) both;
+}
+@keyframes hero-rise {
+  from { transform:translate3d(0, 40px, 0); }
+  to { transform:translate3d(0, 0, 0); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .title { transform:none; will-change:auto; }
+  .revealed { animation:none; }
+}

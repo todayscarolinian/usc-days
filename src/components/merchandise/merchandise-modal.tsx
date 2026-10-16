@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Button } from "@/src/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,10 +13,12 @@ import {
 } from "@/src/components/ui/dialog";
 import { MerchandiseProduct } from "@/src/lib/prisma/generated/client";
 
-interface Product extends Omit<MerchandiseProduct, "imgUrls, designers"> {
+interface Product extends Omit<MerchandiseProduct, "imgUrls" | "designers"> {
   imgUrls: string[];
   designers: string[];
 }
+
+const ORDER_URL = "https://form.jotform.com/262874904022457";
 
 interface MerchandiseModalProps {
   product: Product;
@@ -73,18 +76,14 @@ export default function MerchandiseModal({
     : null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
         <DialogOverlay />
         <DialogContent
           showCloseButton={true}
           className="sm:max-w-140 pt-12 pb-8 bg-white rounded-lg"
         >
-          <DialogTitle className="sr-only">{product.productTitle}</DialogTitle>
           <div className="flex gap-6">
-            <DialogTitle className="sr-only">
-              {product.productTitle}
-            </DialogTitle>
             {/* Left: Image */}
             <div className="shrink-0 flex flex-col gap-3">
               {/* Main Image */}
@@ -149,9 +148,9 @@ export default function MerchandiseModal({
             <div className="flex-1 flex flex-col">
               {/* Product Details */}
               <div className="mb-5">
-                <h2 className="text-xl font-bold mb-2">
+                <DialogTitle className="text-xl font-bold mb-2">
                   {product.productTitle}
-                </h2>
+                </DialogTitle>
                 {product.productSize && (
                   <p className="text-sm text-gray-600 mb-3">
                     {product.productSize}
@@ -183,65 +182,20 @@ export default function MerchandiseModal({
             </div>
           </div>
 
-          {/* Purchase Information */}
-          {product.isAvailable && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                How to Purchase
-              </h3>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div className="flex items-start gap-2">
-                  <svg
-                    className="w-5 h-5 text-tc_primary mt-0.5 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      TC Booth, USC Museum (Downtown Campus)
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <svg
-                    className="w-5 h-5 text-tc_primary mt-0.5 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Monday - Friday
-                    </p>
-                    <p className="text-sm text-gray-600">9:00 AM - 5:00 PM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="mt-6 border-t border-gray-200 pt-6">
+            {product.isAvailable ? (
+              <Button asChild className="w-full">
+                <a href={ORDER_URL} target="_blank" rel="noopener noreferrer">
+                  Order now
+                  <ExternalLink />
+                </a>
+              </Button>
+            ) : (
+              <Button disabled className="w-full">
+                Sold out
+              </Button>
+            )}
+          </div>
         </DialogContent>
       </DialogPortal>
     </Dialog>

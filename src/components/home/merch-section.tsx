@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
+import { EmptyState } from "@/src/components/ui/empty-state";
 import { getCategoriesQuery } from "@/src/queries/categories.queries";
 
 export default function MerchSection() {
@@ -53,11 +55,11 @@ export default function MerchSection() {
     return (
       <section className="py-12">
         <h2 className="text-3xl font-bold mb-8">Featured Merchandise</h2>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-gray-600">
-            No merchandise categories available at this time.
-          </p>
-        </div>
+        <EmptyState
+          icon={ShoppingBag}
+          title="No merchandise available yet"
+          description="Check back soon for new collections and campus merchandise."
+        />
       </section>
     );
     }
