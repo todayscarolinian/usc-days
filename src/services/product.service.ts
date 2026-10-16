@@ -64,13 +64,18 @@ class ProductService {
       };
     }
 
-    return prisma.merchandiseProduct.findMany({
-      where,
-      include: { merchandiseCategory: true },
-      orderBy: [{ createdAt: "desc" }],
-      skip: (page && pageSize) ? (page - 1) * pageSize : undefined,
-      take: pageSize,
-    });
+    const [products, total] = await prisma.$transaction([
+      prisma.merchandiseProduct.findMany({
+        where,
+        include: { merchandiseCategory: true },
+        orderBy: [{ createdAt: "desc" }],
+        skip: (page && pageSize) ? (page - 1) * pageSize : undefined,
+        take: pageSize,
+      }),
+      prisma.merchandiseProduct.count({ where }),
+    ]);
+
+    return { products, total };
   }
 
   async getProductById(productId: number) {

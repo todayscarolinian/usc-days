@@ -2,9 +2,9 @@
     {
         "id": 1,
         "categoryId": 1,
-        "title": "USC Days '26 Lanyard",
-        "size": null,
-        "price": 150.00,
+        "productTitle": "USC Days '26 Lanyard",
+        "productSize": null,
+        "productPrice": 150.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/lanyard/lanyard.png",
@@ -12,21 +12,21 @@
             "/merch/lanyard/lanyard-2.png",
             "/merch/lanyard/lanyard-3.png"
         ],
-        "designer": [
+        "designers": [
             "Jyreneah Angel"
         ]
     },
     {
         "id": 2,
         "categoryId": 2,
-        "title": "Soccer",
-        "size": "2.5 x 1.5 inches",
-        "price": 15.00,
+        "productTitle": "Soccer",
+        "productSize": "2.5 x 1.5 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/1_soccer.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -34,14 +34,14 @@
     {
         "id": 3,
         "categoryId": 2,
-        "title": "Flag Football",
-        "size": "2.5 x 1.5 inches",
-        "price": 15.00,
+        "productTitle": "Flag Football",
+        "productSize": "2.5 x 1.5 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/2_flag-football.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -49,14 +49,14 @@
     {
         "id": 4,
         "categoryId": 2,
-        "title": "Basketball",
-        "size": "2.5 x 1.5 inches",
-        "price": 15.00,
+        "productTitle": "Basketball",
+        "productSize": "2.5 x 1.5 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/3_basketball.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -64,14 +64,14 @@
     {
         "id": 5,
         "categoryId": 2,
-        "title": "Futsal",
-        "size": "2.5 x 1.5 inches",
-        "price": 15.00,
+        "productTitle": "Futsal",
+        "productSize": "2.5 x 1.5 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/4_futsal.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -79,14 +79,14 @@
     {
         "id": 6,
         "categoryId": 2,
-        "title": "Frisbee",
-        "size": "2.5 x 1.5 inches",
-        "price": 15.00,
+        "productTitle": "Frisbee",
+        "productSize": "2.5 x 1.5 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/5_frisbee.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -94,14 +94,14 @@
     {
         "id": 7,
         "categoryId": 2,
-        "title": "Badminton",
-        "size": "2.5 x 1.35 inches",
-        "price": 15.00,
+        "productTitle": "Badminton",
+        "productSize": "2.5 x 1.35 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/6_badminton.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -109,14 +109,14 @@
     {
         "id": 8,
         "categoryId": 2,
-        "title": "Swimming",
-        "size": "2.5 x 1.35 inches",
-        "price": 15.00,
+        "productTitle": "Swimming",
+        "productSize": "2.5 x 1.35 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/7_swimming.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -124,14 +124,14 @@
     {
         "id": 9,
         "categoryId": 2,
-        "title": "Chess",
-        "size": "2.5 x 1.35 inches",
-        "price": 15.00,
+        "productTitle": "Chess",
+        "productSize": "2.5 x 1.35 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/8_chess.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -139,14 +139,14 @@
     {
         "id": 10,
         "categoryId": 2,
-        "title": "Lawn Tennis",
-        "size": "2.5 x 1.35 inches",
-        "price": 15.00,
+        "productTitle": "Lawn Tennis",
+        "productSize": "2.5 x 1.35 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/9_lawn-tennis.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -154,14 +154,14 @@
     {
         "id": 11,
         "categoryId": 2,
-        "title": "Cheerdance",
-        "size": "2.5 x 1.35 inches",
-        "price": 15.00,
+        "productTitle": "Cheerdance",
+        "productSize": "2.5 x 1.35 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/10_cheerdance.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -169,14 +169,14 @@
     {
         "id": 12,
         "categoryId": 2,
-        "title": "Contemporary Dance",
-        "size": "2.5 x 1.9 inches",
-        "price": 15.00,
+        "productTitle": "Contemporary Dance",
+        "productSize": "2.5 x 1.9 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/11_contemporary-dance.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -184,14 +184,14 @@
     {
         "id": 13,
         "categoryId": 2,
-        "title": "E-Sports",
-        "size": "2.5 x 1.9 inches",
-        "price": 15.00,
+        "productTitle": "E-Sports",
+        "productSize": "2.5 x 1.9 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/12_e-sports.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -199,14 +199,14 @@
     {
         "id": 14,
         "categoryId": 2,
-        "title": "MS & MR Intramurals",
-        "size": "2.5 x 1.9 inches",
-        "price": 15.00,
+        "productTitle": "MS & MR Intramurals",
+        "productSize": "2.5 x 1.9 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/13_ms&mr-intrams.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -214,14 +214,14 @@
     {
         "id": 15,
         "categoryId": 2,
-        "title": "Volleyball",
-        "size": "2.5 x 1.9 inches",
-        "price": 15.00,
+        "productTitle": "Volleyball",
+        "productSize": "2.5 x 1.9 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/stickers/14_volleyball.png"
         ],
-        "designer": [
+        "designers": [
             "Blaire Cadavilla",
             "Nixie Lebosada"
         ]
@@ -229,247 +229,247 @@
     {
         "id": 16,
         "categoryId": 3,
-        "title": "SAFAD \"Got a lot on my plate\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SAFAD \"Got a lot on my plate\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/safad.png"
         ],
-        "designer": [
+        "designers": [
             "Janna Revero"
         ]
     },
     {
         "id": 17,
         "categoryId": 3,
-        "title": "SAS \"Royal Flush!!\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SAS \"Royal Flush!!\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/sas.png"
         ],
-        "designer": [
+        "designers": [
             "Aleah Zoe Tan"
         ]
     },
     {
         "id": 18,
         "categoryId": 3,
-        "title": "SBE \"I Make Money Moves\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SBE \"I Make Money Moves\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/sbe.png"
         ],
-        "designer": [
+        "designers": [
             "Chessa Baluma"
         ]
     },
     {
         "id": 19,
         "categoryId": 3,
-        "title": "SED \"Yes, We Exist\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SED \"Yes, We Exist\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/sed.png"
         ],
-        "designer": null
+        "designers": null
     },
     {
         "id": 20,
         "categoryId": 3,
-        "title": "SHCP \"SCHP lakers\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SHCP \"SCHP lakers\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/shcp.png"
         ],
-        "designer": [
+        "designers": [
             "Marie Raffiñan"
         ]
     },
     {
         "id": 21,
         "categoryId": 3,
-        "title": "SLG \"Codals over cuddles\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SLG \"Codals over cuddles\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/slg.png"
         ],
-        "designer": [
+        "designers": [
             "Elle Villar"
         ]
     },
     {
         "id": 22,
         "categoryId": 3,
-        "title": "SOE \"Sci-cal spammers\"",
-        "size": "1.25 inches",
-        "price": 25.00,
+        "productTitle": "SOE \"Sci-cal spammers\"",
+        "productSize": "1.25 inches",
+        "productPrice": 25.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/soe.png"
         ],
-        "designer": [
+        "designers": [
             "Reve Geormin Garrote"
         ]
     },
     {
         "id": 23,
         "categoryId": 4,
-        "title": "\"ang pagsulat ay di biro\" (Dark Red)",
-        "size": "2 x 4 inches",
-        "price": 20.00,
+        "productTitle": "\"ang pagsulat ay di biro\" (Dark Red)",
+        "productSize": "2 x 4 inches",
+        "productPrice": 20.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/bookmarks/dark-red.png"
         ],
-        "designer": [
+        "designers": [
             "RC"
         ]
     },
     {
         "id": 24,
         "categoryId": 4,
-        "title": "\"ang pagsulat ay di biro\" (Light Red)",
-        "size": "2 x 4 inches",
-        "price": 20.00,
+        "productTitle": "\"ang pagsulat ay di biro\" (Light Red)",
+        "productSize": "2 x 4 inches",
+        "productPrice": 20.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/bookmarks/light-red.png"
         ],
-        "designer": [
+        "designers": [
             "RC"
         ]
     },
     {
         "id": 25,
         "categoryId": 4,
-        "title": "\"ang pagsulat ay di biro\" (Blue)",
-        "size": "2 x 4 inches",
-        "price": 20.00,
+        "productTitle": "\"ang pagsulat ay di biro\" (Blue)",
+        "productSize": "2 x 4 inches",
+        "productPrice": 20.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/bookmarks/blue.png"
         ],
-        "designer": [
+        "designers": [
             "RC"
         ]
     },
     {
         "id": 26,
         "categoryId": 4,
-        "title": "\"Cut Ties\"",
-        "size": "2 x 4 inches",
-        "price": 20.00,
+        "productTitle": "\"Cut Ties\"",
+        "productSize": "2 x 4 inches",
+        "productPrice": 20.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/bookmarks/cut-ties.png"
         ],
-        "designer": [
+        "designers": [
             "Saiyenne Seth Soliano"
         ]
     },
     {
         "id": 27,
         "categoryId": 5,
-        "title": "\"Streetfood Yum\" Print",
-        "size": "4 x 4 inches",
-        "price": 30.00,
+        "productTitle": "\"Streetfood Yum\" Print",
+        "productSize": "4 x 4 inches",
+        "productPrice": 30.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/postcards/streetfood-yum.jpg"
         ],
-        "designer": [
+        "designers": [
             "Elle Villar"
         ]
     },
     {
         "id": 28,
         "categoryId": 5,
-        "title": "\"Kapre\"",
-        "size": "4 x 4 inches",
-        "price": 30.00,
+        "productTitle": "\"Kapre\"",
+        "productSize": "4 x 4 inches",
+        "productPrice": 30.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/postcards/kapre.png"
         ],
-        "designer": [
+        "designers": [
             "Aaron Bayer"
         ]
     },
     {
         "id": 29,
         "categoryId": 5,
-        "title": "\"Adore\"",
-        "size": "4 x 6 inches",
-        "price": 30.00,
+        "productTitle": "\"Adore\"",
+        "productSize": "4 x 6 inches",
+        "productPrice": 30.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/postcards/adore.png"
         ],
-        "designer": [
+        "designers": [
             "Milourd Catayas"
         ]
     },
     {
         "id": 30,
         "categoryId": 5,
-        "title": "\"Shoes\"",
-        "size": "4 x 6 inches",
-        "price": 30.00,
+        "productTitle": "\"Shoes\"",
+        "productSize": "4 x 6 inches",
+        "productPrice": 30.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/postcards/shoes.png"
         ],
-        "designer": [
+        "designers": [
             "Milourd Catayas"
         ]
     },
     {
         "id": 31,
         "categoryId": 5,
-        "title": "Home Away From Home",
-        "size": "4 x 6 inches",
-        "price": 30.00,
+        "productTitle": "Home Away From Home",
+        "productSize": "4 x 6 inches",
+        "productPrice": 30.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/postcards/home-away-from-home.png"
         ],
-        "designer": [
+        "designers": [
             "Silke"
         ]
     },
     {
         "id": 32,
         "categoryId": 3,
-        "title": "White",
-        "size": "1.46 inches",
-        "price": 15.00,
+        "productTitle": "White",
+        "productSize": "1.46 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/tc-pin-white.png"
         ],
-        "designer": null
+        "designers": null
     },
     {
         "id": 33,
         "categoryId": 3,
-        "title": "Pride",
-        "size": "1.46 inches",
-        "price": 15.00,
+        "productTitle": "Pride",
+        "productSize": "1.46 inches",
+        "productPrice": 15.00,
         "isAvailable": true,
         "imgUrls": [
             "/merch/pins/tc-pin-pride.png"
         ],
-        "designer": null
+        "designers": null
     }
 ]

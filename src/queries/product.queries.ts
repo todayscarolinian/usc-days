@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AddMerchProductPayload, EditMerchProductPayload } from "../types/merchProducts.types";
 import axios from "axios";
 import { MerchandiseProduct } from "../lib/prisma/generated/client";
@@ -19,28 +19,48 @@ interface ProductsMutationContext {
   prevProducts?: MerchandiseProduct[];
 }
 
+interface ProductsPage {
+  products: MerchandiseProduct[];
+  total: number;
+}
+
+async function fetchProducts(params?: GetProductsParams): Promise<ProductsPage> {
+  const queryParams = new URLSearchParams();
+  if (params?.categoryId)
+    queryParams.append("categoryId", params.categoryId.toString());
+  if (params?.isAvailable !== undefined)
+    queryParams.append("isAvailable", params.isAvailable.toString());
+  if (params?.minPrice)
+    queryParams.append("minPrice", params.minPrice.toString());
+  if (params?.maxPrice)
+    queryParams.append("maxPrice", params.maxPrice.toString());
+  if (params?.size) queryParams.append("size", params.size);
+  if (params?.search) queryParams.append("search", params.search);
+  if(params?.page) queryParams.append("page", params.page.toString());
+  if(params?.pageSize) queryParams.append("pageSize", params.pageSize.toString());
+
+  const url = `${PRODUCTS_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  const response = await axios.get(url);
+  return { products: response.data.data, total: response.data.total };
+}
+
 export const useGetProductsQuery = (params?: GetProductsParams) => {
   return useQuery<MerchandiseProduct[]>({
     queryKey: ["products", params],
-    queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      if (params?.categoryId)
-        queryParams.append("categoryId", params.categoryId.toString());
-      if (params?.isAvailable !== undefined)
-        queryParams.append("isAvailable", params.isAvailable.toString());
-      if (params?.minPrice)
-        queryParams.append("minPrice", params.minPrice.toString());
-      if (params?.maxPrice)
-        queryParams.append("maxPrice", params.maxPrice.toString());
-      if (params?.size) queryParams.append("size", params.size);
-      if (params?.search) queryParams.append("search", params.search);
-      if(params?.page) queryParams.append("page", params.page.toString());
-      if(params?.pageSize) queryParams.append("pageSize", params.pageSize.toString());
+    queryFn: async () => (await fetchProducts(params)).products,
+    staleTime: STALE_TIME,
+  });
+};
 
-      const url = `${PRODUCTS_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-      const response = await axios.get(url);
-      return response.data.data;
-    },
+export const useGetInfiniteProductsQuery = (
+  params: Omit<GetProductsParams, "page" | "pageSize"> & { pageSize: number },
+) => {
+  return useInfiniteQuery({
+    queryKey: ["products", "infinite", params],
+    queryFn: ({ pageParam }) => fetchProducts({ ...params, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      allPages.length * params.pageSize < lastPage.total ? allPages.length + 1 : undefined,
     staleTime: STALE_TIME,
   });
 };

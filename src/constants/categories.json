@@ -1,27 +1,27 @@
 [
     {
         "id": 1,
-        "name": "Lanyards",
+        "categoryName": "Lanyards",
         "imgUrl": "/merch/lanyard/lanyard.png"
     },
     {
         "id": 2,
-        "name": "Stickers",
+        "categoryName": "Stickers",
         "imgUrl": "/merch/stickers/stickers.png"
     },
     {
         "id": 3,
-        "name": "Pins",
+        "categoryName": "Pins",
         "imgUrl": "/merch/pins/pins.png"
     },
     {
         "id": 4,
-        "name": "Bookmarks",
+        "categoryName": "Bookmarks",
         "imgUrl": "/merch/bookmarks/blue.png"
     },
     {
         "id": 5,
-        "name": "Post Cards",
+        "categoryName": "Post Cards",
         "imgUrl": "/merch/postcards/adore.png"
     }
 ]

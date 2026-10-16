@@ -33,8 +33,8 @@ export async function GET(req: NextRequest) {
   if (!query.ok) return query.response;
 
   try {
-    const data = await productService.getProducts(query.data);
-    return NextResponse.json({ data });
+    const { products, total } = await productService.getProducts(query.data);
+    return NextResponse.json({ data: products, total });
   } catch (error) {
     return handleRouteError(error, "Could not fetch products.");
   }

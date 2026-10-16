@@ -36,7 +36,7 @@ const leftNavigation: NavigationItem[] = [
     name: "Home",
   },
   {
-    href: "/#featured-merch",
+    href: "/merchandise",
     name: "Merch",
   },
 ];

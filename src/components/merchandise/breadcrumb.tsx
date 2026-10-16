@@ -24,7 +24,7 @@ export default function MerchBreadcrumb({ categoryName }: BreadcrumbProps) {
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/#featured-merch">Merchandise</Link>
+            <Link href="/merchandise">Merchandise</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />

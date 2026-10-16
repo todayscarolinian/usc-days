@@ -12,7 +12,7 @@ async function main() {
       update: {},
       create: {
         id: cat.id,
-        categoryName: cat.name,
+        categoryName: cat.categoryName,
         imgUrl: cat.imgUrl,
       },
     });
@@ -22,18 +22,18 @@ async function main() {
     await prisma.merchandiseProduct.upsert({
       where: { id: p.id },
       update: {
-        productPrice: p.price,
+        productPrice: p.productPrice,
         isAvailable: p.isAvailable,
       },
       create: {
         id: p.id,
         categoryId: p.categoryId,
-        productTitle: p.title,
-        productSize: p.size,
-        productPrice: p.price,
+        productTitle: p.productTitle,
+        productSize: p.productSize,
+        productPrice: p.productPrice,
         isAvailable: p.isAvailable,
         imgUrls: p.imgUrls,
-        designers: p.designer || [],
+        designers: p.designers || [],
       },
     });
   }

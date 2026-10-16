@@ -38,11 +38,3 @@ const StandingsPage = () => {
 };
 
 export default StandingsPage;
-
-/*
-
-<Suspense fallback={<div />}>
-  <Standings />
-</Suspense>
-
-*/
