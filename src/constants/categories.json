@@ -1,27 +1,32 @@
 [
     {
         "id": 1,
-        "categoryName": "Lanyards",
-        "imgUrl": "/merch/lanyard/lanyard.png"
+        "categoryName": "T-Shirts",
+        "imgUrl": "/merch/tshirt/front-back.webp"
     },
     {
         "id": 2,
-        "categoryName": "Stickers",
-        "imgUrl": "/merch/stickers/stickers.png"
+        "categoryName": "Lanyards",
+        "imgUrl": "/merch/lanyards/rangers-mockup.webp"
     },
     {
         "id": 3,
         "categoryName": "Pins",
-        "imgUrl": "/merch/pins/pins.png"
+        "imgUrl": "/merch/pins/safad.webp"
     },
     {
         "id": 4,
-        "categoryName": "Bookmarks",
-        "imgUrl": "/merch/bookmarks/blue.png"
+        "categoryName": "Stickers",
+        "imgUrl": "/merch/stickers/chibi-safad.webp"
     },
     {
         "id": 5,
+        "categoryName": "Bookmarks",
+        "imgUrl": "/merch/bookmarks/pag-angkon-sa-gahum-front.webp"
+    },
+    {
+        "id": 6,
         "categoryName": "Post Cards",
-        "imgUrl": "/merch/postcards/adore.png"
+        "imgUrl": "/merch/postcards/safad.webp"
     }
 ]

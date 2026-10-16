@@ -9,7 +9,10 @@ async function main() {
   for (const cat of CATEGORIES) {
     await prisma.merchandiseCategory.upsert({
       where: { id: cat.id },
-      update: {},
+      update: {
+        categoryName: cat.categoryName,
+        imgUrl: cat.imgUrl,
+      },
       create: {
         id: cat.id,
         categoryName: cat.categoryName,
@@ -22,8 +25,13 @@ async function main() {
     await prisma.merchandiseProduct.upsert({
       where: { id: p.id },
       update: {
+        categoryId: p.categoryId,
+        productTitle: p.productTitle,
+        productSize: p.productSize,
         productPrice: p.productPrice,
         isAvailable: p.isAvailable,
+        imgUrls: p.imgUrls,
+        designers: p.designers || [],
       },
       create: {
         id: p.id,
