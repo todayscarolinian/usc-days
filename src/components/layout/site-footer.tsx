@@ -12,13 +12,18 @@ import Ribbon2 from "@/src/assets/footer/ribbon2.png";
 import Ribbon3 from "@/src/assets/footer/ribbon3.png";
 import TCPrintLogoWhite from "@/src/assets/footer/tc-print-logo-white.png";
 import { PUBLICATION } from "@/src/constants/publication";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 
 const contactEmail = "todaysusc@gmail.com";
 
-const links = [
+const links: { href: string; label: string; comingSoon?: boolean }[] = [
   { href: "/#news", label: "News" },
-  // Hidden from prod until merch is ready to launch
-  // { href: "/merchandise", label: "Merch" },
+  // Shown disabled until merch is ready to launch
+  { href: "/merchandise", label: "Merch", comingSoon: true },
   { href: "/schedules", label: "Schedules" },
   { href: "/standings", label: "Standings" },
 ];
@@ -119,12 +124,25 @@ export default function SiteFooter() {
             <ul className="space-y-3 pb-5 text-sm text-white/70">
               {links.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="inline-block py-1 transition-colors hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.comingSoon ? (
+                    <span
+                      role="link"
+                      aria-disabled="true"
+                      className="inline-flex items-center gap-2 py-1 text-white/40"
+                    >
+                      {link.label}
+                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/70">
+                        Coming soon
+                      </span>
+                    </span>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="inline-block py-1 transition-colors hover:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -178,12 +196,28 @@ export default function SiteFooter() {
           <ul className="space-y-2 text-sm text-white/70">
             {links.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="inline-block py-0.5 transition-colors hover:text-white"
-                >
-                  {link.label}
-                </Link>
+                {link.comingSoon ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span
+                        role="link"
+                        aria-disabled="true"
+                        tabIndex={0}
+                        className="inline-block cursor-not-allowed py-0.5 text-white/40"
+                      >
+                        {link.label}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Coming soon</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Link
+                    href={link.href}
+                    className="inline-block py-0.5 transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

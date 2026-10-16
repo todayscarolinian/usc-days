@@ -21,6 +21,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/src/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { signOutFromHerald } from "@/src/lib/herald/auth-client";
 
@@ -28,6 +33,7 @@ type NavigationItem = {
   href: string;
   name: string;
   external?: boolean;
+  comingSoon?: boolean;
 };
 
 const leftNavigation: NavigationItem[] = [
@@ -35,11 +41,12 @@ const leftNavigation: NavigationItem[] = [
     href: "/",
     name: "Home",
   },
-  // Hidden from prod until merch is ready to launch
-  // {
-  //   href: "/merchandise",
-  //   name: "Merch",
-  // },
+  // Shown disabled until merch is ready to launch
+  {
+    href: "/merchandise",
+    name: "Merch",
+    comingSoon: true,
+  },
 ];
 
 const rightNavigation: NavigationItem[] = [
@@ -187,6 +194,24 @@ export default function Navbar() {
         : "",
     ].join(" ");
 
+    if (item.comingSoon) {
+      return (
+        <Tooltip key={item.name}>
+          <TooltipTrigger asChild>
+            <span
+              role="link"
+              aria-disabled="true"
+              tabIndex={0}
+              className="relative cursor-not-allowed px-2 py-2 text-base font-medium whitespace-nowrap text-white/50 lg:text-lg"
+            >
+              {item.name}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Coming soon</TooltipContent>
+        </Tooltip>
+      );
+    }
+
     if (item.external) {
       return (
         <a
@@ -219,6 +244,22 @@ export default function Navbar() {
         ? "font-bold text-white"
         : "text-white/75",
     ].join(" ");
+
+    if (item.comingSoon) {
+      return (
+        <span
+          key={item.name}
+          role="link"
+          aria-disabled="true"
+          className="flex items-center gap-2 border-b border-white/10 py-3 text-lg font-medium text-white/40"
+        >
+          {item.name}
+          <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-normal text-white/70">
+            Coming soon
+          </span>
+        </span>
+      );
+    }
 
     if (item.external) {
       return (
