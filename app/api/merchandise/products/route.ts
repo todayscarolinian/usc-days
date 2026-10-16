@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { number, z } from "zod";
 import ProductService from "@/src/services/product.service";
 import { AddMerchProductSchema } from "@/src/types/merchProducts.types";
 import { requireHeraldAccess, isAccessError } from "@/src/lib/herald/require-access";
@@ -23,6 +23,9 @@ const GetProductsQuery = z.object({
   maxPrice: numberQuery,
   size: stringQuery,
   search: stringQuery,
+
+  page: numberQuery,
+  pageSize: numberQuery,
 });
 
 export async function GET(req: NextRequest) {
