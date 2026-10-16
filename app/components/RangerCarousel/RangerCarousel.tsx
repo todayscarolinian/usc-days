@@ -25,7 +25,7 @@ export default function RangerCarousel({ children }: { children: ReactNode }) {
       } as CSSProperties}
     >
       {children}
-      <div className="schools-carousel">
+      <div className="schools-carousel mx-auto max-w-[1600px]">
         <div className="ranger-carousel">
           <div className="ranger-carousel-layout">
             <div className="ranger-deck" aria-label="Ranger cards">

@@ -25,6 +25,10 @@ export function TodaysGamesCard({
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
   const sport = game.gameType.gameName;
+  const time = format(start, "h:mm a");
+  const gameStatus = ongoing ? "LIVE" : status ? "UPCOMING" : "FINAL";
+  const logoA = getLogoForSchool(teamA);
+  const logoB = getLogoForSchool(teamB);
 
   return (
     <Button
@@ -33,114 +37,82 @@ export function TodaysGamesCard({
       onClick={() => onOpen(game)}
       aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}`}
       className={cn(
-        "block w-full min-w-0 cursor-pointer rounded-none bg-white text-left whitespace-normal text-[#171717] shadow-none transition-none hover:bg-white hover:text-[#171717] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 dark:hover:bg-white dark:hover:text-[#171717]",
-        compact ? "h-[93px] border border-[#171717] p-2.5" : "h-[220px] p-2.5",
+        "block w-full min-w-0 cursor-pointer rounded-none border bg-white text-left whitespace-normal text-[#171717] shadow-none transition-none hover:bg-white hover:text-[#171717] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 dark:hover:bg-white dark:hover:text-[#171717]",
+        compact
+          ? "h-[78px] border-[#dedbd6] p-3"
+          : cn(
+              "h-[216px] p-4 sm:p-[17px]",
+              ongoing
+                ? "border-[#ed4545] bg-[#fff9f8] hover:bg-[#fff9f8] dark:hover:bg-[#fff9f8]"
+                : "border-[#dedbd6]",
+            ),
       )}
     >
-      <span
-        className={cn(
-          "flex h-full min-w-0 flex-col",
-          !compact && "border",
-          !compact && (ongoing ? "border-tc_primary-400" : "border-[#171717]"),
-        )}
-      >
-        {compact ? (
-          <span className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#171717] py-1 font-medium leading-5">
-            <span className="truncate text-sm" title={sport}>
+      {compact ? (
+        <span className="flex h-full min-w-0 flex-col">
+          <span className="flex min-w-0 items-center justify-between gap-2 text-[10px] leading-3">
+            <span className="min-w-0 truncate font-bold uppercase" title={sport}>
               {sport}
             </span>
-            <span
-              className="truncate text-center text-xs text-black/75"
-              title={location}
-            >
+            <span className="min-w-0 truncate text-right text-black/60" title={location}>
               {location}
             </span>
-            <span className="whitespace-nowrap text-xs text-black/75">
-              {format(start, "MMMM d, yyyy")}
+          </span>
+          <span className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 pt-1">
+            <span className="flex min-w-0 items-center gap-2">
+              <Image src={logoA} alt="" width={22} height={22} className="size-[22px] shrink-0 object-contain" />
+              <span className="min-w-0 truncate text-sm leading-4 font-bold" title={teamA}>
+                {teamA}
+              </span>
+            </span>
+            <span className="text-[10px] leading-none font-medium text-black/65">vs</span>
+            <span className="flex min-w-0 items-center justify-end gap-2">
+              <span className="min-w-0 truncate text-right text-sm leading-4 font-bold" title={teamB}>
+                {teamB}
+              </span>
+              <Image src={logoB} alt="" width={22} height={22} className="size-[22px] shrink-0 object-contain" />
             </span>
           </span>
-        ) : (
-          <span className="flex items-center justify-between gap-3 px-3 pt-7 pb-2.5 text-base leading-[22px] font-medium">
+        </span>
+      ) : (
+        <span className="flex h-full min-w-0 flex-col">
+          <span className="flex items-center justify-between gap-2 text-xs leading-4 font-bold">
             <span className="min-w-0 truncate uppercase" title={sport}>
               {sport}
             </span>
             <span
               className={cn(
-                "shrink-0",
-                ongoing ? "text-[#BE0000]" : "text-black/65",
+                "inline-flex shrink-0 items-center gap-1 px-1.5 py-1 text-[9px] leading-none font-bold",
+                ongoing ? "bg-[#e52d32] text-white" : "bg-[#f0efec] text-[#5d5b58]",
               )}
             >
-              {status}
+              {ongoing && <span aria-hidden="true" className="size-2 rounded-full bg-white" />}
+              {gameStatus}
             </span>
           </span>
-        )}
 
-        <span
-          className={cn(
-            "grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 font-medium",
-            compact
-              ? "px-2.5 text-sm leading-5"
-              : "px-3 pb-2 text-[28px] leading-10 min-[375px]:text-[36px] min-[1400px]:text-[48px]",
-          )}
-        >
-          <span
-            className={cn(
-              "flex min-w-0 items-center",
-              compact ? "gap-1" : "gap-2",
-            )}
-          >
-            <span className="min-w-0 truncate" title={teamA}>
-              {teamA}
+          <span className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-1 sm:px-3">
+            <span className="flex min-w-0 flex-col items-center justify-center gap-1.5">
+              <Image src={logoA} alt="" width={44} height={44} className="size-10 shrink-0 object-contain" />
+              <span className="max-w-full truncate text-xl leading-6 font-extrabold sm:text-[28px]" title={teamA}>
+                {teamA}
+              </span>
             </span>
-            <Image
-              src={getLogoForSchool(teamA)}
-              alt=""
-              width={compact ? 40 : 68}
-              height={compact ? 40 : 68}
-              className={cn(
-                "shrink-0 object-contain",
-                compact
-                  ? "size-10"
-                  : "size-11 min-[375px]:size-[52px] min-[1400px]:size-[68px]",
-              )}
-            />
-          </span>
-          <span className={compact ? "text-xs" : "text-sm"}>
-            {compact ? "VS" : "vs"}
-          </span>
-          <span
-            className={cn(
-              "flex min-w-0 items-center justify-end",
-              compact ? "gap-1" : "gap-2",
-            )}
-          >
-            <Image
-              src={getLogoForSchool(teamB)}
-              alt=""
-              width={compact ? 40 : 68}
-              height={compact ? 40 : 68}
-              className={cn(
-                "shrink-0 object-contain",
-                compact
-                  ? "size-10"
-                  : "size-11 min-[375px]:size-[52px] min-[1400px]:size-[68px]",
-              )}
-            />
-            <span className="min-w-0 truncate text-right" title={teamB}>
-              {teamB}
+            <span className="self-center text-xs leading-none font-bold text-black/60">vs</span>
+            <span className="flex min-w-0 flex-col items-center justify-center gap-1.5">
+              <Image src={logoB} alt="" width={44} height={44} className="size-10 shrink-0 object-contain" />
+              <span className="max-w-full truncate text-xl leading-6 font-extrabold sm:text-[28px]" title={teamB}>
+                {teamB}
+              </span>
             </span>
+          </span>
+
+          <span className="flex items-center justify-between gap-2 border-t border-[#dedbd6] pt-2 text-xs leading-4 font-medium text-[#62605d]">
+            <span className="min-w-0 truncate" title={location}>{location}</span>
+            <span className="shrink-0 text-sm font-bold text-[#171717]">{time}</span>
           </span>
         </span>
-
-        {!compact && (
-          <span
-            className="truncate border-t-2 border-[#171717] px-3 py-1 text-sm leading-5 font-medium text-black/55"
-            title={`${location} · ${format(start, "h:mma").toLowerCase()}`}
-          >
-            {location} · {format(start, "h:mma").toLowerCase()}
-          </span>
-        )}
-      </span>
+      )}
     </Button>
   );
 }

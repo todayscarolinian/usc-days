@@ -36,7 +36,7 @@ export default function LeaderboardSection() {
       />
       <div aria-hidden className="absolute inset-0 bg-black/40" />
 
-      <div className="relative mx-auto grid w-full max-w-6xl px-4 py-16 lg:auto-rows-[minmax(560px,auto)] lg:grid-cols-[minmax(700px,3fr)_minmax(0,2fr)] lg:py-24">
+      <div className="relative mx-auto grid w-full max-w-[1600px] px-3 py-16 lg:auto-rows-[minmax(560px,auto)] lg:grid-cols-[minmax(700px,3fr)_minmax(0,2fr)] lg:py-24">
         {isLoading ? (
           <StandingsTableSkeleton rows={7} />
         ) : (

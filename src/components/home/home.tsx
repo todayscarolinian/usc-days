@@ -13,7 +13,7 @@ export default function Home() {
     <div className="min-h-screen bg-[url('/white-bg.png')] bg-top bg-repeat text-slate-900">
       <HeroCarousel />
 
-      <main className="max-w-7xl mx-auto px-4 py-12 space-y-12">
+      <main className="mx-auto max-w-[1600px] px-3 py-12 space-y-12">
         <NewsSection
           hashtag={FACEBOOK_NEWS_CONFIG.hashtag?.trim() || undefined}
         />
@@ -22,11 +22,11 @@ export default function Home() {
       <div className="space-y-8 sm:space-y-12">
         <MatchdayBanner />
 
-        <main className="mx-auto flex h-[calc(100vh-4rem)] max-w-7xl px-3 py-8">
+        <main className="mx-auto max-w-[1600px] px-3 py-8">
           <section
             id="todays-games"
             aria-labelledby="todays-games-heading"
-            className="flex min-h-0 w-full flex-col overflow-y-auto"
+            className="w-full"
           >
             <TodaysGames />
           </section>
@@ -38,7 +38,7 @@ export default function Home() {
           </section>
 
           <RangerCarousel>
-            <div className="w-full shrink-0 px-6 text-center">
+            <div className="mx-auto w-full max-w-[1600px] shrink-0 px-3 text-center">
               <h2
                 id="schools-heading"
                 className="text-4xl font-bold tracking-tight text-black sm:text-5xl lg:text-6xl"
@@ -56,7 +56,7 @@ export default function Home() {
           <LeaderboardSection />
         </div>
 
-        <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+        <main className="mx-auto max-w-[1600px] px-3 py-8 space-y-12">
           <section id="featured-merch" aria-labelledby="featured-merch">
             <MerchSection />
           </section>
