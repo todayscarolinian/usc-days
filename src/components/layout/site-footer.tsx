@@ -20,7 +20,6 @@ const links = [
   { href: "/#featured-merch", label: "Merch" },
   { href: "/schedules", label: "Schedules" },
   { href: "/standings", label: "Standings" },
-  { href: "/leaderboards", label: "Leaderboards" },
 ];
 
 const socialLinks = [

@@ -1,15 +1,36 @@
 .schools-section {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  padding-block: clamp(1rem, 3svh, 2rem);
+  height: calc(100dvh - 4rem);
+  padding-block: clamp(2rem, 5svh, 3rem);
   scroll-margin-top: 4rem;
+  background-color: rgb(255 255 255 / 70%);
+}
+
+.schools-section::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  color: var(--school-color);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, currentColor var(--school-edge-strength, 30%), transparent),
+    transparent 35%,
+    transparent 65%,
+    color-mix(in srgb, currentColor var(--school-edge-strength, 30%), transparent)
+  );
+  transition: color 650ms ease;
 }
 
 .schools-carousel {
   flex: 1;
   min-height: 0;
   width: 100%;
+  padding-top: clamp(1rem, 3svh, 2rem);
 }
 
 .ranger-carousel {
@@ -108,7 +129,7 @@
 @media (max-height: 540px) {
   .schools-section {
     height: auto;
-    min-height: 100dvh;
+    min-height: calc(100dvh - 4rem);
   }
 
   .schools-carousel {
@@ -118,6 +139,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .schools-section::before {
+    transition: none;
+  }
+
   .ranger-card {
     transition: none;
     will-change: auto;

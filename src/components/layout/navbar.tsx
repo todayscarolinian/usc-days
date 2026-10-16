@@ -39,12 +39,6 @@ const leftNavigation: NavigationItem[] = [
     href: "/#featured-merch",
     name: "Merch",
   },
-  {
-    // Replace this URL if TC News uses a different address.
-    href: "/#news",
-    name: "News",
-    external: true,
-  },
 ];
 
 const rightNavigation: NavigationItem[] = [
@@ -55,10 +49,6 @@ const rightNavigation: NavigationItem[] = [
   {
     href: "/standings",
     name: "Standings",
-  },
-  {
-    href: "/leaderboards",
-    name: "Leaderboards",
   },
 ];
 
@@ -189,7 +179,7 @@ export default function Navbar() {
     const active = isActive(item);
 
     const className = [
-      "relative px-2 py-2 text-sm font-normal text-white",
+      "relative px-2 py-2 text-base font-medium whitespace-nowrap text-white lg:text-lg",
       "transition-colors hover:text-white/75",
       active
         ? "after:absolute after:-bottom-0.5 after:left-2 after:right-2 after:h-0.5 after:bg-tc_primary-500"
@@ -223,7 +213,7 @@ export default function Navbar() {
 
   function renderMobileLink(item: NavigationItem) {
     const className = [
-      "block border-b border-white/10 py-3 text-base",
+      "block border-b border-white/10 py-3 text-lg font-medium",
       isActive(item)
         ? "font-bold text-white"
         : "text-white/75",

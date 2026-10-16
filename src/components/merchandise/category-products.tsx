@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ShoppingBag } from "lucide-react";
+import { EmptyState } from "@/src/components/ui/empty-state";
 import MerchandiseModal from "@/src/components/merchandise/merchandise-modal";
 import Breadcrumb from "@/src/components/merchandise/breadcrumb";
 import { useGetProductsQuery } from "@/src/queries/product.queries";
@@ -84,11 +86,11 @@ export default function CategoryProductsClient({
       <section className="py-12 px-6 pt-20">
         <Breadcrumb categoryName={categoryName} />
         <h2 className="text-3xl font-bold mb-8">{categoryName}</h2>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-gray-600">
-            No products found in this category.
-          </p>
-        </div>
+        <EmptyState
+          icon={ShoppingBag}
+          title="No products in this category"
+          description="Explore another category or check back for new arrivals."
+        />
       </section>
     );
   }

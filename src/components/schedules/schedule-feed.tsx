@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
+import { EmptyState } from "@/src/components/ui/empty-state";
 import { groupSwimmingMatches, type ScheduleDay } from "@/src/lib/schedules";
 import type { Schedules } from "@/src/types/types";
 import ScheduleMatch from "./schedule-match";
@@ -39,17 +39,10 @@ function LoadMoreButton({ label, isLoading, onClick }: { label: string; isLoadin
 
 function EmptySchedule({ forDate = false }: { forDate?: boolean }) {
   return (
-    <div role="status" className="flex min-h-52 flex-col items-center justify-center rounded-lg bg-white/60 px-5 py-8 text-center sm:py-10">
-      <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
-        <CalendarDays className="size-6" strokeWidth={1.5} aria-hidden="true" />
-      </span>
-      <p className="font-[family-name:var(--font-roboto-condensed)] text-xl font-semibold text-neutral-800">
-        {forDate ? "No matches on this date" : "No matches scheduled"}
-      </p>
-      <p className="mt-1.5 max-w-64 text-sm leading-relaxed text-neutral-500">
-        Try another date or explore a different event.
-      </p>
-    </div>
+    <EmptyState
+      title={forDate ? "No matches on this date" : "No matches scheduled"}
+      description="Try another date or explore a different event."
+    />
   );
 }
 

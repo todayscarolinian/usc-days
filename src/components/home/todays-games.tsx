@@ -8,6 +8,7 @@ import { useGamesQuery } from "@/src/queries/games.queries";
 import type { Schedules } from "@/src/types/types";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { EmptyState } from "@/src/components/ui/empty-state";
 import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
 import { TodaysGamesCard } from "./todays-games-card";
 
@@ -25,7 +26,7 @@ function GamesSkeleton() {
     <div
       role="status"
       aria-label="Loading today's games"
-      className="space-y-6 md:px-6 xl:px-12"
+      className="space-y-6 md:px-3 xl:px-6"
     >
       <span className="sr-only">Loading today&apos;s games…</span>
       <div
@@ -108,14 +109,16 @@ function GamesContent({
 
   if (featured.length === 0) {
     return (
-      <p role="status" className="py-12 text-center text-lg text-[#4B5563]">
-        No games scheduled today.
-      </p>
+      <EmptyState
+        title="No games scheduled"
+        description="Explore the full schedule for upcoming matches."
+        className="flex-1"
+      />
     );
   }
 
   return (
-    <div className="space-y-6 md:px-6 xl:px-12">
+    <div className="space-y-6 md:px-3 xl:px-6">
       <div className="grid grid-cols-1 gap-5 py-2.5 md:grid-cols-2 xl:grid-cols-3">
         {featured.map((game) => (
           <TodaysGamesCard
@@ -193,9 +196,9 @@ export default function TodaysGames() {
   return (
     <div
       ref={sectionRef}
-      className="space-y-6 py-8 text-[#171717] xl:py-12"
+      className="flex flex-1 flex-col gap-6 py-8 text-[#171717] xl:py-12"
     >
-      <header className="space-y-8 border-b border-[#171717] pb-8">
+      <header className="shrink-0 space-y-8 border-b border-[#171717] pb-8">
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-4 text-sm leading-[22px] md:text-lg">
             <p className="font-bold">THE MATCHDAY DESK</p>
@@ -206,7 +209,7 @@ export default function TodaysGames() {
               FULL SCHEDULE <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <div className="h-1 bg-[#171717]" />
+          <div className="h-0.5 bg-[#171717]" />
         </div>
         <div className="flex items-center justify-between gap-4 md:gap-8">
           <div className="min-w-0 space-y-4">

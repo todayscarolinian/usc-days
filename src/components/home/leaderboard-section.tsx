@@ -25,7 +25,7 @@ export default function LeaderboardSection() {
     <section
       id="leaderboard"
       aria-labelledby="leaderboard-heading"
-      className="relative w-full overflow-hidden"
+      className="relative flex min-h-dvh w-full items-center overflow-hidden"
     >
       <Image
         src="/carousel/frisbee.png"
@@ -36,7 +36,7 @@ export default function LeaderboardSection() {
       />
       <div aria-hidden className="absolute inset-0 bg-black/40" />
 
-      <div className="relative mx-auto grid max-w-6xl px-4 py-16 lg:min-h-[760px] lg:grid-cols-[minmax(700px,3fr)_minmax(0,2fr)] lg:py-24">
+      <div className="relative mx-auto grid w-full max-w-6xl px-4 py-16 lg:auto-rows-[minmax(560px,auto)] lg:grid-cols-[minmax(700px,3fr)_minmax(0,2fr)] lg:py-24">
         {isLoading ? (
           <StandingsTableSkeleton rows={7} />
         ) : (
@@ -60,10 +60,10 @@ export default function LeaderboardSection() {
           </div>
 
           <Link
-            href="/leaderboards"
+            href="/standings"
             className="inline-flex w-fit items-center gap-2 bg-tc_primary px-6 py-3 text-base font-medium uppercase transition-colors hover:bg-tc_primary-600"
           >
-            Check Leaderboards
+            Check Standings
             <ArrowUpRight className="size-5" />
           </Link>
         </div>

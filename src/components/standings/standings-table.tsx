@@ -15,6 +15,8 @@ import {
 } from "@/src/components/ui/table";
 import standingColumns from "./columns";
 import type { TeamStandingData } from "./transformTeamsData";
+import { Trophy } from "lucide-react";
+import { EmptyState } from "@/src/components/ui/empty-state";
 
 type StandingsTableProps = {
   data: TeamStandingData[];
@@ -106,9 +108,14 @@ export default function StandingsTable({
               <TableRow>
                 <TableCell
                   colSpan={standingColumns.length}
-                  className="h-24 whitespace-normal px-3 text-center text-neutral-500"
+                  className="p-0 whitespace-normal"
                 >
-                  No completed games for this sport yet.
+                  <EmptyState
+                    icon={Trophy}
+                    title="No completed games yet"
+                    description="Standings will appear once match results are recorded."
+                    className="rounded-none"
+                  />
                 </TableCell>
               </TableRow>
             )}

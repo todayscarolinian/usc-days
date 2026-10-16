@@ -31,7 +31,7 @@ export default function NewsCard({ post }: { post: FacebookPost }) {
         href={post.permalinkUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative block aspect-[4/3] overflow-hidden border-b-2 border-zinc-500 bg-zinc-900 text-white outline-none hover:border-tc_primary focus-visible:border-tc_primary focus-visible:ring-2 focus-visible:ring-tc_primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+        className="group relative block aspect-[6/5] overflow-hidden border-b-2 border-zinc-500 bg-zinc-900 text-white outline-none hover:border-tc_primary focus-visible:border-tc_primary focus-visible:ring-2 focus-visible:ring-tc_primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
       >
         {post.imageUrl && post.imageUrl !== failedImageUrl ? (
           <Image
@@ -75,7 +75,7 @@ export default function NewsCard({ post }: { post: FacebookPost }) {
               {dateFormatter.format(date)}
             </time>
           ) : null}
-          <h3 className="line-clamp-2 text-xl leading-tight font-bold">
+          <h3 className="line-clamp-2 text-xl leading-tight font-bold sm:text-2xl">
             {headline}
           </h3>
           <p className="mt-2 h-[3.375rem] line-clamp-3 text-sm leading-[1.125rem] text-zinc-300 opacity-0 group-focus-visible:opacity-100 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:opacity-100">
