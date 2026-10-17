@@ -1,6 +1,7 @@
 import styles from "./todays-games.module.css";
 import { format } from "date-fns";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { getMatchdayGameStatus } from "@/src/lib/todays-games";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
@@ -10,14 +11,12 @@ type TodaysGamesCardProps = {
   game: Schedules;
   now: Date;
   compact?: boolean;
-  onOpen: (game: Schedules) => void;
 };
 
 export function TodaysGamesCard({
   game,
   now,
   compact = false,
-  onOpen,
 }: TodaysGamesCardProps) {
   const start = new Date(game.startDate);
   const status = getMatchdayGameStatus(game, now);
@@ -33,12 +32,14 @@ export function TodaysGamesCard({
 
   return (
     <Button
-      type="button"
+      asChild
       variant="ghost"
-      onClick={() => onOpen(game)}
-      aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}`}
       className={cn(styles.card, compact ? styles.compact : styles.featured, ongoing && !compact && styles.live)}
     >
+      <Link
+        href={`/schedules/${game.id}`}
+        aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}`}
+      >
       {compact ? (
         <span className={styles.cardContent}>
           <span className={styles.compactTop}>
@@ -101,6 +102,7 @@ export function TodaysGamesCard({
           </span>
         </span>
       )}
+      </Link>
     </Button>
   );
 }

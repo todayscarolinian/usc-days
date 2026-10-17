@@ -13,15 +13,12 @@ import ScheduleNews from "./schedule-news";
 import ScheduleBackground from "./schedule-background";
 import styles from "./schedules.module.css";
 
-const GameDetailsDialog = dynamic(() => import("./game-details-dialog"), { ssr: false });
 const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
 const EditScheduleDialog = dynamic(() => import("./edit-schedule-dialog"), { ssr: false });
 
 export default function SchedulesPage() {
   const schedules = useSchedules();
   const { hasAccess } = useHasHeraldDomainAccess();
-  const [detailsGame, setDetailsGame] = useState<Schedules | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [scoreGame, setScoreGame] = useState<Schedules | null>(null);
   const [scoreOpen, setScoreOpen] = useState(false);
   const [editGame, setEditGame] = useState<Schedules | null>(null);
@@ -119,7 +116,6 @@ export default function SchedulesPage() {
               onLoadOlder={() => void schedules.games.loadOlder()}
               onLoadNewer={() => void schedules.games.loadNewer()}
               canManage={canManage}
-              onOpenGame={(game) => { setDetailsGame(game); setDetailsOpen(true); }}
               onEditScore={(game) => { setScoreGame(game); setScoreOpen(true); }}
               onEditSchedule={(game) => { setEditGame(game); setEditOpen(true); }}
             />
@@ -129,24 +125,6 @@ export default function SchedulesPage() {
           <ScheduleNews />
         </div>
       </div>
-      {detailsGame && (
-        <GameDetailsDialog
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
-          game={detailsGame}
-          now={schedules.now ?? undefined}
-          onEditSchedule={(game) => {
-            setDetailsOpen(false);
-            setEditGame(game);
-            setEditOpen(true);
-          }}
-          onAddScore={(game) => {
-            setDetailsOpen(false);
-            setScoreGame(game);
-            setScoreOpen(true);
-          }}
-        />
-      )}
       {scoreGame && (
         <AddScoreDialog open={scoreOpen} onOpenChange={setScoreOpen} game={scoreGame} />
       )}

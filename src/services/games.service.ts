@@ -509,7 +509,12 @@ class GameService {
   async getGameById(id: number) {
     const game = await prisma.game.findUnique({
       where: { id },
-      include: { gameType: true, teamA: true, teamB: true },
+      include: {
+        gameType: true,
+        teamA: { include: { school: true } },
+        teamB: { include: { school: true } },
+        winner: true,
+      },
     });
     if (!game) {
       throw new ApiError("NOT_FOUND", "Game not found.");

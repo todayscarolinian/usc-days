@@ -3,10 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { format } from "date-fns";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { getScheduleDay } from "@/src/lib/schedules";
 import { useGamesQuery } from "@/src/queries/games.queries";
-import type { Schedules } from "@/src/types/types";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
@@ -33,13 +30,11 @@ function GamesSkeleton() {
 function GamesContent({
   dateLabel,
   now,
-  onOpenGame,
   mock,
 }: {
   mock: boolean;
   dateLabel: string;
   now: Date;
-  onOpenGame: (g: Schedules) => void;
 }) {
   const {
     data: todaysGames = [],
@@ -92,7 +87,7 @@ function GamesContent({
 
   return (
     <div className={styles.fixtures}>
-      <TodaysGamesCard game={featured[0]} now={now} onOpen={onOpenGame} />
+      <TodaysGamesCard game={featured[0]} now={now} />
       {compact.length > 0 && (
         <div className={styles.sidebar}>
           <div className={styles.sidebarHeading}>
@@ -101,7 +96,7 @@ function GamesContent({
           </div>
           <div className={styles.moreGames}>
             {compact.map((game) => (
-              <TodaysGamesCard key={game.id} game={game} now={now} compact onOpen={onOpenGame} />
+              <TodaysGamesCard key={game.id} game={game} now={now} compact />
             ))}
           </div>
         </div>
@@ -111,7 +106,6 @@ function GamesContent({
 }
 
 export default function TodaysGames({ mock = false }: { mock?: boolean }) {
-  const router = useRouter();
   const [inView, setInView] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -148,15 +142,6 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
 
   const todayString = now ? format(now, "yyyy-MM-dd") : null;
   const eventDay = now ? getEventDay(now, "2026-10-19") : 0;
-
-  function openGame(game: Schedules) {
-    const params = new URLSearchParams({
-      date: getScheduleDay(new Date(game.startDate)),
-      match: String(game.id),
-    });
-    if (mock && now) params.set("preview", now.toISOString());
-    router.push(`/schedules?${params}`, { scroll: false });
-  }
 
   return (
     <div
@@ -216,7 +201,6 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
           mock={mock}
           dateLabel={todayString}
           now={now}
-          onOpenGame={openGame}
         />
       ) : (
         <GamesSkeleton />

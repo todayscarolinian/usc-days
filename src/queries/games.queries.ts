@@ -1,6 +1,6 @@
 "use client";
 
-import { AddGamePayload, EditGamePayload } from "@/src/types/games.types";
+import { AddGamePayload, EditGamePayload, ScoreDeltaPayload } from "@/src/types/games.types";
 import { useMemo } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { fetchGamesPage } from "@/src/services/games.client";
@@ -62,6 +62,66 @@ export const useEditGamesQuery = () => {
 
     onError: (error) => {
       console.error("Error editing game: ", error);
+    },
+  });
+};
+
+export const gameQueryKey = (id: number) => ["games", "detail", id] as const;
+
+export const useGameQuery = (id: number) =>
+  useQuery<Schedules>({
+    queryKey: gameQueryKey(id),
+    queryFn: async ({ signal }) => {
+      const { data } = await axios.get(`/api/games/${id}`, { signal });
+      return data;
+    },
+  });
+
+/**
+ * Applies a score change to a cached game the way the server does: empty scores start at 0.
+ * Scores arrive as JSON strings of Prisma decimals, so the result is stored the same way.
+ */
+function applyScoreDelta(game: Schedules, { team, delta }: ScoreDeltaPayload): Schedules {
+  const field = team === "A" ? "teamAScore" : "teamBScore";
+  const score = (value: unknown) => String(Number(value ?? 0)) as unknown as Schedules["teamAScore"];
+  return {
+    ...game,
+    teamAScore: score(game.teamAScore),
+    teamBScore: score(game.teamBScore),
+    [field]: score(Number(game[field] ?? 0) + delta),
+  };
+}
+
+export const scoreMutationKey = (id: number) => ["games", "score", id] as const;
+
+/**
+ * Optimistic: the cached score changes immediately and taps can overlap, since the server
+ * applies each delta atomically. Once the last change settles, the game is refetched so
+ * responses arriving out of order cannot leave a stale score on screen.
+ */
+export const useUpdateScoreQuery = (id: number) => {
+  const queryClient = useQueryClient();
+  return useMutation<Game, Error, ScoreDeltaPayload>({
+    mutationKey: scoreMutationKey(id),
+    mutationFn: async (body) => {
+      const { data } = await axios.patch(`/api/games/${id}/score`, body);
+      return data;
+    },
+    onMutate: async (change) => {
+      await queryClient.cancelQueries({ queryKey: gameQueryKey(id) });
+      queryClient.setQueryData<Schedules>(gameQueryKey(id), (current) =>
+        current && applyScoreDelta(current, change),
+      );
+    },
+    onError: (_error, change) => {
+      queryClient.setQueryData<Schedules>(gameQueryKey(id), (current) =>
+        current && applyScoreDelta(current, { ...change, delta: -change.delta }),
+      );
+    },
+    onSettled: () => {
+      // This mutation still counts as in flight while its callbacks run.
+      if (queryClient.isMutating({ mutationKey: scoreMutationKey(id) }) > 1) return;
+      queryClient.invalidateQueries({ queryKey: ["games"] });
     },
   });
 };

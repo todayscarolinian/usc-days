@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
 import { scheduleTimeFormatter } from "@/src/lib/schedules";
@@ -10,7 +11,6 @@ type ScheduleMatchProps = {
   game: Schedules;
   now: Date;
   canManage: boolean;
-  onOpen: (game: Schedules) => void;
   onEditScore: (game: Schedules) => void;
   onEditSchedule: (game: Schedules) => void;
 };
@@ -55,7 +55,7 @@ function MatchTeam({ team, side, featured }: MatchTeamProps) {
   );
 }
 
-export default function ScheduleMatch({ game, now, showEventLabel, canManage, onOpen, onEditScore, onEditSchedule }: ScheduleMatchProps) {
+export default function ScheduleMatch({ game, now, showEventLabel, canManage, onEditScore, onEditSchedule }: ScheduleMatchProps) {
   const status = getGameStatus(game, now);
   const featured = status === "live";
   const statusLabel = GAME_STATUS_LABELS[status];
@@ -87,9 +87,8 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           </Button>
         </div>
       )}
-      <button
-        type="button"
-        onClick={() => onOpen(game)}
+      <Link
+        href={`/schedules/${game.id}`}
         aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
         className="block w-full cursor-pointer hover:bg-neutral-200/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 motion-safe:transition-colors"
       >
@@ -102,7 +101,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           <span className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
             <MatchTeam team={game.teamA} side="home" featured />
             <span className="flex flex-col text-2xl font-bold">
-              VS
+              {showScores ? `${homeScore} – ${awayScore}` : "VS"}
               <span className="text-sm font-normal text-tc_primary-500">{time}</span>
             </span>
             <MatchTeam team={game.teamB} side="away" featured />
@@ -136,7 +135,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           </span>
         </>
       )}
-      </button>
+      </Link>
     </article>
   );
 }
