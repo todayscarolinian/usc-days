@@ -321,6 +321,7 @@ class GameService {
     }
 
     // Check for location conflict (same venue can't host two games)
+    /*
     if (location && location.trim() !== "") {
       const normalizedLocation = location.trim().toLowerCase();
       const locationConflict = conflicts.find(
@@ -333,6 +334,7 @@ class GameService {
         );
       }
     }
+    */
 
     // All validations passed, create the game
     const newGame = await prisma.game.create({
