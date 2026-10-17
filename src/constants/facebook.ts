@@ -7,7 +7,7 @@ import {
 export const FACEBOOK_GRAPH_CONFIG = {
   url: "https://graph.facebook.com/v26.0",
   postFields: "id,message,created_time,permalink_url,full_picture",
-  revalidateSeconds: 30 * 60,
+  revalidateSeconds: 10 * 60,
   cacheTag: "facebook-posts",
   pageSize: 100,
   // Bound how much Page history a single request can fetch.
