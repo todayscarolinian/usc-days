@@ -33,6 +33,7 @@
 .teamLogo { width:105px; height:105px; object-fit:contain; }
 .teamName { max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:70px; line-height:1.2; font-weight:800; }
 .versus { font-size:25px; font-weight:700; color:#626262; }
+.featured .score { font-size:clamp(28px, 4vw, 48px); line-height:1; font-weight:800; color:#000; }
 .cardFooter { position:relative; display:flex; justify-content:space-between; align-items:center; gap:20px; padding-top:42px; font-size:28px; line-height:1.2; color:#626262; }
 .cardFooter::before { content:""; position:absolute; top:0; left:8%; right:8%; height:2px; background:#d6d4d0; }
 .live .cardFooter::before { background:#ecc9c5; }

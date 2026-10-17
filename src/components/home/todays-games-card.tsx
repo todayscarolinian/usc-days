@@ -21,6 +21,10 @@ export function TodaysGamesCard({
   const start = new Date(game.startDate);
   const status = getMatchdayGameStatus(game, now);
   const ongoing = status === "ONGOING";
+  const showScores = ongoing && (game.teamAScore != null || game.teamBScore != null);
+  const scoreA = String(game.teamAScore ?? "–");
+  const scoreB = String(game.teamBScore ?? "–");
+  const score = showScores ? `${scoreA} – ${scoreB}` : null;
   const location = game.location?.trim() || "TBA";
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
@@ -38,7 +42,7 @@ export function TodaysGamesCard({
     >
       <Link
         href={`/schedules/${game.id}`}
-        aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}`}
+        aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}${showScores ? `, score ${teamA} ${scoreA}, ${teamB} ${scoreB}` : ""}`}
       >
       {compact ? (
         <span className={styles.cardContent}>
@@ -57,7 +61,12 @@ export function TodaysGamesCard({
                 {teamA}
               </span>
             </span>
-            <span className="text-[10px] leading-none font-medium text-black/65">vs</span>
+            <span className={cn(
+              "leading-none whitespace-nowrap tabular-nums",
+              showScores ? "text-[22px] font-bold text-black" : "text-[10px] font-medium text-black/65",
+            )}>
+              {score ?? "vs"}
+            </span>
             <span className="flex min-w-0 items-center justify-end gap-2">
               <span className="min-w-0 truncate text-right text-[22px] leading-[1.2] font-bold" title={teamB}>
                 {teamB}
@@ -87,7 +96,9 @@ export function TodaysGamesCard({
                 {teamA}
               </span>
             </span>
-            <span className={styles.versus}>VS</span>
+            <span className={cn(styles.versus, showScores && styles.score, showScores && "whitespace-nowrap tabular-nums")}>
+              {score ?? "VS"}
+            </span>
             <span className={styles.team}>
               <Image src={logoB} alt="" width={106} height={106} className={styles.teamLogo} />
               <span className={styles.teamName} title={teamB}>
