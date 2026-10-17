@@ -232,7 +232,6 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   setTeamAForfeited(isChecked);
                   if (isChecked) {
                     setAScore(0);
-                    setBScore(0);
                     setIsDraw(false); // Clear draw if forfeit is set
                     // If B also forfeited, clear winner; otherwise B wins
                     setWinnerId(teamBForfeited ? null : teamB.id);
@@ -261,7 +260,6 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   const isChecked = checked === true;
                   setTeamBForfeited(isChecked);
                   if (isChecked) {
-                    setAScore(0);
                     setBScore(0);
                     setIsDraw(false); // Clear draw if forfeit is set
                     // If A also forfeited, clear winner; otherwise A wins
@@ -300,7 +298,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   const v = e.currentTarget.value;
                   setAScore(v === "" ? "" : Number(v));
                 }}
-                disabled={editGameMutation.isPending || oneForfeited}
+                disabled={editGameMutation.isPending || teamAForfeited}
               />
             </div>
           </div>
@@ -320,7 +318,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   const v = e.currentTarget.value;
                   setBScore(v === "" ? "" : Number(v));
                 }}
-                disabled={editGameMutation.isPending || oneForfeited}
+                disabled={editGameMutation.isPending || teamBForfeited}
               />
             </div>
           </div>
