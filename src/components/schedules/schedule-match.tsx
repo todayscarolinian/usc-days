@@ -80,9 +80,9 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
       {canManage && game.id > 0 && (
         <div className="flex items-center justify-end gap-2 px-3 py-2">
           {canManage && game.id > 0 && (
-            <Button size="sm" variant="outline" onClick={() => onEditSchedule(game)}>Edit schedule</Button>
+            <Button className="cursor-pointer" size="sm" variant="outline" onClick={() => onEditSchedule(game)}>Edit schedule</Button>
           )}
-          <Button size="sm" variant="ghost" onClick={() => onEditScore(game)} aria-label={`Edit score for ${matchup}`}>
+          <Button className="cursor-pointer" size="sm" variant="ghost" onClick={() => onEditScore(game)} aria-label={`Edit score for ${matchup}`}>
             Edit score
           </Button>
         </div>

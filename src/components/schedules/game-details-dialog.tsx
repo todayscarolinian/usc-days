@@ -147,17 +147,17 @@ export default function GameDetailsDialog({
           {hasAccess && !readOnly && (
             <>
               <Button
+                className="w-full cursor-pointer sm:w-auto"
                 onClick={goEditSchedule}
                 disabled={busyEdit}
-                className="w-full sm:w-auto"
               >
                 {busyEdit ? "Opening…" : "Edit Schedule"}
               </Button>
 
               <Button
+                className="w-full cursor-pointer sm:w-auto"
                 onClick={() => onAddScore?.(game)}
                 disabled={!teamsAreSet}
-                className="w-full sm:w-auto"
               >
                 Edit Score
               </Button>

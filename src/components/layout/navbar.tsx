@@ -79,7 +79,7 @@ function UserAvatar({
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-full text-white hover:bg-white/15 hover:text-white"
+          className="cursor-pointer rounded-full text-white hover:bg-white/15 hover:text-white"
         >
           <CircleUser className="size-5" />
           <span className="sr-only">Open user menu</span>
@@ -94,6 +94,7 @@ function UserAvatar({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
+          className="cursor-pointer"
           disabled={isPending}
           onClick={onLogout}
         >

@@ -65,7 +65,7 @@ export default function ScheduleDateNavigation({
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 sm:size-9"
+          className="size-8 cursor-pointer sm:size-9"
           disabled={disabled || !previous}
           aria-label="Previous day"
           onClick={() => previous && onSelect(format(previous, "yyyy-MM-dd"))}
@@ -77,7 +77,7 @@ export default function ScheduleDateNavigation({
           disabled={disabled || !previous}
           aria-label={previous ? `Scroll to ${format(previous, "MMMM d, yyyy")}` : "Previous date"}
           onClick={() => previous && onSelect(format(previous, "yyyy-MM-dd"))}
-          className={cn("h-10 min-w-0 overflow-hidden px-1 text-xs text-neutral-500 sm:text-sm", actions && "hidden sm:inline-flex")}
+          className={cn("h-10 min-w-0 cursor-pointer overflow-hidden px-1 text-xs text-neutral-500 sm:text-sm", actions && "hidden sm:inline-flex")}
         >
           <SlidingDateLabel
             key={anchor}
@@ -91,7 +91,7 @@ export default function ScheduleDateNavigation({
           aria-label={selectedDate ? `Scroll to ${format(selectedDate, "MMMM d, yyyy")}` : "Scroll to today"}
           disabled={disabled || !anchor}
           onClick={() => anchor && onSelect(anchor)}
-          className="h-12 overflow-hidden px-2 text-xl font-bold sm:text-2xl"
+          className="h-12 cursor-pointer overflow-hidden px-2 text-xl font-bold sm:text-2xl"
         >
           <SlidingDateLabel
             key={anchor}
@@ -107,7 +107,7 @@ export default function ScheduleDateNavigation({
           disabled={disabled || !next}
           aria-label={next ? `Scroll to ${format(next, "MMMM d, yyyy")}` : "Next date"}
           onClick={() => next && onSelect(format(next, "yyyy-MM-dd"))}
-          className={cn("h-10 min-w-0 overflow-hidden px-1 text-xs text-neutral-500 sm:text-sm", actions && "hidden sm:inline-flex")}
+          className={cn("h-10 min-w-0 cursor-pointer overflow-hidden px-1 text-xs text-neutral-500 sm:text-sm", actions && "hidden sm:inline-flex")}
         >
           <SlidingDateLabel
             key={anchor}
@@ -119,7 +119,7 @@ export default function ScheduleDateNavigation({
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 sm:size-9"
+          className="size-8 cursor-pointer sm:size-9"
           disabled={disabled || !next}
           aria-label="Next day"
           onClick={() => next && onSelect(format(next, "yyyy-MM-dd"))}

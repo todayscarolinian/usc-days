@@ -233,7 +233,7 @@ export default function EditScheduleDialog({
         }
       }}
     >
-      <DialogContent className="sm:max-w-150">
+      <DialogContent className="sm:max-w-150 [&_[data-slot=dialog-close]]:cursor-pointer">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>
           <DialogDescription>
@@ -256,8 +256,8 @@ export default function EditScheduleDialog({
                 }}
                 className={
                   validationErrors.startDate
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
+                    ? "cursor-pointer border-red-500 focus-visible:ring-red-500"
+                    : "cursor-pointer"
                 }
               />
               {validationErrors.startDate && (
@@ -278,6 +278,7 @@ export default function EditScheduleDialog({
                 placeholder="Start Time"
                 value={inputs.startTime ?? ""}
                 onChange={(e) => updateInput("startTime", e.target.value)}
+                className="cursor-pointer"
               />
             </div>
 
@@ -290,6 +291,7 @@ export default function EditScheduleDialog({
                 placeholder="End Time"
                 value={inputs.endTime ?? ""}
                 onChange={(e) => updateInput("endTime", e.target.value)}
+                className="cursor-pointer"
               />
             </div>
           </div>
@@ -306,7 +308,7 @@ export default function EditScheduleDialog({
               }
               disabled={sportsOptions.length <= 0 || loading}
               loading={sportsLoading}
-              className="w-full"
+              className="w-full cursor-pointer"
             />
           </div>
 
@@ -327,7 +329,7 @@ export default function EditScheduleDialog({
                 }
                 disabled={inputs.gameTypeId <= 0 || loading}
                 loading={teamLoading}
-                className={validationErrors.teamAId ? "border-red-500" : ""}
+                className={validationErrors.teamAId ? "cursor-pointer border-red-500" : "cursor-pointer"}
               />
               {validationErrors.teamAId && (
                 <span className="text-xs text-red-500">
@@ -352,7 +354,7 @@ export default function EditScheduleDialog({
                 }
                 disabled={loading || inputs.gameTypeId <= 0}
                 loading={teamLoading}
-                className={validationErrors.teamBId ? "border-red-500" : ""}
+                className={validationErrors.teamBId ? "cursor-pointer border-red-500" : "cursor-pointer"}
               />
               {validationErrors.teamBId && (
                 <span className="text-xs text-red-500">
@@ -380,7 +382,7 @@ export default function EditScheduleDialog({
             <AlertDialogTrigger asChild>
               <Button
                 type="button"
-                className="bg-transparent border border-tc_primary text-tc_primary hover:text-white"
+                className="cursor-pointer border border-tc_primary bg-transparent text-tc_primary hover:text-white"
                 disabled={loading}
               >
                 Delete
@@ -398,7 +400,7 @@ export default function EditScheduleDialog({
 
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={deleteSchedule}>
+                <AlertDialogAction className="cursor-pointer" onClick={deleteSchedule}>
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -412,7 +414,7 @@ export default function EditScheduleDialog({
           )}
           <Button
             type="submit"
-            className="px-8"
+            className="cursor-pointer px-8"
             onClick={editSchedule}
             disabled={
               loading || inputs.gameTypeId <= 0 || sportsOptions.length <= 0
