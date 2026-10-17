@@ -34,6 +34,9 @@ export function TodaysGamesCard({
   const location = game.location?.trim() || "TBA";
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
+  const hasLongTeamName = [teamA, teamB].some((name) =>
+    name.split(/\s+/).some((word) => word.length >= 10),
+  );
   const sport = game.gameType.gameName;
   const time = format(start, "h:mm a");
   const gameStatus = ongoing ? "LIVE" : status ? "UPCOMING" : "FINAL";
@@ -95,7 +98,11 @@ export function TodaysGamesCard({
             </span>
           </span>
 
-          <span className={cn(styles.matchup, showScores && styles.scoredMatchup)}>
+          <span className={cn(
+            styles.matchup,
+            showScores && styles.scoredMatchup,
+            hasLongTeamName && styles.longTeamNames,
+          )}>
             <span className={styles.team}>
               <Image src={logoA} alt="" width={106} height={106} className={styles.teamLogo} />
               <span className={styles.teamName} title={teamA}>

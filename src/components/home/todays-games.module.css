@@ -53,6 +53,8 @@
 @media (max-width:639px) { .section { padding:24px 16px; gap:24px; } .header, .masthead { gap:24px; } .mastheadRow { font-size:13px; } .title { font-size:clamp(28px,7.7vw,46px); } .eyebrow, .dayLabel { font-size:11px; } .dayNumber { font-size:64px; } .intro { font-size:16px; } .fixtures { gap:24px; } .featured { padding:24px 20px; min-height:360px; } .featured .cardContent { gap:28px; } .cardTop { font-size:20px; } .status, .liveStatus { padding:8px; font-size:13px; } .teamLogo { width:72px; height:72px; } .team { gap:12px; } .teamName { font-size:38px; } .versus { font-size:18px; } .matchup { gap:12px; } .cardFooter { padding-top:28px; font-size:18px; gap:12px; } .time { font-size:24px; } .moreGames { grid-template-columns:1fr; } .sidebarHeading { font-size:14px; } }
 
 @media (max-width:639px) {
+  .teamName { text-align:center; }
+  .longTeamNames .teamName { font-size:clamp(16px, 4.5vw, 24px); }
   .scoredMatchup { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:20px; }
   .scoredMatchup > .team { align-self:start; }
   .scoredMatchup > :first-child { grid-column:1; grid-row:1; }
