@@ -33,7 +33,7 @@ export default function ScheduleEvents({
         value={selectedEvent ?? ""}
         disabled={disabled || isLoading}
         onChange={event => onSelect(event.target.value || null)}
-        className="mt-3 h-12 w-full rounded border border-neutral-300 bg-[#f7f6f6] px-3 text-base focus-visible:outline-2 focus-visible:outline-tc_primary-400 disabled:opacity-50 xl:hidden"
+        className="mt-3 h-12 w-full cursor-pointer rounded border border-neutral-300 bg-[#f7f6f6] px-3 text-base focus-visible:outline-2 focus-visible:outline-tc_primary-400 disabled:cursor-not-allowed disabled:opacity-50 xl:hidden"
       >
         <option value="">All Events</option>
         {visibleGroups.map(group => (
@@ -50,7 +50,7 @@ export default function ScheduleEvents({
         disabled={disabled}
         onClick={() => onSelect(null)}
         className={cn(
-          "my-2 hidden h-9 w-full justify-start rounded-none px-2 text-[15px] motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none xl:flex",
+          "my-2 hidden h-9 w-full cursor-pointer justify-start rounded-none px-2 text-[15px] motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none xl:flex",
           !selectedEvent && "bg-white/40 font-bold",
         )}
       >
@@ -71,7 +71,7 @@ export default function ScheduleEvents({
                   disabled={disabled}
                   onClick={() => onSelect(event.name)}
                   className={cn(
-                    "flex h-auto min-h-9 w-full justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none",
+                    "flex h-auto min-h-9 w-full cursor-pointer justify-start rounded-none px-2 py-1 text-[15px] whitespace-normal motion-safe:transition-colors motion-safe:duration-200 motion-reduce:transition-none",
                     selectedEvent === event.name && "bg-white/40 font-bold",
                   )}
                 >

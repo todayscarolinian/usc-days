@@ -116,7 +116,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   if (!teamA || !teamB) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-[520px] [&_[data-slot=dialog-close]]:cursor-pointer">
           <DialogHeader>
             <DialogTitle>Add / Edit Score</DialogTitle>
             <DialogDescription>
@@ -127,7 +127,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto"
+              className="w-full cursor-pointer sm:w-auto"
             >
               Cancel
             </Button>
@@ -212,7 +212,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
+      <DialogContent className="sm:max-w-[520px] [&_[data-slot=dialog-close]]:cursor-pointer">
         <DialogHeader>
           <DialogTitle>Add / Edit Score</DialogTitle>
           <DialogDescription>
@@ -226,6 +226,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
             <div className="flex items-center gap-2">
               <Checkbox
                 id="teamAForfeit"
+                className="cursor-pointer"
                 checked={teamAForfeited}
                 onCheckedChange={(checked) => {
                   const isChecked = checked === true;
@@ -255,6 +256,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
             <div className="flex items-center gap-2">
               <Checkbox
                 id="teamBForfeit"
+                className="cursor-pointer"
                 checked={teamBForfeited}
                 onCheckedChange={(checked) => {
                   const isChecked = checked === true;
@@ -344,18 +346,18 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                   }}
                   disabled={editGameMutation.isPending || oneForfeited}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full cursor-pointer">
                     <SelectValue placeholder="Select winning team or draw" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={teamA.id.toString()}>
+                    <SelectItem className="cursor-pointer" value={teamA.id.toString()}>
                       {home}
                     </SelectItem>
-                    <SelectItem value={teamB.id.toString()}>
+                    <SelectItem className="cursor-pointer" value={teamB.id.toString()}>
                       {away}
                     </SelectItem>
-                    <SelectItem value="draw">Draw</SelectItem>
-                    <SelectItem value="none">No winner yet</SelectItem>
+                    <SelectItem className="cursor-pointer" value="draw">Draw</SelectItem>
+                    <SelectItem className="cursor-pointer" value="none">No winner yet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -401,14 +403,14 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={editGameMutation.isPending}
-            className="w-full sm:w-auto"
+            className="w-full cursor-pointer sm:w-auto"
           >
             Cancel
           </Button>
           <Button
             onClick={save}
             disabled={editGameMutation.isPending || !editingChanged}
-            className="w-full sm:w-auto"
+            className="w-full cursor-pointer sm:w-auto"
           >
             {editGameMutation.isPending ? "Saving…" : "Save Score"}
           </Button>

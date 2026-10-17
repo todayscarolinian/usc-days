@@ -175,7 +175,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild onClick={() => setOpen(true)}>
         <Button className={cn(
-          "bg-tc_primary-500 hover:bg-tc_primary-600",
+          "cursor-pointer bg-tc_primary-500 hover:bg-tc_primary-600",
           compactTrigger && "size-10 p-0 sm:h-9 sm:w-auto sm:px-3",
         )}>
           {compactTrigger && <Plus className="size-4" aria-hidden="true" />}
