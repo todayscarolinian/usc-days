@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { AxiosError } from "axios";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Trophy } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { useIsMutating } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access
 import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
 import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { MAX_SCORE_DELTA, SCORES_REQUIRE_TEAMS_MESSAGE, type ScoreDeltaPayload } from "@/src/types/games.types";
-import { getLogoForSchool } from "@/src/lib/utils";
+import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
 
 const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
@@ -36,32 +36,55 @@ function errorMessage(error: unknown) {
   return "Something went wrong. Please try again.";
 }
 
-function resultLabel(game: Schedules) {
-  if (game.teamAForfeited && game.teamBForfeited) return "Both teams forfeited";
-  if (game.isDraw) return "Draw";
-  if (game.winner) {
-    const forfeit = game.teamAForfeited || game.teamBForfeited ? " (forfeit)" : "";
-    return `${game.winner.teamName} wins${forfeit}`;
-  }
-  return null;
+type Outcome = "winner" | "loser" | "draw" | "forfeit" | null;
+
+function getOutcome(game: Schedules, team: Schedules["teamA"], forfeited: boolean): Outcome {
+  if (forfeited) return "forfeit";
+  if (game.isDraw) return "draw";
+  if (game.winnerId == null || team == null) return null;
+  return game.winnerId === team.id ? "winner" : "loser";
 }
+
+const OUTCOME_BADGES: Record<Exclude<Outcome, "loser" | null>, { label: string; className: string }> = {
+  winner: { label: "Winner", className: "bg-tc_primary-400 text-white" },
+  draw: { label: "Draw", className: "bg-neutral-800 text-white" },
+  forfeit: { label: "Forfeit", className: "bg-neutral-300 text-neutral-700" },
+};
 
 type TeamScoreProps = {
   team: Schedules["teamA"];
   score: string;
+  outcome: Outcome;
   /** Numeric score for the minus-button floor; omitted for viewers who cannot edit. */
   editable?: { value: number; onChange: (delta: number) => void };
 };
 
-function TeamScore({ team, score, editable }: TeamScoreProps) {
+function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
   const [custom, setCustom] = useState("");
   const customDelta = Number(custom);
   const customValid = custom !== "" && Number.isInteger(customDelta) && customDelta > 0 && customDelta <= MAX_SCORE_DELTA;
   const name = team?.teamName ?? "TBD";
+  const badge = outcome && outcome !== "loser" ? OUTCOME_BADGES[outcome] : null;
+  const dimmed = outcome === "loser" || outcome === "forfeit";
 
   return (
-    <section aria-label={`${name} score`} className="flex flex-col items-center gap-4 bg-neutral-100 p-4 sm:p-6">
-      <div className="flex flex-col items-center gap-2">
+    <section
+      aria-label={`${name} score${badge ? `, ${badge.label.toLowerCase()}` : ""}`}
+      className={cn(
+        "flex flex-col items-center gap-4 border-t-4 bg-neutral-100 p-4 sm:p-6",
+        outcome === "winner" ? "border-tc_primary-400 bg-white shadow-sm" : "border-transparent",
+      )}
+    >
+      {/* Reserved on both cards so logos and scores stay aligned whether or not a badge shows. */}
+      <div className="flex h-6 items-center">
+        {badge && (
+          <span className={cn("inline-flex items-center gap-1 px-2 py-1 text-xs font-bold tracking-wider uppercase", badge.className)}>
+            {outcome === "winner" && <Trophy aria-hidden="true" className="size-3.5" />}
+            {badge.label}
+          </span>
+        )}
+      </div>
+      <div className={cn("flex flex-col items-center gap-2", dimmed && "opacity-50")}>
         {team ? (
           <Image src={getLogoForSchool(name)} alt="" width={64} height={64} className="size-16 object-contain" />
         ) : (
@@ -69,7 +92,16 @@ function TeamScore({ team, score, editable }: TeamScoreProps) {
         )}
         <h2 className="text-center text-lg font-bold uppercase sm:text-xl">{name}</h2>
       </div>
-      <output aria-live="polite" className="text-6xl font-bold tabular-nums sm:text-7xl">{score}</output>
+      <output
+        aria-live="polite"
+        className={cn(
+          "text-6xl font-bold tabular-nums sm:text-7xl",
+          outcome === "winner" && "text-tc_primary-500",
+          dimmed && "text-neutral-400",
+        )}
+      >
+        {score}
+      </output>
       {editable && (
         <>
           <div className="grid w-full grid-cols-3 gap-2">
@@ -134,10 +166,9 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
   const finished = status === "finished";
   const teamsSet = game.teamA != null && game.teamB != null;
   const canTrack = canManage && teamsSet && !finished;
-  const result = resultLabel(game);
   const location = game.location?.trim() || "Location TBA";
   const start = new Date(game.startDate);
-  // Sport, teams, status, and result already appear above the details.
+  // Sport, teams, status, and the result badges already appear above the details.
   const details = [
     { label: "Date", value: dateFormatter.format(start), Icon: CalendarDays },
     { label: "Time", value: `${timeFormatter.format(start)} – ${timeFormatter.format(new Date(game.endDate))}`, Icon: Clock },
@@ -171,16 +202,16 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
         <TeamScore
           team={game.teamA}
           score={display(game.teamAScore, game.teamAForfeited)}
+          outcome={getOutcome(game, game.teamA, game.teamAForfeited)}
           editable={editable("A", game.teamAScore)}
         />
         <TeamScore
           team={game.teamB}
           score={display(game.teamBScore, game.teamBForfeited)}
+          outcome={getOutcome(game, game.teamB, game.teamBForfeited)}
           editable={editable("B", game.teamBScore)}
         />
       </div>
-
-      {result && <p className="text-center text-lg font-semibold">{result}</p>}
 
       {canManage && !teamsSet && <p className="text-sm text-neutral-600">{SCORES_REQUIRE_TEAMS_MESSAGE}</p>}
       {updateScore.isError && (
