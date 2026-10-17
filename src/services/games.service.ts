@@ -210,16 +210,15 @@ class GameService {
       // Games are ordered by (startDate, id), so the id breaks start-time ties.
       if (after) {
         and.push({
-          OR:
-            order === "asc"
-              ? [
-                  { startDate: { gt: after.startDate } },
-                  { startDate: after.startDate, id: { gt: after.id } },
-                ]
-              : [
-                  { startDate: { lt: after.startDate } },
-                  { startDate: after.startDate, id: { lt: after.id } },
-                ],
+          OR: order === "asc"
+            ? [
+                { startDate: { gt: after.startDate } },
+                { startDate: after.startDate, id: { gt: after.id } },
+              ]
+            : [
+                { startDate: { lt: after.startDate } },
+                { startDate: after.startDate, id: { lt: after.id } },
+              ],
         });
       }
 
@@ -496,11 +495,7 @@ class GameService {
 
       const updated = await tx.game.findUniqueOrThrow({ where: { id } });
       if (count === 0) {
-        const finished = hasSavedResult({
-          ...updated,
-          teamAScore: null,
-          teamBScore: null,
-        });
+        const finished = hasSavedResult({ ...updated, teamAScore: null, teamBScore: null });
         throw finished
           ? new ApiError("CONFLICT", FINISHED_GAME_SCORE_MESSAGE)
           : new ApiError("VALIDATION_ERROR", NEGATIVE_SCORE_MESSAGE);
