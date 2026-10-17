@@ -2,6 +2,7 @@ import { prisma } from "@/src/lib/prisma";
 import {
   AddGamePayload,
   EditGamePayload,
+  ScoreDeltaPayload,
   PaginationParams,
   PaginatedGamesResponse,
   SCORES_REQUIRE_TEAMS_MESSAGE,
@@ -83,6 +84,18 @@ export function duplicateTeamMatchupFilter(
     ],
   };
 }
+
+/** A game without a winner, draw, or forfeit can still have its score changed. */
+const UNFINISHED_GAME: Prisma.GameWhereInput = {
+  winnerId: null,
+  isDraw: false,
+  teamAForfeited: false,
+  teamBForfeited: false,
+};
+
+export const FINISHED_GAME_SCORE_MESSAGE =
+  "This game already has a result. Edit its score from the Add Score dialog.";
+export const NEGATIVE_SCORE_MESSAGE = "Scores cannot go below 0.";
 
 export interface GetGamesParams {
   gameTypeId?: number;
@@ -441,6 +454,52 @@ class GameService {
       },
     });
     return updatedGame;
+  }
+  /**
+   * Adds `delta` to one team's score atomically, so concurrent scorers never lose points.
+   * Empty scores start at 0 for both teams. Finished games and scores below 0 are rejected.
+   */
+  async updateScore(id: number, { team, delta }: ScoreDeltaPayload) {
+    const field = team === "A" ? "teamAScore" : "teamBScore";
+
+    return prisma.$transaction(async (tx) => {
+      const existing = await tx.game.findUnique({ where: { id } });
+      if (!existing) {
+        throw new ApiError("NOT_FOUND", "Game not found.");
+      }
+      if (existing.teamAId == null || existing.teamBId == null) {
+        throw new ApiError("VALIDATION_ERROR", SCORES_REQUIRE_TEAMS_MESSAGE);
+      }
+
+      await tx.game.updateMany({
+        where: { id, teamAScore: null, ...UNFINISHED_GAME },
+        data: { teamAScore: 0 },
+      });
+      await tx.game.updateMany({
+        where: { id, teamBScore: null, ...UNFINISHED_GAME },
+        data: { teamBScore: 0 },
+      });
+
+      // The conditions are checked in the same statement as the increment,
+      // so a result saved meanwhile or a concurrent decrement cannot slip past them.
+      const { count } = await tx.game.updateMany({
+        where: {
+          id,
+          ...UNFINISHED_GAME,
+          ...(delta < 0 ? { [field]: { gte: -delta } } : {}),
+        },
+        data: { [field]: { increment: delta } },
+      });
+
+      const updated = await tx.game.findUniqueOrThrow({ where: { id } });
+      if (count === 0) {
+        const finished = hasSavedResult({ ...updated, teamAScore: null, teamBScore: null });
+        throw finished
+          ? new ApiError("CONFLICT", FINISHED_GAME_SCORE_MESSAGE)
+          : new ApiError("VALIDATION_ERROR", NEGATIVE_SCORE_MESSAGE);
+      }
+      return updated;
+    });
   }
   async deleteGame(id: number) {
     return prisma.game.delete({

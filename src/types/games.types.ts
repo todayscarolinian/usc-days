@@ -254,9 +254,22 @@ export const EditGameSchema = z
     },
   );
 
+export const MAX_SCORE_DELTA = 1000;
+
+export const ScoreDeltaSchema = z.object({
+  team: z.enum(["A", "B"], { error: "team must be either A or B." }),
+  delta: z
+    .number({ error: "delta must be a number." })
+    .int("delta must be a whole number.")
+    .min(-MAX_SCORE_DELTA, `delta cannot be less than -${MAX_SCORE_DELTA}.`)
+    .max(MAX_SCORE_DELTA, `delta cannot be more than ${MAX_SCORE_DELTA}.`)
+    .refine((delta) => delta !== 0, "delta cannot be 0."),
+});
+
 // Export inferred types
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
+export type ScoreDeltaPayload = z.infer<typeof ScoreDeltaSchema>;
 
 export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
 
