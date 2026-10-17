@@ -2,7 +2,7 @@
     {
         "id": 1,
         "categoryName": "T-Shirts",
-        "imgUrl": "/merch/tshirt/front-back.webp"
+        "imgUrl": "/merch/tshirt/box-cut.webp"
     },
     {
         "id": 2,
@@ -22,7 +22,7 @@
     {
         "id": 5,
         "categoryName": "Bookmarks",
-        "imgUrl": "/merch/bookmarks/pag-angkon-sa-gahum-front.webp"
+        "imgUrl": "/merch/bookmarks/usc-rangers-bookmark.webp"
     },
     {
         "id": 6,

@@ -2,12 +2,25 @@
     {
         "id": 1,
         "categoryId": 1,
-        "productTitle": "USC Days '26 Shirt",
+        "productTitle": "USC Rangers Go! Shirt (Box Style)",
         "productSize": null,
         "productPrice": 290,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/tshirt/front-back.webp",
+            "/merch/tshirt/box-cut.webp",
+            "/merch/tshirt/back-print.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 2,
+        "categoryId": 1,
+        "productTitle": "USC Rangers Go! Shirt (Regular Cut)",
+        "productSize": null,
+        "productPrice": 290,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/tshirt/regular-cut.webp",
             "/merch/tshirt/front.webp",
             "/merch/tshirt/back.webp",
             "/merch/tshirt/back-print.webp"
@@ -15,7 +28,7 @@
         "designers": []
     },
     {
-        "id": 2,
+        "id": 3,
         "categoryId": 2,
         "productTitle": "USC Rangers Lanyard",
         "productSize": null,
@@ -28,7 +41,7 @@
         "designers": []
     },
     {
-        "id": 3,
+        "id": 4,
         "categoryId": 2,
         "productTitle": "USC Textile Lanyard",
         "productSize": null,
@@ -41,7 +54,7 @@
         "designers": []
     },
     {
-        "id": 4,
+        "id": 5,
         "categoryId": 3,
         "productTitle": "SAFAD Pin",
         "productSize": null,
@@ -53,7 +66,7 @@
         "designers": []
     },
     {
-        "id": 5,
+        "id": 6,
         "categoryId": 3,
         "productTitle": "SAS Pin",
         "productSize": null,
@@ -65,7 +78,7 @@
         "designers": []
     },
     {
-        "id": 6,
+        "id": 7,
         "categoryId": 3,
         "productTitle": "SBE Pin",
         "productSize": null,
@@ -77,7 +90,7 @@
         "designers": []
     },
     {
-        "id": 7,
+        "id": 8,
         "categoryId": 3,
         "productTitle": "SED Pin",
         "productSize": null,
@@ -89,7 +102,7 @@
         "designers": []
     },
     {
-        "id": 8,
+        "id": 9,
         "categoryId": 3,
         "productTitle": "SHCP Pin",
         "productSize": null,
@@ -101,7 +114,7 @@
         "designers": []
     },
     {
-        "id": 9,
+        "id": 10,
         "categoryId": 3,
         "productTitle": "SLG Pin",
         "productSize": null,
@@ -113,7 +126,7 @@
         "designers": []
     },
     {
-        "id": 10,
+        "id": 11,
         "categoryId": 3,
         "productTitle": "SOE Pin",
         "productSize": null,
@@ -125,7 +138,7 @@
         "designers": []
     },
     {
-        "id": 11,
+        "id": 12,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SAFAD",
         "productSize": null,
@@ -137,7 +150,7 @@
         "designers": []
     },
     {
-        "id": 12,
+        "id": 13,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SAS",
         "productSize": null,
@@ -149,7 +162,7 @@
         "designers": []
     },
     {
-        "id": 13,
+        "id": 14,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SBE",
         "productSize": null,
@@ -161,7 +174,7 @@
         "designers": []
     },
     {
-        "id": 14,
+        "id": 15,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SED",
         "productSize": null,
@@ -173,7 +186,7 @@
         "designers": []
     },
     {
-        "id": 15,
+        "id": 16,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SHCP",
         "productSize": null,
@@ -185,7 +198,7 @@
         "designers": []
     },
     {
-        "id": 16,
+        "id": 17,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SLG",
         "productSize": null,
@@ -197,7 +210,7 @@
         "designers": []
     },
     {
-        "id": 17,
+        "id": 18,
         "categoryId": 4,
         "productTitle": "Chibi Ranger Sticker – SOE",
         "productSize": null,
@@ -209,7 +222,7 @@
         "designers": []
     },
     {
-        "id": 18,
+        "id": 19,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – All-Nighter Igniter (SAFAD)",
         "productSize": null,
@@ -221,7 +234,7 @@
         "designers": []
     },
     {
-        "id": 19,
+        "id": 20,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Hydrological (SAS)",
         "productSize": null,
@@ -233,7 +246,7 @@
         "designers": []
     },
     {
-        "id": 20,
+        "id": 21,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Asset Quaker (SBE)",
         "productSize": null,
@@ -245,7 +258,7 @@
         "designers": []
     },
     {
-        "id": 21,
+        "id": 22,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Gale-Force Educator (SED)",
         "productSize": null,
@@ -257,7 +270,7 @@
         "designers": []
     },
     {
-        "id": 22,
+        "id": 23,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Shift Shifter (SHCP)",
         "productSize": null,
@@ -269,7 +282,7 @@
         "designers": []
     },
     {
-        "id": 23,
+        "id": 24,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Timeless Codal (SLG)",
         "productSize": null,
@@ -281,7 +294,7 @@
         "designers": []
     },
     {
-        "id": 24,
+        "id": 25,
         "categoryId": 4,
         "productTitle": "Bagani Helmet Sticker – Engineergizer (SOE)",
         "productSize": null,
@@ -293,7 +306,7 @@
         "designers": []
     },
     {
-        "id": 25,
+        "id": 26,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SAFAD",
         "productSize": null,
@@ -305,7 +318,7 @@
         "designers": []
     },
     {
-        "id": 26,
+        "id": 27,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SAS",
         "productSize": null,
@@ -317,7 +330,7 @@
         "designers": []
     },
     {
-        "id": 27,
+        "id": 28,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SBE",
         "productSize": null,
@@ -329,7 +342,7 @@
         "designers": []
     },
     {
-        "id": 28,
+        "id": 29,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SED",
         "productSize": null,
@@ -341,7 +354,7 @@
         "designers": []
     },
     {
-        "id": 29,
+        "id": 30,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SHCP",
         "productSize": null,
@@ -353,7 +366,7 @@
         "designers": []
     },
     {
-        "id": 30,
+        "id": 31,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SLG",
         "productSize": null,
@@ -365,7 +378,7 @@
         "designers": []
     },
     {
-        "id": 31,
+        "id": 32,
         "categoryId": 4,
         "productTitle": "Bagani ID Sticker – SOE",
         "productSize": null,
@@ -377,7 +390,7 @@
         "designers": []
     },
     {
-        "id": 32,
+        "id": 33,
         "categoryId": 4,
         "productTitle": "Magi Staff Morpher Sticker",
         "productSize": null,
@@ -389,20 +402,31 @@
         "designers": []
     },
     {
-        "id": 33,
+        "id": 34,
         "categoryId": 5,
-        "productTitle": "\"Ang Pag-angkon sa Gahum\"",
+        "productTitle": "USC Rangers Bookmark (\"Ang Pag-angkon sa Gahum\")",
         "productSize": null,
         "productPrice": 30,
         "isAvailable": true,
         "imgUrls": [
-            "/merch/bookmarks/pag-angkon-sa-gahum-front.webp",
-            "/merch/bookmarks/pag-angkon-sa-gahum-back.webp"
+            "/merch/bookmarks/usc-rangers-bookmark.webp"
         ],
         "designers": []
     },
     {
-        "id": 34,
+        "id": 35,
+        "categoryId": 5,
+        "productTitle": "Naginid Bookmark (\"Ang Pag-angkon sa Gahum\")",
+        "productSize": null,
+        "productPrice": 30,
+        "isAvailable": true,
+        "imgUrls": [
+            "/merch/bookmarks/naginid-bookmark.webp"
+        ],
+        "designers": []
+    },
+    {
+        "id": 36,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SHCP",
         "productSize": null,
@@ -414,7 +438,7 @@
         "designers": []
     },
     {
-        "id": 35,
+        "id": 37,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SAFAD",
         "productSize": null,
@@ -426,7 +450,7 @@
         "designers": []
     },
     {
-        "id": 36,
+        "id": 38,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SAS",
         "productSize": null,
@@ -438,7 +462,7 @@
         "designers": []
     },
     {
-        "id": 37,
+        "id": 39,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SED",
         "productSize": null,
@@ -450,7 +474,7 @@
         "designers": []
     },
     {
-        "id": 38,
+        "id": 40,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SLG",
         "productSize": null,
@@ -462,7 +486,7 @@
         "designers": []
     },
     {
-        "id": 39,
+        "id": 41,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SBE",
         "productSize": null,
@@ -474,7 +498,7 @@
         "designers": []
     },
     {
-        "id": 40,
+        "id": 42,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – SOE",
         "productSize": null,
@@ -486,7 +510,7 @@
         "designers": []
     },
     {
-        "id": 41,
+        "id": 43,
         "categoryId": 6,
         "productTitle": "Meet the Rangers Postcard – Naginid",
         "productSize": null,
