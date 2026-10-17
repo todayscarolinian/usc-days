@@ -33,7 +33,10 @@
 .teamLogo { width:105px; height:105px; object-fit:contain; }
 .teamName { max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:70px; line-height:1.2; font-weight:800; }
 .versus { font-size:25px; font-weight:700; color:#626262; }
-.featured .score { font-size:clamp(28px, 4vw, 48px); line-height:1; font-weight:800; color:#000; }
+.featured .score { font-size:clamp(32px, 5vw, 64px); line-height:1; font-weight:800; color:#000; }
+.card .scoreValue { font-size:inherit; color:#000; }
+.scoreSeparator { color:#626262; }
+.compact .scoreSeparator { font-size:inherit; color:rgb(0 0 0 / 60%); }
 .cardFooter { position:relative; display:flex; justify-content:space-between; align-items:center; gap:20px; padding-top:42px; font-size:28px; line-height:1.2; color:#626262; }
 .cardFooter::before { content:""; position:absolute; top:0; left:8%; right:8%; height:2px; background:#d6d4d0; }
 .live .cardFooter::before { background:#ecc9c5; }
@@ -48,6 +51,14 @@
 @media (max-width:1199px) { .section { padding:32px; } .fixtures { gap:28px; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); } .featured { padding:28px; } .teamName { font-size:52px; } .teamLogo { width:88px; height:88px; } .cardTop, .cardFooter { font-size:22px; } .time { font-size:28px; } .compact { padding:16px; } }
 @media (max-width:1023px) { .fixtures { grid-template-columns:1fr; } .featured { min-height:450px; } .moreGames { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } .title { font-size:52px; } }
 @media (max-width:639px) { .section { padding:24px 16px; gap:24px; } .header, .masthead { gap:24px; } .mastheadRow { font-size:13px; } .title { font-size:clamp(28px,7.7vw,46px); } .eyebrow, .dayLabel { font-size:11px; } .dayNumber { font-size:64px; } .intro { font-size:16px; } .fixtures { gap:24px; } .featured { padding:24px 20px; min-height:360px; } .featured .cardContent { gap:28px; } .cardTop { font-size:20px; } .status, .liveStatus { padding:8px; font-size:13px; } .teamLogo { width:72px; height:72px; } .team { gap:12px; } .teamName { font-size:38px; } .versus { font-size:18px; } .matchup { gap:12px; } .cardFooter { padding-top:28px; font-size:18px; gap:12px; } .time { font-size:24px; } .moreGames { grid-template-columns:1fr; } .sidebarHeading { font-size:14px; } }
+
+@media (max-width:639px) {
+  .scoredMatchup { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:20px; }
+  .scoredMatchup > .team { align-self:start; }
+  .scoredMatchup > :first-child { grid-column:1; grid-row:1; }
+  .scoredMatchup > :last-child { grid-column:2; grid-row:1; }
+  .scoredMatchup > :nth-child(2) { grid-column:1 / -1; grid-row:2; justify-self:center; }
+}
 
 /* Keep the desktop matchday desk within the space below the 64px navbar. */
 @media (min-width:1024px) {

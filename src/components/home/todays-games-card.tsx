@@ -24,7 +24,13 @@ export function TodaysGamesCard({
   const showScores = ongoing && (game.teamAScore != null || game.teamBScore != null);
   const scoreA = String(game.teamAScore ?? "–");
   const scoreB = String(game.teamBScore ?? "–");
-  const score = showScores ? `${scoreA} – ${scoreB}` : null;
+  const score = showScores ? (
+    <>
+      <span className={styles.scoreValue}>{scoreA}</span>{" "}
+      <span className={styles.scoreSeparator}>–</span>{" "}
+      <span className={styles.scoreValue}>{scoreB}</span>
+    </>
+  ) : null;
   const location = game.location?.trim() || "TBA";
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
@@ -54,7 +60,7 @@ export function TodaysGamesCard({
               {location}
             </span>
           </span>
-          <span className={styles.compactTeams}>
+          <span className={cn(styles.compactTeams, showScores && styles.scoredMatchup)}>
             <span className="flex min-w-0 items-center gap-2">
               <Image src={logoA} alt="" width={22} height={22} className="size-[30px] shrink-0 object-contain" />
               <span className="min-w-0 truncate text-[22px] leading-[1.2] font-bold" title={teamA}>
@@ -63,7 +69,7 @@ export function TodaysGamesCard({
             </span>
             <span className={cn(
               "leading-none whitespace-nowrap tabular-nums",
-              showScores ? "text-[22px] font-bold text-black" : "text-[10px] font-medium text-black/65",
+              showScores ? "text-[28px] font-bold text-black" : "text-[10px] font-medium text-black/65",
             )}>
               {score ?? "vs"}
             </span>
@@ -89,7 +95,7 @@ export function TodaysGamesCard({
             </span>
           </span>
 
-          <span className={styles.matchup}>
+          <span className={cn(styles.matchup, showScores && styles.scoredMatchup)}>
             <span className={styles.team}>
               <Image src={logoA} alt="" width={106} height={106} className={styles.teamLogo} />
               <span className={styles.teamName} title={teamA}>
