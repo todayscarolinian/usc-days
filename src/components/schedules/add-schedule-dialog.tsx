@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogError,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -59,7 +60,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     reset,
   } = useScheduleForm();
 
-  const { showToast, dismissAll } = useToastManager();
+  const { showToast, dismissAll, inlineError, clearInlineError } = useToastManager({ inlineMobileErrors: true });
 
   // Track which errors have already been shown
   const shownErrorsRef = useRef<Set<string>>(new Set());
@@ -127,6 +128,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
   }));
 
   async function createSchedule() {
+    clearInlineError();
 
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
@@ -184,16 +186,16 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
           </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-150">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 grid-cols-[minmax(0,1fr)] overflow-y-auto p-4 sm:max-w-150 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl sm:text-3xl">Add Schedule</DialogTitle>
           <DialogDescription>
             Add a new game schedule. Click Submit when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-8 py-4">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 py-4 sm:gap-8">
           <div className="w-full grid grid-cols-1 gap-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="startDate" className="font-bold opacity-50">
                 Date
               </Label>
@@ -204,11 +206,10 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
                   updateInput("startDate", e.target.value);
                   updateInput("endDate", e.target.value);
                 }}
-                className={
-                  validationErrors.startDate
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
-                }
+                className={cn(
+                  "max-w-full",
+                  validationErrors.startDate && "border-red-500 focus-visible:ring-red-500",
+                )}
               />
               {validationErrors.startDate && (
                 <span className="text-xs text-red-500">
@@ -218,22 +219,24 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
             </div>
           </div>
           <div className="w-full grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="startTime" className="font-bold opacity-50">
                 Start Time
               </Label>
               <Input
-                type="time"
+                 type="time"
+                className="max-w-full"
                 value={inputs.startTime}
                 onChange={(e) => updateInput("startTime", e.target.value)}
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="endTime" className="font-bold opacity-50">
                 End Time
               </Label>
               <Input
-                type="time"
+                 type="time"
+                className="max-w-full"
                 value={inputs.endTime}
                 onChange={(e) => updateInput("endTime", e.target.value)}
               />
@@ -271,8 +274,8 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
               Could not load teams. <button type="button" className="underline" onClick={() => void teams.refetch()}>Try again</button>
             </div>
           )}
-          <div className="w-full flex justify-between items-center gap-4">
-            <div className="flex flex-col gap-1 w-full">
+          <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="teamA" className="font-bold opacity-50">
                 Team
               </Label>
@@ -297,7 +300,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
               )}
             </div>
             <span className="font-bold opacity-50">vs</span>
-            <div className="flex flex-col gap-1 w-full">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="teamB" className="font-bold opacity-50">
                 Team
               </Label>
@@ -339,6 +342,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
             />
           </div>
         </div>
+        <DialogError error={inlineError} />
         <DialogFooter className="flex items-center">
           {hasErrors && (
             <span className="text-sm text-red-500 mr-auto">

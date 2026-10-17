@@ -103,6 +103,25 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+function DialogError({ error }: { error: { title: string; description?: string } | null }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (error && ref.current?.getClientRects().length) {
+      ref.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [error]);
+
+  if (!error) return null;
+
+  return (
+    <div ref={ref} role="alert" className="min-w-0 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive [overflow-wrap:anywhere] sm:hidden">
+      <p className="font-semibold">{error.title}</p>
+      {error.description && <p className="mt-1">{error.description}</p>}
+    </div>
+  );
+}
+
 function DialogTitle({
   className,
   ...props
@@ -134,6 +153,7 @@ export {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogError,
   DialogFooter,
   DialogHeader,
   DialogOverlay,

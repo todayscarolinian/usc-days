@@ -129,7 +129,7 @@ export function SearchableSelect({
           aria-label={placeholder}
           disabled={isDisabled}
           className={cn(
-            "w-full justify-between",
+            "w-full min-w-0 max-w-full justify-between",
             !selectedOption && "text-muted-foreground",
             className,
           )}

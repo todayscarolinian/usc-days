@@ -21,6 +21,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogError,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -88,7 +89,7 @@ export default function EditScheduleDialog({
     }),
   });
 
-  const { showToast, dismissAll } = useToastManager();
+  const { showToast, dismissAll, inlineError, clearInlineError } = useToastManager({ inlineMobileErrors: true });
 
   // Track which errors have already been shown
   const shownErrorsRef = useRef<Set<string>>(new Set());
@@ -147,6 +148,7 @@ export default function EditScheduleDialog({
 
   const edit = useEditGamesQuery();
   const editSchedule = () => {
+    clearInlineError();
     // Validate sport selection
     if (inputs.gameTypeId <= 0) {
       showToast("error", "Please select a sport");
@@ -199,6 +201,7 @@ export default function EditScheduleDialog({
 
   const del = useDeleteGamesQuery();
   const deleteSchedule = () => {
+    clearInlineError();
     del.mutate(
       { scheduleId: schedule.id },
       {
@@ -233,7 +236,7 @@ export default function EditScheduleDialog({
         }
       }}
     >
-      <DialogContent className="sm:max-w-150 [&_[data-slot=dialog-close]]:cursor-pointer">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 grid-cols-[minmax(0,1fr)] overflow-y-auto sm:max-w-150 [&_[data-slot=dialog-close]]:cursor-pointer">
         <DialogHeader>
           <DialogTitle>Edit Schedule</DialogTitle>
           <DialogDescription>
@@ -377,6 +380,7 @@ export default function EditScheduleDialog({
           </div>
         </div>
 
+        <DialogError error={inlineError} />
         <DialogFooter className="flex items-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>
