@@ -91,9 +91,20 @@ class FacebookService {
       id: raw.id,
       message: raw.message ?? null,
       createdTime: raw.created_time,
-      permalinkUrl: raw.permalink_url,
+      permalinkUrl: this.toPermalinkUrl(raw),
       imageUrl: raw.full_picture ?? null,
     };
+  }
+
+  /**
+   * Builds `facebook.com/{pageId}/posts/{postId}` from the `{pageId}_{postId}`
+   * Graph ID. The Facebook mobile app opens this numeric form reliably, unlike
+   * the `pfbid` and `photo.php` URLs Graph returns in `permalink_url`.
+   */
+  private toPermalinkUrl(raw: GraphPost): string {
+    const [pageId, postId] = raw.id.split("_");
+    if (!pageId || !postId) return raw.permalink_url;
+    return `https://www.facebook.com/${pageId}/posts/${postId}`;
   }
 
   /** All Page posts created within [since, until], newest first. */
