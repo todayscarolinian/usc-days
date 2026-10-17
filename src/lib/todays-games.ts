@@ -47,15 +47,19 @@ export function getMatchdayGameStatus(
   return null;
 }
 
-export function selectTodaysGames(games: Schedules[]): TodaysGamesSelection {
-  const sortedGames = [...games].sort(
+export function selectTodaysGames(games: Schedules[], now: Date): TodaysGamesSelection {
+  const sortedGames = games.filter((game) => {
+    const status = getGameStatus(game, now);
+    return status === "live" || status === "upcoming";
+  }).sort(
     (a, b) =>
+      Number(getGameStatus(b, now) === "live") - Number(getGameStatus(a, now) === "live") ||
       new Date(a.startDate).getTime() - new Date(b.startDate).getTime() ||
       a.id - b.id,
   );
 
   return {
-    featured: sortedGames.slice(0, 3),
-    compact: sortedGames.slice(3, 7),
+    featured: sortedGames.slice(0, 1),
+    compact: sortedGames.slice(1, 5),
   };
 }
