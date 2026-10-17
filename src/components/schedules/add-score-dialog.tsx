@@ -88,6 +88,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   const [teamAForfeited, setTeamAForfeited] = React.useState(false);
   const [teamBForfeited, setTeamBForfeited] = React.useState(false);
   const [isDraw, setIsDraw] = React.useState(false);
+  const [noResult, setNoResult] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const editGameMutation = useEditGamesQuery();
@@ -102,6 +103,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
       setTeamAForfeited(game.teamAForfeited ?? false);
       setTeamBForfeited(game.teamBForfeited ?? false);
       setIsDraw(game.isDraw ?? false);
+      setNoResult(false);
       setError(null);
     }
   }, [open, game]);
@@ -183,9 +185,9 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
 
     // Both forfeited: winnerId must be null, skip winnerId check
     // Draw: winnerId must be null
-    // One or no forfeits and not draw: winnerId is required
-    if (!bothForfeited && !isDraw && winnerId === null) {
-      setError("Please select a winning team or mark as draw.");
+    // One or no forfeits and not draw: winnerId is required unless "No winner yet" was picked
+    if (!bothForfeited && !isDraw && winnerId === null && !noResult) {
+      setError("Please select a winning team, mark as draw, or choose no winner yet.");
       return;
     }
 
@@ -328,10 +330,14 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
               <span className="text-muted-foreground">Winner</span>
               <div className="col-span-2">
                 <Select
-                  value={isDraw ? "draw" : (winnerId?.toString() ?? "")}
+                  value={isDraw ? "draw" : (winnerId?.toString() ?? (noResult ? "none" : ""))}
                   onValueChange={(value) => {
+                    setNoResult(value === "none");
                     if (value === "draw") {
                       setIsDraw(true);
+                      setWinnerId(null);
+                    } else if (value === "none") {
+                      setIsDraw(false);
                       setWinnerId(null);
                     } else {
                       setIsDraw(false);
@@ -351,6 +357,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
                       {away}
                     </SelectItem>
                     <SelectItem value="draw">Draw</SelectItem>
+                    <SelectItem value="none">No winner yet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -377,7 +384,9 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
               <div className="text-sm text-muted-foreground mt-1">
                 {isDraw
                   ? "Result: Draw"
-                  : `Winner: ${
+                  : noResult && winnerId === null
+                    ? "No winner yet"
+                    : `Winner: ${
                       winnerId === teamA.id
                         ? home
                         : winnerId === teamB.id
