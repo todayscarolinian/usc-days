@@ -5,7 +5,7 @@ export type GameStatus = "upcoming" | "live" | "finished" | "awaiting" | "ended"
 export const GAME_STATUS_LABELS: Record<GameStatus, string> = {
   upcoming: "Upcoming",
   live: "Live",
-  finished: "Final",
+  finished: "Finished",
   awaiting: "Awaiting result",
   ended: "Ended",
 };

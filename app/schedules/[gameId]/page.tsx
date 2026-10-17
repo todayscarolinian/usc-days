@@ -22,7 +22,7 @@ function parseGameId(raw: string) {
 
 type Game = Awaited<ReturnType<GameService["getGameById"]>>;
 
-/** The score line people see in link previews, e.g. "Final: SAS 9 – 0 SAFAD. SAS wins." */
+/** The score line people see in link previews, e.g. "Finished: SAS 9 – 0 SAFAD. SAS wins." */
 function describeResult(game: Game) {
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
@@ -35,7 +35,7 @@ function describeResult(game: Game) {
         return `${game.teamAForfeited ? teamA : teamB} forfeited. ${game.winner?.teamName ?? ""} wins.`.trim();
       }
       const outcome = game.isDraw ? "Draw." : game.winner ? `${game.winner.teamName} wins.` : "";
-      return `Final: ${score}. ${outcome}`.trim();
+      return `Finished: ${score}. ${outcome}`.trim();
     }
     case "live":
       return game.teamAScore != null || game.teamBScore != null ? `Live: ${score}.` : "Live now.";
