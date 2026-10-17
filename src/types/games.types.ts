@@ -105,7 +105,7 @@ export const EditGameSchema = z
             ? "teamAScore is required."
             : "teamAScore must be a number.",
       })
-      .min(-1, "teamAScore cannot be negative.")
+      .min(0, "teamAScore cannot be negative.")
       .nullable()
       .optional(),
     teamBScore: z
@@ -115,7 +115,7 @@ export const EditGameSchema = z
             ? "teamBScore is required."
             : "teamBScore must be a number.",
       })
-      .min(-1, "teamBScore cannot be negative.")
+      .min(0, "teamBScore cannot be negative.")
       .nullable()
       .optional(),
     winnerId: z

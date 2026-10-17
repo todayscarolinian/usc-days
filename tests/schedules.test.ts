@@ -48,9 +48,8 @@ describe("shared match status", () => {
     assert.equal(getGameStatus(game({ endDate: now.toISOString() }), now), "ended");
   });
 
-  it("treats zero scores, draws, winners, and forfeits as results regardless of time", () => {
+  it("treats draws, winners, and forfeits as results regardless of time", () => {
     for (const result of [
-      { teamAScore: 0, teamBScore: 0 },
       { isDraw: true },
       { winnerId: 10 },
       { teamAForfeited: true },
@@ -59,6 +58,14 @@ describe("shared match status", () => {
       assert.equal(getGameStatus(game(result), now), "finished");
       assert.equal(getMatchdayGameStatus(game(result), now), null);
     }
+  });
+
+  it("keeps scored games without a result live until they end, then awaiting a result", () => {
+    const scores = { teamAScore: 3, teamBScore: 0 };
+    assert.equal(getGameStatus(game(scores), now), "live");
+    assert.equal(getMatchdayGameStatus(game(scores), now), "ONGOING");
+    assert.equal(getGameStatus(game({ ...scores, endDate: now.toISOString() }), now), "awaiting");
+    assert.equal(getMatchdayGameStatus(game({ ...scores, endDate: now.toISOString() }), now), null);
   });
 
   it("keeps homepage status behavior compatible", () => {
