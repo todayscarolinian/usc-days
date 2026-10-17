@@ -1,16 +1,28 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import { format } from "date-fns";
 import Link from "next/link";
 import { useGamesQuery } from "@/src/queries/games.queries";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
 import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
+import { getScheduleDay, SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { TodaysGamesCard } from "./todays-games-card";
 import styles from "./todays-games.module.css";
 import { createMockTodaysGames } from "./todays-games.mock";
+
+const REFRESH_INTERVAL = 30_000;
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: SCHEDULE_TIME_ZONE,
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: SCHEDULE_TIME_ZONE,
+  weekday: "long",
+});
 
 function GamesSkeleton() {
   return (
@@ -37,7 +49,7 @@ function GamesContent({
   now: Date;
 }) {
   const {
-    data: todaysGames = [],
+    data: todaysGames,
     error,
     isLoading: loading,
     isFetching,
@@ -45,17 +57,16 @@ function GamesContent({
   } = useGamesQuery({
     startDate: dateLabel,
     endDate: dateLabel,
-  }, { enabled: !mock });
+  }, { enabled: !mock, refetchInterval: REFRESH_INTERVAL });
 
-  const { featured, compact } = useMemo(() => {
-    const selection = selectTodaysGames(mock ? createMockTodaysGames(now) : todaysGames);
-    const games = [...selection.featured, ...selection.compact];
-    return { featured: games.slice(0, 1), compact: games.slice(1, 5) };
-  }, [mock, now, todaysGames]);
+  const { featured, compact } = useMemo(
+    () => selectTodaysGames(mock ? createMockTodaysGames(now) : todaysGames ?? [], now),
+    [mock, now, todaysGames],
+  );
 
   if (!mock && loading) return <GamesSkeleton />;
 
-  if (!mock && error) {
+  if (!mock && error && !todaysGames) {
     return (
       <div
         role="alert"
@@ -78,7 +89,7 @@ function GamesContent({
   if (featured.length === 0) {
     return (
       <EmptyState
-        title="No games scheduled"
+        title={todaysGames?.length ? "No more games today" : "No games scheduled"}
         description="Explore the full schedule for upcoming matches."
         className="flex-1 [&>p:first-of-type]:text-2xl [&>p:last-of-type]:text-base md:[&>p:first-of-type]:text-3xl md:[&>p:last-of-type]:text-lg"
       />
@@ -92,7 +103,7 @@ function GamesContent({
         <div className={styles.sidebar}>
           <div className={styles.sidebarHeading}>
             <h3>MORE SCHEDULES</h3>
-            <span>{format(now, "MMMM d, yyyy")}</span>
+            <span>{dateFormatter.format(now)}</span>
           </div>
           <div className={styles.moreGames}>
             {compact.map((game) => (
@@ -113,7 +124,7 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
   useEffect(() => {
     const updateClock = () => setNow(new Date());
     const initialUpdate = window.setTimeout(updateClock, 0);
-    const interval = window.setInterval(updateClock, 60_000);
+    const interval = window.setInterval(updateClock, REFRESH_INTERVAL);
     return () => {
       window.clearTimeout(initialUpdate);
       window.clearInterval(interval);
@@ -140,7 +151,7 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
     return () => observer.disconnect();
   }, []);
 
-  const todayString = now ? format(now, "yyyy-MM-dd") : null;
+  const todayString = now ? getScheduleDay(now) : null;
   const eventDay = now ? getEventDay(now, "2026-10-19") : 0;
 
   return (
@@ -166,7 +177,7 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
             <div className={styles.titleGroup}>
               <p className={styles.eyebrow}>
                 {now ? (
-                  `${format(now, "EEEE").toUpperCase()} / USC DAYS`
+                  `${weekdayFormatter.format(now).toUpperCase()} / USC DAYS`
                 ) : (
                   <span
                     aria-hidden="true"
