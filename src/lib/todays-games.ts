@@ -49,6 +49,7 @@ export function getMatchdayGameStatus(
 
 export function selectTodaysGames(games: Schedules[], now: Date): TodaysGamesSelection {
   const sortedGames = games.filter((game) => {
+    if (game.teamA == null || game.teamB == null) return false;
     const status = getGameStatus(game, now);
     return status === "live" || status === "upcoming";
   }).sort(
