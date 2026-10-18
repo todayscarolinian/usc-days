@@ -6,7 +6,7 @@ import { useGamesQuery } from "@/src/queries/games.queries";
 import { Button } from "@/src/components/ui/button";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
-import { getEventDay, selectTodaysGames } from "@/src/lib/todays-games";
+import { getEventDay, getMatchdayGameStatus, selectTodaysGames } from "@/src/lib/todays-games";
 import { getScheduleDay, SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { TodaysGamesCard } from "./todays-games-card";
 import styles from "./todays-games.module.css";
@@ -87,10 +87,15 @@ function GamesContent({
   }
 
   if (featured.length === 0) {
+    const hasRemainingGames = todaysGames?.some((game) => getMatchdayGameStatus(game, now) !== null);
     return (
       <EmptyState
-        title={todaysGames?.length ? "No more games today" : "No games scheduled"}
-        description="Explore the full schedule for upcoming matches."
+        title={hasRemainingGames
+          ? "No confirmed matchups available"
+          : todaysGames?.length ? "No more games today" : "No games scheduled"}
+        description={hasRemainingGames
+          ? "Check back when teams are assigned, or explore the full schedule."
+          : "Explore the full schedule for upcoming matches."}
         className="flex-1 [&>p:first-of-type]:text-2xl [&>p:last-of-type]:text-base md:[&>p:first-of-type]:text-3xl md:[&>p:last-of-type]:text-lg"
       />
     );
