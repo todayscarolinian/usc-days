@@ -7,7 +7,7 @@ export const GAME_STATUS_LABELS: Record<GameStatus, string> = {
   live: "Live",
   finished: "Finished",
   awaiting: "Awaiting result",
-  ended: "Ended",
+  ended: "Finished",
 };
 
 /**
