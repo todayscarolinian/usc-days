@@ -38,7 +38,7 @@ export default function StandingsTable({
     <section className="min-w-0 border border-neutral-300 bg-white bg-[url('/white-bg.png')] bg-top bg-repeat-y p-3 sm:p-5">
       <header className="mb-4 border-l-4 border-tc_primary pl-3">
         <h2 className="text-base font-bold uppercase text-neutral-950 sm:text-lg">
-          {sportName || "Standings"}
+          {sportName.replace(/^e-sports\b/i, "Esports") || "Standings"}
         </h2>
       </header>
 

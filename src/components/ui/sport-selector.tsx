@@ -58,7 +58,7 @@ export default function SportSelector({
   const options: SelectOption[] = useMemo(() => {
     const sportOptions = sports.map((sport) => ({
       value: sport.id.toString(),
-      label: sport.gameName,
+      label: sport.gameName.replace(/^e-sports\b/i, "Esports"),
       id: sport.id,
       icon: <Image src={getIconFor(sport.gameName)} alt={sport.gameName} className="size-6" />,
     }));
