@@ -5,6 +5,7 @@ import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
 import { scheduleTimeFormatter } from "@/src/lib/schedules";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
+import ScheduleLabel from "./schedule-label";
 
 type ScheduleMatchProps = {
   showEventLabel: boolean;
@@ -71,7 +72,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
     <article
       id={`schedule-match-${game.id}`}
       tabIndex={-1}
-      aria-label={`${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
+      aria-label={`${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}${game.label ? `, ${game.label}` : ""}`}
       className={cn(
         "block w-full min-w-0 select-none overflow-hidden bg-neutral-100 text-center text-sm font-medium text-[#171717] focus:outline-2 focus:outline-offset-4 focus:outline-tc_primary-400 motion-safe:transition-colors",
         featured && "border-t-2 border-tc_primary-400",
@@ -89,9 +90,12 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
       )}
       <Link
         href={`/schedules/${game.id}`}
-        aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}`}
+        aria-label={`View ${game.gameType.gameName}: ${matchup}, ${time}, ${location}, ${statusLabel}${game.label ? `, ${game.label}` : ""}`}
         className="block w-full cursor-pointer hover:bg-neutral-200/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400 motion-safe:transition-colors"
       >
+      {game.label && (
+        <span className="block px-3 pt-3"><ScheduleLabel label={game.label} /></span>
+      )}
       {featured ? (
         <span className="block p-3 sm:p-5">
           <span className="flex items-center justify-between gap-3 text-xs">

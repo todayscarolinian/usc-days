@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createMockTodaysGames } from "@/src/components/home/todays-games.mock";
 import { useSearchParams } from "next/navigation";
 import { useGamesQuery, useScheduleWindow } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
@@ -27,8 +26,6 @@ function scrollToScheduleDate(date: string) {
 export function useSchedules() {
   const params = useSearchParams();
   const matchId = /^-?[1-9]\d*$/.test(params.get("match") ?? "") ? params.get("match") : null;
-  const previewTime = Date.parse(params.get("preview") ?? "");
-  const isPreview = Number.isFinite(previewTime);
   const navigation = useScheduleFilters();
   const { filters } = navigation;
   const { requestedDate, setRequestedDate } = useScheduleScrollTarget();
@@ -52,16 +49,7 @@ export function useSchedules() {
   const gameTypeIds = sports.data
     ? getScheduleGameTypeIds(sports.data, filters)
     : filters.event || filters.sportId ? undefined : null;
-  const liveGames = useScheduleWindow({ anchor: windowAnchor, gameTypeIds, teamId: filters.teamId });
-  const previewGames = useMemo(
-    () => isPreview ? createMockTodaysGames(new Date(previewTime)) : [],
-    [isPreview, previewTime],
-  );
-  const games = isPreview ? {
-    ...liveGames, games: previewGames,
-    isPending: false, isError: false, isFetching: false,
-    hasOlder: false, hasNewer: false, isLoadingOlder: false, isLoadingNewer: false,
-  } : liveGames;
+  const games = useScheduleWindow({ anchor: windowAnchor, gameTypeIds, teamId: filters.teamId });
   // Live markers cover every event, not just the filtered window.
   const todayGames = useGamesQuery(
     today ? { startDate: today, endDate: today } : undefined,

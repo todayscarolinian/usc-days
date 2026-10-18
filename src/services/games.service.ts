@@ -268,6 +268,7 @@ class GameService {
       startDate,
       endDate,
       location,
+      label,
     }: AddGamePayload,
     createdByHeraldId: string,
   ) {
@@ -345,6 +346,7 @@ class GameService {
         startDate,
         endDate,
         location,
+        label,
         createdByHeraldId,
       },
     });
@@ -362,6 +364,7 @@ class GameService {
       startDate,
       endDate,
       location,
+      label,
       teamAForfeited,
       teamBForfeited,
       isDraw,
@@ -450,6 +453,7 @@ class GameService {
         startDate,
         endDate,
         location,
+        ...(label !== undefined ? { label } : {}),
         ...(teamAForfeited !== undefined ? { teamAForfeited } : {}),
         ...(teamBForfeited !== undefined ? { teamBForfeited } : {}),
         ...(isDraw !== undefined ? { isDraw } : {}),

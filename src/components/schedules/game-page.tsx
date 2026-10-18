@@ -16,6 +16,7 @@ import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { MAX_SCORE_DELTA, SCORES_REQUIRE_TEAMS_MESSAGE, type ScoreDeltaPayload } from "@/src/types/games.types";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
+import ScheduleLabel from "./schedule-label";
 
 const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
 
@@ -192,6 +193,7 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
     <>
       <header className="space-y-2">
         <p className="text-sm text-neutral-600">{game.gameType.gameName}</p>
+        <ScheduleLabel label={game.label} />
         <h1 className="text-2xl font-bold sm:text-3xl">
           {game.teamA?.teamName ?? "TBD"} vs {game.teamB?.teamName ?? "TBD"}
         </h1>

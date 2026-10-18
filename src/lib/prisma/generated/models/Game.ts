@@ -51,6 +51,7 @@ export type GameMinAggregateOutputType = {
   teamAId: number | null
   teamBId: number | null
   location: string | null
+  label: string | null
   id: number | null
   endDate: Date | null
   startDate: Date | null
@@ -69,6 +70,7 @@ export type GameMaxAggregateOutputType = {
   teamAId: number | null
   teamBId: number | null
   location: string | null
+  label: string | null
   id: number | null
   endDate: Date | null
   startDate: Date | null
@@ -87,6 +89,7 @@ export type GameCountAggregateOutputType = {
   teamAId: number
   teamBId: number
   location: number
+  label: number
   id: number
   endDate: number
   startDate: number
@@ -127,6 +130,7 @@ export type GameMinAggregateInputType = {
   teamAId?: true
   teamBId?: true
   location?: true
+  label?: true
   id?: true
   endDate?: true
   startDate?: true
@@ -145,6 +149,7 @@ export type GameMaxAggregateInputType = {
   teamAId?: true
   teamBId?: true
   location?: true
+  label?: true
   id?: true
   endDate?: true
   startDate?: true
@@ -163,6 +168,7 @@ export type GameCountAggregateInputType = {
   teamAId?: true
   teamBId?: true
   location?: true
+  label?: true
   id?: true
   endDate?: true
   startDate?: true
@@ -268,6 +274,7 @@ export type GameGroupByOutputType = {
   teamAId: number | null
   teamBId: number | null
   location: string | null
+  label: string | null
   id: number
   endDate: Date
   startDate: Date
@@ -309,6 +316,7 @@ export type GameWhereInput = {
   teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
   teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
+  label?: Prisma.StringNullableFilter<"Game"> | string | null
   id?: Prisma.IntFilter<"Game"> | number
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
   startDate?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -331,6 +339,7 @@ export type GameOrderByWithRelationInput = {
   teamAId?: Prisma.SortOrderInput | Prisma.SortOrder
   teamBId?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  label?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -357,6 +366,7 @@ export type GameWhereUniqueInput = Prisma.AtLeast<{
   teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
   teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
+  label?: Prisma.StringNullableFilter<"Game"> | string | null
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
   startDate?: Prisma.DateTimeFilter<"Game"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -378,6 +388,7 @@ export type GameOrderByWithAggregationInput = {
   teamAId?: Prisma.SortOrderInput | Prisma.SortOrder
   teamBId?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  label?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -404,6 +415,7 @@ export type GameScalarWhereWithAggregatesInput = {
   teamAId?: Prisma.IntNullableWithAggregatesFilter<"Game"> | number | null
   teamBId?: Prisma.IntNullableWithAggregatesFilter<"Game"> | number | null
   location?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
+  label?: Prisma.StringNullableWithAggregatesFilter<"Game"> | string | null
   id?: Prisma.IntWithAggregatesFilter<"Game"> | number
   endDate?: Prisma.DateTimeWithAggregatesFilter<"Game"> | Date | string
   startDate?: Prisma.DateTimeWithAggregatesFilter<"Game"> | Date | string
@@ -419,6 +431,7 @@ export type GameScalarWhereWithAggregatesInput = {
 
 export type GameCreateInput = {
   location?: string | null
+  label?: string | null
   endDate?: Date | string
   startDate?: Date | string
   createdAt?: Date | string
@@ -439,6 +452,7 @@ export type GameUncheckedCreateInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -454,6 +468,7 @@ export type GameUncheckedCreateInput = {
 
 export type GameUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -474,6 +489,7 @@ export type GameUncheckedUpdateInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -492,6 +508,7 @@ export type GameCreateManyInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -507,6 +524,7 @@ export type GameCreateManyInput = {
 
 export type GameUpdateManyMutationInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -523,6 +541,7 @@ export type GameUncheckedUpdateManyInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -551,6 +570,7 @@ export type GameCountOrderByAggregateInput = {
   teamAId?: Prisma.SortOrder
   teamBId?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  label?: Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -579,6 +599,7 @@ export type GameMaxOrderByAggregateInput = {
   teamAId?: Prisma.SortOrder
   teamBId?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  label?: Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -597,6 +618,7 @@ export type GameMinOrderByAggregateInput = {
   teamAId?: Prisma.SortOrder
   teamBId?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  label?: Prisma.SortOrder
   id?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -818,6 +840,7 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type GameCreateWithoutTeamAInput = {
   location?: string | null
+  label?: string | null
   endDate?: Date | string
   startDate?: Date | string
   createdAt?: Date | string
@@ -836,6 +859,7 @@ export type GameUncheckedCreateWithoutTeamAInput = {
   gameTypeId: number
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -861,6 +885,7 @@ export type GameCreateManyTeamAInputEnvelope = {
 
 export type GameCreateWithoutTeamBInput = {
   location?: string | null
+  label?: string | null
   endDate?: Date | string
   startDate?: Date | string
   createdAt?: Date | string
@@ -879,6 +904,7 @@ export type GameUncheckedCreateWithoutTeamBInput = {
   gameTypeId: number
   teamAId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -904,6 +930,7 @@ export type GameCreateManyTeamBInputEnvelope = {
 
 export type GameCreateWithoutWinnerInput = {
   location?: string | null
+  label?: string | null
   endDate?: Date | string
   startDate?: Date | string
   createdAt?: Date | string
@@ -923,6 +950,7 @@ export type GameUncheckedCreateWithoutWinnerInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -969,6 +997,7 @@ export type GameScalarWhereInput = {
   teamAId?: Prisma.IntNullableFilter<"Game"> | number | null
   teamBId?: Prisma.IntNullableFilter<"Game"> | number | null
   location?: Prisma.StringNullableFilter<"Game"> | string | null
+  label?: Prisma.StringNullableFilter<"Game"> | string | null
   id?: Prisma.IntFilter<"Game"> | number
   endDate?: Prisma.DateTimeFilter<"Game"> | Date | string
   startDate?: Prisma.DateTimeFilter<"Game"> | Date | string
@@ -1016,6 +1045,7 @@ export type GameUpdateManyWithWhereWithoutWinnerInput = {
 
 export type GameCreateWithoutGameTypeInput = {
   location?: string | null
+  label?: string | null
   endDate?: Date | string
   startDate?: Date | string
   createdAt?: Date | string
@@ -1034,6 +1064,7 @@ export type GameUncheckedCreateWithoutGameTypeInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -1077,6 +1108,7 @@ export type GameCreateManyTeamAInput = {
   gameTypeId: number
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -1094,6 +1126,7 @@ export type GameCreateManyTeamBInput = {
   gameTypeId: number
   teamAId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -1112,6 +1145,7 @@ export type GameCreateManyWinnerInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -1126,6 +1160,7 @@ export type GameCreateManyWinnerInput = {
 
 export type GameUpdateWithoutTeamAInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1144,6 +1179,7 @@ export type GameUncheckedUpdateWithoutTeamAInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1161,6 +1197,7 @@ export type GameUncheckedUpdateManyWithoutTeamAInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1176,6 +1213,7 @@ export type GameUncheckedUpdateManyWithoutTeamAInput = {
 
 export type GameUpdateWithoutTeamBInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1194,6 +1232,7 @@ export type GameUncheckedUpdateWithoutTeamBInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1211,6 +1250,7 @@ export type GameUncheckedUpdateManyWithoutTeamBInput = {
   gameTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1226,6 +1266,7 @@ export type GameUncheckedUpdateManyWithoutTeamBInput = {
 
 export type GameUpdateWithoutWinnerInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1245,6 +1286,7 @@ export type GameUncheckedUpdateWithoutWinnerInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1262,6 +1304,7 @@ export type GameUncheckedUpdateManyWithoutWinnerInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1278,6 +1321,7 @@ export type GameCreateManyGameTypeInput = {
   teamAId?: number | null
   teamBId?: number | null
   location?: string | null
+  label?: string | null
   id?: number
   endDate?: Date | string
   startDate?: Date | string
@@ -1293,6 +1337,7 @@ export type GameCreateManyGameTypeInput = {
 
 export type GameUpdateWithoutGameTypeInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1311,6 +1356,7 @@ export type GameUncheckedUpdateWithoutGameTypeInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1328,6 +1374,7 @@ export type GameUncheckedUpdateManyWithoutGameTypeInput = {
   teamAId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teamBId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.IntFieldUpdateOperationsInput | number
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1348,6 +1395,7 @@ export type GameSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   teamAId?: boolean
   teamBId?: boolean
   location?: boolean
+  label?: boolean
   id?: boolean
   endDate?: boolean
   startDate?: boolean
@@ -1370,6 +1418,7 @@ export type GameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   teamAId?: boolean
   teamBId?: boolean
   location?: boolean
+  label?: boolean
   id?: boolean
   endDate?: boolean
   startDate?: boolean
@@ -1392,6 +1441,7 @@ export type GameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   teamAId?: boolean
   teamBId?: boolean
   location?: boolean
+  label?: boolean
   id?: boolean
   endDate?: boolean
   startDate?: boolean
@@ -1414,6 +1464,7 @@ export type GameSelectScalar = {
   teamAId?: boolean
   teamBId?: boolean
   location?: boolean
+  label?: boolean
   id?: boolean
   endDate?: boolean
   startDate?: boolean
@@ -1427,7 +1478,7 @@ export type GameSelectScalar = {
   isDraw?: boolean
 }
 
-export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"gameTypeId" | "teamAId" | "teamBId" | "location" | "id" | "endDate" | "startDate" | "createdAt" | "createdByHeraldId" | "teamAScore" | "teamBScore" | "winnerId" | "teamAForfeited" | "teamBForfeited" | "isDraw", ExtArgs["result"]["game"]>
+export type GameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"gameTypeId" | "teamAId" | "teamBId" | "location" | "label" | "id" | "endDate" | "startDate" | "createdAt" | "createdByHeraldId" | "teamAScore" | "teamBScore" | "winnerId" | "teamAForfeited" | "teamBForfeited" | "isDraw", ExtArgs["result"]["game"]>
 export type GameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gameType?: boolean | Prisma.GameTypeDefaultArgs<ExtArgs>
   teamA?: boolean | Prisma.Game$teamAArgs<ExtArgs>
@@ -1460,6 +1511,7 @@ export type $GamePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     teamAId: number | null
     teamBId: number | null
     location: string | null
+    label: string | null
     id: number
     endDate: Date
     startDate: Date
@@ -1902,6 +1954,7 @@ export interface GameFieldRefs {
   readonly teamAId: Prisma.FieldRef<"Game", 'Int'>
   readonly teamBId: Prisma.FieldRef<"Game", 'Int'>
   readonly location: Prisma.FieldRef<"Game", 'String'>
+  readonly label: Prisma.FieldRef<"Game", 'String'>
   readonly id: Prisma.FieldRef<"Game", 'Int'>
   readonly endDate: Prisma.FieldRef<"Game", 'DateTime'>
   readonly startDate: Prisma.FieldRef<"Game", 'DateTime'>
