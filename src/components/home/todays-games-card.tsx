@@ -6,6 +6,7 @@ import { Button } from "@/src/components/ui/button";
 import { getMatchdayGameStatus } from "@/src/lib/todays-games";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
+import ScheduleLabel from "@/src/components/schedules/schedule-label";
 
 type TodaysGamesCardProps = {
   game: Schedules;
@@ -51,7 +52,7 @@ export function TodaysGamesCard({
     >
       <Link
         href={`/schedules/${game.id}`}
-        aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}${showScores ? `, score ${teamA} ${scoreA}, ${teamB} ${scoreB}` : ""}`}
+        aria-label={`View ${sport}: ${teamA} vs ${teamB}, ${location}, ${format(start, "MMMM d, h:mm a")}${status ? `, ${status.toLowerCase()}` : ""}${showScores ? `, score ${teamA} ${scoreA}, ${teamB} ${scoreB}` : ""}${game.label ? `, ${game.label}` : ""}`}
       >
       {compact ? (
         <span className={styles.cardContent}>
@@ -83,6 +84,7 @@ export function TodaysGamesCard({
               <Image src={logoB} alt="" width={22} height={22} className="size-[30px] shrink-0 object-contain" />
             </span>
           </span>
+          <ScheduleLabel label={game.label} />
         </span>
       ) : (
         <span className={styles.cardContent}>
@@ -120,6 +122,7 @@ export function TodaysGamesCard({
             </span>
           </span>
 
+          <ScheduleLabel label={game.label} />
           <span className={styles.cardFooter}>
             <span className="min-w-0 truncate" title={location}>{location}</span>
             <span className={styles.time}>{time}</span>

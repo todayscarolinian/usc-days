@@ -18,6 +18,7 @@ interface ScheduleInputs {
   startTime: string;
   endTime: string;
   location?: string;
+  label: string;
 }
 
 interface UseScheduleFormOptions<T = any> {
@@ -35,6 +36,7 @@ const getDefaultInputs = (): ScheduleInputs => ({
   startTime: getEventTimeOfDay(),
   endTime: getEventTimeOfDay(addHours(new Date(), 1)),
   location: undefined,
+  label: "",
 });
 
 export function useScheduleForm<T = any>(
@@ -76,6 +78,7 @@ export function useScheduleForm<T = any>(
               startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
               endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
               location: inputs.location,
+              label: inputs.label,
             };
 
         schema.parse(dataToValidate);

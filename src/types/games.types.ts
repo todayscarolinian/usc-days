@@ -4,6 +4,14 @@ import { Schedules } from "./types";
 export const SCORES_REQUIRE_TEAMS_MESSAGE =
   "Scores and results cannot be saved until both teams are set.";
 
+export const ScheduleLabelSchema = z
+  .string()
+  .trim()
+  .max(100, "Custom label must be 100 characters or fewer.")
+  .transform((value) => value || null)
+  .nullable()
+  .optional();
+
 /** A numeric score (including 0) or an actual result. False flags and nulls do not count. */
 export function hasSavedResult(data: {
   teamAScore?: unknown;
@@ -64,6 +72,7 @@ export const AddGameSchema = z
         message: "Please enter a valid end date.",
       }),
     location: z.string().optional(),
+    label: ScheduleLabelSchema,
   })
   .refine(
     (data) =>
@@ -148,6 +157,7 @@ export const EditGameSchema = z
         message: "Invalid date format for endDate. Use ISO format.",
       }),
     location: z.string().nullable().optional(),
+    label: ScheduleLabelSchema,
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),

@@ -28,6 +28,7 @@ import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import { cn } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 import { eventDateTimeToISO } from "@/src/lib/time";
+import ScheduleLabelField from "./schedule-label-field";
 
 const SCHEDULE_LOCATIONS = [
   "Bunzel Lobby, Talamban Campus",
@@ -153,6 +154,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
       startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
       endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location || undefined,
+      label: inputs.label.trim() || null,
     };
 
     add.mutate(data, {
@@ -341,6 +343,11 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
               onValueChange={(value) => updateInput("location", value)}
             />
           </div>
+          <ScheduleLabelField
+            value={inputs.label}
+            onChange={(value) => updateInput("label", value)}
+            error={validationErrors.label}
+          />
         </div>
         <DialogError error={inlineError} />
         <DialogFooter className="flex items-center">

@@ -54,6 +54,7 @@ model Game {
   teamAId           Int?     @map("team_a_id")
   teamBId           Int?     @map("team_b_id")
   location          String?  @db.VarChar(255)
+  label             String?  @db.VarChar(100)
   id                Int      @id @default(autoincrement())
   endDate           DateTime @default(now()) @map("end_date")
   startDate         DateTime @default(now()) @map("start_date")

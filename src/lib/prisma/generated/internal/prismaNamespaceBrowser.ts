@@ -116,6 +116,7 @@ export const GameScalarFieldEnum = {
   teamAId: 'teamAId',
   teamBId: 'teamBId',
   location: 'location',
+  label: 'label',
   id: 'id',
   endDate: 'endDate',
   startDate: 'startDate',

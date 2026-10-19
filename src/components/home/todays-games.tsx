@@ -10,7 +10,6 @@ import { getEventDay, getMatchdayGameStatus, selectTodaysGames } from "@/src/lib
 import { getScheduleDay, SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { TodaysGamesCard } from "./todays-games-card";
 import styles from "./todays-games.module.css";
-import { createMockTodaysGames } from "./todays-games.mock";
 
 const REFRESH_INTERVAL = 30_000;
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -42,9 +41,7 @@ function GamesSkeleton() {
 function GamesContent({
   dateLabel,
   now,
-  mock,
 }: {
-  mock: boolean;
   dateLabel: string;
   now: Date;
 }) {
@@ -57,16 +54,16 @@ function GamesContent({
   } = useGamesQuery({
     startDate: dateLabel,
     endDate: dateLabel,
-  }, { enabled: !mock, refetchInterval: REFRESH_INTERVAL });
+  }, { refetchInterval: REFRESH_INTERVAL });
 
   const { featured, compact } = useMemo(
-    () => selectTodaysGames(mock ? createMockTodaysGames(now) : todaysGames ?? [], now),
-    [mock, now, todaysGames],
+    () => selectTodaysGames(todaysGames ?? [], now),
+    [now, todaysGames],
   );
 
-  if (!mock && loading) return <GamesSkeleton />;
+  if (loading) return <GamesSkeleton />;
 
-  if (!mock && error && !todaysGames) {
+  if (error && !todaysGames) {
     return (
       <div
         role="alert"
@@ -121,7 +118,7 @@ function GamesContent({
   );
 }
 
-export default function TodaysGames({ mock = false }: { mock?: boolean }) {
+export default function TodaysGames() {
   const [inView, setInView] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -214,7 +211,6 @@ export default function TodaysGames({ mock = false }: { mock?: boolean }) {
       </header>
       {inView && now && todayString ? (
         <GamesContent
-          mock={mock}
           dateLabel={todayString}
           now={now}
         />

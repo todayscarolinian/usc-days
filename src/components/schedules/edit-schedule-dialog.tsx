@@ -43,6 +43,7 @@ import {
 import { EditGamePayload, EditGameSchema } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
+import ScheduleLabelField from "./schedule-label-field";
 
 export default function EditScheduleDialog({
   schedule,
@@ -71,6 +72,7 @@ export default function EditScheduleDialog({
       startTime: getEventTimeOfDay(schedule.startDate),
       endTime: getEventTimeOfDay(schedule.endDate),
       location: schedule.location ? schedule.location : undefined,
+      label: schedule.label ?? "",
     },
     schema: EditGameSchema,
     transformData: (inputs) => ({
@@ -81,6 +83,7 @@ export default function EditScheduleDialog({
       startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
       endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location,
+      label: inputs.label,
       teamAScore:
         schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
       teamBScore:
@@ -176,6 +179,7 @@ export default function EditScheduleDialog({
         inputs.location && inputs.location.trim() !== ""
           ? inputs.location
           : null,
+      label: inputs.label.trim() || null,
       teamAScore:
         schedule.teamAScore !== null ? Number(schedule.teamAScore) : null,
       teamBScore:
@@ -378,6 +382,11 @@ export default function EditScheduleDialog({
               onChange={(e) => updateInput("location", e.target.value)}
             />
           </div>
+          <ScheduleLabelField
+            value={inputs.label}
+            onChange={(value) => updateInput("label", value)}
+            error={validationErrors.label}
+          />
         </div>
 
         <DialogError error={inlineError} />
