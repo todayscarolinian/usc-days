@@ -126,7 +126,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
             <MatchTeam team={game.teamB} side="away" featured={false} />
           </span>
           <span className={cn(
-            "grid items-center gap-2 bg-tc_primary-400 px-3.5 py-2 text-xs text-white sm:text-sm",
+            "grid items-center gap-2 bg-tc_primary-400 px-3.5 py-2 text-sm text-white sm:text-base",
             showEventLabel ? "grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]" : "grid-cols-2",
           )}>
             <span className="min-w-0 text-left">{time}</span>
