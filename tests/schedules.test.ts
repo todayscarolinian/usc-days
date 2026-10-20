@@ -99,7 +99,7 @@ describe("event categories", () => {
     const cases = {
       "Women's Basketball": "Basketball",
       "Men's Basketball (3x3)": "3x3 Basketball",
-      Football: "Soccer",
+      Football: "Football",
       "Flag Football": "Flag Football",
       "E-Sports (Mobile Legends)": "Mobile Legends",
       "Women's 50m Backstroke": "Swimming",

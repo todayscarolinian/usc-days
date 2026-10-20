@@ -34,7 +34,7 @@ const EVENT_DEFINITIONS = [
   { name: "Basketball", group: "Court", pattern: /basketball/i },
   { name: "Volleyball", group: "Court", pattern: /volleyball/i },
   { name: "Flag Football", group: "Field", pattern: /flag football/i },
-  { name: "Soccer", group: "Field", pattern: /soccer|football/i },
+  { name: "Football", group: "Field", pattern: /soccer|football/i },
   { name: "Futsal", group: "Field", pattern: /futsal/i },
   { name: "Frisbee", group: "Field", pattern: /frisbee/i },
   { name: "Pickleball", group: "Racket", pattern: /pickleball/i },
