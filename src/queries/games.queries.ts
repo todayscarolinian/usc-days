@@ -1,6 +1,6 @@
 "use client";
 
-import { AddGamePayload, EditGamePayload, ScoreDeltaPayload } from "@/src/types/games.types";
+import { AddGamePayload, EditGamePayload, MultiTeamResultPayload, ScoreDeltaPayload } from "@/src/types/games.types";
 import { useMemo } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { fetchGamesPage } from "@/src/services/games.client";
@@ -62,6 +62,19 @@ export const useEditGamesQuery = () => {
 
     onError: (error) => {
       console.error("Error editing game: ", error);
+    },
+  });
+};
+
+export const useSaveResultsQuery = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Schedules, Error, MultiTeamResultPayload & { id: number }>({
+    mutationFn: async ({ id, ...body }) => {
+      const { data } = await axios.put(`/api/games/${id}/results`, body);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games"] });
     },
   });
 };

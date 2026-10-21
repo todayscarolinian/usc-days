@@ -47,6 +47,7 @@ export type GameParticipantWithTeam = {
     id: number;
     gameId: number;
     teamId: number;
+    name: string | null;
     rank: number | null;
     team: {
         id: number;

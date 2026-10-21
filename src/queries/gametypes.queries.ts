@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import type { GameFormat } from "../lib/prisma/generated/client";
 
 type GameType = {
   id: number;
   gameName: string;
+  format: GameFormat;
 };
 
 const STALE_TIME = 1000 * 60 * 5;

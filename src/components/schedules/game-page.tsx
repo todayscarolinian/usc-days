@@ -16,7 +16,9 @@ import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { MAX_SCORE_DELTA, SCORES_REQUIRE_TEAMS_MESSAGE, type ScoreDeltaPayload } from "@/src/types/games.types";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
+import { isMultiTeam, ordinal, sortedParticipants } from "@/src/lib/multi-team";
 import ScheduleLabel from "./schedule-label";
+import PlacingMedal from "./placing-medal";
 
 const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
 
@@ -167,14 +169,6 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
   const finished = status === "finished";
   const teamsSet = game.teamA != null && game.teamB != null;
   const canTrack = canManage && teamsSet && !finished;
-  const location = game.location?.trim() || "Location TBA";
-  const start = new Date(game.startDate);
-  // Sport, teams, status, and the result badges already appear above the details.
-  const details = [
-    { label: "Date", value: dateFormatter.format(start), Icon: CalendarDays },
-    { label: "Time", value: `${timeFormatter.format(start)} – ${timeFormatter.format(new Date(game.endDate))}`, Icon: Clock },
-    { label: "Venue", value: location, Icon: MapPin },
-  ];
 
   function display(score: Schedules["teamAScore"], forfeited: boolean) {
     if (forfeited) return "X";
@@ -228,25 +222,100 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
         </>
       )}
 
-      <section aria-labelledby="match-details-heading" className="bg-neutral-100">
-        <h2 id="match-details-heading" className="bg-tc_primary-400 px-4 py-2 text-xs font-bold tracking-wider text-white uppercase sm:px-6">
-          Match details
-        </h2>
-        <dl className="grid divide-y divide-neutral-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {details.map(({ label, value, Icon }) => (
-            <div key={label} className="flex items-center gap-3 p-4 sm:flex-col sm:items-start sm:p-6">
-              <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center bg-tc_primary-400/10 text-tc_primary-500">
-                <Icon className="size-5" />
-              </span>
-              <div className="min-w-0">
-                <dt className="text-xs font-medium tracking-wider text-neutral-500 uppercase">{label}</dt>
-                <dd className="mt-0.5 font-semibold break-words">{value}</dd>
-              </div>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <MatchDetails game={game} />
     </>
+  );
+}
+
+/** Every team in a multi-team game, in finishing order once ranked. */
+function MultiTeamGame({ game, canManage }: { game: Schedules; canManage: boolean }) {
+  const [finalizeOpen, setFinalizeOpen] = useState(false);
+  const status = getGameStatus(game, new Date());
+  const finished = status === "finished";
+  const canFinalize = canManage && !finished && game.participants.length > 0;
+
+  return (
+    <>
+      <header className="space-y-2">
+        <ScheduleLabel label={game.label} />
+        <h1 className="text-2xl font-bold sm:text-3xl">{game.gameType.gameName}</h1>
+        <p className="inline-block bg-tc_primary-400 px-2 py-1 text-xs text-white uppercase">{GAME_STATUS_LABELS[status]}</p>
+      </header>
+
+      <section aria-labelledby="placings-heading" className="bg-neutral-100">
+        <h2 id="placings-heading" className="bg-tc_primary-400 px-4 py-2 text-xs font-bold tracking-wider text-white uppercase sm:px-6">
+          {finished ? "Results" : "Teams"}
+        </h2>
+        {game.participants.length === 0 ? (
+          <p className="p-4 text-sm text-neutral-600 sm:p-6">No teams have been added yet.</p>
+        ) : (
+          <ol className="divide-y divide-neutral-200">
+            {sortedParticipants(game).map(({ id, name, team, rank }) => (
+              <li
+                key={id}
+                className={cn(
+                  "grid grid-cols-[3rem_1.5rem_2.5rem_minmax(0,1fr)] items-center gap-3 px-4 py-3 sm:px-6",
+                  rank === 1 && "bg-white",
+                )}
+              >
+                <span className={cn("text-sm font-bold tabular-nums", rank == null && "text-neutral-400")}>
+                  {rank != null ? ordinal(rank) : finished ? "DNF" : "–"}
+                </span>
+                <PlacingMedal rank={rank} />
+                <Image src={getLogoForSchool(team.teamName)} alt="" width={40} height={40} className="size-10 object-contain" />
+                <span className={cn("flex min-w-0 flex-col", finished && rank == null && "opacity-50")}>
+                  <span className="truncate font-bold uppercase">{name ?? team.teamName}</span>
+                  {name != null && <span className="truncate text-sm text-neutral-600">{team.teamName}</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      {canFinalize && (
+        <>
+          <div className="flex justify-end">
+            <Button onClick={() => setFinalizeOpen(true)}>Finalize</Button>
+          </div>
+          <AddScoreDialog open={finalizeOpen} onOpenChange={setFinalizeOpen} game={game} />
+        </>
+      )}
+
+      <MatchDetails game={game} />
+    </>
+  );
+}
+
+function MatchDetails({ game }: { game: Schedules }) {
+  const location = game.location?.trim() || "Location TBA";
+  const start = new Date(game.startDate);
+  // Sport, teams, status, and the result badges already appear above the details.
+  const details = [
+    { label: "Date", value: dateFormatter.format(start), Icon: CalendarDays },
+    { label: "Time", value: `${timeFormatter.format(start)} – ${timeFormatter.format(new Date(game.endDate))}`, Icon: Clock },
+    { label: "Venue", value: location, Icon: MapPin },
+  ];
+
+  return (
+    <section aria-labelledby="match-details-heading" className="bg-neutral-100">
+      <h2 id="match-details-heading" className="bg-tc_primary-400 px-4 py-2 text-xs font-bold tracking-wider text-white uppercase sm:px-6">
+        Match details
+      </h2>
+      <dl className="grid divide-y divide-neutral-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {details.map(({ label, value, Icon }) => (
+          <div key={label} className="flex items-center gap-3 p-4 sm:flex-col sm:items-start sm:p-6">
+            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center bg-tc_primary-400/10 text-tc_primary-500">
+              <Icon className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <dt className="text-xs font-medium tracking-wider text-neutral-500 uppercase">{label}</dt>
+              <dd className="mt-0.5 font-semibold break-words">{value}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 
@@ -268,7 +337,9 @@ export default function GamePage({ gameId }: { gameId: number }) {
             <Button variant="outline" onClick={() => void game.refetch()}>Try again</Button>
           </div>
         ) : (
-          <GameScore game={game.data} canManage={hasAccess} />
+          isMultiTeam(game.data)
+            ? <MultiTeamGame game={game.data} canManage={hasAccess} />
+            : <GameScore game={game.data} canManage={hasAccess} />
         )}
       </div>
     </div>

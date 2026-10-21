@@ -13,7 +13,8 @@ import {
   assertTeamsSetForResults,
   duplicateTeamMatchupFilter,
   resolveEditedGame,
-  sameTeamSet,
+  planEntryEdit,
+  sameEntries,
   type StoredGameTeams,
 } from "@/src/services/games.service";
 import { transformTeamsData } from "@/src/components/standings/transformTeamsData";
@@ -129,16 +130,29 @@ describe("AddGameSchema", () => {
 });
 
 describe("multi-team payloads", () => {
-  const participants = { teamAId: null, teamBId: null, participantTeamIds: [10, 20, 30] };
+  const entries = (...teamIds: number[]) => teamIds.map((teamId) => ({ teamId }));
+  const participants = { teamAId: null, teamBId: null, participants: entries(10, 20, 30) };
 
   it("accepts participants in place of team A and team B", () => {
     assert.equal(AddGameSchema.safeParse(addPayload(participants)).success, true);
     assert.equal(EditGameSchema.safeParse(editPayload(participants)).success, true);
   });
 
-  it("rejects fewer than two teams or a repeated team", () => {
-    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participantTeamIds: [10] })).success, false);
-    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participantTeamIds: [10, 10] })).success, false);
+  it("accepts several entries from one team but not fewer than two entries", () => {
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participants: entries(10, 10, 20) })).success, true);
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participants: entries(10) })).success, false);
+  });
+
+  it("requires a team for every entry and stores a blank name as no name", () => {
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participants: entries(10, -1) })).success, false);
+    const result = AddGameSchema.safeParse(addPayload({
+      ...participants,
+      participants: [{ teamId: 10, name: "  Yu, Ashley " }, { teamId: 20, name: "  " }],
+    }));
+    assert.equal(result.success, true);
+    if (result.success) {
+      assert.deepEqual(result.data.participants?.map((entry) => entry.name), ["Yu, Ashley", null]);
+    }
   });
 
   it("rejects team A, team B, or an A/B result alongside participants", () => {
@@ -146,26 +160,47 @@ describe("multi-team payloads", () => {
     assert.equal(EditGameSchema.safeParse(editPayload({ ...participants, teamAScore: 3 })).success, false);
   });
 
-  it("accepts tied and unranked placings but not a team ranked twice", () => {
+  it("accepts tied and unranked placings but not an entry ranked twice", () => {
     assert.equal(
       MultiTeamResultSchema.safeParse({
-        results: [{ teamId: 10, rank: 1 }, { teamId: 20, rank: 1 }, { teamId: 30, rank: null }],
+        results: [{ participantId: 1, rank: 1 }, { participantId: 2, rank: 1 }, { participantId: 3, rank: null }],
       }).success,
       true,
     );
-    assert.equal(MultiTeamResultSchema.safeParse({ results: [{ teamId: 10, rank: 0 }] }).success, false);
+    assert.equal(MultiTeamResultSchema.safeParse({ results: [{ participantId: 1, rank: 0 }] }).success, false);
     assert.equal(
       MultiTeamResultSchema.safeParse({
-        results: [{ teamId: 10, rank: 1 }, { teamId: 10, rank: 2 }],
+        results: [{ participantId: 1, rank: 1 }, { participantId: 1, rank: 2 }],
       }).success,
       false,
     );
   });
 
-  it("compares participant sets regardless of order", () => {
-    assert.equal(sameTeamSet([10, 20, 30], [30, 10, 20]), true);
-    assert.equal(sameTeamSet([10, 20], [10, 20, 30]), false);
-    assert.equal(sameTeamSet([10, 20], [10, 30]), false);
+  it("compares entry lists regardless of order, counting repeated teams", () => {
+    assert.equal(sameEntries([10, 20, 10], [10, 10, 20]), true);
+    assert.equal(sameEntries([10, 20], [10, 20, 20]), false);
+    assert.equal(sameEntries([10, 10, 20], [10, 20, 20]), false);
+  });
+
+  it("lets names change without counting as a change of teams", () => {
+    const stored = [{ id: 1, teamId: 10, rank: 1 }, { id: 2, teamId: 20, rank: 2 }];
+
+    const renamed = planEntryEdit(stored, [{ id: 1, teamId: 10, name: "Yu, Ashley" }, { id: 2, teamId: 20 }]);
+    assert.equal(renamed.teamsChanged, false);
+    assert.deepEqual(renamed.removedIds, []);
+
+    assert.equal(planEntryEdit(stored, [{ id: 1, teamId: 30 }, { id: 2, teamId: 20 }]).teamsChanged, true);
+    const shrunk = planEntryEdit(stored, [{ id: 1, teamId: 10 }, { teamId: 30 }]);
+    assert.equal(shrunk.teamsChanged, true);
+    assert.deepEqual(shrunk.removedIds, [2]);
+    assert.deepEqual(shrunk.added, [{ teamId: 30 }]);
+  });
+
+  it("rejects an entry id from another game", () => {
+    assert.throws(
+      () => planEntryEdit([{ id: 1, teamId: 10, rank: null }], [{ id: 99, teamId: 10 }]),
+      (error: unknown) => error instanceof ApiError,
+    );
   });
 });
 

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "vitest";
 import { getGameStatus } from "@/src/lib/game-status";
 import { getMatchdayGameStatus } from "@/src/lib/todays-games";
+import { entryLabels, ordinal, participatingTeams, sortedParticipants } from "@/src/lib/multi-team";
 import {
   addScheduleDays,
   buildScheduleEvents,
@@ -89,6 +90,27 @@ describe("shared match status", () => {
     assert.equal(getGameStatus(multiTeam([null, null], { startDate: "2026-10-16T03:00:00Z" }), now), "upcoming");
     assert.equal(getGameStatus(multiTeam([null, null], { endDate: now.toISOString() }), now), "ended");
     assert.equal(getGameStatus(multiTeam([1, null]), now), "finished");
+  });
+
+  it("orders placings by rank, ties by name, unranked last", () => {
+    const participant = (teamName: string, rank: number | null) => ({ teamId: teamName.length, rank, team: { teamName } });
+    const order = sortedParticipants(game({
+      participants: [participant("SOE", null), participant("SBE", 2), participant("SAS", 2), participant("SAFAD", 1)],
+    })).map((p) => p.team.teamName);
+    assert.deepEqual(order, ["SAFAD", "SAS", "SBE", "SOE"]);
+    assert.deepEqual([1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(ordinal),
+      ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"]);
+  });
+
+  it("labels named entries by name and numbers a team's unnamed entries", () => {
+    const entry = (id: number, teamId: number, teamName: string, name: string | null = null) =>
+      ({ id, teamId, name, rank: null, team: { id: teamId, teamName } });
+    const g = game({ participants: [entry(1, 10, "SOE"), entry(2, 20, "SAFAD"), entry(3, 10, "SOE"), entry(4, 10, "SOE", "Bagtasos, Laurianna")] });
+    assert.deepEqual(
+      [...entryLabels(g)].sort(([a], [b]) => a - b),
+      [[1, "SOE (1)"], [2, "SAFAD"], [3, "SOE (2)"], [4, "Bagtasos, Laurianna — SOE"]],
+    );
+    assert.deepEqual(participatingTeams(g).map(team => team.teamName), ["SOE", "SAFAD"]);
   });
 });
 

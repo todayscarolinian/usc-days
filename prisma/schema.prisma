@@ -82,16 +82,19 @@ model Game {
   @@map("games")
 }
 
-/// A team in a multi-team game. A null rank means not ranked yet, or did not finish once the game has results.
+/// One entry in a multi-team game. A team can have several entries (e.g. two swimmers).
+/// The name is the athlete's, when known. A null rank means not ranked yet, or did not
+/// finish once the game has results.
 model GameParticipant {
-  id     Int  @id @default(autoincrement())
-  gameId Int  @map("game_id")
-  teamId Int  @map("team_id")
+  id     Int     @id @default(autoincrement())
+  gameId Int     @map("game_id")
+  teamId Int     @map("team_id")
+  name   String? @db.VarChar(100)
   rank   Int?
   game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
   team   Team @relation(fields: [teamId], references: [id], onDelete: Restrict)
 
-  @@unique([gameId, teamId])
+  @@index([gameId])
   @@index([teamId])
   @@map("game_participants")
 }

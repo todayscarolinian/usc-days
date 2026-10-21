@@ -4,6 +4,7 @@ import { generateMetadata as generateMeta } from "@/src/lib/metadata";
 import { ApiError } from "@/src/lib/api";
 import { getGameStatus } from "@/src/lib/game-status";
 import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
+import { isMultiTeam, ordinal, sortedParticipants } from "@/src/lib/multi-team";
 import GameService from "@/src/services/games.service";
 import GamePage from "@/src/components/schedules/game-page";
 
@@ -46,6 +47,26 @@ function describeResult(game: Game) {
   }
 }
 
+/** The podium line for a multi-team game, e.g. "Finished: 1st Yu, Ashley (SAFAD), 2nd SOE & SBE." */
+function describeMultiTeamResult(game: Game) {
+  switch (getGameStatus(game, new Date())) {
+    case "finished": {
+      const places = new Map<number, string[]>();
+      for (const { rank, name, team } of sortedParticipants(game)) {
+        if (rank == null || rank > 3) continue;
+        places.set(rank, [...(places.get(rank) ?? []), name != null ? `${name} (${team.teamName})` : team.teamName]);
+      }
+      // Two unnamed entries of one team tied on a place name the team once.
+      const podium = [...places].map(([rank, teams]) => `${ordinal(rank)} ${[...new Set(teams)].join(" & ")}`);
+      return podium.length > 0 ? `Finished: ${podium.join(", ")}.` : "Finished.";
+    }
+    case "live":
+      return "Live now.";
+    default:
+      return null;
+  }
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const gameId = parseGameId((await params).gameId);
   if (gameId === null) notFound();
@@ -65,13 +86,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const sport = game.gameType.gameName;
-  const matchup = `${game.teamA?.teamName ?? "TBD"} vs ${game.teamB?.teamName ?? "TBD"}`;
+  const multiTeam = isMultiTeam(game);
   const venue = game.location?.trim();
   const when = `${whenFormatter.format(game.startDate)}${venue ? ` at ${venue}` : ""}.`;
-  const result = describeResult(game);
+  const result = multiTeam ? describeMultiTeamResult(game) : describeResult(game);
+  // A multi-team game has no matchup to lead with, so the event name is the title.
+  const title = multiTeam
+    ? sport
+    : `${game.teamA?.teamName ?? "TBD"} vs ${game.teamB?.teamName ?? "TBD"} - ${sport}`;
 
   return generateMeta({
-    title: `${matchup} - ${sport} | USC Days 2026`,
+    title: `${title} | USC Days 2026`,
     description: [`${sport}, ${when}`, result].filter(Boolean).join(" "),
     url: `/schedules/${gameId}`,
     image: "/og_image.jpg",

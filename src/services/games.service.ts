@@ -4,6 +4,7 @@ import {
   EditGamePayload,
   ScoreDeltaPayload,
   MultiTeamResultPayload,
+  ParticipantEntryPayload,
   PaginationParams,
   PaginatedGamesResponse,
   SCORES_REQUIRE_TEAMS_MESSAGE,
@@ -107,7 +108,7 @@ export const FORMAT_CHANGE_MESSAGE =
 export const RANKED_PARTICIPANTS_MESSAGE =
   "Clear this game's results before changing its teams.";
 export const RESULTS_MUST_MATCH_PARTICIPANTS_MESSAGE =
-  "Results must list every participating team exactly once.";
+  "Results must list every entry exactly once.";
 
 const GAME_INCLUDE = {
   gameType: true,
@@ -120,10 +121,35 @@ const GAME_INCLUDE = {
   },
 } satisfies Prisma.GameInclude;
 
-/** True when the participant list is unchanged, ignoring order. */
-export function sameTeamSet(a: readonly number[], b: readonly number[]) {
-  const set = new Set(a);
-  return set.size === new Set(b).size && b.every((id) => set.has(id));
+/** True when both lists hold the same ids the same number of times, ignoring order. */
+export function sameEntries(a: readonly number[], b: readonly number[]) {
+  if (a.length !== b.length) return false;
+  const sortedB = [...b].sort((x, y) => x - y);
+  return [...a].sort((x, y) => x - y).every((id, i) => id === sortedB[i]);
+}
+
+export type StoredEntry = { id: number; teamId: number; rank: number | null };
+
+/**
+ * Splits an edited entry list into entries to update, add, and remove.
+ * `teamsChanged` is false when only names changed, which is allowed after ranking.
+ */
+export function planEntryEdit(current: StoredEntry[], next: ParticipantEntryPayload[]) {
+  const stored = new Map(current.map((entry) => [entry.id, entry]));
+  if (next.some((entry) => entry.id != null && !stored.has(entry.id))) {
+    throw new ApiError("VALIDATION_ERROR", "An entry does not belong to this game.");
+  }
+
+  const kept = next.flatMap((entry) => (entry.id != null ? [{ ...entry, id: entry.id }] : []));
+  const added = next.filter((entry) => entry.id == null);
+  const keptIds = new Set(kept.map((entry) => entry.id));
+  const removedIds = current.filter((entry) => !keptIds.has(entry.id)).map((entry) => entry.id);
+  const teamsChanged =
+    added.length > 0 ||
+    removedIds.length > 0 ||
+    kept.some((entry) => stored.get(entry.id)?.teamId !== entry.teamId);
+
+  return { kept, added, removedIds, teamsChanged };
 }
 
 async function getSportFormat(gameTypeId: number) {
@@ -318,7 +344,7 @@ class GameService {
       endDate,
       location,
       label,
-      participantTeamIds,
+      participants,
     }: AddGamePayload,
     createdByHeraldId: string,
   ) {
@@ -328,13 +354,16 @@ class GameService {
       if (teamAId != null || teamBId != null) {
         throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_HAS_NO_AB_MESSAGE);
       }
-      if (participantTeamIds === undefined) {
+      if (participants === undefined) {
         throw new ApiError(
           "VALIDATION_ERROR",
-          "Please select at least two teams.",
+          "Please add at least two entries.",
         );
       }
-      await assertTeamsInSport(gameTypeId, participantTeamIds);
+      if (participants.some((entry) => entry.id != null)) {
+        throw new ApiError("VALIDATION_ERROR", "New entries cannot have an id.");
+      }
+      await assertTeamsInSport(gameTypeId, participants.map((entry) => entry.teamId));
 
       return prisma.game.create({
         data: {
@@ -345,13 +374,13 @@ class GameService {
           label,
           createdByHeraldId,
           participants: {
-            create: participantTeamIds.map((teamId) => ({ teamId })),
+            create: participants.map(({ teamId, name }) => ({ teamId, name })),
           },
         },
       });
     }
 
-    if (participantTeamIds !== undefined) {
+    if (participants !== undefined) {
       throw new ApiError(
         "VALIDATION_ERROR",
         PARTICIPANTS_REQUIRE_MULTI_TEAM_MESSAGE,
@@ -454,14 +483,14 @@ class GameService {
       teamAForfeited,
       teamBForfeited,
       isDraw,
-      participantTeamIds,
+      participants,
     }: EditGamePayload,
   ) {
     const existing = await prisma.game.findUnique({
       where: { id },
       include: {
         gameType: { select: { format: true } },
-        participants: { select: { teamId: true, rank: true } },
+        participants: { select: { id: true, teamId: true, rank: true } },
       },
     });
     if (!existing) {
@@ -492,18 +521,16 @@ class GameService {
         throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_HAS_NO_AB_MESSAGE);
       }
 
-      const currentIds = existing.participants.map((p) => p.teamId);
-      const nextIds = participantTeamIds ?? currentIds;
-      const teamsChanged = !sameTeamSet(currentIds, nextIds);
+      const plan = participants && planEntryEdit(existing.participants, participants);
 
-      if (teamsChanged && existing.participants.some((p) => p.rank != null)) {
+      if (plan?.teamsChanged && existing.participants.some((p) => p.rank != null)) {
         throw new ApiError("CONFLICT", RANKED_PARTICIPANTS_MESSAGE);
       }
-      if (teamsChanged || gameTypeId !== existing.gameTypeId) {
-        await assertTeamsInSport(gameTypeId, nextIds);
+      if (plan?.teamsChanged || gameTypeId !== existing.gameTypeId) {
+        const teamIds = (participants ?? existing.participants).map((entry) => entry.teamId);
+        await assertTeamsInSport(gameTypeId, teamIds);
       }
 
-      const added = nextIds.filter((teamId) => !currentIds.includes(teamId));
       return prisma.game.update({
         where: { id },
         data: {
@@ -512,15 +539,23 @@ class GameService {
           endDate,
           location,
           ...(label !== undefined ? { label } : {}),
-          participants: {
-            deleteMany: { teamId: { notIn: nextIds } },
-            create: added.map((teamId) => ({ teamId })),
-          },
+          ...(plan
+            ? {
+                participants: {
+                  deleteMany: { id: { in: plan.removedIds } },
+                  update: plan.kept.map(({ id: entryId, teamId, name }) => ({
+                    where: { id: entryId },
+                    data: { teamId, name },
+                  })),
+                  create: plan.added.map(({ teamId, name }) => ({ teamId, name })),
+                },
+              }
+            : {}),
         },
       });
     }
 
-    if (participantTeamIds !== undefined) {
+    if (participants !== undefined) {
       throw new ApiError(
         "VALIDATION_ERROR",
         PARTICIPANTS_REQUIRE_MULTI_TEAM_MESSAGE,
@@ -672,7 +707,7 @@ class GameService {
         where: { id },
         include: {
           gameType: { select: { format: true } },
-          participants: { select: { teamId: true } },
+          participants: { select: { id: true } },
         },
       });
       if (!game) {
@@ -685,21 +720,18 @@ class GameService {
         );
       }
 
-      const participantIds = game.participants.map((p) => p.teamId);
-      const resultIds = results.map((r) => r.teamId);
-      if (
-        resultIds.length !== participantIds.length ||
-        !sameTeamSet(participantIds, resultIds)
-      ) {
+      const participantIds = game.participants.map((p) => p.id);
+      const resultIds = results.map((r) => r.participantId);
+      if (!sameEntries(participantIds, resultIds)) {
         throw new ApiError(
           "VALIDATION_ERROR",
           RESULTS_MUST_MATCH_PARTICIPANTS_MESSAGE,
         );
       }
 
-      for (const { teamId, rank } of results) {
+      for (const { participantId, rank } of results) {
         await tx.gameParticipant.update({
-          where: { gameId_teamId: { gameId: id, teamId } },
+          where: { id: participantId },
           data: { rank },
         });
       }

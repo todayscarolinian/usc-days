@@ -34,13 +34,35 @@ export function hasSavedResult(data: {
 export const MULTI_TEAM_HAS_NO_AB_MESSAGE =
   "Multi-team games list their teams as participants, not as team A and team B.";
 
-/** Teams in a multi-team game. Format-specific rules are checked in the service. */
-export const ParticipantTeamIdsSchema = z
-  .array(z.number({ error: "Participant team selection is invalid." }).int())
-  .min(2, "Please select at least two teams.")
-  .refine((ids) => new Set(ids).size === ids.length, {
-    message: "Each team can only be added once.",
-  })
+/**
+ * The entries in a multi-team game; a team can have several. An existing entry keeps its
+ * `id` so edits update it in place. Format-specific rules are checked in the service.
+ */
+export const ParticipantsSchema = z
+  .array(
+    z.object({
+      id: z.number({ error: "Entry id must be a number." }).int().optional(),
+      teamId: z
+        .number({ error: "Choose a team for every entry." })
+        .int()
+        .positive("Choose a team for every entry."),
+      name: z
+        .string()
+        .trim()
+        .max(100, "Names must be 100 characters or fewer.")
+        .transform((value) => value || null)
+        .nullable()
+        .optional(),
+    }),
+  )
+  .min(2, "Please add at least two entries.")
+  .refine(
+    (entries) => {
+      const ids = entries.flatMap((entry) => (entry.id != null ? [entry.id] : []));
+      return new Set(ids).size === ids.length;
+    },
+    { message: "Each entry can only be listed once." },
+  )
   .optional();
 
 export const AddGameSchema = z
@@ -85,13 +107,13 @@ export const AddGameSchema = z
       }),
     location: z.string().optional(),
     label: ScheduleLabelSchema,
-    participantTeamIds: ParticipantTeamIdsSchema,
+    participants: ParticipantsSchema,
   })
   .refine(
     (data) =>
-      data.participantTeamIds === undefined ||
+      data.participants === undefined ||
       (data.teamAId == null && data.teamBId == null),
-    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participantTeamIds"] },
+    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participants"] },
   )
   .refine(
     (data) =>
@@ -180,13 +202,13 @@ export const EditGameSchema = z
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),
-    participantTeamIds: ParticipantTeamIdsSchema,
+    participants: ParticipantsSchema,
   })
   .refine(
     (data) =>
-      data.participantTeamIds === undefined ||
+      data.participants === undefined ||
       (data.teamAId == null && data.teamBId == null && !hasSavedResult(data)),
-    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participantTeamIds"] },
+    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participants"] },
   )
   .refine(
     (data) =>
@@ -302,12 +324,12 @@ export const ScoreDeltaSchema = z.object({
     .refine((delta) => delta !== 0, "delta cannot be 0."),
 });
 
-/** Ranks for every participant. Ties are allowed; a null rank is unranked (DNF once finished). */
+/** Ranks for every entry. Ties are allowed; a null rank is unranked (DNF once finished). */
 export const MultiTeamResultSchema = z.object({
   results: z
     .array(
       z.object({
-        teamId: z.number({ error: "teamId must be a number." }).int(),
+        participantId: z.number({ error: "participantId must be a number." }).int(),
         rank: z
           .number({ error: "rank must be a number." })
           .int("rank must be a whole number.")
@@ -317,8 +339,8 @@ export const MultiTeamResultSchema = z.object({
       { error: "results must be a list." },
     )
     .refine(
-      (results) => new Set(results.map((r) => r.teamId)).size === results.length,
-      { message: "Each team can only be ranked once." },
+      (results) => new Set(results.map((r) => r.participantId)).size === results.length,
+      { message: "Each entry can only be ranked once." },
     ),
 });
 
@@ -327,6 +349,7 @@ export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
 export type ScoreDeltaPayload = z.infer<typeof ScoreDeltaSchema>;
 export type MultiTeamResultPayload = z.infer<typeof MultiTeamResultSchema>;
+export type ParticipantEntryPayload = NonNullable<z.infer<typeof ParticipantsSchema>>[number];
 
 export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
 

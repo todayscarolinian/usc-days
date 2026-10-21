@@ -6,7 +6,7 @@ import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { getTeamsQuery } from "@/src/queries/teams.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
 import { parseApiError } from "@/src/lib/error-handler";
-import { useScheduleForm } from "@/src/hooks/use-schedule-form";
+import { scheduleTeamFields, useScheduleForm } from "@/src/hooks/use-schedule-form";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 
 import { Button } from "@/src/components/ui/button";
@@ -29,6 +29,7 @@ import { cn } from "@/src/lib/utils";
 import { Plus } from "lucide-react";
 import { eventDateTimeToISO } from "@/src/lib/time";
 import ScheduleLabelField from "./schedule-label-field";
+import ParticipantTeamsField from "./participant-teams-field";
 
 const SCHEDULE_LOCATIONS = [
   "Bunzel Lobby, Talamban Campus",
@@ -42,6 +43,7 @@ const SCHEDULE_LOCATIONS = [
   "AB 202 (Court 1), Downtown Campus",
   "AB 202 (Court 2), Downtown Campus",
   "Pelota Court, Downtown Campus",
+  "Swimming Pool, Downtown Campus",
 ];
 
 export default function AddScheduleDialog({ compactTrigger = false }: {
@@ -118,14 +120,21 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     id: sport.id,
   }));
 
-  const teamOptions: SelectOption[] = useAllTeams ? (teams.data ?? []).map((team) => ({
-    value: team.id.toString(),
-    label: team.teamName,
+  const multiTeam =
+    fetchedSportsData.find((sport) => sport.id === inputs.gameTypeId)?.format === "MULTI_TEAM";
+
+  const teamChoices = useAllTeams ? (teams.data ?? []).map((team) => ({
     id: team.id,
+    label: team.teamName,
   })) : fetchedTeamSportsData.map((team) => ({
-    value: team.teamId.toString(),
-    label: team.team.teamName,
     id: team.teamId,
+    label: team.team.teamName,
+  }));
+
+  const teamOptions: SelectOption[] = teamChoices.map((team) => ({
+    value: team.id.toString(),
+    label: team.label,
+    id: team.id,
   }));
 
   async function createSchedule() {
@@ -138,7 +147,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     }
 
     // Validate form inputs using existing AddGameSchema
-    if (!validate()) {
+    if (!validate({ multiTeam })) {
       showToast(
         "error",
         "Validation Error",
@@ -149,8 +158,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
 
     const data: AddGamePayload = {
       gameTypeId: inputs.gameTypeId,
-      teamAId: inputs.teamAId,
-      teamBId: inputs.teamBId,
+      ...scheduleTeamFields(inputs, multiTeam),
       startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
       endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location || undefined,
@@ -259,6 +267,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
                 updateInput("gameTypeId", value ? Number(value) : -1);
                 updateInput("teamAId", null);
                 updateInput("teamBId", null);
+                updateInput("participants", []);
               }}
               disabled={loading}
               loading={sportsLoading}
@@ -276,57 +285,68 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
               Could not load teams. <button type="button" className="underline" onClick={() => void teams.refetch()}>Try again</button>
             </div>
           )}
-          <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">
-            <div className="flex min-w-0 flex-col gap-1">
-              <Label htmlFor="teamA" className="font-bold opacity-50">
-                Team
-              </Label>
-              <SearchableSelect
-                placeholder="Select Team"
-                searchPlaceholder="Search teams..."
-                emptyMessage="No teams found."
-                options={teamOptions}
-                clearable
-                value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
-                onValueChange={(value) =>
-                  updateInput("teamAId", value ? Number(value) : null)
-                }
-                disabled={inputs.gameTypeId <= 0 || loading}
-                loading={teamLoading}
-                className={validationErrors.teamAId ? "border-red-500" : ""}
-              />
-              {validationErrors.teamAId && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.teamAId}
-                </span>
-              )}
+          {multiTeam ? (
+            <ParticipantTeamsField
+              teams={teamChoices}
+              value={inputs.participants}
+              onChange={(entries) => updateInput("participants", entries)}
+              disabled={loading}
+              loading={teamLoading || (useAllTeams && teams.isPending)}
+              errors={validationErrors}
+            />
+          ) : (
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">
+              <div className="flex min-w-0 flex-col gap-1">
+                <Label htmlFor="teamA" className="font-bold opacity-50">
+                  Team
+                </Label>
+                <SearchableSelect
+                  placeholder="Select Team"
+                  searchPlaceholder="Search teams..."
+                  emptyMessage="No teams found."
+                  options={teamOptions}
+                  clearable
+                  value={inputs.teamAId != null ? inputs.teamAId.toString() : ""}
+                  onValueChange={(value) =>
+                    updateInput("teamAId", value ? Number(value) : null)
+                  }
+                  disabled={inputs.gameTypeId <= 0 || loading}
+                  loading={teamLoading}
+                  className={validationErrors.teamAId ? "border-red-500" : ""}
+                />
+                {validationErrors.teamAId && (
+                  <span className="text-xs text-red-500">
+                    {validationErrors.teamAId}
+                  </span>
+                )}
+              </div>
+              <span className="font-bold opacity-50">vs</span>
+              <div className="flex min-w-0 flex-col gap-1">
+                <Label htmlFor="teamB" className="font-bold opacity-50">
+                  Team
+                </Label>
+                <SearchableSelect
+                  placeholder="Select Team"
+                  searchPlaceholder="Search teams..."
+                  emptyMessage="No teams found."
+                  options={teamOptions}
+                  clearable
+                  value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
+                  onValueChange={(value) =>
+                    updateInput("teamBId", value ? Number(value) : null)
+                  }
+                  disabled={inputs.gameTypeId <= 0 || loading}
+                  loading={teamLoading}
+                  className={validationErrors.teamBId ? "border-red-500" : ""}
+                />
+                {validationErrors.teamBId && (
+                  <span className="text-xs text-red-500">
+                    {validationErrors.teamBId}
+                  </span>
+                )}
+              </div>
             </div>
-            <span className="font-bold opacity-50">vs</span>
-            <div className="flex min-w-0 flex-col gap-1">
-              <Label htmlFor="teamB" className="font-bold opacity-50">
-                Team
-              </Label>
-              <SearchableSelect
-                placeholder="Select Team"
-                searchPlaceholder="Search teams..."
-                emptyMessage="No teams found."
-                options={teamOptions}
-                clearable
-                value={inputs.teamBId != null ? inputs.teamBId.toString() : ""}
-                onValueChange={(value) =>
-                  updateInput("teamBId", value ? Number(value) : null)
-                }
-                disabled={inputs.gameTypeId <= 0 || loading}
-                loading={teamLoading}
-                className={validationErrors.teamBId ? "border-red-500" : ""}
-              />
-              {validationErrors.teamBId && (
-                <span className="text-xs text-red-500">
-                  {validationErrors.teamBId}
-                </span>
-              )}
-            </div>
-          </div>
+          )}
           <div className="w-full flex flex-col gap-1">
             <Label htmlFor={locationId} className="font-bold opacity-50">
               Location

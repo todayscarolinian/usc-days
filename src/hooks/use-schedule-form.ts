@@ -19,6 +19,35 @@ interface ScheduleInputs {
   endTime: string;
   location?: string;
   label: string;
+  participants: ParticipantEntryInput[];
+}
+
+/**
+ * One row of the multi-team entry form. `key` identifies the row on screen; `id` is set
+ * for entries already saved. `teamId` is -1 until a team is chosen.
+ */
+export type ParticipantEntryInput = {
+  key: string;
+  id?: number;
+  teamId: number;
+  name: string;
+};
+
+let entryKeyCounter = 0;
+export function newEntryKey() {
+  entryKeyCounter += 1;
+  return `entry-${entryKeyCounter}`;
+}
+
+/** Multi-team games send their entries; head-to-head games send team A and team B. */
+export function scheduleTeamFields(inputs: ScheduleInputs, multiTeam: boolean) {
+  return multiTeam
+    ? {
+        teamAId: null,
+        teamBId: null,
+        participants: inputs.participants.map(({ id, teamId, name }) => ({ id, teamId, name })),
+      }
+    : { teamAId: inputs.teamAId, teamBId: inputs.teamBId };
 }
 
 interface UseScheduleFormOptions<T = any> {
@@ -37,6 +66,7 @@ const getDefaultInputs = (): ScheduleInputs => ({
   endTime: getEventTimeOfDay(addHours(new Date(), 1)),
   location: undefined,
   label: "",
+  participants: [],
 });
 
 export function useScheduleForm<T = any>(
@@ -55,12 +85,12 @@ export function useScheduleForm<T = any>(
   const updateInput = useCallback(
     <K extends keyof ScheduleInputs>(key: K, value: ScheduleInputs[K]) => {
       setInputs((prev) => ({ ...prev, [key]: value }));
-      // Clear error for this field when user makes changes
-      setValidationErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[key];
-        return newErrors;
-      });
+      // Clear errors for this field, including its nested ones (e.g. "participants.0.teamId")
+      setValidationErrors((prev) =>
+        Object.fromEntries(
+          Object.entries(prev).filter(([path]) => path !== key && !path.startsWith(`${key}.`)),
+        ),
+      );
     },
     [],
   );
@@ -73,8 +103,7 @@ export function useScheduleForm<T = any>(
           ? transformData(inputs, additionalData)
           : {
               gameTypeId: inputs.gameTypeId,
-              teamAId: inputs.teamAId,
-              teamBId: inputs.teamBId,
+              ...scheduleTeamFields(inputs, additionalData?.multiTeam === true),
               startDate: eventDateTimeToISO(inputs.startDate, inputs.startTime),
               endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
               location: inputs.location,
