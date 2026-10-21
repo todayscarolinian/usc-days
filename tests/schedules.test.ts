@@ -46,7 +46,7 @@ describe("shared match status", () => {
   it("distinguishes upcoming, live, and elapsed schedules without results", () => {
     assert.equal(getGameStatus(game(), now), "live");
     assert.equal(getGameStatus(game({ startDate: "2026-10-16T03:00:00Z" }), now), "upcoming");
-    assert.equal(getGameStatus(game({ endDate: now.toISOString() }), now), "ended");
+    assert.equal(getGameStatus(game({ endDate: now.toISOString() }), now), "awaiting");
   });
 
   it("treats draws, winners, and forfeits as results regardless of time", () => {
@@ -88,7 +88,7 @@ describe("shared match status", () => {
 
     assert.equal(getGameStatus(multiTeam([null, null]), now), "live");
     assert.equal(getGameStatus(multiTeam([null, null], { startDate: "2026-10-16T03:00:00Z" }), now), "upcoming");
-    assert.equal(getGameStatus(multiTeam([null, null], { endDate: now.toISOString() }), now), "ended");
+    assert.equal(getGameStatus(multiTeam([null, null], { endDate: now.toISOString() }), now), "awaiting");
     assert.equal(getGameStatus(multiTeam([1, null]), now), "finished");
   });
 
