@@ -65,3 +65,16 @@ export const columns: ColumnDef<StandingData>[] = [
     },
   },
 ];
+
+/** Multi-team 1st/2nd/3rd counts; shown only when some row has a placing. */
+const placingColumns: ColumnDef<StandingData>[] = [
+  { accessorKey: "firsts", header: "1ST", meta: { className: "w-16 text-center" } },
+  { accessorKey: "seconds", header: "2ND", meta: { className: "w-16 text-center" } },
+  { accessorKey: "thirds", header: "3RD", meta: { className: "w-16 text-center" } },
+];
+
+/** Leaderboard columns, with placings before Win % when any row has them. */
+export function getLeaderboardColumns(showPlacings: boolean): ColumnDef<StandingData>[] {
+  if (!showPlacings) return columns;
+  return [...columns.slice(0, -1), ...placingColumns, ...columns.slice(-1)];
+}

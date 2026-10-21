@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/src/components/leaderboards/data-table";
-import { columns } from "@/src/components/leaderboards/columns";
+import { getLeaderboardColumns } from "@/src/components/leaderboards/columns";
+import { hasPlacings } from "@/src/lib/multi-team";
 import { transformSchoolsData } from "@/src/components/leaderboards/transformSchoolsData";
 import { useGamesQuery } from "@/src/queries/games.queries";
 import SportSelector from "@/src/components/ui/sport-selector";
@@ -43,7 +44,7 @@ export default function Leaderboards() {
         {error || loading ? (
           <LeaderboardsTableSkeleton error={error?.message} />
         ) : (
-          <DataTable columns={columns} data={transformed} />
+          <DataTable columns={getLeaderboardColumns(hasPlacings(transformed))} data={transformed} />
         )}
       </div>
     </div>

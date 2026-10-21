@@ -39,6 +39,24 @@ export function entryLabels(game: Pick<Schedules, "participants">): Map<number, 
   return labels;
 }
 
+export type PlacingCounts = { firsts: number; seconds: number; thirds: number };
+
+const PLACING_KEYS: Record<number, keyof PlacingCounts> = { 1: "firsts", 2: "seconds", 3: "thirds" };
+
+/** The tally field a rank counts toward, or null outside the top three. */
+export function placingKey(rank: number | null): keyof PlacingCounts | null {
+  return rank != null ? PLACING_KEYS[rank] ?? null : null;
+}
+
+export function hasPlacings(rows: readonly PlacingCounts[]): boolean {
+  return rows.some((row) => row.firsts + row.seconds + row.thirds > 0);
+}
+
+/** More firsts ranks higher, then more seconds, then more thirds. */
+export function comparePlacings(a: PlacingCounts, b: PlacingCounts): number {
+  return b.firsts - a.firsts || b.seconds - a.seconds || b.thirds - a.thirds;
+}
+
 /** 1 → "1st", 2 → "2nd", 11 → "11th", 22 → "22nd". */
 export function ordinal(rank: number): string {
   const tens = rank % 100;

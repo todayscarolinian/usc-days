@@ -13,10 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/src/components/ui/table";
-import standingColumns from "./columns";
+import { getStandingColumns } from "./columns";
 import type { TeamStandingData } from "./transformTeamsData";
 import { Trophy } from "lucide-react";
 import { EmptyState } from "@/src/components/ui/empty-state";
+import { hasPlacings } from "@/src/lib/multi-team";
 
 type StandingsTableProps = {
   data: TeamStandingData[];
@@ -27,10 +28,11 @@ export default function StandingsTable({
   data,
   sportName,
 }: StandingsTableProps) {
+  const showPlacings = hasPlacings(data);
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
-    columns: standingColumns,
+    columns: getStandingColumns(showPlacings),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -44,14 +46,26 @@ export default function StandingsTable({
 
       <div className="min-w-0 border border-neutral-300">
         <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
-          <colgroup>
-            <col className="w-[8%] sm:w-auto" />
-            <col className="w-[36%] sm:w-auto" />
-            <col className="w-[15%] sm:w-auto" />
-            <col className="w-[15%] sm:w-auto" />
-            <col className="w-[8%] sm:w-auto" />
-            <col className="w-[18%] sm:w-auto" />
-          </colgroup>
+          {showPlacings ? (
+            <colgroup>
+              <col className="w-[7%] sm:w-auto" />
+              <col className="w-[29%] sm:w-auto" />
+              <col className="w-[12%] sm:w-auto" />
+              <col className="w-[13%] sm:w-auto" />
+              <col className="w-[7%] sm:w-auto" />
+              <col className="w-[17%] sm:w-auto" />
+              <col className="w-[15%] sm:w-auto" />
+            </colgroup>
+          ) : (
+            <colgroup>
+              <col className="w-[8%] sm:w-auto" />
+              <col className="w-[36%] sm:w-auto" />
+              <col className="w-[15%] sm:w-auto" />
+              <col className="w-[15%] sm:w-auto" />
+              <col className="w-[8%] sm:w-auto" />
+              <col className="w-[18%] sm:w-auto" />
+            </colgroup>
+          )}
 
           <TableHeader className="bg-neutral-200">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -107,7 +121,7 @@ export default function StandingsTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={standingColumns.length}
+                  colSpan={table.getAllColumns().length}
                   className="p-0 whitespace-normal"
                 >
                   <EmptyState

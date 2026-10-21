@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "vitest";
 import { getGameStatus } from "@/src/lib/game-status";
-import { getMatchdayGameStatus } from "@/src/lib/todays-games";
+import { getMatchdayGameStatus, selectTodaysGames } from "@/src/lib/todays-games";
 import { entryLabels, ordinal, participatingTeams, sortedParticipants } from "@/src/lib/multi-team";
 import {
   addScheduleDays,
@@ -100,6 +100,19 @@ describe("shared match status", () => {
     assert.deepEqual(order, ["SAFAD", "SAS", "SBE", "SOE"]);
     assert.deepEqual([1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(ordinal),
       ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"]);
+  });
+
+  it("shows a multi-team game on the homepage once it has entries", () => {
+    const swim = (id: number, participants: unknown[]) => game({
+      id,
+      gameType: { id: 2, gameName: "Women's 50m Freestyle", format: "MULTI_TEAM" },
+      teamA: null,
+      teamB: null,
+      participants,
+    });
+    const entry = { id: 1, teamId: 10, name: null, rank: null, team: { id: 10, teamName: "SOE" } };
+    const { featured, compact } = selectTodaysGames([swim(1, []), swim(2, [entry])], now);
+    assert.deepEqual([...featured, ...compact].map(g => g.id), [2]);
   });
 
   it("labels named entries by name and numbers a team's unnamed entries", () => {

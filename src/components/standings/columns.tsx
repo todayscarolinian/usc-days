@@ -56,4 +56,18 @@ const standingColumns: ColumnDef<TeamStandingData>[] = [
   },
 ];
 
+/** Multi-team 1st/2nd/3rd counts; shown only when some row has a placing. */
+export const placingsColumn: ColumnDef<TeamStandingData> = {
+  id: "placings",
+  header: () => <span title="1st / 2nd / 3rd places">1st / 2nd / 3rd</span>,
+  cell: ({ row }) =>
+    `${row.original.firsts} / ${row.original.seconds} / ${row.original.thirds}`,
+};
+
+/** Standings columns, with placings before Win % when any row has them. */
+export function getStandingColumns(showPlacings: boolean): ColumnDef<TeamStandingData>[] {
+  if (!showPlacings) return standingColumns;
+  return [...standingColumns.slice(0, -1), placingsColumn, ...standingColumns.slice(-1)];
+}
+
 export default standingColumns;

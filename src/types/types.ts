@@ -41,6 +41,10 @@ export type StandingData = {
     draws: number;
     winPercentage: number;
     sport: string;
+    /** Multi-team placings; every entry's 1st, 2nd, or 3rd counts for its team. */
+    firsts: number;
+    seconds: number;
+    thirds: number;
 };
 
 export type GameParticipantWithTeam = {

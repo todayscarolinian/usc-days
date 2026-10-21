@@ -417,6 +417,40 @@ describe("standings and leaderboards", () => {
     );
   });
 
+  it("counts every multi-team placing toward its team and school, apart from win/loss", async () => {
+    const { transformSchoolsData } = await import(
+      "@/src/components/leaderboards/transformSchoolsData"
+    );
+    const soe = { id: 10, teamName: "SOE Blue", schoolId: 1, school: { id: 1, schoolName: "SOE" } };
+    const sbe = { id: 20, teamName: "SBE Red", schoolId: 2, school: { id: 2, schoolName: "SBE" } };
+    const entry = (id: number, team: typeof soe, rank: number | null) =>
+      ({ id, gameId: 5, teamId: team.id, name: null, rank, team });
+    const swim = schedule({
+      id: 5,
+      teamA: null,
+      teamB: null,
+      teamAId: null,
+      teamBId: null,
+      gameType: { id: 4, gameName: "Swimming", format: "MULTI_TEAM" },
+      participants: [entry(1, soe, 1), entry(2, soe, 2), entry(3, sbe, 3), entry(4, sbe, 4), entry(5, sbe, null)],
+    });
+    const basketball = schedule({ id: 6, winnerId: 20, winner: { id: 20, teamName: "SBE Red" } });
+
+    const placings = (rows: { team: string; wins: number; firsts: number; seconds: number; thirds: number }[]) =>
+      rows.map(({ team, wins, firsts, seconds, thirds }) => ({ team, wins, firsts, seconds, thirds }));
+
+    assert.deepEqual(placings(transformTeamsData([swim, basketball])), [
+      { team: "SBE Red", wins: 1, firsts: 0, seconds: 0, thirds: 1 },
+      { team: "SOE Blue", wins: 0, firsts: 1, seconds: 1, thirds: 0 },
+    ]);
+    assert.deepEqual(placings(transformSchoolsData([swim, basketball])), [
+      { team: "SBE", wins: 1, firsts: 0, seconds: 0, thirds: 1 },
+      { team: "SOE", wins: 0, firsts: 1, seconds: 1, thirds: 0 },
+    ]);
+    // The swim adds no games played: SOE's only W/L game is the basketball loss.
+    assert.equal(transformTeamsData([swim, basketball]).find((row) => row.team === "SOE Blue")?.played, 1);
+  });
+
   it("skips incomplete games in the school leaderboard", async () => {
     const { transformSchoolsData } = await import(
       "@/src/components/leaderboards/transformSchoolsData"

@@ -1,5 +1,6 @@
 import { Schedules } from "@/src/types/types";
 import { StandingData } from "@/src/types/types";
+import { comparePlacings, isMultiTeam, placingKey } from "@/src/lib/multi-team";
 
 export function transformSchoolsData(
   games: Schedules[],
@@ -13,8 +14,25 @@ export function transformSchoolsData(
       losses: number;
       draws: number;
       sport: string;
+      firsts: number;
+      seconds: number;
+      thirds: number;
     }
   > = {};
+
+  function ensureSchool(school: string, sport: string) {
+    leaderboard[school] ??= {
+      school,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      sport: sportId !== undefined ? sport : "Overall",
+      firsts: 0,
+      seconds: 0,
+      thirds: 0,
+    };
+    return leaderboard[school];
+  }
 
   // Filter by sport if specified
   const filteredGames =
@@ -23,6 +41,15 @@ export function transformSchoolsData(
       : games;
 
   for (const g of filteredGames) {
+    // Multi-team games add placings only; win/loss/draw stays head-to-head.
+    if (isMultiTeam(g)) {
+      for (const { rank, team } of g.participants) {
+        const key = placingKey(rank);
+        if (key) ensureSchool(team.school.schoolName, g.gameType.gameName)[key]++;
+      }
+      continue;
+    }
+
     if (!g.teamA || !g.teamB) continue;
 
     const sport = g.gameType.gameName;
@@ -31,27 +58,8 @@ export function transformSchoolsData(
     const schoolA = g.teamA.school.schoolName;
     const schoolB = g.teamB.school.schoolName;
 
-    // Initialize School A entry if it doesn't exist
-    if (!leaderboard[schoolA]) {
-      leaderboard[schoolA] = {
-        school: schoolA,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        sport: sportId !== undefined ? sport : "Overall",
-      };
-    }
-
-    // Initialize School B entry if it doesn't exist
-    if (!leaderboard[schoolB]) {
-      leaderboard[schoolB] = {
-        school: schoolB,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        sport: sportId !== undefined ? sport : "Overall",
-      };
-    }
+    ensureSchool(schoolA, sport);
+    ensureSchool(schoolB, sport);
 
     // Handle both teams forfeiting - both get a loss
     if (g.teamAForfeited && g.teamBForfeited) {
@@ -100,7 +108,10 @@ export function transformSchoolsData(
         draws: entry.draws,
         winPercentage: totalGames > 0 ? (entry.wins / totalGames) * 100 : 0,
         sport: entry.sport,
+        firsts: entry.firsts,
+        seconds: entry.seconds,
+        thirds: entry.thirds,
       };
     })
-    .sort((a, b) => b.winPercentage - a.winPercentage);
+    .sort((a, b) => b.winPercentage - a.winPercentage || comparePlacings(a, b));
 }

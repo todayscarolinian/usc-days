@@ -1,4 +1,5 @@
 import { Schedules, StandingData } from "@/src/types/types";
+import { comparePlacings, isMultiTeam, placingKey } from "@/src/lib/multi-team";
 
 export type TeamStandingData = StandingData & {
   played: number;
@@ -12,6 +13,9 @@ type MutableStanding = {
   draws: number;
   played: number;
   sport: string;
+  firsts: number;
+  seconds: number;
+  thirds: number;
 };
 
 export function transformTeamsData(
@@ -44,6 +48,9 @@ export function transformTeamsData(
       draws: 0,
       played: 0,
       sport: sportId !== undefined ? sport : "Overall",
+      firsts: 0,
+      seconds: 0,
+      thirds: 0,
     };
 
     standings.set(id, standing);
@@ -51,6 +58,15 @@ export function transformTeamsData(
   }
 
   for (const game of filteredGames) {
+    // Multi-team games add placings only; win/loss/draw stays head-to-head.
+    if (isMultiTeam(game)) {
+      for (const { rank, team } of game.participants) {
+        const key = placingKey(rank);
+        if (key) ensureTeam(team.id, team.teamName, game.gameType.gameName)[key]++;
+      }
+      continue;
+    }
+
     if (!game.teamA || !game.teamB) continue;
 
     const teamAName = game.teamA.teamName;
@@ -111,6 +127,7 @@ export function transformTeamsData(
       (a, b) =>
         b.winPercentage - a.winPercentage ||
         b.wins - a.wins ||
+        comparePlacings(a, b) ||
         a.losses - b.losses ||
         a.team.localeCompare(b.team),
     );

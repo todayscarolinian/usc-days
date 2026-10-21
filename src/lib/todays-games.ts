@@ -8,6 +8,7 @@ import type {
 } from "@/src/types/games.types";
 import type { Schedules } from "@/src/types/types";
 import { getGameStatus } from "@/src/lib/game-status";
+import { isMultiTeam } from "@/src/lib/multi-team";
 
 const EVENT_CALENDAR = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Manila",
@@ -47,9 +48,16 @@ export function getMatchdayGameStatus(
   return null;
 }
 
+/** Games still waiting on their teams (TBD) stay off the homepage. */
+function hasTeams(game: Schedules) {
+  return isMultiTeam(game)
+    ? game.participants.length > 0
+    : game.teamA != null && game.teamB != null;
+}
+
 export function selectTodaysGames(games: Schedules[], now: Date): TodaysGamesSelection {
   const sortedGames = games.filter((game) => {
-    if (game.teamA == null || game.teamB == null) return false;
+    if (!hasTeams(game)) return false;
     const status = getGameStatus(game, now);
     return status === "live" || status === "upcoming";
   }).sort(
