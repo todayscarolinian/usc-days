@@ -107,6 +107,7 @@ export const AddGameSchema = z
       }),
     location: z.string().optional(),
     label: ScheduleLabelSchema,
+    bestOf: z.union([z.literal(3), z.literal(5)]).nullable().optional(),
     participants: ParticipantsSchema,
   })
   .refine(
@@ -199,6 +200,7 @@ export const EditGameSchema = z
       }),
     location: z.string().nullable().optional(),
     label: ScheduleLabelSchema,
+    bestOf: z.union([z.literal(3), z.literal(5)]).nullable().optional(),
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),
@@ -348,6 +350,25 @@ export const MultiTeamResultSchema = z.object({
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
 export type ScoreDeltaPayload = z.infer<typeof ScoreDeltaSchema>;
+const SetPointsSchema = z.object({
+  setNumber: z.number().int().min(1).max(5),
+  teamAPoints: z.number().int().min(0).max(2147483647),
+  teamBPoints: z.number().int().min(0).max(2147483647),
+  status: z.enum(["IN_PROGRESS", "COMPLETED"]),
+});
+const scoringVersion = z.number().int().min(0);
+export const SetActionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("final"), scoringVersion,
+    teamAScore: z.number().int().min(0).max(3), teamBScore: z.number().int().min(0).max(3),
+    teamAForfeited: z.boolean(), teamBForfeited: z.boolean() }),
+  z.object({ action: z.literal("start"), scoringVersion }),
+  z.object({ action: z.literal("point"), scoringVersion, setId: z.number().int().positive(),
+    team: ScoreDeltaSchema.shape.team, delta: ScoreDeltaSchema.shape.delta }),
+  z.object({ action: z.literal("complete"), scoringVersion, setId: z.number().int().positive() }),
+  z.object({ action: z.literal("replace"), scoringVersion, sets: z.array(SetPointsSchema).max(5),
+    teamAForfeited: z.boolean(), teamBForfeited: z.boolean() }),
+]);
+export type SetActionPayload = z.infer<typeof SetActionSchema>;
 export type MultiTeamResultPayload = z.infer<typeof MultiTeamResultSchema>;
 export type ParticipantEntryPayload = NonNullable<z.infer<typeof ParticipantsSchema>>[number];
 

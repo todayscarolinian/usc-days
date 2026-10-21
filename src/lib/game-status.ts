@@ -24,7 +24,7 @@ export function getGameStatus(game: Schedules, now: Date): GameStatus {
       game.teamAForfeited ||
       game.teamBForfeited;
   const hasScores =
-    !multiTeam && (game.teamAScore != null || game.teamBScore != null);
+    !multiTeam && (game.teamAScore != null || game.teamBScore != null || (game.sets?.length ?? 0) > 0);
 
   if (hasResult) return "finished";
   if (new Date(game.startDate) > now) return "upcoming";

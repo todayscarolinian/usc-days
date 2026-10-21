@@ -34,8 +34,8 @@ export function parseApiError(error: unknown): string {
       lowerMessage.includes("conflict");
     
     if (hasConflictMessage || error.response?.status === 409) {
-      // Return original message if it has conflict keywords, otherwise use generic
-      return hasConflictMessage ? messageStr : "A schedule already exists for these teams at this time.";
+      // Preserve domain-specific conflicts, including stale score submissions.
+      return messageStr && messageStr !== '[object Object]' ? messageStr : "This update conflicts with the current record. Refresh and try again.";
     }
 
     // Return API message if available

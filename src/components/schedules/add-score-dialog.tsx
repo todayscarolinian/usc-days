@@ -23,6 +23,8 @@ import { SCORES_REQUIRE_TEAMS_MESSAGE } from "@/src/types/games.types";
 import { useEditGamesQuery } from "@/src/queries/games.queries";
 import { isMultiTeam } from "@/src/lib/multi-team";
 import AddPlacingsDialog from "./add-placings-dialog";
+import AddSetScoresDialog from "./add-set-scores-dialog";
+import { isSetScoring } from "@/src/lib/set-scoring";
 
 function getDbScores(g: Schedules) {
   const a = g.teamAScore != null ? Number(g.teamAScore) : null;
@@ -111,6 +113,7 @@ export default function AddScoreDialog({ open, onOpenChange, game }: Props) {
   }, [open, game]);
 
   if (!game) return null;
+  if (isSetScoring(game)) return <AddSetScoresDialog open={open} onOpenChange={onOpenChange} game={game} />;
 
   if (isMultiTeam(game)) {
     return <AddPlacingsDialog open={open} onOpenChange={onOpenChange} game={game} />;

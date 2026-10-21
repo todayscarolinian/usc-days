@@ -6,6 +6,7 @@ type GameType = {
   id: number;
   gameName: string;
   format: GameFormat;
+  scoringMode: "LINEAR" | "SETS";
 };
 
 const STALE_TIME = 1000 * 60 * 5;

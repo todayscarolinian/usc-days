@@ -9,7 +9,7 @@ import { CalendarDays, Clock, MapPin, Trophy } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { useIsMutating } from "@tanstack/react-query";
-import { scoreMutationKey, useGameQuery, useUpdateScoreQuery } from "@/src/queries/games.queries";
+import { scoreMutationKey, setScoreMutationKey, useGameQuery, useUpdateScoreQuery, useUpdateSetsQuery } from "@/src/queries/games.queries";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { GAME_STATUS_LABELS, getGameStatus } from "@/src/lib/game-status";
 import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
@@ -19,6 +19,9 @@ import type { Schedules } from "@/src/types/types";
 import { isMultiTeam, ordinal, sortedParticipants } from "@/src/lib/multi-team";
 import ScheduleLabel from "./schedule-label";
 import PlacingMedal from "./placing-medal";
+import SetScoreboard from "./set-scoreboard";
+import { isSetScoring, setTarget } from "@/src/lib/set-scoring";
+import { parseApiError } from "@/src/lib/error-handler";
 
 const AddScoreDialog = dynamic(() => import("./add-score-dialog"), { ssr: false });
 
@@ -59,7 +62,7 @@ type TeamScoreProps = {
   score: string;
   outcome: Outcome;
   /** Numeric score for the minus-button floor; omitted for viewers who cannot edit. */
-  editable?: { value: number; onChange: (delta: number) => void };
+  editable?: { value: number; onChange: (delta: number) => void; disabled?: boolean };
 };
 
 function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
@@ -109,7 +112,7 @@ function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
         <>
           <div className="grid w-full grid-cols-3 gap-2">
             {STEPS.map(step => (
-              <Button key={`+${step}`} size="lg" onClick={() => editable.onChange(step)} aria-label={`Add ${step} to ${name}`}>
+              <Button key={`+${step}`} size="lg" disabled={editable.disabled} onClick={() => editable.onChange(step)} aria-label={`Add ${step} to ${name}`}>
                 +{step}
               </Button>
             ))}
@@ -118,7 +121,7 @@ function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
                 key={`-${step}`}
                 size="lg"
                 variant="outline"
-                disabled={editable.value - step < 0}
+                disabled={editable.disabled || editable.value - step < 0}
                 onClick={() => editable.onChange(-step)}
                 aria-label={`Subtract ${step} from ${name}`}
               >
@@ -136,18 +139,19 @@ function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
               step={1}
               placeholder="Amount"
               value={custom}
+              disabled={editable.disabled}
               onChange={(e) => setCustom(e.currentTarget.value)}
             />
             <Button
               variant="outline"
-              disabled={!customValid}
+              disabled={editable.disabled || !customValid}
               onClick={() => { editable.onChange(customDelta); setCustom(""); }}
             >
               Add
             </Button>
             <Button
               variant="outline"
-              disabled={!customValid || editable.value - customDelta < 0}
+              disabled={editable.disabled || !customValid || editable.value - customDelta < 0}
               onClick={() => { editable.onChange(-customDelta); setCustom(""); }}
             >
               Subtract
@@ -161,22 +165,40 @@ function TeamScore({ team, score, outcome, editable }: TeamScoreProps) {
 
 function GameScore({ game, canManage }: { game: Schedules; canManage: boolean }) {
   const updateScore = useUpdateScoreQuery(game.id);
+  const updateSets = useUpdateSetsQuery(game.id);
   // Finalizing waits for pending score changes so the dialog starts from the saved score.
   const savingScore = useIsMutating({ mutationKey: scoreMutationKey(game.id) }) > 0;
+  const savingSets = useIsMutating({ mutationKey: setScoreMutationKey(game.id) }) > 0;
   const [finalizeOpen, setFinalizeOpen] = useState(false);
 
   const status = getGameStatus(game, new Date());
   const finished = status === "finished";
   const teamsSet = game.teamA != null && game.teamB != null;
-  const canTrack = canManage && teamsSet && !finished;
+  const setBased = isSetScoring(game);
+  const activeSet = game.sets?.find(set => set.status === "IN_PROGRESS");
+  const showSetPoints = setBased && !finished && activeSet != null;
+  const canTrack = canManage && teamsSet && !finished && (!setBased || activeSet != null);
+  const scoreA = showSetPoints ? activeSet.teamAPoints : game.teamAScore;
+  const scoreB = showSetPoints ? activeSet.teamBPoints : game.teamBScore;
 
-  function display(score: Schedules["teamAScore"], forfeited: boolean) {
+  function display(score: Schedules["teamAScore"] | number, forfeited: boolean) {
     if (forfeited) return "X";
     return score == null ? "–" : String(Number(score));
   }
 
-  function editable(team: ScoreDeltaPayload["team"], score: Schedules["teamAScore"]) {
+  function editable(team: ScoreDeltaPayload["team"], score: Schedules["teamAScore"] | number) {
     if (!canTrack) return undefined;
+    if (setBased) {
+      if (!activeSet) return undefined;
+      const setId = activeSet.id;
+      return {
+        value: Number(score ?? 0),
+        disabled: savingSets,
+        onChange: (delta: number) => updateSets.mutate({
+          action: "point", scoringVersion: game.scoringVersion ?? 0, setId, team, delta,
+        }),
+      };
+    }
     return {
       value: Number(score ?? 0),
       onChange: (delta: number) => updateScore.mutate({ team, delta }),
@@ -194,29 +216,41 @@ function GameScore({ game, canManage }: { game: Schedules; canManage: boolean })
         <p className="inline-block bg-tc_primary-400 px-2 py-1 text-xs text-white uppercase">{GAME_STATUS_LABELS[status]}</p>
       </header>
 
+      {setBased && <div className="space-y-1">
+        <p className="text-sm font-bold uppercase">{showSetPoints
+          ? `Set ${activeSet.setNumber} · Points · to ${setTarget(game.bestOf ?? 3, activeSet.setNumber)}, win by two`
+          : "Match score · Sets won"}</p>
+        {showSetPoints && <p className="text-sm text-neutral-600">
+          Sets won: {game.teamA?.teamName} {String(game.teamAScore ?? 0)}–{String(game.teamBScore ?? 0)} {game.teamB?.teamName}
+        </p>}
+      </div>}
       <div className="grid gap-4 sm:grid-cols-2">
         <TeamScore
+          key={`A-${showSetPoints ? activeSet.id : "match"}`}
           team={game.teamA}
-          score={display(game.teamAScore, game.teamAForfeited)}
+          score={display(scoreA, game.teamAForfeited)}
           outcome={getOutcome(game, game.teamA, game.teamAForfeited)}
-          editable={editable("A", game.teamAScore)}
+          editable={editable("A", scoreA)}
         />
         <TeamScore
+          key={`B-${showSetPoints ? activeSet.id : "match"}`}
           team={game.teamB}
-          score={display(game.teamBScore, game.teamBForfeited)}
+          score={display(scoreB, game.teamBForfeited)}
           outcome={getOutcome(game, game.teamB, game.teamBForfeited)}
-          editable={editable("B", game.teamBScore)}
+          editable={editable("B", scoreB)}
         />
       </div>
+      {setBased && <SetScoreboard game={game} canManage={canManage} />}
 
       {canManage && !teamsSet && <p className="text-sm text-neutral-600">{SCORES_REQUIRE_TEAMS_MESSAGE}</p>}
       {updateScore.isError && (
         <p role="alert" className="text-sm text-red-600">{errorMessage(updateScore.error)}</p>
       )}
-      {canTrack && (
+      {updateSets.isError && <p role="alert" className="text-sm text-red-600">{parseApiError(updateSets.error)}</p>}
+      {(canTrack || (setBased && canManage && teamsSet)) && (
         <>
           <div className="flex justify-end">
-            <Button onClick={() => setFinalizeOpen(true)} disabled={savingScore}>Finalize</Button>
+            <Button onClick={() => setFinalizeOpen(true)} disabled={savingScore || savingSets}>{setBased ? "Edit result" : "Finalize"}</Button>
           </div>
           <AddScoreDialog open={finalizeOpen} onOpenChange={setFinalizeOpen} game={game} />
         </>

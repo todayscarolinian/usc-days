@@ -30,6 +30,7 @@ import { Plus } from "lucide-react";
 import { eventDateTimeToISO } from "@/src/lib/time";
 import ScheduleLabelField from "./schedule-label-field";
 import ParticipantTeamsField from "./participant-teams-field";
+import BestOfField from "./best-of-field";
 
 const SCHEDULE_LOCATIONS = [
   "Bunzel Lobby, Talamban Campus",
@@ -122,6 +123,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
 
   const multiTeam =
     fetchedSportsData.find((sport) => sport.id === inputs.gameTypeId)?.format === "MULTI_TEAM";
+  const setBased = fetchedSportsData.find(sport => sport.id === inputs.gameTypeId)?.scoringMode === "SETS";
 
   const teamChoices = useAllTeams ? (teams.data ?? []).map((team) => ({
     id: team.id,
@@ -163,6 +165,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
       endDate: eventDateTimeToISO(inputs.endDate, inputs.endTime),
       location: inputs.location || undefined,
       label: inputs.label.trim() || null,
+      bestOf: setBased ? inputs.bestOf : null,
     };
 
     add.mutate(data, {
@@ -277,6 +280,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
           {inputs.gameTypeId <= 0 && (
             <p className="text-sm text-muted-foreground">Select a sport to choose teams.</p>
           )}
+          {setBased && <BestOfField value={inputs.bestOf} onChange={v => updateInput("bestOf", v)} disabled={loading} />}
           {useAllTeams && !teams.isPending && !teams.isError && (
             <p className="text-sm text-muted-foreground">No teams are registered for this sport yet. Showing all existing teams.</p>
           )}

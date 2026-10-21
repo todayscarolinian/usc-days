@@ -8,6 +8,7 @@ import type { Schedules } from "@/src/types/types";
 import { isMultiTeam, ordinal, participatingTeams, sortedParticipants } from "@/src/lib/multi-team";
 import ScheduleLabel from "./schedule-label";
 import PlacingMedal from "./placing-medal";
+import { setScoreSummary } from "@/src/lib/set-scoring";
 
 type ScheduleMatchProps = {
   showEventLabel: boolean;
@@ -211,6 +212,7 @@ export default function ScheduleMatch({ game, now, showEventLabel, canManage, on
           </span>
         </>
       )}
+      {setScoreSummary(game) && <span className="block px-3 py-2 text-xs text-neutral-600">{setScoreSummary(game)}</span>}
       </Link>
     </article>
   );

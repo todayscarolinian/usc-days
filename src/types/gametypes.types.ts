@@ -15,6 +15,7 @@ export const AddGameTypeSchema = z
                 })
                 .min(1, 'gameTypeName cannot be empty.'),
          format: GameFormatSchema.optional(),
+         scoringMode: z.enum(['LINEAR', 'SETS']).optional(),
     });
 
 export const EditGameTypeSchema = z
@@ -28,6 +29,7 @@ export const EditGameTypeSchema = z
                 })
                 .min(1, 'gameTypeName cannot be empty.'),
          format: GameFormatSchema.optional(),
+         scoringMode: z.enum(['LINEAR', 'SETS']).optional(),
     });
 
 export type AddGameTypePayload = z.infer<typeof AddGameTypeSchema>;
