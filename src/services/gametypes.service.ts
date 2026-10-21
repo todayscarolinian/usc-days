@@ -35,29 +35,36 @@ class GameTypeService {
     return gameType.teams;
   }
 
-  async addGameType({ gameName, format }: AddGameTypePayload) {
+  async addGameType({ gameName, format, scoringMode }: AddGameTypePayload) {
+    if (format === "MULTI_TEAM" && scoringMode === "SETS") {
+      throw new ApiError("VALIDATION_ERROR", "Set scoring requires head-to-head format.");
+    }
     return prisma.gameType.create({
-      data: { gameName, format },
+      data: { gameName, format, scoringMode },
     })
   }
 
   /** A sport's format is fixed once it has games, so no game ends up in the wrong format. */
-  async editGameType( id: number, { gameName, format }: EditGameTypePayload) {
-    if (format !== undefined) {
+  async editGameType( id: number, { gameName, format, scoringMode }: EditGameTypePayload) {
+    if (format !== undefined || scoringMode !== undefined) {
       const sport = await prisma.gameType.findUnique({
         where: { id },
-        select: { format: true, _count: { select: { games: true } } },
+        select: { format: true, scoringMode: true, _count: { select: { games: true } } },
       });
-      if (sport && sport.format !== format && sport._count.games > 0) {
+      if (sport && ((format !== undefined && sport.format !== format) ||
+          (scoringMode !== undefined && sport.scoringMode !== scoringMode)) && sport._count.games > 0) {
         throw new ApiError(
           "CONFLICT",
           "A sport's format cannot change once it has games.",
         );
       }
+      if (sport && (format ?? sport.format) === "MULTI_TEAM" && (scoringMode ?? sport.scoringMode) === "SETS") {
+        throw new ApiError("VALIDATION_ERROR", "Set scoring requires head-to-head format.");
+      }
     }
     return prisma.gameType.update({
       where: { id },
-      data: { gameName, format },
+      data: { gameName, format, scoringMode },
     });
   }
 

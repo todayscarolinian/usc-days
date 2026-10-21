@@ -271,7 +271,7 @@ describe("EditGameSchema results", () => {
 
   it("rejects an edit that leaves out a team id", () => {
     const payload = editPayload({ teamAScore: 2, teamBScore: 1, winnerId: 10 });
-    delete payload.teamAId;
+    Reflect.deleteProperty(payload, "teamAId");
     const result = EditGameSchema.safeParse(payload);
     assert.equal(result.success, false);
   });

@@ -1,4 +1,4 @@
-import { Game, GameFormat } from "../lib/prisma/generated/client";
+import { Game, GameFormat, GameSet } from "../lib/prisma/generated/client";
 
 /*
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
@@ -61,11 +61,15 @@ export type GameParticipantWithTeam = {
     };
 };
 
-export type Schedules = Game & {
+export type Schedules = Omit<Game, "bestOf" | "scoringVersion"> & {
+    bestOf?: number | null;
+    scoringVersion?: number;
+    sets?: GameSet[];
     gameType: {
         id: number;
         gameName: string;
         format: GameFormat;
+        scoringMode?: "LINEAR" | "SETS";
     };
     participants: GameParticipantWithTeam[];
     teamA: {

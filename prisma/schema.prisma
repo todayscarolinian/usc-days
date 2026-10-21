@@ -35,10 +35,21 @@ enum GameFormat {
   MULTI_TEAM
 }
 
+enum ScoringMode {
+  LINEAR
+  SETS
+}
+
+enum SetStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
 model GameType {
   gameName String         @map("game_name") @db.VarChar(100)
   id       Int            @id @default(autoincrement())
   format   GameFormat     @default(HEAD_TO_HEAD)
+  scoringMode ScoringMode @default(LINEAR) @map("scoring_mode")
   Champion Champion[]
   games    Game[]
   teams    TeamGameType[]
@@ -78,8 +89,24 @@ model Game {
   teamB             Team?    @relation("TeamBGames", fields: [teamBId], references: [id], onDelete: Restrict)
   winner            Team?    @relation("GameWinner", fields: [winnerId], references: [id])
   participants      GameParticipant[]
+  bestOf            Int?     @map("best_of")
+  scoringVersion    Int      @default(0) @map("scoring_version")
+  sets              GameSet[]
 
   @@map("games")
+}
+
+model GameSet {
+  id          Int       @id @default(autoincrement())
+  gameId      Int       @map("game_id")
+  setNumber   Int       @map("set_number")
+  teamAPoints Int       @default(0) @map("team_a_points")
+  teamBPoints Int       @default(0) @map("team_b_points")
+  status      SetStatus @default(IN_PROGRESS)
+  game        Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, setNumber])
+  @@map("game_sets")
 }
 
 /// One entry in a multi-team game. A team can have several entries (e.g. two swimmers).

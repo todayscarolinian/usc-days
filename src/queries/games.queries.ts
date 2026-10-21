@@ -1,6 +1,6 @@
 "use client";
 
-import { AddGamePayload, EditGamePayload, MultiTeamResultPayload, ScoreDeltaPayload } from "@/src/types/games.types";
+import { AddGamePayload, EditGamePayload, MultiTeamResultPayload, ScoreDeltaPayload, SetActionPayload } from "@/src/types/games.types";
 import { useMemo } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { fetchGamesPage } from "@/src/services/games.client";
@@ -84,11 +84,41 @@ export const gameQueryKey = (id: number) => ["games", "detail", id] as const;
 export const useGameQuery = (id: number) =>
   useQuery<Schedules>({
     queryKey: gameQueryKey(id),
+    refetchInterval: 10_000,
     queryFn: async ({ signal }) => {
       const { data } = await axios.get(`/api/games/${id}`, { signal });
       return data;
     },
   });
+
+export const setScoreMutationKey = (id: number) => ["games", "sets", id] as const;
+
+export function useUpdateSetsQuery(id: number) {
+  const client = useQueryClient();
+  return useMutation<Schedules, Error, SetActionPayload, { previous?: Schedules }>({
+    mutationKey: setScoreMutationKey(id),
+    mutationFn: async (body) => (await axios.patch(`/api/games/${id}/sets`, body)).data,
+    onMutate: async (action) => {
+      await client.cancelQueries({ queryKey: gameQueryKey(id) });
+      if (action.action !== "point") return {};
+      const previous = client.getQueryData<Schedules>(gameQueryKey(id));
+      const active = previous?.sets?.find(set => set.id === action.setId && set.status === "IN_PROGRESS");
+      if (!previous || !active || previous.scoringVersion !== action.scoringVersion) return {};
+      const field = action.team === "A" ? "teamAPoints" : "teamBPoints";
+      if (active[field] + action.delta < 0) return {};
+      client.setQueryData<Schedules>(gameQueryKey(id), {
+        ...previous,
+        sets: previous.sets?.map(set => set.id === active.id ? { ...set, [field]: set[field] + action.delta } : set),
+      });
+      return { previous };
+    },
+    onSuccess: (game) => { client.setQueryData(gameQueryKey(id), game); },
+    onError: (_error, _action, context) => {
+      if (context?.previous) client.setQueryData(gameQueryKey(id), context.previous);
+    },
+    onSettled: () => { client.invalidateQueries({ queryKey: ["games"] }); },
+  });
+}
 
 /**
  * Applies a score change to a cached game the way the server does: empty scores start at 0.

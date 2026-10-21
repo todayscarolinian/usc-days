@@ -7,6 +7,7 @@ import { SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
 import { isMultiTeam, ordinal, sortedParticipants } from "@/src/lib/multi-team";
 import GameService from "@/src/services/games.service";
 import GamePage from "@/src/components/schedules/game-page";
+import { isSetScoring, setScoreSummary } from "@/src/lib/set-scoring";
 
 type PageProps = { params: Promise<{ gameId: string }> };
 
@@ -27,7 +28,7 @@ type Game = Awaited<ReturnType<GameService["getGameById"]>>;
 function describeResult(game: Game) {
   const teamA = game.teamA?.teamName ?? "TBD";
   const teamB = game.teamB?.teamName ?? "TBD";
-  const score = `${teamA} ${Number(game.teamAScore ?? 0)} – ${Number(game.teamBScore ?? 0)} ${teamB}`;
+  const score = `${teamA} ${Number(game.teamAScore ?? 0)} – ${Number(game.teamBScore ?? 0)} ${teamB}${isSetScoring(game) ? ` (sets). ${setScoreSummary(game)}` : ""}`;
 
   switch (getGameStatus(game, new Date())) {
     case "finished": {

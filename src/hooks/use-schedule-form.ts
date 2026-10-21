@@ -20,6 +20,7 @@ interface ScheduleInputs {
   location?: string;
   label: string;
   participants: ParticipantEntryInput[];
+  bestOf: 3 | 5;
 }
 
 /**
@@ -67,6 +68,7 @@ const getDefaultInputs = (): ScheduleInputs => ({
   location: undefined,
   label: "",
   participants: [],
+  bestOf: 3,
 });
 
 export function useScheduleForm<T = any>(

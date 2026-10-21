@@ -110,11 +110,12 @@ export const RANKED_PARTICIPANTS_MESSAGE =
 export const RESULTS_MUST_MATCH_PARTICIPANTS_MESSAGE =
   "Results must list every entry exactly once.";
 
-const GAME_INCLUDE = {
+export const GAME_INCLUDE = {
   gameType: true,
   teamA: { include: { school: true } },
   teamB: { include: { school: true } },
   winner: true,
+  sets: { orderBy: { setNumber: "asc" } },
   participants: {
     include: { team: { include: { school: true } } },
     orderBy: { id: "asc" },
@@ -152,20 +153,20 @@ export function planEntryEdit(current: StoredEntry[], next: ParticipantEntryPayl
   return { kept, added, removedIds, teamsChanged };
 }
 
-async function getSportFormat(gameTypeId: number) {
-  const sport = await prisma.gameType.findUnique({
+async function getSportSettings(gameTypeId: number, db: Pick<Prisma.TransactionClient, "gameType"> = prisma) {
+  const sport = await db.gameType.findUnique({
     where: { id: gameTypeId },
-    select: { format: true },
+    select: { format: true, scoringMode: true },
   });
   if (!sport) {
     throw new ApiError("NOT_FOUND", "Sport not found.");
   }
-  return sport.format;
+  return sport;
 }
 
 /** Every participant must be registered for the sport. */
-async function assertTeamsInSport(gameTypeId: number, teamIds: number[]) {
-  const registered = await prisma.teamGameType.findMany({
+async function assertTeamsInSport(gameTypeId: number, teamIds: number[], db: Pick<Prisma.TransactionClient, "teamGameType"> = prisma) {
+  const registered = await db.teamGameType.findMany({
     where: { gameTypeId, teamId: { in: teamIds } },
     select: { teamId: true },
   });
@@ -345,10 +346,15 @@ class GameService {
       location,
       label,
       participants,
+      bestOf,
     }: AddGamePayload,
     createdByHeraldId: string,
   ) {
-    const format = await getSportFormat(gameTypeId);
+    const sport = await getSportSettings(gameTypeId);
+    const format = sport.format;
+    if (sport.scoringMode !== "SETS" && bestOf != null) {
+      throw new ApiError("VALIDATION_ERROR", "Only set-based sports use a best-of format.");
+    }
 
     if (format === "MULTI_TEAM") {
       if (teamAId != null || teamBId != null) {
@@ -463,11 +469,23 @@ class GameService {
         location,
         label,
         createdByHeraldId,
+        bestOf: sport.scoringMode === "SETS" ? bestOf ?? 3 : null,
       },
     });
     return newGame;
   }
   async editGame(
+    id: number,
+    payload: EditGamePayload,
+  ) {
+    return prisma.$transaction(async (tx) => {
+      // Set transitions and schedule edits share the same row lock.
+      await tx.$queryRaw`SELECT id FROM games WHERE id = ${id} FOR UPDATE`;
+      return this.editGameLocked(tx, id, payload);
+    });
+  }
+  private async editGameLocked(
+    prisma: Prisma.TransactionClient,
     id: number,
     {
       gameTypeId,
@@ -484,12 +502,14 @@ class GameService {
       teamBForfeited,
       isDraw,
       participants,
+      bestOf,
     }: EditGamePayload,
   ) {
     const existing = await prisma.game.findUnique({
       where: { id },
       include: {
-        gameType: { select: { format: true } },
+        gameType: { select: { format: true, scoringMode: true } },
+        sets: true,
         participants: { select: { id: true, teamId: true, rank: true } },
       },
     });
@@ -497,12 +517,33 @@ class GameService {
       throw new ApiError("NOT_FOUND", "Game not found.");
     }
 
-    const format =
+    const sport =
       gameTypeId === existing.gameTypeId
-        ? existing.gameType.format
-        : await getSportFormat(gameTypeId);
+        ? existing.gameType
+        : await getSportSettings(gameTypeId, prisma);
+    const format = sport.format;
     if (format !== existing.gameType.format) {
       throw new ApiError("VALIDATION_ERROR", FORMAT_CHANGE_MESSAGE);
+    }
+    const setBased = sport.scoringMode === "SETS";
+    const nextBestOf = setBased ? bestOf === undefined ? existing.bestOf ?? 3 : bestOf : null;
+    if (setBased && nextBestOf !== 3 && nextBestOf !== 5) {
+      throw new ApiError("VALIDATION_ERROR", "Choose best of 3 or best of 5.");
+    }
+    if (!setBased && bestOf != null) {
+      throw new ApiError("VALIDATION_ERROR", "Only set-based sports use a best-of format.");
+    }
+    if ((existing.sets.length > 0 || (existing.gameType.scoringMode === "SETS" && hasSavedResult(existing))) &&
+        (teamAId !== existing.teamAId || teamBId !== existing.teamBId ||
+        gameTypeId !== existing.gameTypeId || nextBestOf !== existing.bestOf)) {
+      throw new ApiError("CONFLICT", "Clear the volleyball result before changing teams, sport, or match format.");
+    }
+    if (sport.scoringMode !== existing.gameType.scoringMode && hasSavedResult(existing)) {
+      throw new ApiError("CONFLICT", "Clear the result before changing scoring modes.");
+    }
+    if (setBased && (teamAScore !== undefined || teamBScore !== undefined || winnerId !== undefined ||
+        teamAForfeited !== undefined || teamBForfeited !== undefined || isDraw !== undefined)) {
+      throw new ApiError("VALIDATION_ERROR", "Use set scoring to save volleyball scores and results.");
     }
 
     if (format === "MULTI_TEAM") {
@@ -528,7 +569,7 @@ class GameService {
       }
       if (plan?.teamsChanged || gameTypeId !== existing.gameTypeId) {
         const teamIds = (participants ?? existing.participants).map((entry) => entry.teamId);
-        await assertTeamsInSport(gameTypeId, teamIds);
+        await assertTeamsInSport(gameTypeId, teamIds, prisma);
       }
 
       return prisma.game.update({
@@ -632,6 +673,10 @@ class GameService {
       where: { id },
       data: {
         gameTypeId,
+        bestOf: nextBestOf,
+        ...(nextBestOf !== existing.bestOf || teamAId !== existing.teamAId ||
+            teamBId !== existing.teamBId || gameTypeId !== existing.gameTypeId
+          ? { scoringVersion: { increment: 1 } } : {}),
         teamAId,
         teamBId,
         teamAScore,
@@ -656,15 +701,19 @@ class GameService {
     const field = team === "A" ? "teamAScore" : "teamBScore";
 
     return prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM games WHERE id = ${id} FOR UPDATE`;
       const existing = await tx.game.findUnique({
         where: { id },
-        include: { gameType: { select: { format: true } } },
+        include: { gameType: { select: { format: true, scoringMode: true } } },
       });
       if (!existing) {
         throw new ApiError("NOT_FOUND", "Game not found.");
       }
       if (existing.gameType.format === "MULTI_TEAM") {
         throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_NOT_SCORED_MESSAGE);
+      }
+      if (existing.gameType.scoringMode === "SETS") {
+        throw new ApiError("VALIDATION_ERROR", "Use the active set to update points.");
       }
       if (existing.teamAId == null || existing.teamBId == null) {
         throw new ApiError("VALIDATION_ERROR", SCORES_REQUIRE_TEAMS_MESSAGE);

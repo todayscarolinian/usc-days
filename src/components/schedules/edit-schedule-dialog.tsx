@@ -41,11 +41,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { EditGamePayload, EditGameSchema } from "@/src/types/games.types";
+import { EditGamePayload, EditGameSchema, hasSavedResult } from "@/src/types/games.types";
 import { Schedules } from "@/src/types/types";
 import { SearchableSelect, SelectOption } from "../ui/searchable-select";
 import ScheduleLabelField from "./schedule-label-field";
 import ParticipantTeamsField from "./participant-teams-field";
+import BestOfField from "./best-of-field";
+import { isSetScoring } from "@/src/lib/set-scoring";
 
 export default function EditScheduleDialog({
   schedule,
@@ -58,10 +60,11 @@ export default function EditScheduleDialog({
 }) {
   // A game keeps its sport's format, so the format is fixed for the dialog.
   const multiTeam = isMultiTeam(schedule);
+  const volleyballResult = isSetScoring(schedule) && (hasSavedResult(schedule) || (schedule.sets?.length ?? 0) > 0);
   const ranked = schedule.participants.some((p) => p.rank != null);
 
   // Results are saved from the score or placings dialog; this keeps the stored ones.
-  const storedResult: Partial<EditGamePayload> = multiTeam
+  const storedResult: Partial<EditGamePayload> = multiTeam || isSetScoring(schedule)
     ? {}
     : {
         teamAScore:
@@ -93,6 +96,7 @@ export default function EditScheduleDialog({
       endTime: getEventTimeOfDay(schedule.endDate),
       location: schedule.location ? schedule.location : undefined,
       label: schedule.label ?? "",
+      bestOf: schedule.bestOf === 5 ? 5 : 3,
     },
     schema: EditGameSchema,
     transformData: (inputs) => ({
@@ -153,7 +157,8 @@ export default function EditScheduleDialog({
   }, [open, reset, dismissAll]);
 
   const sportsOptions: SelectOption[] = fetchedSportsData
-    .filter((sport) => sport.format === schedule.gameType.format)
+    .filter((sport) => sport.format === schedule.gameType.format &&
+      (sport.scoringMode ?? "LINEAR") === (schedule.gameType.scoringMode ?? "LINEAR"))
     .map((sport) => ({
       value: sport.id.toString(),
       label: sport.gameName,
@@ -164,6 +169,7 @@ export default function EditScheduleDialog({
     id: team.teamId,
     label: team.team.teamName,
   }));
+  const setBased = fetchedSportsData.find(sport => sport.id === inputs.gameTypeId)?.scoringMode === "SETS";
 
   const teamOptions: SelectOption[] = teamChoices.map((team) => ({
     value: team.id.toString(),
@@ -201,6 +207,7 @@ export default function EditScheduleDialog({
           ? inputs.location
           : null,
       label: inputs.label.trim() || null,
+      bestOf: setBased ? inputs.bestOf : null,
       ...storedResult,
     };
 
@@ -337,6 +344,8 @@ export default function EditScheduleDialog({
             />
           </div>
 
+          {setBased && <BestOfField value={inputs.bestOf} onChange={v => updateInput("bestOf", v)} disabled={loading || volleyballResult} />}
+          {volleyballResult && <p className="text-xs text-muted-foreground">Clear the volleyball result before changing teams, sport, or match format.</p>}
           {multiTeam ? (
             <ParticipantTeamsField
               teams={teamChoices}

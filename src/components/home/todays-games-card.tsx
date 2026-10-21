@@ -8,6 +8,7 @@ import { isMultiTeam, participatingTeams } from "@/src/lib/multi-team";
 import { cn, getLogoForSchool } from "@/src/lib/utils";
 import type { Schedules } from "@/src/types/types";
 import ScheduleLabel from "@/src/components/schedules/schedule-label";
+import { setScoreSummary } from "@/src/lib/set-scoring";
 
 type TodaysGamesCardProps = {
   game: Schedules;
@@ -113,6 +114,7 @@ export function TodaysGamesCard({
             </span>
           </span>
           <ScheduleLabel label={game.label} />
+          {setScoreSummary(game) && <span className="block text-xs font-normal text-black/60">{setScoreSummary(game)}</span>}
         </span>
       ) : (
         <span className={styles.cardContent}>
@@ -151,6 +153,7 @@ export function TodaysGamesCard({
           </span>
 
           <ScheduleLabel label={game.label} />
+          {setScoreSummary(game) && <span className="block text-xs font-normal text-black/60">{setScoreSummary(game)}</span>}
           <span className={styles.cardFooter}>
             <span className="min-w-0 truncate" title={location}>{location}</span>
             <span className={styles.time}>{time}</span>
