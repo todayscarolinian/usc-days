@@ -113,9 +113,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     }
   }, [open, reset, dismissAll]);
 
-  const sportsOptions: SelectOption[] = fetchedSportsData
-    .filter((sport) => !/dance|\b(?:mr|ms)\b/i.test(sport.gameName))
-    .map((sport) => ({
+  const sportsOptions: SelectOption[] = fetchedSportsData.map((sport) => ({
     value: sport.id.toString(),
     label: sport.gameName,
     id: sport.id,
