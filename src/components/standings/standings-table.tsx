@@ -123,9 +123,28 @@ export default function StandingsTable({
         </Table>
       </div>
 
-      <p className="mt-3 text-[10px] italic text-neutral-500 sm:text-[11px]">
-        Records are calculated from completed tournament games.
-      </p>
+      <footer className="mt-3 flex flex-col gap-2 text-[10px] text-neutral-500 sm:flex-row sm:items-center sm:justify-between sm:text-[11px]">
+        <p className="italic">
+          Records are calculated from completed tournament games.
+        </p>
+
+        <dl className="flex flex-wrap gap-x-3 gap-y-1">
+          <div className="flex gap-1">
+            <dt className="font-bold text-neutral-800">W:</dt>
+            <dd>Wins</dd>
+          </div>
+
+          <div className="flex gap-1">
+            <dt className="font-bold text-neutral-800">L:</dt>
+            <dd>Losses</dd>
+          </div>
+
+          <div className="flex gap-1">
+            <dt className="font-bold text-neutral-800">D:</dt>
+            <dd>Draws</dd>
+          </div>
+        </dl>
+      </footer>
     </section>
   );
 }

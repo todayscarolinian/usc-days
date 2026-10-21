@@ -91,7 +91,14 @@ export default function StandingsTableSkeleton({
         </Table>
       </div>
 
-      <Skeleton className="mt-3 h-3 w-56 max-w-full" />
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <Skeleton className="h-3 w-56 max-w-full" />
+        <div className="flex gap-3">
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+      </div>
     </section>
   );
 }
