@@ -168,9 +168,9 @@ export default function Standings() {
   }
 
   return (
-    <section className="bg-neutral-50 px-4 py-8 sm:px-6 lg:py-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6">
+    <section className="bg-[url('/white-bg.png')] bg-top bg-repeat">
+      <div className="mx-auto w-full max-w-[1600px] px-3 py-8 sm:px-8 lg:py-12 xl:px-12">
+        <div className="mb-6 sm:mb-8">
           <SportSelector
             value={selectedSport}
             onValueChangeAction={handleSportSelect}
@@ -180,7 +180,14 @@ export default function Standings() {
           />
         </div>
 
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="min-w-0 space-y-6 sm:space-y-8">
+          <TournamentPlacings
+            champions={championsData}
+            canEdit={isAdmin}
+            loading={loading}
+            onSelect={handlePlacementSelect}
+          />
+
           {loading ? (
             <StandingsTableSkeleton rows={6} />
           ) : (
@@ -190,14 +197,6 @@ export default function Standings() {
               entryRows={selectedFormat === "MULTI_TEAM"}
             />
           )}
-
-          <TournamentPlacings
-            champions={championsData}
-            canEdit={isAdmin}
-            loading={loading}
-            onSelect={handlePlacementSelect}
-            multiTeam={selectedFormat === "MULTI_TEAM"}
-          />
         </div>
       </div>
 
