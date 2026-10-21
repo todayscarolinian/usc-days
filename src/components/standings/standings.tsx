@@ -15,7 +15,7 @@ import StandingsTable from "./standings-table";
 import StandingsTableSkeleton from "./standings-table-skeleton";
 import TournamentPlacings from "./tournament-placings";
 import StandingFormDialog from "./standing-dialog-form";
-import { transformTeamsData } from "./transformTeamsData";
+import { transformEntryStandings, transformTeamsData } from "./transformTeamsData";
 
 import type { Champions } from "@/src/types/types";
 import type { EditChampionPayload } from "@/src/types/champions.types";
@@ -109,9 +109,12 @@ export default function Standings() {
     gameTypes.find((sport) => sport.id === selectedSport)?.gameName ||
     "";
 
-  const standingsData = selectedSport
-    ? transformTeamsData(games, selectedSport)
-    : [];
+  const selectedFormat = gameTypes.find((sport) => sport.id === selectedSport)?.format;
+  const standingsData = !selectedSport
+    ? []
+    : selectedFormat === "MULTI_TEAM"
+      ? transformEntryStandings(games, selectedSport)
+      : transformTeamsData(games, selectedSport);
 
   const championsData = selectedSport
     ? champions.filter(
@@ -184,6 +187,7 @@ export default function Standings() {
             <StandingsTable
               data={standingsData}
               sportName={sportName}
+              entryRows={selectedFormat === "MULTI_TEAM"}
             />
           )}
 
@@ -192,6 +196,7 @@ export default function Standings() {
             canEdit={isAdmin}
             loading={loading}
             onSelect={handlePlacementSelect}
+            multiTeam={selectedFormat === "MULTI_TEAM"}
           />
         </div>
       </div>

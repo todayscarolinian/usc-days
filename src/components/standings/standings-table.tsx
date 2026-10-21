@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/src/components/ui/table";
-import { getStandingColumns } from "./columns";
+import { getStandingColumns, type MultiTeamColumn } from "./columns";
 import type { TeamStandingData } from "./transformTeamsData";
 import { Trophy } from "lucide-react";
 import { EmptyState } from "@/src/components/ui/empty-state";
@@ -22,17 +22,23 @@ import { hasPlacings } from "@/src/lib/multi-team";
 type StandingsTableProps = {
   data: TeamStandingData[];
   sportName: string;
+  /** Rows are a multi-team sport's entries, shown with their placement. */
+  entryRows?: boolean;
 };
 
 export default function StandingsTable({
   data,
   sportName,
+  entryRows = false,
 }: StandingsTableProps) {
-  const showPlacings = hasPlacings(data);
+  // Entry rows of a multi-team sport show their finish; overall tables show medal counts.
+  const extraColumn: MultiTeamColumn = entryRows
+    ? "placement"
+    : hasPlacings(data) ? "placings" : null;
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
-    columns: getStandingColumns(showPlacings),
+    columns: getStandingColumns(extraColumn),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -46,7 +52,7 @@ export default function StandingsTable({
 
       <div className="min-w-0 border border-neutral-300">
         <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
-          {showPlacings ? (
+          {extraColumn ? (
             <colgroup>
               <col className="w-[7%] sm:w-auto" />
               <col className="w-[29%] sm:w-auto" />
@@ -139,7 +145,6 @@ export default function StandingsTable({
 
       <p className="mt-3 text-[10px] italic text-neutral-500 sm:text-[11px]">
         Records are calculated from completed tournament games.
-      </p>
-    </section>
+      </p>    </section>
   );
 }

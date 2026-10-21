@@ -17,6 +17,7 @@ export default function LeaderboardSection() {
       transformSchoolsData(games).map((school) => ({
         ...school,
         played: school.wins + school.losses + school.draws,
+        placement: null,
       })),
     [games],
   );

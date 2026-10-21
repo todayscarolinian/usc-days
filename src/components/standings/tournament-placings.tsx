@@ -12,6 +12,8 @@ type TournamentPlacingsProps = {
   canEdit: boolean;
   loading?: boolean;
   onSelect: (rank: number) => void;
+  /** Adds the legend entries used by multi-team standings. */
+  multiTeam?: boolean;
 };
 
 const placements = [
@@ -37,6 +39,7 @@ export default function TournamentPlacings({
   canEdit,
   loading = false,
   onSelect,
+  multiTeam = false,
 }: TournamentPlacingsProps) {
   return (
     <div className="min-w-0 space-y-4">
@@ -106,6 +109,13 @@ export default function TournamentPlacings({
           <dd className="text-neutral-500">
             Wins divided by games played
           </dd>
+
+          {multiTeam && (
+            <>
+              <dt className="font-bold">DNF</dt>
+              <dd className="text-neutral-500">Did not finish</dd>
+            </>
+          )}
         </dl>
       </section>
 

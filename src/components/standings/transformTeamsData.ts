@@ -1,8 +1,17 @@
 import { Schedules, StandingData } from "@/src/types/types";
-import { comparePlacings, isMultiTeam, placingKey } from "@/src/lib/multi-team";
+import {
+  comparePlacement,
+  comparePlacings,
+  entryPlacement,
+  isMultiTeam,
+  placingKey,
+  type Placement,
+} from "@/src/lib/multi-team";
 
 export type TeamStandingData = StandingData & {
   played: number;
+  /** An entry row's finish (see transformEntryStandings); null for team rows. */
+  placement: Placement;
 };
 
 type MutableStanding = {
@@ -118,6 +127,7 @@ export function transformTeamsData(
   return Array.from(standings.values())
     .map((standing) => ({
       ...standing,
+      placement: null,
       winPercentage:
         standing.played > 0
           ? (standing.wins / standing.played) * 100
@@ -131,4 +141,34 @@ export function transformTeamsData(
         a.losses - b.losses ||
         a.team.localeCompare(b.team),
     );
+}
+
+/**
+ * Standings for one multi-team sport: a row per entry, so a team that took 1st and 2nd
+ * appears twice. Ordered by finish, with DNF and unranked entries last.
+ */
+export function transformEntryStandings(games: Schedules[], sportId: number): TeamStandingData[] {
+  return games
+    .filter((game) => game.gameType.id === sportId && isMultiTeam(game))
+    .flatMap((game) => {
+      const hasResults = game.participants.some((p) => p.rank != null);
+      return game.participants.map(({ id, rank, team }) => {
+        const key = placingKey(rank);
+        return {
+          id,
+          team: team.teamName,
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          played: 0,
+          winPercentage: 0,
+          sport: game.gameType.gameName,
+          firsts: key === "firsts" ? 1 : 0,
+          seconds: key === "seconds" ? 1 : 0,
+          thirds: key === "thirds" ? 1 : 0,
+          placement: entryPlacement(rank, hasResults),
+        };
+      });
+    })
+    .sort((a, b) => comparePlacement(a.placement, b.placement) || a.team.localeCompare(b.team));
 }

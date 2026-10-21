@@ -57,6 +57,26 @@ export function comparePlacings(a: PlacingCounts, b: PlacingCounts): number {
   return b.firsts - a.firsts || b.seconds - a.seconds || b.thirds - a.thirds;
 }
 
+/** An entry's finish in one game: its rank, "DNF" once the game has results, or null before. */
+export type Placement = number | "DNF" | null;
+
+export function entryPlacement(rank: number | null, gameHasResults: boolean): Placement {
+  if (rank != null) return rank;
+  return gameHasResults ? "DNF" : null;
+}
+
+/** Ranks first (lower is better), then DNF, then not yet ranked. */
+export function comparePlacement(a: Placement, b: Placement): number {
+  const order = (p: Placement) =>
+    typeof p === "number" ? p : p === "DNF" ? Number.MAX_SAFE_INTEGER - 1 : Number.MAX_SAFE_INTEGER;
+  return order(a) - order(b);
+}
+
+export function formatPlacement(placement: Placement): string {
+  if (placement == null) return "–";
+  return placement === "DNF" ? "DNF" : ordinal(placement);
+}
+
 /** 1 → "1st", 2 → "2nd", 11 → "11th", 22 → "22nd". */
 export function ordinal(rank: number): string {
   const tens = rank % 100;

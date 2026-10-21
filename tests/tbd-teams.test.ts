@@ -17,7 +17,8 @@ import {
   sameEntries,
   type StoredGameTeams,
 } from "@/src/services/games.service";
-import { transformTeamsData } from "@/src/components/standings/transformTeamsData";
+import { transformEntryStandings, transformTeamsData } from "@/src/components/standings/transformTeamsData";
+import { formatPlacement } from "@/src/lib/multi-team";
 import type { Schedules } from "@/src/types/types";
 
 const require = createRequire(import.meta.url);
@@ -423,6 +424,7 @@ describe("standings and leaderboards", () => {
     );
     const soe = { id: 10, teamName: "SOE Blue", schoolId: 1, school: { id: 1, schoolName: "SOE" } };
     const sbe = { id: 20, teamName: "SBE Red", schoolId: 2, school: { id: 2, schoolName: "SBE" } };
+    const safad = { id: 30, teamName: "SAFAD Gold", schoolId: 3, school: { id: 3, schoolName: "SAFAD" } };
     const entry = (id: number, team: typeof soe, rank: number | null) =>
       ({ id, gameId: 5, teamId: team.id, name: null, rank, team });
     const swim = schedule({
@@ -432,7 +434,7 @@ describe("standings and leaderboards", () => {
       teamAId: null,
       teamBId: null,
       gameType: { id: 4, gameName: "Swimming", format: "MULTI_TEAM" },
-      participants: [entry(1, soe, 1), entry(2, soe, 2), entry(3, sbe, 3), entry(4, sbe, 4), entry(5, sbe, null)],
+      participants: [entry(1, soe, 1), entry(2, soe, 2), entry(3, sbe, 3), entry(4, sbe, 4), entry(5, safad, null)],
     });
     const basketball = schedule({ id: 6, winnerId: 20, winner: { id: 20, teamName: "SBE Red" } });
 
@@ -447,6 +449,15 @@ describe("standings and leaderboards", () => {
       { team: "SBE", wins: 1, firsts: 0, seconds: 0, thirds: 1 },
       { team: "SOE", wins: 0, firsts: 1, seconds: 1, thirds: 0 },
     ]);
+    // In the sport's own standings, each entry is a row, so SOE appears for both its places.
+    assert.deepEqual(
+      transformEntryStandings([swim, basketball], 4).map((row) => [row.team, formatPlacement(row.placement)]),
+      [["SOE Blue", "1st"], ["SOE Blue", "2nd"], ["SBE Red", "3rd"], ["SBE Red", "4th"], ["SAFAD Gold", "DNF"]],
+    );
+    assert.deepEqual(
+      transformEntryStandings([schedule({ ...swim, participants: [entry(1, soe, null)] })], 4).map((row) => row.placement),
+      [null],
+    );
     // The swim adds no games played: SOE's only W/L game is the basketball loss.
     assert.equal(transformTeamsData([swim, basketball]).find((row) => row.team === "SOE Blue")?.played, 1);
   });
