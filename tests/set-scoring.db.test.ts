@@ -64,7 +64,7 @@ describe.skipIf(!local)("set scoring against local database", () => {
     await expect(updateSets(game.id, { action: "point", scoringVersion: 4, setId, team: "A", delta: 1 })).rejects.toThrow("has a result");
   });
 
-  it("keeps a third non-placement set at 25 and handles placement fifth-set deuces", async () => {
+  it("keeps set three at 25 in the 3-set format and handles 5-set-format deciding-set deuces", async () => {
     const short = await create();
     await expect(replace(short.id, [won(1), won(2, 20, 25), won(3, 15, 10)])).rejects.toThrow("Set 3");
     expect((await replace(short.id, [won(1), won(2, 20, 25), won(3, 27, 25)])).winnerId).toBe(aId);

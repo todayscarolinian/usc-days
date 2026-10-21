@@ -12,8 +12,8 @@ export default function BestOfField({ value, onChange, disabled }: {
       <Select value={String(value)} onValueChange={v => onChange(Number(v) as 3 | 5)} disabled={disabled}>
         <SelectTrigger id={id} className="w-full"><SelectValue /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="3">Best of 3 — non-placement</SelectItem>
-          <SelectItem value="5">Best of 5 — placement</SelectItem>
+          <SelectItem value="3">3-set format</SelectItem>
+          <SelectItem value="5">5-set format</SelectItem>
         </SelectContent>
       </Select>
       <p className="text-xs text-muted-foreground">

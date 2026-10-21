@@ -7,7 +7,7 @@ const won = (setNumber: number, a = 25, b = 20): SetScore => ({
 });
 
 describe("volleyball rules", () => {
-  it("uses 25 for every non-placement set and 15 only for placement set five", () => {
+  it("uses 25 throughout the 3-set format and 15 only for set five in the 5-set format", () => {
     expect([1, 2, 3].map(n => setTarget(3, n))).toEqual([25, 25, 25]);
     expect([1, 2, 3, 4, 5].map(n => setTarget(5, n))).toEqual([25, 25, 25, 25, 15]);
   });
@@ -32,7 +32,7 @@ describe("volleyball rules", () => {
     expect(() => summarizeSets(3, [won(1), won(2), won(3)])).toThrow("match-winning");
   });
 
-  it("ends placement matches at three sets and validates fifth-set deuces", () => {
+  it("ends 5-set matches at three sets won and validates fifth-set deuces", () => {
     const split = [won(1), won(2, 20, 25), won(3), won(4, 20, 25)];
     expect(summarizeSets(5, split)).toEqual({ a: 2, b: 2, winner: null });
     expect(summarizeSets(5, [...split, won(5, 18, 20)])).toEqual({ a: 2, b: 3, winner: "B" });
