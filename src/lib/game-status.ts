@@ -26,9 +26,8 @@ export function getGameStatus(game: Schedules, now: Date): GameStatus {
   const hasScores =
     !multiTeam && (game.teamAScore != null || game.teamBScore != null || (game.sets?.length ?? 0) > 0);
 
-  if(!hasScores) return "awaiting";
   if (hasResult) return "finished";
   if (new Date(game.startDate) > now) return "upcoming";
   if (new Date(game.endDate) > now) return "live";
-  return "ended";
+  return hasScores ? "awaiting" : "ended";
 }
