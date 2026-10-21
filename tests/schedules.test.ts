@@ -217,6 +217,16 @@ describe("schedule filtering and ordering", () => {
     const days = groupScheduleGames(matches, { ...noFilters, event: "Basketball", teamId: 20, date: today });
     assert.deepEqual(days.map(day => day.games.map(match => match.id)), [[1]]);
     assert.equal(groupScheduleGames(matches, { ...noFilters, teamId: 999 }).length, 0);
+
+    const swim = game({
+      id: 5,
+      gameType: { id: 5, gameName: "Men's 50m Freestyle", format: "MULTI_TEAM" },
+      teamA: null,
+      teamB: null,
+      participants: [{ id: 1, teamId: 30, rank: null, team: { id: 30, teamName: "SOE" } }],
+    });
+    const filtered = groupScheduleGames([swim], { ...noFilters, teamId: 30 });
+    assert.deepEqual(filtered.map(day => day.games.map(match => match.id)), [[5]]);
   });
 
   it("preserves legacy sport IDs while allowing a named event to include all variants", () => {

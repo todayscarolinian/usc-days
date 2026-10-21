@@ -53,6 +53,13 @@ const EVENT_DEFINITIONS = [
 
 const EVENT_GROUPS = ["Court", "Field", "Racket", "Esports", "Board Games", "Aquatics", "Other Events"];
 
+/** The team is team A, team B, or one of a multi-team game's entries. */
+function playsIn(game: Schedules, teamId: number) {
+  return game.teamA?.id === teamId ||
+    game.teamB?.id === teamId ||
+    (game.participants ?? []).some(entry => entry.teamId === teamId);
+}
+
 export function getScheduleEventName(name: string): string {
   return EVENT_DEFINITIONS.find(event => event.pattern.test(name))?.name ?? name;
 }
@@ -173,7 +180,7 @@ export function groupScheduleGames(
     if (filters.event && getScheduleEventName(game.gameType.gameName) !== filters.event) continue;
     // A named event supersedes a legacy sport ID if both are present in a URL.
     if (!filters.event && filters.sportId && game.gameType.id !== filters.sportId) continue;
-    if (filters.teamId && game.teamA?.id !== filters.teamId && game.teamB?.id !== filters.teamId) continue;
+    if (filters.teamId && !playsIn(game, filters.teamId)) continue;
     const start = new Date(game.startDate);
     if (!isValid(start)) continue;
     const date = getScheduleDay(start);
