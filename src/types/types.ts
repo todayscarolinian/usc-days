@@ -1,4 +1,4 @@
-import { Game } from "../lib/prisma/generated/client";
+import { Game, GameFormat } from "../lib/prisma/generated/client";
 
 /*
   Types for the score, Initialy set to string for all types for testing purposes. Will be changed later to match DB types
@@ -43,11 +43,26 @@ export type StandingData = {
     sport: string;
 };
 
+export type GameParticipantWithTeam = {
+    id: number;
+    gameId: number;
+    teamId: number;
+    rank: number | null;
+    team: {
+        id: number;
+        teamName: string;
+        schoolId: number;
+        school: { id: number; schoolName: string };
+    };
+};
+
 export type Schedules = Game & {
     gameType: {
         id: number;
         gameName: string;
+        format: GameFormat;
     };
+    participants: GameParticipantWithTeam[];
     teamA: {
         id: number;
         teamName: string;

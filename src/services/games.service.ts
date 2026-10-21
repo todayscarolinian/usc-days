@@ -3,9 +3,11 @@ import {
   AddGamePayload,
   EditGamePayload,
   ScoreDeltaPayload,
+  MultiTeamResultPayload,
   PaginationParams,
   PaginatedGamesResponse,
   SCORES_REQUIRE_TEAMS_MESSAGE,
+  MULTI_TEAM_HAS_NO_AB_MESSAGE,
   hasSavedResult,
 } from "@/src/types/games.types";
 import { ApiError } from "@/src/lib/api";
@@ -96,13 +98,66 @@ const UNFINISHED_GAME: Prisma.GameWhereInput = {
 export const FINISHED_GAME_SCORE_MESSAGE =
   "This game already has a result. Edit its score from the Add Score dialog.";
 export const NEGATIVE_SCORE_MESSAGE = "Scores cannot go below 0.";
+export const MULTI_TEAM_NOT_SCORED_MESSAGE =
+  "Multi-team games are ranked, not scored.";
+export const PARTICIPANTS_REQUIRE_MULTI_TEAM_MESSAGE =
+  "Only multi-team sports list participants.";
+export const FORMAT_CHANGE_MESSAGE =
+  "A game cannot move between a head-to-head and a multi-team sport.";
+export const RANKED_PARTICIPANTS_MESSAGE =
+  "Clear this game's results before changing its teams.";
+export const RESULTS_MUST_MATCH_PARTICIPANTS_MESSAGE =
+  "Results must list every participating team exactly once.";
+
+const GAME_INCLUDE = {
+  gameType: true,
+  teamA: { include: { school: true } },
+  teamB: { include: { school: true } },
+  winner: true,
+  participants: {
+    include: { team: { include: { school: true } } },
+    orderBy: { id: "asc" },
+  },
+} satisfies Prisma.GameInclude;
+
+/** True when the participant list is unchanged, ignoring order. */
+export function sameTeamSet(a: readonly number[], b: readonly number[]) {
+  const set = new Set(a);
+  return set.size === new Set(b).size && b.every((id) => set.has(id));
+}
+
+async function getSportFormat(gameTypeId: number) {
+  const sport = await prisma.gameType.findUnique({
+    where: { id: gameTypeId },
+    select: { format: true },
+  });
+  if (!sport) {
+    throw new ApiError("NOT_FOUND", "Sport not found.");
+  }
+  return sport.format;
+}
+
+/** Every participant must be registered for the sport. */
+async function assertTeamsInSport(gameTypeId: number, teamIds: number[]) {
+  const registered = await prisma.teamGameType.findMany({
+    where: { gameTypeId, teamId: { in: teamIds } },
+    select: { teamId: true },
+  });
+  const registeredIds = new Set(registered.map((row) => row.teamId));
+  if (teamIds.some((id) => !registeredIds.has(id))) {
+    throw new ApiError(
+      "VALIDATION_ERROR",
+      "Every participating team must be registered for this sport.",
+    );
+  }
+}
 
 export interface GetGamesParams {
   gameTypeId?: number;
   gameTypeIds?: number[];
   teamAId?: number;
   teamBId?: number;
-  teamId?: number; // matches either teamA or teamB
+  teamId?: number; // matches teamA, teamB, or a multi-team participant
   winnerId?: number;
   location?: string;
   startDate?: Date;
@@ -150,7 +205,11 @@ class GameService {
     }
 
     if (params?.teamId) {
-      where.OR = [{ teamAId: params.teamId }, { teamBId: params.teamId }];
+      where.OR = [
+        { teamAId: params.teamId },
+        { teamBId: params.teamId },
+        { participants: { some: { teamId: params.teamId } } },
+      ];
     }
 
     if (params?.winnerId !== undefined) {
@@ -226,12 +285,7 @@ class GameService {
 
       const games = await prisma.game.findMany({
         where,
-        include: {
-          gameType: true,
-          teamA: { include: { school: true } },
-          teamB: { include: { school: true } },
-          winner: true,
-        },
+        include: GAME_INCLUDE,
         orderBy: [{ startDate: order }, { id: order }],
         take: pageSize + 1,
       });
@@ -249,12 +303,7 @@ class GameService {
     // No pagination: return all games
     const games = await prisma.game.findMany({
       where,
-      include: {
-        gameType: true,
-        teamA: { include: { school: true } },
-        teamB: { include: { school: true } },
-        winner: true,
-      },
+      include: GAME_INCLUDE,
       orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
     });
 
@@ -269,9 +318,46 @@ class GameService {
       endDate,
       location,
       label,
+      participantTeamIds,
     }: AddGamePayload,
     createdByHeraldId: string,
   ) {
+    const format = await getSportFormat(gameTypeId);
+
+    if (format === "MULTI_TEAM") {
+      if (teamAId != null || teamBId != null) {
+        throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_HAS_NO_AB_MESSAGE);
+      }
+      if (participantTeamIds === undefined) {
+        throw new ApiError(
+          "VALIDATION_ERROR",
+          "Please select at least two teams.",
+        );
+      }
+      await assertTeamsInSport(gameTypeId, participantTeamIds);
+
+      return prisma.game.create({
+        data: {
+          gameTypeId,
+          startDate,
+          endDate,
+          location,
+          label,
+          createdByHeraldId,
+          participants: {
+            create: participantTeamIds.map((teamId) => ({ teamId })),
+          },
+        },
+      });
+    }
+
+    if (participantTeamIds !== undefined) {
+      throw new ApiError(
+        "VALIDATION_ERROR",
+        PARTICIPANTS_REQUIRE_MULTI_TEAM_MESSAGE,
+      );
+    }
+
     const proposedStart = new Date(startDate);
     const proposedEnd = new Date(endDate);
     const duplicateFilter = duplicateTeamMatchupFilter(
@@ -368,11 +454,77 @@ class GameService {
       teamAForfeited,
       teamBForfeited,
       isDraw,
+      participantTeamIds,
     }: EditGamePayload,
   ) {
-    const existing = await prisma.game.findUnique({ where: { id } });
+    const existing = await prisma.game.findUnique({
+      where: { id },
+      include: {
+        gameType: { select: { format: true } },
+        participants: { select: { teamId: true, rank: true } },
+      },
+    });
     if (!existing) {
       throw new ApiError("NOT_FOUND", "Game not found.");
+    }
+
+    const format =
+      gameTypeId === existing.gameTypeId
+        ? existing.gameType.format
+        : await getSportFormat(gameTypeId);
+    if (format !== existing.gameType.format) {
+      throw new ApiError("VALIDATION_ERROR", FORMAT_CHANGE_MESSAGE);
+    }
+
+    if (format === "MULTI_TEAM") {
+      const editsAB =
+        teamAId != null ||
+        teamBId != null ||
+        hasSavedResult({
+          teamAScore,
+          teamBScore,
+          winnerId,
+          teamAForfeited,
+          teamBForfeited,
+          isDraw,
+        });
+      if (editsAB) {
+        throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_HAS_NO_AB_MESSAGE);
+      }
+
+      const currentIds = existing.participants.map((p) => p.teamId);
+      const nextIds = participantTeamIds ?? currentIds;
+      const teamsChanged = !sameTeamSet(currentIds, nextIds);
+
+      if (teamsChanged && existing.participants.some((p) => p.rank != null)) {
+        throw new ApiError("CONFLICT", RANKED_PARTICIPANTS_MESSAGE);
+      }
+      if (teamsChanged || gameTypeId !== existing.gameTypeId) {
+        await assertTeamsInSport(gameTypeId, nextIds);
+      }
+
+      const added = nextIds.filter((teamId) => !currentIds.includes(teamId));
+      return prisma.game.update({
+        where: { id },
+        data: {
+          gameTypeId,
+          startDate,
+          endDate,
+          location,
+          ...(label !== undefined ? { label } : {}),
+          participants: {
+            deleteMany: { teamId: { notIn: nextIds } },
+            create: added.map((teamId) => ({ teamId })),
+          },
+        },
+      });
+    }
+
+    if (participantTeamIds !== undefined) {
+      throw new ApiError(
+        "VALIDATION_ERROR",
+        PARTICIPANTS_REQUIRE_MULTI_TEAM_MESSAGE,
+      );
     }
 
     assertTeamsSetForResults(
@@ -469,9 +621,15 @@ class GameService {
     const field = team === "A" ? "teamAScore" : "teamBScore";
 
     return prisma.$transaction(async (tx) => {
-      const existing = await tx.game.findUnique({ where: { id } });
+      const existing = await tx.game.findUnique({
+        where: { id },
+        include: { gameType: { select: { format: true } } },
+      });
       if (!existing) {
         throw new ApiError("NOT_FOUND", "Game not found.");
+      }
+      if (existing.gameType.format === "MULTI_TEAM") {
+        throw new ApiError("VALIDATION_ERROR", MULTI_TEAM_NOT_SCORED_MESSAGE);
       }
       if (existing.teamAId == null || existing.teamBId == null) {
         throw new ApiError("VALIDATION_ERROR", SCORES_REQUIRE_TEAMS_MESSAGE);
@@ -507,6 +665,48 @@ class GameService {
       return updated;
     });
   }
+  /** Replaces every participant's rank at once. All-null ranks clear the result. */
+  async saveMultiTeamResults(id: number, { results }: MultiTeamResultPayload) {
+    return prisma.$transaction(async (tx) => {
+      const game = await tx.game.findUnique({
+        where: { id },
+        include: {
+          gameType: { select: { format: true } },
+          participants: { select: { teamId: true } },
+        },
+      });
+      if (!game) {
+        throw new ApiError("NOT_FOUND", "Game not found.");
+      }
+      if (game.gameType.format !== "MULTI_TEAM") {
+        throw new ApiError(
+          "VALIDATION_ERROR",
+          "Only multi-team games have placings.",
+        );
+      }
+
+      const participantIds = game.participants.map((p) => p.teamId);
+      const resultIds = results.map((r) => r.teamId);
+      if (
+        resultIds.length !== participantIds.length ||
+        !sameTeamSet(participantIds, resultIds)
+      ) {
+        throw new ApiError(
+          "VALIDATION_ERROR",
+          RESULTS_MUST_MATCH_PARTICIPANTS_MESSAGE,
+        );
+      }
+
+      for (const { teamId, rank } of results) {
+        await tx.gameParticipant.update({
+          where: { gameId_teamId: { gameId: id, teamId } },
+          data: { rank },
+        });
+      }
+
+      return tx.game.findUniqueOrThrow({ where: { id }, include: GAME_INCLUDE });
+    });
+  }
   async deleteGame(id: number) {
     return prisma.game.delete({
       where: { id },
@@ -515,12 +715,7 @@ class GameService {
   async getGameById(id: number) {
     const game = await prisma.game.findUnique({
       where: { id },
-      include: {
-        gameType: true,
-        teamA: { include: { school: true } },
-        teamB: { include: { school: true } },
-        winner: true,
-      },
+      include: GAME_INCLUDE,
     });
     if (!game) {
       throw new ApiError("NOT_FOUND", "Game not found.");

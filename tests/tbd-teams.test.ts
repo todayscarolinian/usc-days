@@ -4,6 +4,7 @@ import { describe, it } from "vitest";
 import {
   AddGameSchema,
   EditGameSchema,
+  MultiTeamResultSchema,
   SCORES_REQUIRE_TEAMS_MESSAGE,
   hasSavedResult,
 } from "@/src/types/games.types";
@@ -12,6 +13,7 @@ import {
   assertTeamsSetForResults,
   duplicateTeamMatchupFilter,
   resolveEditedGame,
+  sameTeamSet,
   type StoredGameTeams,
 } from "@/src/services/games.service";
 import { transformTeamsData } from "@/src/components/standings/transformTeamsData";
@@ -86,10 +88,12 @@ function schedule(overrides: Partial<Schedules> = {}): Schedules {
     teamAForfeited: false,
     teamBForfeited: false,
     isDraw: false,
-    gameType: { id: 3, gameName: "Basketball" },
+    label: null,
+    gameType: { id: 3, gameName: "Basketball", format: "HEAD_TO_HEAD" },
     teamA: { id: 10, teamName: "SOE Blue", schoolId: 1, school: { id: 1, schoolName: "SOE" } },
     teamB: { id: 20, teamName: "SBE Red", schoolId: 2, school: { id: 2, schoolName: "SBE" } },
     winner: null,
+    participants: [],
     ...overrides,
   } as Schedules;
 }
@@ -121,6 +125,47 @@ describe("AddGameSchema", () => {
   it("rejects a non-numeric team id", () => {
     const result = AddGameSchema.safeParse(addPayload({ teamAId: "TBD" }));
     assert.equal(result.success, false);
+  });
+});
+
+describe("multi-team payloads", () => {
+  const participants = { teamAId: null, teamBId: null, participantTeamIds: [10, 20, 30] };
+
+  it("accepts participants in place of team A and team B", () => {
+    assert.equal(AddGameSchema.safeParse(addPayload(participants)).success, true);
+    assert.equal(EditGameSchema.safeParse(editPayload(participants)).success, true);
+  });
+
+  it("rejects fewer than two teams or a repeated team", () => {
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participantTeamIds: [10] })).success, false);
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, participantTeamIds: [10, 10] })).success, false);
+  });
+
+  it("rejects team A, team B, or an A/B result alongside participants", () => {
+    assert.equal(AddGameSchema.safeParse(addPayload({ ...participants, teamAId: 10 })).success, false);
+    assert.equal(EditGameSchema.safeParse(editPayload({ ...participants, teamAScore: 3 })).success, false);
+  });
+
+  it("accepts tied and unranked placings but not a team ranked twice", () => {
+    assert.equal(
+      MultiTeamResultSchema.safeParse({
+        results: [{ teamId: 10, rank: 1 }, { teamId: 20, rank: 1 }, { teamId: 30, rank: null }],
+      }).success,
+      true,
+    );
+    assert.equal(MultiTeamResultSchema.safeParse({ results: [{ teamId: 10, rank: 0 }] }).success, false);
+    assert.equal(
+      MultiTeamResultSchema.safeParse({
+        results: [{ teamId: 10, rank: 1 }, { teamId: 10, rank: 2 }],
+      }).success,
+      false,
+    );
+  });
+
+  it("compares participant sets regardless of order", () => {
+    assert.equal(sameTeamSet([10, 20, 30], [30, 10, 20]), true);
+    assert.equal(sameTeamSet([10, 20], [10, 20, 30]), false);
+    assert.equal(sameTeamSet([10, 20], [10, 30]), false);
   });
 });
 

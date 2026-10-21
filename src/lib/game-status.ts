@@ -13,14 +13,18 @@ export const GAME_STATUS_LABELS: Record<GameStatus, string> = {
 /**
  * Only a winner, draw, or forfeit finishes a game; scores alone are a running tally.
  * An elapsed schedule with scores but no result is awaiting its result.
+ * A multi-team game finishes once any team is ranked, and has no running tally.
  */
 export function getGameStatus(game: Schedules, now: Date): GameStatus {
-  const hasResult =
-    game.winnerId != null ||
-    game.isDraw ||
-    game.teamAForfeited ||
-    game.teamBForfeited;
-  const hasScores = game.teamAScore != null || game.teamBScore != null;
+  const multiTeam = game.gameType.format === "MULTI_TEAM";
+  const hasResult = multiTeam
+    ? game.participants.some((p) => p.rank != null)
+    : game.winnerId != null ||
+      game.isDraw ||
+      game.teamAForfeited ||
+      game.teamBForfeited;
+  const hasScores =
+    !multiTeam && (game.teamAScore != null || game.teamBScore != null);
 
   if (hasResult) return "finished";
   if (new Date(game.startDate) > now) return "upcoming";

@@ -17,6 +17,7 @@ model Team {
   teamBGames Game[]         @relation("TeamBGames")
   gameWinner Game[]         @relation("GameWinner")
   gameTypes  TeamGameType[]
+  gameParticipations GameParticipant[]
 
   @@map("teams")
 }
@@ -29,9 +30,15 @@ model School {
   @@map("schools")
 }
 
+enum GameFormat {
+  HEAD_TO_HEAD
+  MULTI_TEAM
+}
+
 model GameType {
   gameName String         @map("game_name") @db.VarChar(100)
   id       Int            @id @default(autoincrement())
+  format   GameFormat     @default(HEAD_TO_HEAD)
   Champion Champion[]
   games    Game[]
   teams    TeamGameType[]
@@ -70,8 +77,23 @@ model Game {
   teamA             Team?    @relation("TeamAGames", fields: [teamAId], references: [id], onDelete: Restrict)
   teamB             Team?    @relation("TeamBGames", fields: [teamBId], references: [id], onDelete: Restrict)
   winner            Team?    @relation("GameWinner", fields: [winnerId], references: [id])
+  participants      GameParticipant[]
 
   @@map("games")
+}
+
+/// A team in a multi-team game. A null rank means not ranked yet, or did not finish once the game has results.
+model GameParticipant {
+  id     Int  @id @default(autoincrement())
+  gameId Int  @map("game_id")
+  teamId Int  @map("team_id")
+  rank   Int?
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Restrict)
+
+  @@unique([gameId, teamId])
+  @@index([teamId])
+  @@map("game_participants")
 }
 
 model Champion {

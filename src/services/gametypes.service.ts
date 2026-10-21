@@ -35,16 +35,29 @@ class GameTypeService {
     return gameType.teams;
   }
 
-  async addGameType({ gameName }: AddGameTypePayload) {
+  async addGameType({ gameName, format }: AddGameTypePayload) {
     return prisma.gameType.create({
-      data: { gameName },
+      data: { gameName, format },
     })
   }
 
-  async editGameType( id: number, { gameName }: EditGameTypePayload) {
+  /** A sport's format is fixed once it has games, so no game ends up in the wrong format. */
+  async editGameType( id: number, { gameName, format }: EditGameTypePayload) {
+    if (format !== undefined) {
+      const sport = await prisma.gameType.findUnique({
+        where: { id },
+        select: { format: true, _count: { select: { games: true } } },
+      });
+      if (sport && sport.format !== format && sport._count.games > 0) {
+        throw new ApiError(
+          "CONFLICT",
+          "A sport's format cannot change once it has games.",
+        );
+      }
+    }
     return prisma.gameType.update({
       where: { id },
-      data: { gameName },
+      data: { gameName, format },
     });
   }
 

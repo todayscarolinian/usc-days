@@ -31,6 +31,18 @@ export function hasSavedResult(data: {
   );
 }
 
+export const MULTI_TEAM_HAS_NO_AB_MESSAGE =
+  "Multi-team games list their teams as participants, not as team A and team B.";
+
+/** Teams in a multi-team game. Format-specific rules are checked in the service. */
+export const ParticipantTeamIdsSchema = z
+  .array(z.number({ error: "Participant team selection is invalid." }).int())
+  .min(2, "Please select at least two teams.")
+  .refine((ids) => new Set(ids).size === ids.length, {
+    message: "Each team can only be added once.",
+  })
+  .optional();
+
 export const AddGameSchema = z
   .object({
     gameTypeId: z.number({
@@ -73,7 +85,14 @@ export const AddGameSchema = z
       }),
     location: z.string().optional(),
     label: ScheduleLabelSchema,
+    participantTeamIds: ParticipantTeamIdsSchema,
   })
+  .refine(
+    (data) =>
+      data.participantTeamIds === undefined ||
+      (data.teamAId == null && data.teamBId == null),
+    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participantTeamIds"] },
+  )
   .refine(
     (data) =>
       data.teamAId == null ||
@@ -161,7 +180,14 @@ export const EditGameSchema = z
     teamAForfeited: z.boolean().optional(),
     teamBForfeited: z.boolean().optional(),
     isDraw: z.boolean().optional(),
+    participantTeamIds: ParticipantTeamIdsSchema,
   })
+  .refine(
+    (data) =>
+      data.participantTeamIds === undefined ||
+      (data.teamAId == null && data.teamBId == null && !hasSavedResult(data)),
+    { message: MULTI_TEAM_HAS_NO_AB_MESSAGE, path: ["participantTeamIds"] },
+  )
   .refine(
     (data) =>
       data.teamAId == null ||
@@ -276,10 +302,31 @@ export const ScoreDeltaSchema = z.object({
     .refine((delta) => delta !== 0, "delta cannot be 0."),
 });
 
+/** Ranks for every participant. Ties are allowed; a null rank is unranked (DNF once finished). */
+export const MultiTeamResultSchema = z.object({
+  results: z
+    .array(
+      z.object({
+        teamId: z.number({ error: "teamId must be a number." }).int(),
+        rank: z
+          .number({ error: "rank must be a number." })
+          .int("rank must be a whole number.")
+          .min(1, "rank must be 1 or more.")
+          .nullable(),
+      }),
+      { error: "results must be a list." },
+    )
+    .refine(
+      (results) => new Set(results.map((r) => r.teamId)).size === results.length,
+      { message: "Each team can only be ranked once." },
+    ),
+});
+
 // Export inferred types
 export type AddGamePayload = z.infer<typeof AddGameSchema>;
 export type EditGamePayload = z.infer<typeof EditGameSchema>;
 export type ScoreDeltaPayload = z.infer<typeof ScoreDeltaSchema>;
+export type MultiTeamResultPayload = z.infer<typeof MultiTeamResultSchema>;
 
 export type MatchdayGameStatus = "UPCOMING" | "ONGOING" | null;
 

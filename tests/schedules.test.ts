@@ -74,6 +74,22 @@ describe("shared match status", () => {
     assert.equal(getMatchdayGameStatus(game({ endDate: now.toISOString() }), now), null);
     assert.equal(getGameStatus(game({ teamAScore: 0 }), now), "live");
   });
+
+  it("finishes a multi-team game once any participant is ranked", () => {
+    const multiTeam = (ranks: (number | null)[], overrides: Record<string, unknown> = {}) =>
+      game({
+        gameType: { id: 2, gameName: "Men's 50m Freestyle", format: "MULTI_TEAM" },
+        teamA: null,
+        teamB: null,
+        participants: ranks.map((rank, i) => ({ teamId: 10 + i, rank })),
+        ...overrides,
+      });
+
+    assert.equal(getGameStatus(multiTeam([null, null]), now), "live");
+    assert.equal(getGameStatus(multiTeam([null, null], { startDate: "2026-10-16T03:00:00Z" }), now), "upcoming");
+    assert.equal(getGameStatus(multiTeam([null, null], { endDate: now.toISOString() }), now), "ended");
+    assert.equal(getGameStatus(multiTeam([1, null]), now), "finished");
+  });
 });
 
 describe("schedule dates and query parameters", () => {

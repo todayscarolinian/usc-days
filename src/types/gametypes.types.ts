@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+const GameFormatSchema = z.enum(['HEAD_TO_HEAD', 'MULTI_TEAM'], {
+    error: 'format must be HEAD_TO_HEAD or MULTI_TEAM.',
+});
+
 export const AddGameTypeSchema = z
     .object({
          gameName: z
@@ -10,9 +14,10 @@ export const AddGameTypeSchema = z
                             : 'gameTypeName must be a string.',
                 })
                 .min(1, 'gameTypeName cannot be empty.'),
+         format: GameFormatSchema.optional(),
     });
 
-export const EditGameTypeSchema = z 
+export const EditGameTypeSchema = z
     .object({
          gameName: z
                 .string({
@@ -22,6 +27,7 @@ export const EditGameTypeSchema = z
                             : 'gameTypeName must be a string.',
                 })
                 .min(1, 'gameTypeName cannot be empty.'),
+         format: GameFormatSchema.optional(),
     });
 
 export type AddGameTypePayload = z.infer<typeof AddGameTypeSchema>;
