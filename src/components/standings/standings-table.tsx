@@ -52,7 +52,12 @@ export default function StandingsTable({
 
       <div className="min-w-0 border border-neutral-300">
         <Table className="table-fixed text-[10px] sm:min-w-160 sm:table-auto sm:text-sm">
-          {extraColumn ? (
+          {extraColumn === "placement" ? (
+            <colgroup>
+              <col className="w-[60%] sm:w-auto" />
+              <col className="w-[40%] sm:w-auto" />
+            </colgroup>
+          ) : extraColumn ? (
             <colgroup>
               <col className="w-[7%] sm:w-auto" />
               <col className="w-[29%] sm:w-auto" />
@@ -79,11 +84,11 @@ export default function StandingsTable({
                 key={headerGroup.id}
                 className="border-neutral-300 hover:bg-neutral-200"
               >
-                {headerGroup.headers.map((header, index) => (
+                {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={
-                      index === 1
+                      header.column.id === "team"
                         ? "h-9 overflow-hidden px-1.5 text-left text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-4 sm:text-[11px]"
                         : "h-9 overflow-hidden px-1 text-center text-[9px] font-bold uppercase text-neutral-700 sm:h-10 sm:px-3 sm:text-[11px]"
                     }
@@ -107,11 +112,11 @@ export default function StandingsTable({
                   key={row.id}
                   className="border-neutral-300 odd:bg-white even:bg-neutral-100 hover:bg-neutral-200"
                 >
-                  {row.getVisibleCells().map((cell, index) => (
+                  {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={
-                        index === 1
+                        cell.column.id === "team"
                           ? "h-10 overflow-hidden px-1.5 text-left sm:h-12 sm:px-4"
                           : "h-10 overflow-hidden px-1 text-center font-medium sm:h-12 sm:px-3"
                       }

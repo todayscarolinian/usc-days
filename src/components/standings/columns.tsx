@@ -13,6 +13,7 @@ const standingColumns: ColumnDef<TeamStandingData>[] = [
     cell: ({ row }) => row.index + 1,
   },
   {
+    id: "team",
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
@@ -74,11 +75,16 @@ const placingsColumn: ColumnDef<TeamStandingData> = {
 
 export type MultiTeamColumn = "placement" | "placings" | null;
 
-/** Standings columns, with the multi-team column (if any) before Win %. */
+/**
+ * Standings columns. Entry rows of a multi-team sport show only team and placement, since
+ * position, games played, and win/loss never apply to them. Medal counts go before Win %.
+ */
 export function getStandingColumns(extra: MultiTeamColumn): ColumnDef<TeamStandingData>[] {
   if (extra == null) return standingColumns;
-  const column = extra === "placement" ? placementColumn : placingsColumn;
-  return [...standingColumns.slice(0, -1), column, ...standingColumns.slice(-1)];
+  if (extra === "placement") {
+    return [...standingColumns.filter((column) => column.id === "team"), placementColumn];
+  }
+  return [...standingColumns.slice(0, -1), placingsColumn, ...standingColumns.slice(-1)];
 }
 
 export default standingColumns;

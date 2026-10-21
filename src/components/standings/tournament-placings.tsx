@@ -12,7 +12,7 @@ type TournamentPlacingsProps = {
   canEdit: boolean;
   loading?: boolean;
   onSelect: (rank: number) => void;
-  /** Adds the legend entries used by multi-team standings. */
+  /** Shows the multi-team legend (DNF) in place of the win/loss one. */
   multiTeam?: boolean;
 };
 
@@ -99,21 +99,23 @@ export default function TournamentPlacings({
 
       <section className="border border-neutral-300 bg-white p-4">
         <dl className="grid grid-cols-[3rem_1fr] gap-x-3 gap-y-2 text-xs">
-          <dt className="font-bold">W</dt>
-          <dd className="text-neutral-500">Games won</dd>
-
-          <dt className="font-bold">L</dt>
-          <dd className="text-neutral-500">Games lost</dd>
-
-          <dt className="font-bold">Win %</dt>
-          <dd className="text-neutral-500">
-            Wins divided by games played
-          </dd>
-
-          {multiTeam && (
+          {multiTeam ? (
             <>
               <dt className="font-bold">DNF</dt>
               <dd className="text-neutral-500">Did not finish</dd>
+            </>
+          ) : (
+            <>
+              <dt className="font-bold">W</dt>
+              <dd className="text-neutral-500">Games won</dd>
+
+              <dt className="font-bold">L</dt>
+              <dd className="text-neutral-500">Games lost</dd>
+
+              <dt className="font-bold">Win %</dt>
+              <dd className="text-neutral-500">
+                Wins divided by games played
+              </dd>
             </>
           )}
         </dl>
