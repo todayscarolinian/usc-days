@@ -75,7 +75,7 @@ export default function SchedulesPage() {
     <div className="relative min-h-[calc(100vh-64px)] bg-[#f7f6f6] text-[#171717]">
       <ScheduleBackground />
       <div ref={layoutRef} className="relative mx-auto grid max-w-[1600px] grid-cols-1 items-start gap-8 p-4 sm:p-8 xl:grid-cols-[minmax(200px,1fr)_minmax(0,2.75fr)_minmax(200px,1fr)] xl:gap-10 xl:p-12">
-        <div data-schedule-sidebar className={styles.sidebarRail}>
+        <div data-schedule-sidebar className={`${styles.sidebarRail} ${styles.eventsSidebarRail}`}>
           <ScheduleEvents
           groups={schedules.eventGroups}
           selectedEvent={schedules.selectedEvent}

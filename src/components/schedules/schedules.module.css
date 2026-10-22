@@ -17,6 +17,16 @@
     width: 100%;
     max-height: min(100%, calc(100dvh - 10rem));
   }
+
+  .eventsSidebarRail {
+    width: 100%;
+    height: calc(100dvh - 7rem);
+  }
+
+  .eventsSidebarRail > aside {
+    height: calc(100dvh - 7rem);
+    max-height: calc(100dvh - 7rem);
+  }
 }
 
 @keyframes enter {
