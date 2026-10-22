@@ -85,11 +85,16 @@ export function TodaysGamesCard({
       >
       {compact ? (
         <span className={styles.cardContent}>
-          <span className={styles.compactTop}>
-            <span className="min-w-0 truncate font-bold uppercase" title={sport}>
+          <span className={cn(styles.compactTop, game.label?.trim() && styles.compactTopWithMetadata)}>
+            <span className={cn(styles.compactSport, "min-w-0 truncate font-bold uppercase")} title={sport}>
               {sport}
             </span>
-            <span className="min-w-0 truncate text-right text-black/60" title={location}>
+            {game.label?.trim() && (
+              <span className={styles.compactMetadata}>
+                <ScheduleLabel label={game.label} />
+              </span>
+            )}
+            <span className={cn(styles.compactLocation, "min-w-0 truncate text-right text-black/60")} title={location}>
               {location}
             </span>
           </span>
@@ -113,8 +118,11 @@ export function TodaysGamesCard({
               <Image src={logoB} alt="" width={22} height={22} className="size-[30px] shrink-0 object-contain" />
             </span>
           </span>
-          <ScheduleLabel label={game.label} />
-          {setScoreSummary(game) && <span className="block text-xs font-normal text-black/60">{setScoreSummary(game)}</span>}
+          {setScoreSummary(game) && (
+            <span className={cn(styles.compactScoreSummary, "block text-xs font-normal text-black/60")}>
+              {setScoreSummary(game)}
+            </span>
+          )}
         </span>
       ) : (
         <span className={styles.cardContent}>
@@ -186,16 +194,20 @@ function MultiTeamGameCard({ game, now, compact }: { game: Schedules; now: Date;
       >
       {compact ? (
         <span className={styles.cardContent}>
-          <span className={styles.compactTop}>
-            <span className="min-w-0 truncate font-bold uppercase" title={sport}>
+          <span className={cn(styles.compactTop, game.label?.trim() && styles.compactTopWithMetadata)}>
+            <span className={cn(styles.compactSport, "min-w-0 truncate font-bold uppercase")} title={sport}>
               {sport}
             </span>
-            <span className="min-w-0 truncate text-right text-black/60" title={location}>
+            {game.label?.trim() && (
+              <span className={styles.compactMetadata}>
+                <ScheduleLabel label={game.label} />
+              </span>
+            )}
+            <span className={cn(styles.compactLocation, "min-w-0 truncate text-right text-black/60")} title={location}>
               {location}
             </span>
           </span>
           <MultiTeamLogos game={game} compact />
-          <ScheduleLabel label={game.label} />
         </span>
       ) : (
         <span className={styles.cardContent}>

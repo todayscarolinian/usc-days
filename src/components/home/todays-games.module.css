@@ -43,7 +43,13 @@
 .time { flex-shrink:0; font-size:35px; font-weight:700; color:#181818; }
 .compact { min-height:105px; padding:20px; }
 .compact .cardContent { gap:16px; }
-.compactTop { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:14px; line-height:17px; }
+.compactScoreSummary { width:100%; margin-top:auto; text-align:center; }
+.compactTop { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"sport location"; align-items:center; gap:8px 12px; font-size:14px; line-height:17px; }
+.compactTopWithMetadata { grid-template-columns:minmax(0,1fr) fit-content(50%) minmax(0,1fr); grid-template-areas:"sport metadata location"; }
+.compactSport { grid-area:sport; }
+.compactMetadata { grid-area:metadata; display:flex; min-width:0; max-width:100%; justify-content:center; overflow:hidden; }
+.compactMetadata > span { min-width:0; }
+.compactLocation { grid-area:location; }
 .compactTeams { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:12px; }
 .compactTeams > span:first-child, .compactTeams > span:last-child { justify-content:space-between; }
 .featureSkeleton { min-height:527px; }
