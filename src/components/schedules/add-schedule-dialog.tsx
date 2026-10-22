@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useId } from "react";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
 import { getTeamsQuery } from "@/src/queries/teams.queries";
 import { useAddGamesQuery } from "@/src/queries/games.queries";
 import { parseApiError } from "@/src/lib/error-handler";
@@ -76,14 +75,12 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
   } = getGameTypesQuery();
 
   const {
-    data: fetchedTeamSportsData = [],
-    error: teamSportsError,
+    data: fetchedTeamsData = [],
+    error: teamsError,
     isLoading: teamLoading,
-  } = getTeamGameTypesQuery(inputs.gameTypeId > 0 ? inputs.gameTypeId : 0);
+  } = getTeamsQuery();
 
   const add = useAddGamesQuery();
-  const teams = getTeamsQuery();
-  const useAllTeams = inputs.gameTypeId > 0 && !teamLoading && !teamSportsError && fetchedTeamSportsData.length === 0;
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
@@ -94,15 +91,15 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError && !shownErrorsRef.current.has("teamSportsError")) {
+    if (teamsError && !shownErrorsRef.current.has("teamsError")) {
       showToast(
         "error",
         "Failed to load teams",
-        parseApiError(teamSportsError),
+        parseApiError(teamsError),
       );
-      shownErrorsRef.current.add("teamSportsError");
+      shownErrorsRef.current.add("teamsError");
     }
-  }, [teamSportsError, showToast]);
+  }, [teamsError, showToast]);
 
   // Reset form and dismiss toasts when dialog closes
   useEffect(() => {
@@ -123,12 +120,9 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     fetchedSportsData.find((sport) => sport.id === inputs.gameTypeId)?.format === "MULTI_TEAM";
   const setBased = fetchedSportsData.find(sport => sport.id === inputs.gameTypeId)?.scoringMode === "SETS";
 
-  const teamChoices = useAllTeams ? (teams.data ?? []).map((team) => ({
+  const teamChoices = fetchedTeamsData.map((team) => ({
     id: team.id,
     label: team.teamName,
-  })) : fetchedTeamSportsData.map((team) => ({
-    id: team.teamId,
-    label: team.team.teamName,
   }));
 
   const teamOptions: SelectOption[] = teamChoices.map((team) => ({
@@ -182,7 +176,7 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
     });
   }
 
-  const loading = sportsLoading || teamLoading || (useAllTeams && teams.isPending) || add.isPending;
+  const loading = sportsLoading || teamLoading || add.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -279,21 +273,13 @@ export default function AddScheduleDialog({ compactTrigger = false }: {
             <p className="text-sm text-muted-foreground">Select a sport to choose teams.</p>
           )}
           {setBased && <BestOfField value={inputs.bestOf} onChange={v => updateInput("bestOf", v)} disabled={loading} />}
-          {useAllTeams && !teams.isPending && !teams.isError && (
-            <p className="text-sm text-muted-foreground">No teams are registered for this sport yet. Showing all existing teams.</p>
-          )}
-          {useAllTeams && teams.isError && (
-            <div role="alert" className="text-sm text-destructive">
-              Could not load teams. <button type="button" className="underline" onClick={() => void teams.refetch()}>Try again</button>
-            </div>
-          )}
           {multiTeam ? (
             <ParticipantTeamsField
               teams={teamChoices}
               value={inputs.participants}
               onChange={(entries) => updateInput("participants", entries)}
               disabled={loading}
-              loading={teamLoading || (useAllTeams && teams.isPending)}
+              loading={teamLoading}
               errors={validationErrors}
             />
           ) : (

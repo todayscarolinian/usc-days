@@ -18,23 +18,6 @@ class GameTypeService {
     return gameType;
   }
 
-  async getGameTypeTeams(id: number) {
-    const gameType = await prisma.gameType.findUnique({
-      where: { id },
-      select: {
-        teams: {
-          include: {
-            team: { select: { teamName: true } },
-          },
-        },
-      },
-    });
-    if(!gameType) {
-      throw new ApiError("NOT_FOUND", "Sport not found.");
-    }
-    return gameType.teams;
-  }
-
   async addGameType({ gameName, format, scoringMode }: AddGameTypePayload) {
     if (format === "MULTI_TEAM" && scoringMode === "SETS") {
       throw new ApiError("VALIDATION_ERROR", "Set scoring requires head-to-head format.");

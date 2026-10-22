@@ -16,7 +16,6 @@ model Team {
   teamAGames Game[]         @relation("TeamAGames")
   teamBGames Game[]         @relation("TeamBGames")
   gameWinner Game[]         @relation("GameWinner")
-  gameTypes  TeamGameType[]
   gameParticipations GameParticipant[]
 
   @@map("teams")
@@ -52,19 +51,8 @@ model GameType {
   scoringMode ScoringMode @default(LINEAR) @map("scoring_mode")
   Champion Champion[]
   games    Game[]
-  teams    TeamGameType[]
 
   @@map("game_types")
-}
-
-model TeamGameType {
-  id         Int      @id @default(autoincrement())
-  gameTypeId Int      @map("game_type_id")
-  teamId     Int      @map("team_id")
-  gameType   GameType @relation(fields: [gameTypeId], references: [id])
-  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@map("team_game_types")
 }
 
 model Game {

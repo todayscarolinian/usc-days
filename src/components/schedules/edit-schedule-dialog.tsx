@@ -6,7 +6,7 @@ import {
   useDeleteGamesQuery,
 } from "@/src/queries/games.queries";
 import { getGameTypesQuery } from "@/src/queries/gametypes.queries";
-import { getTeamGameTypesQuery } from "@/src/queries/teamgametypes.queries";
+import { getTeamsQuery } from "@/src/queries/teams.queries";
 import { parseApiError } from "@/src/lib/error-handler";
 import { useToastManager } from "@/src/hooks/use-toast-manager";
 import { scheduleTeamFields, useScheduleForm } from "@/src/hooks/use-schedule-form";
@@ -123,10 +123,10 @@ export default function EditScheduleDialog({
   } = getGameTypesQuery();
 
   const {
-    data: fetchedTeamSportsData = [],
-    error: teamSportsError,
+    data: fetchedTeamsData = [],
+    error: teamsError,
     isLoading: teamLoading,
-  } = getTeamGameTypesQuery(Number(inputs.gameTypeId));
+  } = getTeamsQuery();
 
   // Handle query errors - only show toast once per error
   useEffect(() => {
@@ -137,15 +137,15 @@ export default function EditScheduleDialog({
   }, [sportsError, showToast]);
 
   useEffect(() => {
-    if (teamSportsError && !shownErrorsRef.current.has("teamSportsError")) {
+    if (teamsError && !shownErrorsRef.current.has("teamsError")) {
       showToast(
         "error",
         "Failed to load teams",
-        parseApiError(teamSportsError),
+        parseApiError(teamsError),
       );
-      shownErrorsRef.current.add("teamSportsError");
+      shownErrorsRef.current.add("teamsError");
     }
-  }, [teamSportsError, showToast]);
+  }, [teamsError, showToast]);
 
   // Reset form and dismiss toasts when dialog closes
   useEffect(() => {
@@ -165,9 +165,9 @@ export default function EditScheduleDialog({
       id: sport.id,
     }));
 
-  const teamChoices = fetchedTeamSportsData.map((team) => ({
-    id: team.teamId,
-    label: team.team.teamName,
+  const teamChoices = fetchedTeamsData.map((team) => ({
+    id: team.id,
+    label: team.teamName,
   }));
   const setBased = fetchedSportsData.find(sport => sport.id === inputs.gameTypeId)?.scoringMode === "SETS";
 

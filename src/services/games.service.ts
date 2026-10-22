@@ -164,21 +164,6 @@ async function getSportSettings(gameTypeId: number, db: Pick<Prisma.TransactionC
   return sport;
 }
 
-/** Every participant must be registered for the sport. */
-async function assertTeamsInSport(gameTypeId: number, teamIds: number[], db: Pick<Prisma.TransactionClient, "teamGameType"> = prisma) {
-  const registered = await db.teamGameType.findMany({
-    where: { gameTypeId, teamId: { in: teamIds } },
-    select: { teamId: true },
-  });
-  const registeredIds = new Set(registered.map((row) => row.teamId));
-  if (teamIds.some((id) => !registeredIds.has(id))) {
-    throw new ApiError(
-      "VALIDATION_ERROR",
-      "Every participating team must be registered for this sport.",
-    );
-  }
-}
-
 export interface GetGamesParams {
   gameTypeId?: number;
   gameTypeIds?: number[];
@@ -369,7 +354,6 @@ class GameService {
       if (participants.some((entry) => entry.id != null)) {
         throw new ApiError("VALIDATION_ERROR", "New entries cannot have an id.");
       }
-      await assertTeamsInSport(gameTypeId, participants.map((entry) => entry.teamId));
 
       return prisma.game.create({
         data: {
@@ -566,10 +550,6 @@ class GameService {
 
       if (plan?.teamsChanged && existing.participants.some((p) => p.rank != null)) {
         throw new ApiError("CONFLICT", RANKED_PARTICIPANTS_MESSAGE);
-      }
-      if (plan?.teamsChanged || gameTypeId !== existing.gameTypeId) {
-        const teamIds = (participants ?? existing.participants).map((entry) => entry.teamId);
-        await assertTeamsInSport(gameTypeId, teamIds, prisma);
       }
 
       return prisma.game.update({

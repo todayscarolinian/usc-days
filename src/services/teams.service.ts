@@ -6,11 +6,6 @@ class TeamService {
   async getTeams() {
     return prisma.team.findMany({
       include: {
-        gameTypes: {
-          include: {
-            gameType: true,
-          },
-        },
         school: true,
       },
     });
@@ -20,11 +15,6 @@ class TeamService {
     const team = await prisma.team.findUnique({
       where: { id },
       include: {
-        gameTypes: {
-          include: {
-            gameType: true,
-          },
-        },
         school: true,
       },
     });
@@ -34,32 +24,21 @@ class TeamService {
     return team;
   }
 
-  async addTeam({ teamName, schoolId, gameTypeIds }: AddTeamPayload) {
+  async addTeam({ teamName, schoolId }: AddTeamPayload) {
     return prisma.team.create({
       data: {
         teamName,
         schoolId,
-        gameTypes: {
-          create: gameTypeIds.map((gameTypeId) => ({
-            gameTypeId,
-          })),
-        },
       },
     });
   }
 
-  async editTeam(id: number, { schoolId, teamName, gameTypeIds }: EditTeamPayload) {
+  async editTeam(id: number, { schoolId, teamName }: EditTeamPayload) {
     return prisma.team.update({
       where: { id },
       data: {
         teamName,
         schoolId,
-        gameTypes: {
-          deleteMany: {},
-          create: gameTypeIds.map((gameTypeId) => ({
-            gameTypeId,
-          })),
-        },
       },
     });
   }

@@ -15,16 +15,6 @@ export const AddTeamSchema = z.object({
                 ? 'schoolId is required.'
                 : 'schoolId must be a number.',
     }),
-    gameTypeIds: z
-        .array(
-            z.number({
-                error: (issue) =>
-                    issue.input === undefined
-                        ? 'Each gameTypeId must be a number.'
-                        : 'gameTypeIds must be an array of numbers.',
-            })
-        )
-        .nonempty('gameTypeIds cannot be empty.'),
 });
 
 export const EditTeamSchema = z.object({
@@ -42,16 +32,6 @@ export const EditTeamSchema = z.object({
                 ? 'schoolId is required.'
                 : 'schoolId must be a number.',
     }),
-    gameTypeIds: z
-        .array(
-            z.number({
-                error: (issue) =>
-                    issue.input === undefined
-                        ? 'Each gameTypeId must be a number.'
-                        : 'gameTypeIds must be an array of numbers.',
-            })
-        )
-        .nonempty('gameTypeIds cannot be empty.'),
 });
 
 export type AddTeamPayload = z.infer<typeof AddTeamSchema>;

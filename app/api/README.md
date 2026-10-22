@@ -7,7 +7,7 @@ Shared helpers live in `src/lib/api` (import from `@/src/lib/api`). Use them ins
 - Collection: `app/api/<resource>/route.ts` → `GET` (list), `POST` (create).
 - Item: `app/api/<resource>/[id]/route.ts` → `GET`, `PUT` (full replacement), `DELETE`.
 - IDs go in the path, never in the request body. `DELETE` has no body.
-- Related collections are nested: `/api/sports/{id}/teams`, not `/api/teamgametypes?sportId=`.
+- Related collections are nested: `/api/<parent>/{id}/<children>`, not `/api/<children>?parentId=`.
 - Plural, lowercase resource names.
 
 ## Status codes
