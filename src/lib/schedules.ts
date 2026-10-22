@@ -46,12 +46,12 @@ const EVENT_DEFINITIONS = [
   { name: "Valorant", group: "Esports", pattern: /valorant/i },
   { name: "Esports", group: "Esports", pattern: /e-?sports/i },
   { name: "Swimming", group: "Aquatics", pattern: /swim|freestyle|backstroke|butterfly|breaststroke|medley/i },
-  { name: "Cheer Dance", group: "Other Events", pattern: /cheer\s?dance/i },
-  { name: "Contemporary Dance", group: "Other Events", pattern: /contemporary dance/i },
-  { name: "Mr. & Ms. USC", group: "Other Events", pattern: /mr\.|ms\./i },
+  { name: "Mr. & Ms. USC", group: "Performances", pattern: /mr\.|ms\./i },
+  { name: "Contemporary Dance", group: "Performances", pattern: /contemporary dance/i },
+  { name: "Cheer Dance", group: "Performances", pattern: /cheer\s?dance/i },
 ] as const;
 
-const EVENT_GROUPS = ["Court", "Field", "Racket", "Esports", "Board Games", "Aquatics", "Other Events"];
+const EVENT_GROUPS = ["Court", "Field", "Racket", "Esports", "Board Games", "Aquatics", "Performances", "Other Events"];
 
 /** The team is team A, team B, or one of a multi-team game's entries. */
 function playsIn(game: Schedules, teamId: number) {
