@@ -28,6 +28,7 @@ import {
 } from "@/src/components/ui/tooltip";
 import { useHasHeraldDomainAccess } from "@/src/lib/herald/use-has-domain-access";
 import { signOutFromHerald } from "@/src/lib/herald/auth-client";
+import { requestFullScheduleAutoScroll } from "@/src/lib/schedule-auto-scroll";
 
 type NavigationItem = {
   href: string;
@@ -164,6 +165,7 @@ export default function Navbar() {
       item.external ||
       !sportParameter ||
       item.href === "/" ||
+      item.href === "/schedules" ||
       item.href.includes("#")
     ) {
       return item.href;
@@ -230,6 +232,7 @@ export default function Navbar() {
         key={item.name}
         href={getHref(item)}
         className={className}
+        onClick={item.href === "/schedules" ? requestFullScheduleAutoScroll : undefined}
       >
         {item.name}
       </Link>
@@ -280,7 +283,10 @@ export default function Navbar() {
         key={item.name}
         href={getHref(item)}
         className={className}
-        onClick={() => setIsSheetOpen(false)}
+        onClick={() => {
+          setIsSheetOpen(false);
+          if (item.href === "/schedules") requestFullScheduleAutoScroll();
+        }}
       >
         {item.name}
       </Link>

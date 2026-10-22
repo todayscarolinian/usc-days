@@ -12,6 +12,15 @@ import {
   groupScheduleGames,
   isScheduleDateLoaded,
 } from "@/src/lib/schedules";
+import {
+  completeScheduleAutoScrollRequest,
+  getPendingScheduleAutoScrollRequest,
+  isScheduleAutoScrollScopeReady,
+  requestEventScheduleAutoScroll,
+  selectScheduleAutoScrollTarget,
+  subscribeToScheduleAutoScrollRequests,
+  type ScheduleAutoScrollRequest,
+} from "@/src/lib/schedule-auto-scroll";
 import { useScheduleFilters } from "./use-schedule-filters";
 import { useVisibleScheduleDate } from "./use-visible-schedule-date";
 import { useScheduleScrollTarget } from "./use-schedule-scroll-target";
@@ -31,6 +40,9 @@ export function useSchedules() {
   const { requestedDate, setRequestedDate } = useScheduleScrollTarget();
   const sports = getGameTypesQuery();
   const [now, setNow] = useState<Date | null>(null);
+  const [autoScrollRequest, setAutoScrollRequest] = useState<ScheduleAutoScrollRequest | null>(null);
+  const completedAutoScrollRequest = useRef<number | null>(null);
+  const attemptedFuturePage = useRef<string | null>(null);
   // The day the loaded games are centred on. `null` follows today.
   const [anchorDate, setAnchorDate] = useState<string | null>(filters.date);
 
@@ -42,6 +54,22 @@ export function useSchedules() {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    function handleRequest(request: ScheduleAutoScrollRequest) {
+      completedAutoScrollRequest.current = null;
+      attemptedFuturePage.current = null;
+      if (request.source === "full-schedule") {
+        setRequestedDate(null);
+        setAnchorDate(null);
+      }
+      setAutoScrollRequest(request);
+    }
+
+    const pending = getPendingScheduleAutoScrollRequest();
+    if (pending) handleRequest(pending);
+    return subscribeToScheduleAutoScrollRequests(handleRequest);
+  }, [setRequestedDate]);
 
   const today = now ? getScheduleDay(now) : null;
   const windowAnchor = anchorDate ?? today;
@@ -70,33 +98,80 @@ export function useSchedules() {
   const selectedEvent = filters.event ??
     (selectedSport ? getScheduleEventName(selectedSport.gameName) : null);
 
-  // Scroll to the anchor once per window, and again whenever the URL date changes.
-  const scrollTarget = filters.date ?? windowAnchor;
-  const scrollKey = `${windowAnchor}|${filters.event}|${filters.sportId}|${filters.teamId}|${scrollTarget}`;
+  // Preserve explicit date/match deep links, but do not scroll on an ordinary
+  // direct visit. Click-triggered automatic targeting is handled separately.
+  const deepLinkScrollTarget = filters.date ?? (matchId ? windowAnchor : null);
+  const deepLinkScrollKey = `${windowAnchor}|${filters.event}|${filters.sportId}|${filters.teamId}|${deepLinkScrollTarget}`;
   const scrolledKey = useRef<string | null>(null);
   useEffect(() => {
-    if (isLoading || !scrollTarget || scrolledKey.current === `${scrollKey}|${matchId}`) return;
+    if ((autoScrollRequest && completedAutoScrollRequest.current !== autoScrollRequest.id) ||
+      isLoading || !deepLinkScrollTarget || scrolledKey.current === `${deepLinkScrollKey}|${matchId}`) return;
     const frame = requestAnimationFrame(() => {
       const target = matchId ? document.getElementById(`schedule-match-${matchId}`) : null;
-      scrolledKey.current = `${scrollKey}|${matchId}`;
+      scrolledKey.current = `${deepLinkScrollKey}|${matchId}`;
       if (target) {
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        // Offset the center to account for the fixed 64px navigation bar.
+        // Keep the established match deep-link positioning.
         const top = target.getBoundingClientRect().top + window.scrollY -
           (window.innerHeight + 64 - target.getBoundingClientRect().height) / 2;
         target.focus({ preventScroll: true });
         window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion ? "instant" : "smooth" });
-      } else scrollToScheduleDate(scrollTarget);
+      } else scrollToScheduleDate(deepLinkScrollTarget);
     });
     return () => cancelAnimationFrame(frame);
-  }, [isLoading, scrollTarget, scrollKey, matchId]);
+  }, [autoScrollRequest, isLoading, deepLinkScrollTarget, deepLinkScrollKey, matchId]);
+
+  useEffect(() => {
+    if (!autoScrollRequest || completedAutoScrollRequest.current === autoScrollRequest.id ||
+      !now || isLoading || !isScheduleAutoScrollScopeReady(autoScrollRequest, filters, matchId)) return;
+
+    const request = autoScrollRequest;
+    const game = selectScheduleAutoScrollTarget(days, now, selectedEvent === "Swimming");
+    if (!game) {
+      if (games.isLoadingNewer) return;
+      if (games.hasNewer) {
+        const pageKey = `${request.id}|${games.futurePageCount}`;
+        if (attemptedFuturePage.current !== pageKey) {
+          attemptedFuturePage.current = pageKey;
+          void games.loadNewer();
+          return;
+        }
+      }
+      completedAutoScrollRequest.current = request.id;
+      completeScheduleAutoScrollRequest(request.id);
+      return;
+    }
+
+    const targetGame = game;
+    let frame = 0;
+    function scrollWhenUnlocked() {
+      if (document.body.hasAttribute("data-scroll-locked")) {
+        frame = requestAnimationFrame(scrollWhenUnlocked);
+        return;
+      }
+
+      const target = document.getElementById(`schedule-match-${targetGame.id}`);
+      if (!target) return;
+      const day = target.closest<HTMLElement>(`[id^="schedule-day-"]`);
+      const scrollMargin = day ? Number.parseFloat(getComputedStyle(day).scrollMarginTop) : Number.NaN;
+      const offset = Number.isFinite(scrollMargin) ? scrollMargin : 80;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      target.focus({ preventScroll: true });
+      window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion ? "instant" : "smooth" });
+      completedAutoScrollRequest.current = request.id;
+      completeScheduleAutoScrollRequest(request.id);
+    }
+
+    frame = requestAnimationFrame(scrollWhenUnlocked);
+    return () => cancelAnimationFrame(frame);
+  }, [autoScrollRequest, days, filters, games, isLoading, matchId, now, selectedEvent]);
 
   function selectEvent(event: string | null) {
     setRequestedDate(null);
     setAnchorDate(null);
     navigation.setFilter("event", event);
-    // Each tab starts fresh; cancel any in-progress jump from the previous sport.
-    window.scrollTo({ top: 0, behavior: "instant" });
+    requestEventScheduleAutoScroll(event);
   }
 
   function navigateToDate(date: string) {

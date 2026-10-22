@@ -276,6 +276,7 @@ export function useScheduleWindow({
     isFetching: day.isFetching || past.isFetching || future.isFetching,
     refetch: () => Promise.all([day.refetch(), past.refetch(), future.refetch()]),
     pastPageCount: past.data?.pages.length ?? 0,
+    futurePageCount: future.data?.pages.length ?? 0,
     hasOlder,
     hasNewer,
     isLoadingOlder: past.isFetchingNextPage,

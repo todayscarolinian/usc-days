@@ -18,6 +18,15 @@ import {
   type ScheduleFilters,
 } from "@/src/lib/schedules";
 import type { Schedules } from "@/src/types/types";
+import {
+  completeScheduleAutoScrollRequest,
+  getPendingScheduleAutoScrollRequest,
+  isScheduleAutoScrollScopeReady,
+  requestFullScheduleAutoScroll,
+  selectScheduleAutoScrollTarget,
+  subscribeToScheduleAutoScrollRequests,
+  type ScheduleAutoScrollRequest,
+} from "@/src/lib/schedule-auto-scroll";
 
 const now = new Date("2026-10-15T04:00:00Z");
 const today = "2026-10-15";
@@ -251,6 +260,127 @@ describe("schedule filtering and ordering", () => {
     assert.deepEqual(days.map(day => day.date), ["2026-10-13", "2026-10-14", today, "2026-10-16"]);
     assert.deepEqual(days[2].games.map(match => match.id), [1, 2]);
     assert.deepEqual(matches.map(match => match.id), originalOrder);
+  });
+});
+
+describe("schedule auto-scroll targeting", () => {
+  it("publishes a new request for every full-schedule click", () => {
+    const received: ScheduleAutoScrollRequest[] = [];
+    const unsubscribe = subscribeToScheduleAutoScrollRequests(request => received.push(request));
+
+    try {
+      requestFullScheduleAutoScroll();
+      requestFullScheduleAutoScroll();
+
+      assert.equal(received.length, 2);
+      assert.equal(received[0].source, "full-schedule");
+      assert.equal(received[1].source, "full-schedule");
+      assert.ok(received[1].id > received[0].id);
+      completeScheduleAutoScrollRequest(received[0].id);
+      assert.equal(getPendingScheduleAutoScrollRequest()?.id, received[1].id);
+      completeScheduleAutoScrollRequest(received[1].id);
+      assert.equal(getPendingScheduleAutoScrollRequest(), null);
+    } finally {
+      const pending = getPendingScheduleAutoScrollRequest();
+      if (pending) completeScheduleAutoScrollRequest(pending.id);
+      unsubscribe();
+    }
+  });
+
+  it("prefers the first live match in displayed order over upcoming matches", () => {
+    const days = [{
+      date: today,
+      games: [
+        game({ id: 1, startDate: "2026-10-15T05:00:00Z" }),
+        game({ id: 2 }),
+        game({ id: 3, startDate: "2026-10-15T03:45:00Z", endDate: "2026-10-15T04:45:00Z" }),
+      ],
+    }];
+
+    assert.equal(selectScheduleAutoScrollTarget(days, now)?.id, 2);
+  });
+
+  it("otherwise chooses the earliest strictly future match", () => {
+    const days = [{
+      date: today,
+      games: [
+        game({ id: 3, startDate: "2026-10-15T07:00:00Z" }),
+        game({ id: 1, winnerId: 10 }),
+        game({ id: 2, startDate: "2026-10-15T05:00:00Z" }),
+      ],
+    }];
+
+    assert.equal(selectScheduleAutoScrollTarget(days, now)?.id, 2);
+  });
+
+  it("uses the grouped Swimming display order for live matches", () => {
+    const days = [{
+      date: today,
+      games: [
+        game({
+          id: 1,
+          startDate: "2026-10-15T01:00:00Z",
+          endDate: "2026-10-15T02:00:00Z",
+          winnerId: 10,
+          gameType: { id: 1, gameName: "Men's 50m Freestyle" },
+        }),
+        game({
+          id: 2,
+          startDate: "2026-10-15T03:00:00Z",
+          endDate: "2026-10-15T05:00:00Z",
+          gameType: { id: 2, gameName: "Men's 100m Backstroke" },
+        }),
+        game({
+          id: 3,
+          gameType: { id: 3, gameName: "Women's 50m Freestyle" },
+        }),
+      ],
+    }];
+
+    assert.equal(selectScheduleAutoScrollTarget(days, now)?.id, 2);
+    assert.equal(selectScheduleAutoScrollTarget(days, now, true)?.id, 3);
+  });
+
+  it("does not target finished, elapsed, or exactly-now matches", () => {
+    const days = [{
+      date: today,
+      games: [
+        game({ id: 1, winnerId: 10 }),
+        game({ id: 2, endDate: now.toISOString() }),
+        game({ id: 3, startDate: now.toISOString(), endDate: now.toISOString() }),
+      ],
+    }];
+
+    assert.equal(selectScheduleAutoScrollTarget(days, now), null);
+  });
+
+  it("selects only from the displayed event-filter scope", () => {
+    const days = groupScheduleGames([
+      game({ id: 1, gameType: { id: 2, gameName: "Volleyball" } }),
+      game({ id: 2, startDate: "2026-10-15T05:00:00Z" }),
+    ], { ...noFilters, event: "Basketball" });
+
+    assert.equal(selectScheduleAutoScrollTarget(days, now)?.id, 2);
+  });
+
+  it("waits for the requested navigation or event-filter scope", () => {
+    const fullRequest: ScheduleAutoScrollRequest = { id: 1, source: "full-schedule" };
+    assert.equal(isScheduleAutoScrollScopeReady(fullRequest, noFilters, null), true);
+    assert.equal(isScheduleAutoScrollScopeReady(fullRequest, { ...noFilters, teamId: 10 }, null), false);
+    assert.equal(isScheduleAutoScrollScopeReady(fullRequest, noFilters, "3"), false);
+
+    const eventRequest: ScheduleAutoScrollRequest = { id: 2, source: "event-filter", event: "Basketball" };
+    assert.equal(isScheduleAutoScrollScopeReady(
+      eventRequest,
+      { ...noFilters, event: "Basketball", teamId: 10 },
+      null,
+    ), true);
+    assert.equal(isScheduleAutoScrollScopeReady(eventRequest, { ...noFilters, event: "Volleyball" }, null), false);
+    assert.equal(isScheduleAutoScrollScopeReady(
+      eventRequest,
+      { ...noFilters, event: "Basketball", date: today },
+      null,
+    ), false);
   });
 });
 

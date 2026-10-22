@@ -8,6 +8,7 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { EmptyState } from "@/src/components/ui/empty-state";
 import { getEventDay, getMatchdayGameStatus, selectTodaysGames } from "@/src/lib/todays-games";
 import { getScheduleDay, SCHEDULE_TIME_ZONE } from "@/src/lib/schedules";
+import { requestFullScheduleAutoScroll } from "@/src/lib/schedule-auto-scroll";
 import { TodaysGamesCard } from "./todays-games-card";
 import styles from "./todays-games.module.css";
 
@@ -167,6 +168,7 @@ export default function TodaysGames() {
             <p className="font-bold">THE MATCHDAY DESK</p>
             <Link
               href="/schedules"
+              onClick={requestFullScheduleAutoScroll}
               className="shrink-0 font-extrabold whitespace-nowrap text-tc_primary-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tc_primary-400"
             >
               FULL SCHEDULE <span aria-hidden="true">→</span>
